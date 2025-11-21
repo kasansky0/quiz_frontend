@@ -4,6 +4,8 @@ import { cn } from '@/lib/utils'
 import "./styles/globals.css";
 import Footer from "@/app/components/sections/Footer"
 import Providers from "@/app/components/Providers"; // <-- make sure this line exists
+import Script from "next/script";
+
 
 
 
@@ -70,6 +72,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 FontSans.variable
             )}
         >
+
+        {/* Google Analytics */}
+        <Script
+            strategy="afterInteractive"
+            src={`https://www.googletagmanager.com/gtag/js?id=G-8TYPXH8EQF`}
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+            {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-8TYPXH8EQF');
+          `}
+        </Script>
+
         <Providers>
             {children}  {/* all pages/components inside here */}
         </Providers>
