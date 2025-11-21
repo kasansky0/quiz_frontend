@@ -16,7 +16,7 @@ export default function LoggedInPage() {
     const buttonRef = useRef<HTMLButtonElement>(null); // ref for toggle button
 
     useEffect(() => {
-        if (!session) return;
+        if (!session || !session.user || !session.user.email) return; // ✅ add this check
 
         const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -39,6 +39,7 @@ export default function LoggedInPage() {
             .then(data => setUserStats(data))
             .catch(err => console.error("❌ Failed to fetch user stats:", err));
     }, [session]);
+
 
 
     useEffect(() => {
