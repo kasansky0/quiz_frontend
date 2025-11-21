@@ -47,7 +47,18 @@ export const metadata: Metadata = {
     themeColor: "#ffffff",
     authors: [{ name: "Netaprep", url: "https://netaprep.com" }],
     category: "Education",
-    robots: { index: true, follow: true, googleBot: { index: true, follow: true, maxImagePreview: "large", maxSnippet: -1, maxVideoPreview: -1 } },
+    robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+            index: true,
+            follow: true,
+            "max-image-preview": "large",
+            "max-snippet": -1,
+            "max-video-preview": -1
+        }
+    },
+
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
