@@ -66,13 +66,15 @@ export default function QuizSampleSection({ isLoggedIn, onClick }: QuizSampleSec
     const isCorrect = selectedOption === questionData?.answer;
 
     const handleNextQuestion = () => {
-        // Move to next question, loop back to start if at the end
         setCurrentIndex((prev) => (prev + 1) % questions.length);
-
-        // Reset selection
         setSelectedOption(null);
-        scrollToTop();
+
+        // Delay to ensure question renders before scrolling
+        setTimeout(() => {
+            scrollToTop();
+        }, 20);
     };
+
 
 
     return (
