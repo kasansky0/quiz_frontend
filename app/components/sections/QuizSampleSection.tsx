@@ -27,7 +27,12 @@ function scrollToOptions(ref: React.RefObject<HTMLDivElement>) {
     });
 }
 
-export default function QuizSampleSection({ isLoggedIn }: { isLoggedIn: boolean }) {
+interface QuizSampleSectionProps {
+    isLoggedIn: boolean;
+    onClick?: () => void; // optional prop
+}
+
+export default function QuizSampleSection({ isLoggedIn, onClick }: QuizSampleSectionProps) {
     const [questions, setQuestions] = useState<QuestionType[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -98,8 +103,10 @@ export default function QuizSampleSection({ isLoggedIn }: { isLoggedIn: boolean 
                                     onClick={() => {
                                         if (!selectedOption) {
                                             setSelectedOption(option);
+                                            if (onClick) onClick(); // ✅ call parent handler if provided
                                         }
                                     }}
+
                                 />
                             ))}
                         </div>
