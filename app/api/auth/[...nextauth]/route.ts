@@ -1,7 +1,8 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions, Session } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import { JWT } from "next-auth/jwt";
 
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
     providers: [
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -13,9 +14,9 @@ export const authOptions = {
         maxAge: 30 * 24 * 60 * 60, // 30 days
     },
     callbacks: {
-        async session({ session, token }) {
+        async session({ session, token }: { session: Session; token: JWT }) {
             if (session.user) {
-                session.user.id = token.sub as string;
+                session.user.id = token.sub as string; // now TypeScript knows about session.user
             }
             return session;
         },
