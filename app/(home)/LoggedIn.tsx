@@ -14,7 +14,6 @@ export default function LoggedInPage() {
 
     const sidebarRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null); // ref for toggle button
-    const mainRef = useRef<HTMLDivElement>(null); // add this
 
     useEffect(() => {
         if (!session || !session.user || !session.user.email) return; // ✅ add this check
@@ -97,17 +96,16 @@ export default function LoggedInPage() {
                 </button>
 
                 {/* QUIZ SECTION */}
-                <main ref={mainRef} className="flex-1 flex flex-col items-center justify-start p-6 md:p-8 overflow-y-auto">
+                <main className="flex-1 flex flex-col items-center justify-start p-6 md:p-8 overflow-y-auto">
                     <QuizSampleSection
                         isLoggedIn={true}
                         onClick={() => {
                             setSidebarOpen(false);
-                            if (mainRef.current) {
-                                mainRef.current.scrollTo({ top: 0, behavior: "smooth" });
-                            }
+                            window.scrollTo({ top: 0, behavior: "smooth" });
                         }}
                     />
                 </main>
+
 
 
                 {/* FOOTER */}
