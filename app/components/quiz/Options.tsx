@@ -18,7 +18,7 @@ export default function Option({ text, isSelected, isAnswer, disabled, onClick }
             baseClass += " bg-green-600 border-green-500 shadow-lg hover:scale-[1.02]";
         } else if (isSelected && !isAnswer) {
             // Selected wrong → dull red
-            baseClass += " bg-red-600 border-red-500 shadow-lg hover:scale-[1.02]";
+            baseClass += " bg-gray-800 border-gray-700 shadow-md hover:scale-[1.02]";
         } else if (!isSelected && isAnswer) {
             // Correct answer not selected → dull green
             baseClass += " bg-green-600 border-green-500 shadow-md hover:scale-[1.02]";
