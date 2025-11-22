@@ -33,10 +33,10 @@ interface QuizSampleSectionProps {
 }
 
 export default function QuizSampleSection({ isLoggedIn, onClick }: QuizSampleSectionProps) {
-    const [questions, setQuestions] = useState<QuestionType[]>([]);
-    const [currentIndex, setCurrentIndex] = useState(0);
+    const [questionData, setQuestionData] = useState<QuestionType | null>(null);
 
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
+    const [answerResult, setAnswerResult] = useState<{ correct: boolean; answer: string; explanation: string } | null>(null);
 
     // ✅ Create the ref inside the component
     const optionsRef = useRef<HTMLDivElement>(null);
@@ -54,26 +54,36 @@ export default function QuizSampleSection({ isLoggedIn, onClick }: QuizSampleSec
 
     // Fetch all questions on mount
     useEffect(() => {
-        async function fetchQuestions() {
-            const res = await fetch("/api/quiz");
-            const data: QuestionType[] = await res.json();
-            setQuestions(data);
+        async function fetchQuestion() {
+            const res = await fetch(
+                isLoggedIn
+                    ? `${process.env.NEXT_PUBLIC_API_URL}/questions/random` // MongoDB
+                    : `${process.env.NEXT_PUBLIC_API_URL}/dailyQuestion/random` // Hardcoded
+            );
+            const data: QuestionType = await res.json();
+            setQuestionData(data);
         }
-        fetchQuestions();
-    }, []);
+        fetchQuestion();
+    }, [isLoggedIn]);
 
-    const questionData = questions[currentIndex];
-    const isCorrect = selectedOption === questionData?.answer;
 
-    const handleNextQuestion = () => {
-        setCurrentIndex((prev) => (prev + 1) % questions.length);
+    const isCorrect = answerResult?.correct ?? false;
+
+    const handleNextQuestion = async () => {
         setSelectedOption(null);
+        setAnswerResult(null);
 
-        // Delay to ensure question renders before scrolling
-        setTimeout(() => {
-            scrollToTop();
-        }, 20);
+        const res = await fetch(
+            isLoggedIn
+                ? `${process.env.NEXT_PUBLIC_API_URL}/questions/random`
+                : `${process.env.NEXT_PUBLIC_API_URL}/dailyQuestion/random`
+        );
+        const data: QuestionType = await res.json();
+        setQuestionData(data);
+
+        scrollToTop();
     };
+
 
 
 
@@ -95,22 +105,50 @@ export default function QuizSampleSection({ isLoggedIn, onClick }: QuizSampleSec
 
                         {/* Options */}
                         <div ref={optionsRef} className="flex flex-col gap-3">
-                            {questionData.options.map((option) => (
+                            {questionData?.options?.map((option) => (
                                 <Option
                                     key={option}
                                     text={option}
                                     isSelected={selectedOption === option}
-                                    isAnswer={option === questionData.answer}
+                                    isAnswer={answerResult ? option === answerResult.answer : false}
                                     disabled={!!selectedOption}
-                                    onClick={() => {
+                                    onClick={async () => {
                                         if (!selectedOption) {
                                             setSelectedOption(option);
-                                            if (onClick) onClick(); // ✅ call parent handler if provided
+                                            if (onClick) onClick();
+
+                                            if (isLoggedIn && questionData) {
+                                                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/answer/check`, {
+                                                    method: "POST",
+                                                    headers: { "Content-Type": "application/json" },
+                                                    body: JSON.stringify({
+                                                        question_id: questionData.id,
+                                                        selected_option: option
+                                                    })
+                                                });
+                                                const result = await res.json();
+
+                                                // ✅ Only set after API response
+                                                setAnswerResult({
+                                                    correct: result.correct,       // from backend
+                                                    answer: result.answer,         // safer than using questionData.answer
+                                                    explanation: result.explanation || questionData.explanation
+                                                });
+                                            } else {
+                                                setAnswerResult({
+                                                    correct: option === questionData?.answer,
+                                                    answer: questionData?.answer!,
+                                                    explanation: questionData?.explanation!
+                                                });
+                                            }
                                         }
                                     }}
 
+
+
                                 />
                             ))}
+
                         </div>
 
 
@@ -132,9 +170,16 @@ export default function QuizSampleSection({ isLoggedIn, onClick }: QuizSampleSec
                         )}
 
                         {/* Explanation */}
-                        {selectedOption && (
-                            <Comment isCorrect={isCorrect} text={questionData.explanation} />
+                        {answerResult && selectedOption && (
+                            <>
+                                <Comment
+                                    isCorrect={answerResult.correct} // ✅ ONLY use backend result
+                                    text={answerResult.explanation}
+                                    correctAnswer={answerResult.answer}
+                                />
+                            </>
                         )}
+
 
 
                     </div>

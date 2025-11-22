@@ -44,10 +44,7 @@ export function HeroCard({ question }: { question: any }) {
             <div className="mt-3">
                 <p className="text-sm font-bold text-green-100">Explanation:</p>
                 <p className="text-xs mt-1 leading-relaxed">
-                    Lockout/Tagout (LOTO) procedures are designed to control hazardous
-                    energy sources during maintenance or servicing of equipment. This
-                    ensures that machinery cannot start unexpectedly, preventing
-                    injuries. The primary purpose is to control energy for safety.
+                    {question.explanation}
                 </p>
             </div>
         </motion.div>

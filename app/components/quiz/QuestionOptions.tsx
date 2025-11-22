@@ -1,4 +1,4 @@
-export function QuestionOptions({ options }: { options: string[] }) {
+export function QuestionOptions({ options = [] }: { options?: string[] }) {
     return (
         <ul className="space-y-2">
             {options.map((opt, idx) => (
