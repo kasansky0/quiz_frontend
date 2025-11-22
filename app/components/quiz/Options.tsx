@@ -36,8 +36,13 @@ export default function Option({ text, isSelected, isAnswer, disabled, onClick }
     }
 
     return (
-        <div className={baseClass} onClick={() => !disabled && onClick()}>
+        <div
+            className={baseClass}
+            onClick={() => !disabled && onClick()}
+            style={{ WebkitTapHighlightColor: "transparent" }} // ✅ prevents iPhone tap flash
+        >
             {text}
         </div>
     );
+
 }
