@@ -33,7 +33,9 @@ interface QuizSampleSectionProps {
 }
 
 export default function QuizSampleSection({ isLoggedIn, onClick }: QuizSampleSectionProps) {
-    const [questionData, setQuestionData] = useState<QuestionType | null>(null);
+    const [currentQuestion, setCurrentQuestion] = useState<QuestionType | null>(null);
+    const [nextQuestion, setNextQuestion] = useState<QuestionType | null>(null);
+
 
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [answerResult, setAnswerResult] = useState<{ correct: boolean; answer: string; explanation: string } | null>(null);
@@ -52,19 +54,27 @@ export default function QuizSampleSection({ isLoggedIn, onClick }: QuizSampleSec
     }, [selectedOption]);
 
 
-    // Fetch all questions on mount
+    // Load initial and next question
     useEffect(() => {
         async function fetchQuestion() {
             const res = await fetch(
                 isLoggedIn
-                    ? `${process.env.NEXT_PUBLIC_API_URL}/questions/random` // MongoDB
-                    : `${process.env.NEXT_PUBLIC_API_URL}/dailyQuestion/random` // Hardcoded
+                    ? `${process.env.NEXT_PUBLIC_API_URL}/questions/random`
+                    : `${process.env.NEXT_PUBLIC_API_URL}/dailyQuestion/random`
             );
-            const data: QuestionType = await res.json();
-            setQuestionData(data);
+            return res.json();
         }
-        fetchQuestion();
+
+        async function load() {
+            const first = await fetchQuestion();
+            setCurrentQuestion(first);
+
+            const second = await fetchQuestion();
+            setNextQuestion(second);
+        }
+        load();
     }, [isLoggedIn]);
+
 
 
     const isCorrect = answerResult?.correct ?? false;
@@ -73,18 +83,20 @@ export default function QuizSampleSection({ isLoggedIn, onClick }: QuizSampleSec
         setSelectedOption(null);
         setAnswerResult(null);
 
+        // Instantly swap
+        setCurrentQuestion(nextQuestion);
+
+        // Preload again in background
         const res = await fetch(
             isLoggedIn
                 ? `${process.env.NEXT_PUBLIC_API_URL}/questions/random`
                 : `${process.env.NEXT_PUBLIC_API_URL}/dailyQuestion/random`
         );
-        const data: QuestionType = await res.json();
-        setQuestionData(data);
+        const newQ = await res.json();
+        setNextQuestion(newQ);
 
         scrollToTop();
     };
-
-
 
 
     return (
@@ -94,18 +106,18 @@ export default function QuizSampleSection({ isLoggedIn, onClick }: QuizSampleSec
                     <div className="mb-4">
                         <ScrollHint />
                     </div>
-                    {questionData && <HeroCard question={questionData} />}
+                    {currentQuestion && <HeroCard question={currentQuestion} />}
                 </>
             ) : (
-                questionData && (
+                currentQuestion && (
                     <div className="w-full max-w-xl flex flex-col gap-6 justify-start">
 
                         {/* Question */}
-                        <Question question={questionData.question} />
+                        <Question question={currentQuestion.question} />
 
                         {/* Options */}
                         <div ref={optionsRef} className="flex flex-col gap-3">
-                            {questionData?.options?.map((option) => (
+                            {currentQuestion?.options?.map((option) => (
                                 <Option
                                     key={option}
                                     text={option}
@@ -117,12 +129,12 @@ export default function QuizSampleSection({ isLoggedIn, onClick }: QuizSampleSec
                                             setSelectedOption(option);
                                             if (onClick) onClick();
 
-                                            if (isLoggedIn && questionData) {
+                                            if (isLoggedIn && currentQuestion) {
                                                 const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/answer/check`, {
                                                     method: "POST",
                                                     headers: { "Content-Type": "application/json" },
                                                     body: JSON.stringify({
-                                                        question_id: questionData.id,
+                                                        question_id: currentQuestion.id,
                                                         selected_option: option
                                                     })
                                                 });
@@ -131,14 +143,14 @@ export default function QuizSampleSection({ isLoggedIn, onClick }: QuizSampleSec
                                                 // ✅ Only set after API response
                                                 setAnswerResult({
                                                     correct: result.correct,       // from backend
-                                                    answer: result.answer,         // safer than using questionData.answer
-                                                    explanation: result.explanation || questionData.explanation
+                                                    answer: result.answer,         // safer than using currentQuestion.answer
+                                                    explanation: result.explanation || currentQuestion.explanation
                                                 });
                                             } else {
                                                 setAnswerResult({
-                                                    correct: option === questionData?.answer,
-                                                    answer: questionData?.answer!,
-                                                    explanation: questionData?.explanation!
+                                                    correct: option === currentQuestion?.answer,
+                                                    answer: currentQuestion?.answer!,
+                                                    explanation: currentQuestion?.explanation!
                                                 });
                                             }
                                         }
