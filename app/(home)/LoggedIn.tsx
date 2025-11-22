@@ -25,7 +25,7 @@ export default function LoggedInPage() {
             return;
         }
 
-        fetch(`${apiUrl}/api/v1/user/${session.user.email}`, {
+        fetch(`${apiUrl}/user/`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -35,6 +35,8 @@ export default function LoggedInPage() {
                 google_id: session.user.id
             })
         })
+
+
             .then(res => res.json())
             .then(data => setUserStats(data))
             .catch(err => console.error("❌ Failed to fetch user stats:", err));
