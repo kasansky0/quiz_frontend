@@ -20,13 +20,6 @@ function scrollToTop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-function scrollToOptions(ref: React.RefObject<HTMLDivElement>) {
-    ref.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start", // aligns top of the container with viewport
-    });
-}
-
 interface QuizSampleSectionProps {
     isLoggedIn: boolean;
     onClick?: () => void; // optional prop
@@ -34,31 +27,29 @@ interface QuizSampleSectionProps {
 
 export default function QuizSampleSection({ isLoggedIn, onClick }: QuizSampleSectionProps) {
     const [questionData, setQuestionData] = useState<QuestionType | null>(null);
-
+    const [fade, setFade] = useState(true); // true = visible
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [answerResult, setAnswerResult] = useState<{ correct: boolean; answer: string; explanation: string } | null>(null);
 
-    // ✅ Create the ref inside the component
     const optionsRef = useRef<HTMLDivElement>(null);
 
-// Scroll to options when an answer is selected
+    // Scroll to options when an answer is selected
     useEffect(() => {
         if (selectedOption) {
             optionsRef.current?.scrollIntoView({
                 behavior: "smooth",
-                block: "start", // aligns top of options container with viewport
+                block: "start",
             });
         }
     }, [selectedOption]);
 
-
-    // Fetch all questions on mount
+    // Fetch question on mount
     useEffect(() => {
         async function fetchQuestion() {
             const res = await fetch(
                 isLoggedIn
-                    ? `${process.env.NEXT_PUBLIC_API_URL}/questions/random` // MongoDB
-                    : `${process.env.NEXT_PUBLIC_API_URL}/dailyQuestion/random` // Hardcoded
+                    ? `${process.env.NEXT_PUBLIC_API_URL}/questions/random`
+                    : `${process.env.NEXT_PUBLIC_API_URL}/dailyQuestion/random`
             );
             const data: QuestionType = await res.json();
             setQuestionData(data);
@@ -66,26 +57,25 @@ export default function QuizSampleSection({ isLoggedIn, onClick }: QuizSampleSec
         fetchQuestion();
     }, [isLoggedIn]);
 
-
-    const isCorrect = answerResult?.correct ?? false;
-
     const handleNextQuestion = async () => {
-        setSelectedOption(null);
-        setAnswerResult(null);
+        setFade(false); // fade out
 
-        const res = await fetch(
-            isLoggedIn
-                ? `${process.env.NEXT_PUBLIC_API_URL}/questions/random`
-                : `${process.env.NEXT_PUBLIC_API_URL}/dailyQuestion/random`
-        );
-        const data: QuestionType = await res.json();
-        setQuestionData(data);
+        setTimeout(async () => {
+            setSelectedOption(null);
+            setAnswerResult(null);
 
-        scrollToTop();
+            const res = await fetch(
+                isLoggedIn
+                    ? `${process.env.NEXT_PUBLIC_API_URL}/questions/random`
+                    : `${process.env.NEXT_PUBLIC_API_URL}/dailyQuestion/random`
+            );
+            const data: QuestionType = await res.json();
+            setQuestionData(data);
+
+            setFade(true); // fade in
+            scrollToTop();
+        }, 500); // fade-out duration
     };
-
-
-
 
     return (
         <div className="flex-1 flex flex-col items-center justify-start p-6 md:p-8 min-h-[50vh] md:h-auto bg-black-200 w-full">
@@ -98,14 +88,17 @@ export default function QuizSampleSection({ isLoggedIn, onClick }: QuizSampleSec
                 </>
             ) : (
                 questionData && (
-                    <div className="w-full max-w-xl flex flex-col gap-6 justify-start">
-
+                    <div
+                        className={`w-full max-w-xl flex flex-col gap-6 justify-start transition-all duration-700 ease-in-out ${
+                            fade ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-4 scale-95"
+                        }`}
+                    >
                         {/* Question */}
                         <Question question={questionData.question} />
 
                         {/* Options */}
                         <div ref={optionsRef} className="flex flex-col gap-3">
-                            {questionData?.options?.map((option) => (
+                            {questionData.options.map((option) => (
                                 <Option
                                     key={option}
                                     text={option}
@@ -123,65 +116,51 @@ export default function QuizSampleSection({ isLoggedIn, onClick }: QuizSampleSec
                                                     headers: { "Content-Type": "application/json" },
                                                     body: JSON.stringify({
                                                         question_id: questionData.id,
-                                                        selected_option: option
-                                                    })
+                                                        selected_option: option,
+                                                    }),
                                                 });
                                                 const result = await res.json();
 
-                                                // ✅ Only set after API response
                                                 setAnswerResult({
-                                                    correct: result.correct,       // from backend
-                                                    answer: result.answer,         // safer than using questionData.answer
-                                                    explanation: result.explanation || questionData.explanation
+                                                    correct: result.correct,
+                                                    answer: result.answer,
+                                                    explanation: result.explanation || questionData.explanation,
                                                 });
                                             } else {
                                                 setAnswerResult({
-                                                    correct: option === questionData?.answer,
-                                                    answer: questionData?.answer!,
-                                                    explanation: questionData?.explanation!
+                                                    correct: option === questionData.answer,
+                                                    answer: questionData.answer,
+                                                    explanation: questionData.explanation,
                                                 });
                                             }
                                         }
                                     }}
-
-
-
                                 />
                             ))}
-
                         </div>
-
 
                         {/* NEXT BUTTON */}
                         {selectedOption && (
                             <div className="mt-4 flex flex-col items-center gap-2 w-full">
-                                <Button onClick={handleNextQuestion}>
-                                    Next
-                                </Button>
+                                <Button onClick={handleNextQuestion}>Next</Button>
 
-                                {/* Scroll hint pointing to comment */}
                                 <div className="flex flex-col items-center mt-2 text-center">
                                     <ScrollHint />
                                     <span className="text-white text-sm opacity-80 mt-1">
-                Study the explanation below ⬇️
-            </span>
+                                        Study the explanation below ⬇️
+                                    </span>
                                 </div>
                             </div>
                         )}
 
                         {/* Explanation */}
                         {answerResult && selectedOption && (
-                            <>
-                                <Comment
-                                    isCorrect={answerResult.correct} // ✅ ONLY use backend result
-                                    text={answerResult.explanation}
-                                    correctAnswer={questionData?.answer}
-                                />
-                            </>
+                            <Comment
+                                isCorrect={answerResult.correct}
+                                text={answerResult.explanation}
+                                correctAnswer={questionData.answer}
+                            />
                         )}
-
-
-
                     </div>
                 )
             )}
