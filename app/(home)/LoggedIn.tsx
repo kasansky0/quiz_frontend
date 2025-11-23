@@ -79,7 +79,7 @@ export default function LoggedInPage() {
     md:sticky md:top-0 md:translate-x-0 md:transition-none md:shadow-none md:z-auto
   `}
             >
-                <UserSidebar backendStats={userStats} />
+                <UserSidebar />
             </div>
 
 

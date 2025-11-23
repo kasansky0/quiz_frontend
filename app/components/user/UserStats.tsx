@@ -44,7 +44,7 @@ export default function UserStats() {
                     ))}
                 </div>
                 <p className="mt-4 text-green-300 text-center font-mono">
-                    Level 2 Electrical Technician - Neta
+                    NETA Level 2 Electrical Technician
                 </p>
             </motion.div>
 
