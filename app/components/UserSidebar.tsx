@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import UserStats from "./user/UserStats";
 
-export default function UserSidebar({ backendStats }: { backendStats: any }) {
+export default function UserSidebar() {
     const { data: session } = useSession();
 
     return (
@@ -17,8 +17,7 @@ export default function UserSidebar({ backendStats }: { backendStats: any }) {
                 shadow-xl
                 p-6
             ">
-            <UserStats backendStats={backendStats} />
+            <UserStats />
         </aside>
-
     );
 }
