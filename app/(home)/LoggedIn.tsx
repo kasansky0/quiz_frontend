@@ -69,14 +69,9 @@ export default function LoggedInPage() {
     const wakeDelays = [5000, 12000, 25000];
 
     useEffect(() => {
-        if (!loading) return;
+        if (!loading || !apiUrl) return;
 
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-        if (!apiUrl) {
-            console.error("❌ NEXT_PUBLIC_API_URL is not set");
-            return;
-        }
-
+        const apiUrlString = apiUrl; // now TypeScript knows this is a string
         let retryIndex = 0;
         let timeout: NodeJS.Timeout;
 
@@ -88,7 +83,7 @@ export default function LoggedInPage() {
 
             timeout = setTimeout(() => {
                 console.log(`🔄 Wake attempt #${retryIndex + 1}`);
-                forceWakeAPI(apiUrl); // TypeScript knows apiUrl is a string here
+                forceWakeAPI(apiUrlString); // ✅ TypeScript knows it's string
                 retryIndex++;
                 scheduleWake();
             }, delay);
@@ -97,7 +92,8 @@ export default function LoggedInPage() {
         scheduleWake();
 
         return () => clearTimeout(timeout);
-    }, [loading]);
+    }, [loading, apiUrl]);
+
 
 
     useEffect(() => {
