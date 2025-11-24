@@ -25,10 +25,14 @@ export default function LoadingBanner() {
             <motion.p
                 animate={{ opacity: [0.3, 1, 0.3], y: [0, -5, 0] }}
                 transition={{ repeat: Infinity, duration: 1.2 }}
-                className="text-green-300 font-mono text-lg uppercase tracking-wider"
+                className="text-center text-green-300 font-mono uppercase tracking-wider"
             >
-                Loading NETA Level 2 Quiz... ⚡
+                {/* First line */}
+                <span className="block text-lg md:text-xl font-semibold">Loading</span>
+                {/* Second line */}
+                <span className="block text-2xl md:text-3xl font-bold mt-1">NETA Level 2 Quiz... ⚡</span>
             </motion.p>
+
         </div>
     );
 }
