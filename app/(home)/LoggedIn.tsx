@@ -69,20 +69,26 @@ export default function LoggedInPage() {
     const wakeDelays = [5000, 12000, 25000];
 
     useEffect(() => {
-        if (!loading || !apiUrl) return;
+        if (!loading) return;
+
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        if (!apiUrl) {
+            console.error("❌ NEXT_PUBLIC_API_URL is not set");
+            return;
+        }
 
         let retryIndex = 0;
         let timeout: NodeJS.Timeout;
 
         function scheduleWake() {
-            if (retryIndex >= wakeDelays.length) return; // Stop after 3 tries
+            if (retryIndex >= wakeDelays.length) return;
 
             const delay = wakeDelays[retryIndex];
             console.log(`⏳ Backend still loading → retry ${retryIndex + 1} in ${delay / 1000}s`);
 
             timeout = setTimeout(() => {
                 console.log(`🔄 Wake attempt #${retryIndex + 1}`);
-                forceWakeAPI(apiUrl!);
+                forceWakeAPI(apiUrl); // TypeScript knows apiUrl is a string here
                 retryIndex++;
                 scheduleWake();
             }, delay);
@@ -91,7 +97,8 @@ export default function LoggedInPage() {
         scheduleWake();
 
         return () => clearTimeout(timeout);
-    }, [loading, apiUrl]);
+    }, [loading]);
+
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
