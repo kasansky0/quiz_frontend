@@ -5,8 +5,11 @@ import { useEffect, useState, useRef } from "react";
 import UserSidebar from "../components/UserSidebar";
 import QuizSampleSection from "../components/sections/QuizSampleSection";
 import Footer from "../components/sections/Footer";
+import LoadingBanner from "../components/LoadingBanner";
+
 
 export default function LoggedInPage() {
+    const [loading, setLoading] = useState(true);
     const { data: session } = useSession();
     const [userStats, setUserStats] = useState(null);
 
@@ -16,33 +19,38 @@ export default function LoggedInPage() {
     const buttonRef = useRef<HTMLButtonElement>(null); // ref for toggle button
 
     useEffect(() => {
-        if (!session || !session.user || !session.user.email) return; // ✅ add this check
+        if (!session || !session.user || !session.user.email) return;
 
         const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
         if (!apiUrl) {
             console.error("❌ NEXT_PUBLIC_API_URL is not set");
             return;
         }
 
-        fetch(`${apiUrl}/user/`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                name: session.user.name,
-                email: session.user.email,
-                image: session.user.image,
-                google_id: session.user.id
-            })
-        })
+        const fetchData = async () => {
+            try {
+                const res = await fetch(`${apiUrl}/user/`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        name: session.user.name,
+                        email: session.user.email,
+                        image: session.user.image,
+                        google_id: session.user.id
+                    })
+                });
+                const data = await res.json();
+                setUserStats(data);
+            } catch (err) {
+                console.error("❌ Failed to fetch user stats:", err);
+            } finally {
+                // Force a minimum 3-second loading
+                setTimeout(() => setLoading(false), 3000);
+            }
+        };
 
-
-            .then(res => res.json())
-            .then(data => setUserStats(data))
-            .catch(err => console.error("❌ Failed to fetch user stats:", err));
+        fetchData();
     }, [session]);
-
-
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -99,14 +107,20 @@ export default function LoggedInPage() {
 
                 {/* QUIZ SECTION */}
                 <main className="flex-1 flex flex-col items-center justify-start p-6 md:p-8 overflow-y-auto">
-                    <QuizSampleSection
-                        isLoggedIn={true}
-                        onClick={() => {
-                            setSidebarOpen(false);
-                            window.scrollTo({ top: 0, behavior: "smooth" });
-                        }}
-                    />
+                    {loading ? (
+                        <LoadingBanner />
+                    ) : (
+                        <QuizSampleSection
+                            isLoggedIn={true}
+                            onClick={() => {
+                                setSidebarOpen(false);
+                                window.scrollTo({ top: 0, behavior: "smooth" });
+                            }}
+                        />
+                    )}
                 </main>
+
+
 
 
 
