@@ -22,10 +22,18 @@ function scrollToTop() {
 
 interface QuizSampleSectionProps {
     isLoggedIn: boolean;
-    onClick?: () => void; // optional prop
+    onClick?: () => void;
+    staticQuestion?: {
+        id: number;
+        question: string;
+        options: string[];
+        answer: string;
+        explanation: string;
+    };
 }
 
-export default function QuizSampleSection({ isLoggedIn, onClick }: QuizSampleSectionProps) {
+
+export default function QuizSampleSection({ isLoggedIn, onClick, staticQuestion }: QuizSampleSectionProps) {
     const [questionData, setQuestionData] = useState<QuestionType | null>(null);
     const [fade, setFade] = useState(true); // true = visible
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -45,6 +53,11 @@ export default function QuizSampleSection({ isLoggedIn, onClick }: QuizSampleSec
 
     // Fetch question on mount
     useEffect(() => {
+        if (!isLoggedIn && staticQuestion) {
+            setQuestionData(staticQuestion);
+            return;
+        }
+
         async function fetchQuestion() {
             const res = await fetch(
                 isLoggedIn
@@ -55,7 +68,8 @@ export default function QuizSampleSection({ isLoggedIn, onClick }: QuizSampleSec
             setQuestionData(data);
         }
         fetchQuestion();
-    }, [isLoggedIn]);
+    }, [isLoggedIn, staticQuestion]);
+
 
     const handleNextQuestion = async () => {
         setFade(false); // fade out
