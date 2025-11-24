@@ -82,7 +82,7 @@ export default function LoggedInPage() {
 
             timeout = setTimeout(() => {
                 console.log(`🔄 Wake attempt #${retryIndex + 1}`);
-                forceWakeAPI(apiUrl);
+                forceWakeAPI(apiUrl!);
                 retryIndex++;
                 scheduleWake();
             }, delay);
