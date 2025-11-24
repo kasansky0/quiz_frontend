@@ -18,6 +18,16 @@ export default function LoggedInPage() {
     const sidebarRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null); // ref for toggle button
 
+    async function forceWakeAPI(apiUrl: string) {
+        try {
+            await fetch(`${apiUrl}/questions/random`, { method: "GET" });
+            console.log("🔄 Backend wake ping sent (questions/random)");
+        } catch (err) {
+            console.error("❌ Wake failed:", err);
+        }
+    }
+
+
     useEffect(() => {
         if (!session || !session.user || !session.user.email) return;
 
@@ -36,7 +46,8 @@ export default function LoggedInPage() {
                         name: session.user.name,
                         email: session.user.email,
                         image: session.user.image,
-                        google_id: session.user.id
+                        google_id: session.user.id ?? null
+
                     })
                 });
                 const data = await res.json();
@@ -51,6 +62,36 @@ export default function LoggedInPage() {
 
         fetchData();
     }, [session]);
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+    // Progressive wake retry delays in ms
+    const wakeDelays = [5000, 12000, 25000];
+
+    useEffect(() => {
+        if (!loading || !apiUrl) return;
+
+        let retryIndex = 0;
+        let timeout: NodeJS.Timeout;
+
+        function scheduleWake() {
+            if (retryIndex >= wakeDelays.length) return; // Stop after 3 tries
+
+            const delay = wakeDelays[retryIndex];
+            console.log(`⏳ Backend still loading → retry ${retryIndex + 1} in ${delay / 1000}s`);
+
+            timeout = setTimeout(() => {
+                console.log(`🔄 Wake attempt #${retryIndex + 1}`);
+                forceWakeAPI(apiUrl);
+                retryIndex++;
+                scheduleWake();
+            }, delay);
+        }
+
+        scheduleWake();
+
+        return () => clearTimeout(timeout);
+    }, [loading, apiUrl]);
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
