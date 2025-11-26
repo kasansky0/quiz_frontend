@@ -199,6 +199,7 @@ export default function QuizSampleSection({
             ) : (
                 questionData && (
                     <div
+                        key={questionData.id}
                         className={`w-full max-w-xl flex flex-col gap-6 justify-start transition-opacity duration-700 ease-in-out ${
                             fade ? "opacity-100" : "opacity-0"
                         }`}
@@ -219,7 +220,6 @@ export default function QuizSampleSection({
                                 />
                             ))}
                         </div>
-
                         {/* NEXT BUTTON */}
                         {selectedOption && (
                             <div className="mt-4 flex flex-col items-center gap-2 w-full">
