@@ -28,7 +28,8 @@ interface QuizSampleSectionProps {
     setWrongQueue?: React.Dispatch<React.SetStateAction<QuestionType[]>>;
     apiUrl?: string;
     userId?: string | number;
-    loadingDone?: boolean;   // ✅ new prop
+    loadingDone?: boolean;
+    style?: React.CSSProperties;
 }
 
 
