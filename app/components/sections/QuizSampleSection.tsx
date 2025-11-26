@@ -119,7 +119,7 @@ export default function QuizSampleSection({
         let nextQuestion: QuestionType | null = null;
 
         // 4️⃣ Decide: fetch or wrong question
-        if (cycleCount === 2 && wrongQueue && wrongQueue.length > 0) {
+        if (cycleCount === 2 && wrongQueue && wrongQueue.length > 0 && setWrongQueue) {
             // Pull first wrong question
             nextQuestion = wrongQueue[0];
             // Remove it from queue
