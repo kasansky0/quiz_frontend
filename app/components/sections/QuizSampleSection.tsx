@@ -43,7 +43,7 @@ interface QuizSampleSectionProps {
     userId?: string | number;
     loadingDone?: boolean;
     style?: React.CSSProperties;
-    scrollContainerRef?: React.RefObject<HTMLElement>;
+    scrollContainerRef?: React.RefObject<HTMLElement | null>;
 }
 
 
