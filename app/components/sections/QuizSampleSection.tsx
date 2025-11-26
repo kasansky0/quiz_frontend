@@ -85,6 +85,13 @@ export default function QuizSampleSection({
         }
     }, [loadingDone]);
 
+    // Add this inside your QuizSampleSection component
+    useEffect(() => {
+        if (questionData) {
+            // Scroll to top only when a new question is loaded
+            scrollToTopChild(scrollContainerRef);
+        }
+    }, [questionData, scrollContainerRef]);
 
     // Fetch first question on mount
     useEffect(() => {
@@ -106,9 +113,6 @@ export default function QuizSampleSection({
 
         return () => { isMounted = false };
     }, [loadingDone, apiUrl]);
-
-
-
 
 
     // Handle when user clicks "Next"
@@ -143,7 +147,6 @@ export default function QuizSampleSection({
 
         if (nextQuestion) setQuestionData(nextQuestion);
 
-        scrollToTopChild(scrollContainerRef);
 
         setFade(true);
     };
