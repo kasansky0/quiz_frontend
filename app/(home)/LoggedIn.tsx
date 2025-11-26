@@ -7,17 +7,25 @@ import QuizSampleSection from "../components/sections/QuizSampleSection";
 import Footer from "../components/sections/Footer";
 import LoadingBanner from "../components/LoadingBanner";
 
+// ✅ Import your QuestionType if you have it
+import type { QuestionType } from "../components/sections/QuizSampleSection";
 
 export default function LoggedInPage() {
     const [loading, setLoading] = useState(true);
     const { data: session } = useSession();
     const [userStats, setUserStats] = useState(null);
 
-    const [sidebarOpen, setSidebarOpen] = useState(false);
 
+    // ✅ Wrong queue state for spaced repetition logic
+    const [wrongQueue, setWrongQueue] = useState<QuestionType[]>([]);
+
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const sidebarRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null); // ref for toggle button
 
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+    // ✅ Wake backend to prevent cold start
     async function forceWakeAPI(apiUrl: string) {
         try {
             await fetch(`${apiUrl}/questions/random`, { method: "GET" });
@@ -27,15 +35,10 @@ export default function LoggedInPage() {
         }
     }
 
-
+    // ✅ Fetch user stats
     useEffect(() => {
         if (!session || !session.user || !session.user.email) return;
-
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-        if (!apiUrl) {
-            console.error("❌ NEXT_PUBLIC_API_URL is not set");
-            return;
-        }
+        if (!apiUrl) return console.error("❌ NEXT_PUBLIC_API_URL is not set");
 
         const fetchData = async () => {
             try {
@@ -47,7 +50,6 @@ export default function LoggedInPage() {
                         email: session.user.email,
                         image: session.user.image,
                         google_id: session.user.id ?? null
-
                     })
                 });
                 const data = await res.json();
@@ -55,89 +57,63 @@ export default function LoggedInPage() {
             } catch (err) {
                 console.error("❌ Failed to fetch user stats:", err);
             } finally {
-                // Force a minimum 3-second loading
-                setTimeout(() => setLoading(false), 3000);
+                // Minimum 3-second loading
+                setTimeout(() => setLoading(false), 2300);
             }
         };
 
         fetchData();
-    }, [session]);
+    }, [session, apiUrl]);
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
-    // Progressive wake retry delays in ms
-    const wakeDelays = [5000, 12000, 25000];
-
+    // ✅ Progressive wake retry
     useEffect(() => {
         if (!loading || !apiUrl) return;
 
-        const apiUrlString = apiUrl; // now TypeScript knows this is a string
-        let retryIndex = 0;
-        let timeout: NodeJS.Timeout;
+        const timeout = setTimeout(() => {
+            forceWakeAPI(apiUrl);
+        }, 5000);
 
-        function scheduleWake() {
-            if (retryIndex >= wakeDelays.length) return;
-
-            const delay = wakeDelays[retryIndex];
-            console.log(`⏳ Backend still loading → retry ${retryIndex + 1} in ${delay / 1000}s`);
-
-            timeout = setTimeout(() => {
-                console.log(`🔄 Wake attempt #${retryIndex + 1}`);
-                forceWakeAPI(apiUrlString); // ✅ TypeScript knows it's string
-                retryIndex++;
-                scheduleWake();
-            }, delay);
-        }
-
-        scheduleWake();
-
+        // Prevent multiple retries
         return () => clearTimeout(timeout);
     }, [loading, apiUrl]);
 
 
 
+    // ✅ Close sidebar if clicked outside
     useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
+        function handleClick(event: MouseEvent) {
             if (
                 sidebarOpen &&
                 sidebarRef.current &&
                 !sidebarRef.current.contains(event.target as Node) &&
-                buttonRef.current &&
-                !buttonRef.current.contains(event.target as Node)
+                !buttonRef.current?.contains(event.target as Node)
             ) {
                 setSidebarOpen(false);
             }
         }
 
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [sidebarOpen]);
+        document.addEventListener("mousedown", handleClick);
+        return () => document.removeEventListener("mousedown", handleClick);
+    }, []);
+
 
     return (
-
         <div className="min-h-screen flex bg-black-200 relative">
-
             {/* ======= SLIDE-IN SIDEBAR ======= */}
             <div
                 ref={sidebarRef}
                 className={`
-    h-full w-64 bg-black-400/90 backdrop-blur-md shadow-lg
-
-    /* MOBILE: slide-in with transition */
-    fixed inset-y-0 right-0 z-50 transition-transform duration-300 ease-in-out
-    ${sidebarOpen ? "translate-x-0" : "translate-x-full"}
-
-    /* DESKTOP: no transition, static layout */
-    md:sticky md:top-0 md:translate-x-0 md:transition-none md:shadow-none md:z-auto
-  `}
+                    h-full w-64 bg-black-400/90 backdrop-blur-md shadow-lg
+                    fixed inset-y-0 right-0 z-50 transition-transform duration-300 ease-in-out
+                    ${sidebarOpen ? "translate-x-0" : "translate-x-full"}
+                    md:sticky md:top-0 md:translate-x-0 md:transition-none md:shadow-none md:z-auto
+                `}
             >
                 <UserSidebar />
             </div>
 
-
             {/* ======= MAIN PANEL ======= */}
             <div className="flex-1 flex flex-col">
-
                 {/* MOBILE MENU BUTTON */}
                 <button
                     ref={buttonRef}
@@ -150,23 +126,25 @@ export default function LoggedInPage() {
                 </button>
 
                 {/* QUIZ SECTION */}
-                <main className="flex-1 flex flex-col items-center justify-start p-6 md:p-8 overflow-y-auto">
-                    {loading ? (
+                <main className="flex-1 flex flex-col items-center justify-start p-6 md:p-8 overflow-y-auto min-h-[50vh]">
+                    {loading || !apiUrl || !session?.user ? (
                         <LoadingBanner />
                     ) : (
                         <QuizSampleSection
                             isLoggedIn={true}
+                            wrongQueue={wrongQueue}
+                            setWrongQueue={setWrongQueue}
+                            apiUrl={apiUrl}
+                            userId={session.user.id}
                             onClick={() => {
                                 setSidebarOpen(false);
                                 window.scrollTo({ top: 0, behavior: "smooth" });
                             }}
+                            loadingDone={!loading}
+                            style={{ minHeight: "300px" }} // optional: reserve height
                         />
                     )}
                 </main>
-
-
-
-
 
                 {/* FOOTER */}
                 <Footer />

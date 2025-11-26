@@ -23,72 +23,155 @@ function scrollToTop() {
 interface QuizSampleSectionProps {
     isLoggedIn: boolean;
     onClick?: () => void;
-    staticQuestion?: {
-        id: number;
-        question: string;
-        options: string[];
-        answer: string;
-        explanation: string;
-    };
+    staticQuestion?: QuestionType;
+    wrongQueue?: QuestionType[];
+    setWrongQueue?: React.Dispatch<React.SetStateAction<QuestionType[]>>;
+    apiUrl?: string;
+    userId?: string | number;
+    loadingDone?: boolean;   // ✅ new prop
 }
 
 
-export default function QuizSampleSection({ isLoggedIn, onClick, staticQuestion }: QuizSampleSectionProps) {
+export default function QuizSampleSection({
+                                              isLoggedIn,
+                                              onClick,
+                                              staticQuestion,
+                                              wrongQueue,
+                                              setWrongQueue,
+                                              apiUrl,
+                                              loadingDone,
+                                          }: QuizSampleSectionProps) {
     const [questionData, setQuestionData] = useState<QuestionType | null>(null);
-    const [fade, setFade] = useState(true); // true = visible
+    const [fade, setFade] = useState(true);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [answerResult, setAnswerResult] = useState<{ correct: boolean; answer: string; explanation: string } | null>(null);
-
+    const [currentIndex, setCurrentIndex] = useState(0);
     const optionsRef = useRef<HTMLDivElement>(null);
+    const [nextQuestionPrefetch, setNextQuestionPrefetch] = useState<QuestionType | null>(null);
+    const [displayedQuestion, setDisplayedQuestion] = useState<QuestionType | null>(null);
 
-    // Scroll to options when an answer is selected
+
+
+
+    // Scroll to options when selected
     useEffect(() => {
         if (selectedOption) {
-            optionsRef.current?.scrollIntoView({
-                behavior: "smooth",
-                block: "start",
-            });
+            optionsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
         }
     }, [selectedOption]);
 
-    // Fetch question on mount
     useEffect(() => {
-        if (!isLoggedIn && staticQuestion) {
-            setQuestionData(staticQuestion);
-            return;
+        if (!apiUrl || !questionData) return;
+
+        let isMounted = true;
+
+        async function prefetchNext() {
+            try {
+                const res = await fetch(`${apiUrl}/questions/random`);
+                const data: QuestionType = await res.json();
+                if (isMounted) setNextQuestionPrefetch(data);
+            } catch (err) {
+                console.error("Prefetch failed:", err);
+            }
         }
 
-        async function fetchQuestion() {
-            const res = await fetch(
-                isLoggedIn
-                    ? `${process.env.NEXT_PUBLIC_API_URL}/questions/random`
-                    : `${process.env.NEXT_PUBLIC_API_URL}/dailyQuestion/random`
-            );
-            const data: QuestionType = await res.json();
-            setQuestionData(data);
+        prefetchNext();
+
+        return () => { isMounted = false; };
+    }, [questionData, apiUrl]);
+
+
+    // Fetch first question on mount
+    useEffect(() => {
+        if (!loadingDone || !apiUrl) return;
+
+        let isMounted = true;
+
+        async function fetchFirstQuestion() {
+            try {
+                const res = await fetch(`${apiUrl}/questions/random`);
+                const data: QuestionType = await res.json();
+                if (isMounted) {
+                    setQuestionData(data);
+                }
+            } catch (err) {
+                console.error(err);
+            }
         }
-        fetchQuestion();
-    }, [isLoggedIn, staticQuestion]);
+
+        // Only fetch if we have no question yet
+        if (!questionData) fetchFirstQuestion();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [loadingDone, apiUrl, questionData]);
 
 
+
+
+    // Handle when user clicks "Next"
     const handleNextQuestion = async () => {
-        setFade(false); // fade out
+        // start fade-out
+        setFade(false);
 
-        setTimeout(async () => {
-            setSelectedOption(null);
-            setAnswerResult(null);
+        // wait for fade-out to complete (match duration)
+        await new Promise(resolve => setTimeout(resolve, 500)); // same as CSS duration
 
-            const res = await fetch(
-                isLoggedIn
-                    ? `${process.env.NEXT_PUBLIC_API_URL}/questions/random`
-                    : `${process.env.NEXT_PUBLIC_API_URL}/dailyQuestion/random`
-            );
-            const data: QuestionType = await res.json();
-            setQuestionData(data);
+        // reset selections and answer result
+        setSelectedOption(null);
+        setAnswerResult(null);
 
-            setFade(true); // fade in
-            scrollToTop();
-        }, 500); // fade-out duration
+        // get next question
+        let nextQuestion = nextQuestionPrefetch ?? (await fetchNextQuestion());
+
+        // update question **while still invisible**
+        setQuestionData(nextQuestion);
+        setCurrentIndex(prev => prev + 1);
+
+        scrollToTop();
+
+        // wait a tiny bit to ensure browser registers DOM change
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        // fade-in smoothly
+        setFade(true);
+    };
+
+
+
+
+    // Handle answer click
+    const handleAnswerClick = async (option: string) => {
+        if (!selectedOption && questionData) {
+            setSelectedOption(option);
+            if (onClick) onClick();
+
+            let correct = false;
+            let answer = questionData.answer;
+            let explanation = questionData.explanation;
+
+            if (isLoggedIn && apiUrl) {
+                const res = await fetch(`${apiUrl}/answer/check`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ question_id: questionData.id, selected_option: option }),
+                });
+                const result = await res.json();
+                correct = result.correct;
+                answer = result.answer;
+                explanation = result.explanation || questionData.explanation;
+
+                if (!correct) {
+                    setWrongQueue?.(prev => [...prev, questionData]);
+                }
+            } else {
+                correct = option === questionData.answer;
+                if (!correct) setWrongQueue?.(prev => [...prev, questionData]);
+            }
+
+            setAnswerResult({ correct, answer, explanation });
+        }
     };
 
     return (
@@ -103,8 +186,8 @@ export default function QuizSampleSection({ isLoggedIn, onClick, staticQuestion 
             ) : (
                 questionData && (
                     <div
-                        className={`w-full max-w-xl flex flex-col gap-6 justify-start transition-all duration-700 ease-in-out ${
-                            fade ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-4 scale-95"
+                        className={`w-full max-w-xl flex flex-col gap-6 justify-start transition-opacity duration-700 ease-in-out ${
+                            fade ? "opacity-100" : "opacity-0"
                         }`}
                     >
                         {/* Question */}
@@ -112,43 +195,14 @@ export default function QuizSampleSection({ isLoggedIn, onClick, staticQuestion 
 
                         {/* Options */}
                         <div ref={optionsRef} className="flex flex-col gap-3">
-                            {questionData.options.map((option) => (
+                            {questionData.options.map(option => (
                                 <Option
                                     key={option}
                                     text={option}
                                     isSelected={selectedOption === option}
                                     isAnswer={answerResult ? option === answerResult.answer : false}
                                     disabled={!!selectedOption}
-                                    onClick={async () => {
-                                        if (!selectedOption) {
-                                            setSelectedOption(option);
-                                            if (onClick) onClick();
-
-                                            if (isLoggedIn && questionData) {
-                                                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/answer/check`, {
-                                                    method: "POST",
-                                                    headers: { "Content-Type": "application/json" },
-                                                    body: JSON.stringify({
-                                                        question_id: questionData.id,
-                                                        selected_option: option,
-                                                    }),
-                                                });
-                                                const result = await res.json();
-
-                                                setAnswerResult({
-                                                    correct: result.correct,
-                                                    answer: result.answer,
-                                                    explanation: result.explanation || questionData.explanation,
-                                                });
-                                            } else {
-                                                setAnswerResult({
-                                                    correct: option === questionData.answer,
-                                                    answer: questionData.answer,
-                                                    explanation: questionData.explanation,
-                                                });
-                                            }
-                                        }
-                                    }}
+                                    onClick={() => handleAnswerClick(option)}
                                 />
                             ))}
                         </div>
@@ -157,12 +211,11 @@ export default function QuizSampleSection({ isLoggedIn, onClick, staticQuestion 
                         {selectedOption && (
                             <div className="mt-4 flex flex-col items-center gap-2 w-full">
                                 <Button onClick={handleNextQuestion}>Next</Button>
-
                                 <div className="flex flex-col items-center mt-2 text-center">
                                     <ScrollHint />
                                     <span className="text-white text-sm opacity-80 mt-1">
-                                        Study the explanation below ⬇️
-                                    </span>
+            Study the explanation below ⬇️
+          </span>
                                 </div>
                             </div>
                         )}
@@ -177,6 +230,7 @@ export default function QuizSampleSection({ isLoggedIn, onClick, staticQuestion 
                         )}
                     </div>
                 )
+
             )}
         </div>
     );

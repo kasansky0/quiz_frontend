@@ -1,17 +1,7 @@
 "use client";
 
 import LoginSection from "../components/sections/LoginSection";
-import QuizSampleSection from "../components/sections/QuizSampleSection";
 import Footer from "@/app/components/sections/Footer";
-
-const staticQuestion = {
-    id: 1,
-    question: "What is the standard voltage for a Level 2 electrical panel?",
-    options: ["120V", "240V", "480V", "12V"],
-    answer: "240V",
-    explanation: "Level 2 panels in residential setups typically use 240V circuits."
-};
-
 
 export default function LoggedOutPage() {
     return (
@@ -41,15 +31,11 @@ export default function LoggedOutPage() {
                 </div>
             </main>
 
-
-
-            {/* RIGHT SIDE (Quiz preview) */}
-            <div className="md:flex-1 flex items-center justify-center md:p-9 w-full">
+            {/* RIGHT SIDE (remove quiz preview entirely) */}
+            {/* <div className="md:flex-1 flex items-center justify-center md:p-9 w-full">
                 <QuizSampleSection isLoggedIn={false} staticQuestion={staticQuestion} />
-            </div>
-
+            </div> */}
 
         </div>
-
     );
 }

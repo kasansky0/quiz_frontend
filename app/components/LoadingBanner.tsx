@@ -15,9 +15,12 @@ export default function LoadingBanner() {
                     Loading...
                 </p>
 
-                {/* Subtle glow line */}
-                <div className="mt-6 w-2/3 h-1 bg-green-400/40 rounded-full animate-pulse"></div>
+                {/* Moving glow line */}
+                <div className="mt-6 w-2/3 h-1 bg-green-400/20 rounded-full overflow-hidden relative">
+                    <div className="absolute top-0 left-0 h-full w-1/3 bg-green-400/60 rounded-full animate-loading"></div>
+                </div>
             </div>
+
         </div>
     );
 }
