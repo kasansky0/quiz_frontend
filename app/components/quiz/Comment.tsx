@@ -11,7 +11,7 @@
             ${isCorrect ? "bg-green-600 border-green-500 text-white" : "bg-red-600 border-red-500 text-white"}`;
 
         // Split text by newlines to create paragraphs
-        const paragraphs = text.split("\n").filter(p => p.trim() !== "");
+        const paragraphs = text?.split("\n").filter(p => p.trim() !== "") || [];
 
         return (
             <div className={baseClass}>

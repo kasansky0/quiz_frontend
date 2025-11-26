@@ -69,29 +69,13 @@ export default function QuizSampleSection({
     const [currentIndex, setCurrentIndex] = useState(0);
     const optionsRef = useRef<HTMLDivElement>(null);
     const [cycleCount, setCycleCount] = useState(0);
-    const questionBlockRef = useRef<HTMLDivElement>(null);
 
 
-    // Scroll to options when selected
+    // Scroll to options when an option is selected
     useEffect(() => {
-        if (!questionData) return;
-
-        requestAnimationFrame(() => {
-            if (!selectedOption) {
-                // Scroll entire question block to top
-                if (questionBlockRef.current && scrollContainerRef?.current) {
-                    const containerTop = scrollContainerRef.current.getBoundingClientRect().top;
-                    const blockTop = questionBlockRef.current.getBoundingClientRect().top;
-                    const scrollOffset = blockTop - containerTop + scrollContainerRef.current.scrollTop;
-                    scrollContainerRef.current.scrollTo({ top: scrollOffset, behavior: "smooth" });
-                }
-            } else {
-                // Scroll options into view
-                optionsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-            }
-        });
-    }, [questionData, selectedOption, scrollContainerRef]);
-
+        if (!selectedOption) return;
+        optionsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, [selectedOption]);
 
     useEffect(() => {
         if (!loadingDone) {
@@ -135,15 +119,19 @@ export default function QuizSampleSection({
         }
     }
 
+    // Handle "Next" button click
     const handleNextQuestion = async () => {
+        // Fade out current question
         setFade(false);
         await new Promise(res => setTimeout(res, 500));
 
+        // Reset selected option and answer result
         setSelectedOption(null);
         setAnswerResult(null);
 
         let nextQuestion: QuestionType | null = null;
 
+        // Handle wrongQueue cycling
         if (cycleCount === 2 && wrongQueue?.length && setWrongQueue) {
             nextQuestion = wrongQueue[0];
             setWrongQueue(prev => prev.slice(1));
@@ -153,11 +141,17 @@ export default function QuizSampleSection({
             setCycleCount(prev => prev + 1);
         }
 
+        // Set the new question
         if (nextQuestion) setQuestionData(nextQuestion);
 
+        // ✅ Reset scroll for container and viewport
+        scrollContainerRef?.current?.scrollTo({ top: 0, behavior: "auto" });
+        window.scrollTo({ top: 0, behavior: "auto" });
 
+        // Fade in new question
         setFade(true);
     };
+
 
     // Handle answer click
     const handleAnswerClick = async (option: string) => {
@@ -205,7 +199,6 @@ export default function QuizSampleSection({
             ) : (
                 questionData && (
                     <div
-                        ref={questionBlockRef}
                         className={`w-full max-w-xl flex flex-col gap-6 justify-start transition-opacity duration-700 ease-in-out ${
                             fade ? "opacity-100" : "opacity-0"
                         }`}
