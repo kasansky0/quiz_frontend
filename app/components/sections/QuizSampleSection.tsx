@@ -69,13 +69,29 @@ export default function QuizSampleSection({
     const [currentIndex, setCurrentIndex] = useState(0);
     const optionsRef = useRef<HTMLDivElement>(null);
     const [cycleCount, setCycleCount] = useState(0);
+    const questionBlockRef = useRef<HTMLDivElement>(null);
+
 
     // Scroll to options when selected
     useEffect(() => {
-        if (selectedOption) {
-            optionsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-    }, [selectedOption]);
+        if (!questionData) return;
+
+        requestAnimationFrame(() => {
+            if (!selectedOption) {
+                // Scroll entire question block to top
+                if (questionBlockRef.current && scrollContainerRef?.current) {
+                    const containerTop = scrollContainerRef.current.getBoundingClientRect().top;
+                    const blockTop = questionBlockRef.current.getBoundingClientRect().top;
+                    const scrollOffset = blockTop - containerTop + scrollContainerRef.current.scrollTop;
+                    scrollContainerRef.current.scrollTo({ top: scrollOffset, behavior: "smooth" });
+                }
+            } else {
+                // Scroll options into view
+                optionsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        });
+    }, [questionData, selectedOption, scrollContainerRef]);
+
 
     useEffect(() => {
         if (!loadingDone) {
@@ -84,14 +100,6 @@ export default function QuizSampleSection({
             setAnswerResult(null);
         }
     }, [loadingDone]);
-
-    // Add this inside your QuizSampleSection component
-    useEffect(() => {
-        if (questionData) {
-            // Scroll to top only when a new question is loaded
-            scrollToTopChild(scrollContainerRef);
-        }
-    }, [questionData, scrollContainerRef]);
 
     // Fetch first question on mount
     useEffect(() => {
@@ -197,6 +205,7 @@ export default function QuizSampleSection({
             ) : (
                 questionData && (
                     <div
+                        ref={questionBlockRef}
                         className={`w-full max-w-xl flex flex-col gap-6 justify-start transition-opacity duration-700 ease-in-out ${
                             fade ? "opacity-100" : "opacity-0"
                         }`}
