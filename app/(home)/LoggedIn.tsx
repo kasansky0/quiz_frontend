@@ -1,18 +1,18 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { useEffect, useState, useRef } from "react";
+import {useSession} from "next-auth/react";
+import {useEffect, useState, useRef} from "react";
 import UserSidebar from "../components/UserSidebar";
 import QuizSampleSection from "../components/sections/QuizSampleSection";
 import Footer from "../components/sections/Footer";
 import LoadingBanner from "../components/LoadingBanner";
 
 // ✅ Import your QuestionType if you have it
-import type { QuestionType } from "../components/sections/QuizSampleSection";
+import type {QuestionType} from "../components/sections/QuizSampleSection";
 
 export default function LoggedInPage() {
     const [loading, setLoading] = useState(true);
-    const { data: session } = useSession();
+    const {data: session} = useSession();
     const [userStats, setUserStats] = useState(null);
 
 
@@ -30,7 +30,7 @@ export default function LoggedInPage() {
     // ✅ Wake backend to prevent cold start
     async function forceWakeAPI(apiUrl: string) {
         try {
-            await fetch(`${apiUrl}/questions/random`, { method: "GET" });
+            await fetch(`${apiUrl}/questions/random`, {method: "GET"});
             console.log("🔄 Backend wake ping sent (questions/random)");
         } catch (err) {
             console.error("❌ Wake failed:", err);
@@ -46,7 +46,7 @@ export default function LoggedInPage() {
             try {
                 const res = await fetch(`${apiUrl}/user/`, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: {"Content-Type": "application/json"},
                     body: JSON.stringify({
                         name: session.user.name,
                         email: session.user.email,
@@ -80,7 +80,6 @@ export default function LoggedInPage() {
     }, [loading, apiUrl]);
 
 
-
     // ✅ Close sidebar if clicked outside
     useEffect(() => {
         function handleClick(event: MouseEvent) {
@@ -111,7 +110,7 @@ export default function LoggedInPage() {
                     md:sticky md:top-0 md:translate-x-0 md:transition-none md:shadow-none md:z-auto
                 `}
             >
-                <UserSidebar />
+                <UserSidebar/>
             </div>
 
             {/* ======= MAIN PANEL ======= */}
@@ -132,7 +131,7 @@ export default function LoggedInPage() {
                     ref={mainRef}
                     className="flex-1 flex flex-col items-center justify-start p-6 md:p-8 overflow-y-auto min-h-[50vh]">
                     {loading || !apiUrl || !session?.user ? (
-                        <LoadingBanner />
+                        <LoadingBanner/>
                     ) : (
                         <QuizSampleSection
                             isLoggedIn={true}
@@ -142,17 +141,17 @@ export default function LoggedInPage() {
                             userId={session.user.id}
                             onClick={() => {
                                 setSidebarOpen(false);
-                                window.scrollTo({ top: 0, behavior: "smooth" });
+                                window.scrollTo({top: 0, behavior: "smooth"});
                             }}
                             loadingDone={!loading}
-                            style={{ minHeight: "300px" }} // optional: reserve height
+                            style={{minHeight: "300px"}} // optional: reserve height
                             scrollContainerRef={mainRef}
                         />
                     )}
                 </main>
 
                 {/* FOOTER */}
-                <Footer />
+                <Footer/>
             </div>
         </div>
     );
