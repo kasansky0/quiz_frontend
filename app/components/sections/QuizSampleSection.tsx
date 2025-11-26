@@ -106,7 +106,6 @@ export default function QuizSampleSection({
         return () => { isMounted = false };
     }, [loadingDone, apiUrl]);
 
-
     // Handle when user clicks "Next"
     async function fetchRandomQuestion() {
         if (!apiUrl) return null;
@@ -177,8 +176,10 @@ export default function QuizSampleSection({
                 correct = option === questionData.answer;
             }
 
+
             // ✅ Only add to wrongQueue if answered wrong
             if (!correct && setWrongQueue) {
+                // After you determine correctness and before updating wrongQueue
                 setWrongQueue(prev => [...prev, questionData]);
             }
 
