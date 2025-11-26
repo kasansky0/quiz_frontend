@@ -141,7 +141,7 @@ export default function LoggedInPage() {
                             userId={session.user.id}
                             onClick={() => {
                                 setSidebarOpen(false);
-                                window.scrollTo({top: 0, behavior: "smooth"});
+                                mainRef.current?.scrollTo({ top: 0, behavior: "smooth" });
                             }}
                             loadingDone={!loading}
                             style={{minHeight: "300px"}} // optional: reserve height

@@ -16,14 +16,21 @@ export interface QuestionType {
     explanation: string;
 }
 
-function scrollToTop(container?: React.RefObject<HTMLElement | null>) {
-    if (container?.current) {
-        container.current.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-        window.scrollTo({ top: 0, behavior: "smooth" });
+function scrollToTop(container?: React.RefObject<HTMLElement>) {
+    if (container?.current instanceof HTMLElement) {
+        // Delay ensures iOS actually scrolls
+        setTimeout(() => {
+            container.current?.scrollTo({ top: 0, behavior: "smooth" });
+        }, 50);
+        return;
+    }
+
+    if (typeof window !== "undefined") {
+        setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }, 50);
     }
 }
-
 
 
 interface QuizSampleSectionProps {
@@ -36,7 +43,7 @@ interface QuizSampleSectionProps {
     userId?: string | number;
     loadingDone?: boolean;
     style?: React.CSSProperties;
-    scrollContainerRef?: React.RefObject<HTMLElement | null>;
+    scrollContainerRef?: React.RefObject<HTMLElement>;
 }
 
 
@@ -58,20 +65,20 @@ export default function QuizSampleSection({
     const optionsRef = useRef<HTMLDivElement>(null);
     const [cycleCount, setCycleCount] = useState(0);
 
-
-    async function fetchNextQuestion(): Promise<QuestionType> {
-        if (!apiUrl) throw new Error("API URL not provided");
-        const res = await fetch(`${apiUrl}/questions/random`);
-        return res.json();
-    }
-
-
     // Scroll to options when selected
     useEffect(() => {
         if (selectedOption) {
             optionsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
         }
     }, [selectedOption]);
+
+    useEffect(() => {
+        if (!loadingDone) {
+            setQuestionData(null);     // prevents leftover question
+            setSelectedOption(null);
+            setAnswerResult(null);
+        }
+    }, [loadingDone]);
 
 
     // Fetch first question on mount
@@ -84,21 +91,17 @@ export default function QuizSampleSection({
             try {
                 const res = await fetch(`${apiUrl}/questions/random`);
                 const data: QuestionType = await res.json();
-                if (isMounted) {
-                    setQuestionData(data);
-                }
+                if (isMounted) setQuestionData(data);
             } catch (err) {
                 console.error(err);
             }
         }
 
-        // Only fetch if we have no question yet
-        if (!questionData) fetchFirstQuestion();
+        fetchFirstQuestion();
 
-        return () => {
-            isMounted = false;
-        };
-    }, [loadingDone, apiUrl, questionData]);
+        return () => { isMounted = false };
+    }, [loadingDone, apiUrl]);
+
 
 
 
