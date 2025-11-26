@@ -16,9 +16,8 @@ export interface QuestionType {
     explanation: string;
 }
 
-function scrollToTop(container?: React.RefObject<HTMLElement>) {
+export function scrollToTop(container?: React.RefObject<HTMLElement | null>) {
     if (container?.current instanceof HTMLElement) {
-        // Delay ensures iOS actually scrolls
         setTimeout(() => {
             container.current?.scrollTo({ top: 0, behavior: "smooth" });
         }, 50);
@@ -31,6 +30,7 @@ function scrollToTop(container?: React.RefObject<HTMLElement>) {
         }, 50);
     }
 }
+
 
 
 interface QuizSampleSectionProps {
