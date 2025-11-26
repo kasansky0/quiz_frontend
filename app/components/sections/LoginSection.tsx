@@ -3,6 +3,7 @@
 import { signIn } from "next-auth/react";
 import { motion } from "framer-motion";
 import { Button } from "../ui/Button";
+import castle from "@/public/images/castle.png"; // <-- import the image
 
 export default function LoginSection() {
     return (
@@ -19,15 +20,21 @@ export default function LoginSection() {
                 </span>
             </h1>
 
-            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="flex items-center gap-4 mt-4 md:mt-6">
+                {/* Left placeholder */}
+                <img src={castle.src} alt="Engineer Castle" className="w-30 h-12" />
+
                 <Button
                     variant="glass"
-                    className="mt-4 md:mt-6"
                     onClick={() => signIn("google")}
                 >
                     Sign in with Google
                 </Button>
+
+                {/* Right placeholder */}
+                <img src={castle.src} alt="Engineer Castle" className="w-30 h-12" />
             </motion.div>
+
 
             <p className="text-xs text-dark-600 mt-2">
                 Secure authentication via Google OAuth 2.0
