@@ -55,7 +55,7 @@ export default function QuizSampleSection({
     const [answerResult, setAnswerResult] = useState<{ correct: boolean; answer: string; explanation: string } | null>(null);
     const [currentIndex, setCurrentIndex] = useState(0);
     const optionsRef = useRef<HTMLDivElement>(null);
-    const [nextQuestionPrefetch, setNextQuestionPrefetch] = useState<QuestionType | null>(null);
+    const [cycleCount, setCycleCount] = useState(0);
 
 
     async function fetchNextQuestion(): Promise<QuestionType> {
@@ -71,26 +71,6 @@ export default function QuizSampleSection({
             optionsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
         }
     }, [selectedOption]);
-
-    useEffect(() => {
-        if (!apiUrl || !questionData) return;
-
-        let isMounted = true;
-
-        async function prefetchNext() {
-            try {
-                const res = await fetch(`${apiUrl}/questions/random`);
-                const data: QuestionType = await res.json();
-                if (isMounted) setNextQuestionPrefetch(data);
-            } catch (err) {
-                console.error("Prefetch failed:", err);
-            }
-        }
-
-        prefetchNext();
-
-        return () => { isMounted = false; };
-    }, [questionData, apiUrl]);
 
 
     // Fetch first question on mount
@@ -124,44 +104,51 @@ export default function QuizSampleSection({
 
     // Handle when user clicks "Next"
     const handleNextQuestion = async () => {
-        // start fade-out
+        if (!apiUrl) return;
+
+        // 1️⃣ Start fade-out
         setFade(false);
 
-        // wait for fade-out to complete (match CSS duration)
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // 2️⃣ Wait for fade-out
+        await new Promise(res => setTimeout(res, 500));
 
-        // reset selections and answer result
+        // 3️⃣ Reset selections and answer result
         setSelectedOption(null);
         setAnswerResult(null);
 
-        // get next question
-        let nextQuestion: QuestionType;
-        try {
-            nextQuestion = nextQuestionPrefetch ?? (await fetchNextQuestion());
-        } catch (err) {
-            console.error("Failed to fetch next question:", err);
-            return; // stop execution if fetch fails
+        let nextQuestion: QuestionType | null = null;
+
+        // 4️⃣ Decide: fetch or wrong question
+        if (cycleCount === 2 && wrongQueue && wrongQueue.length > 0) {
+            // Pull first wrong question
+            nextQuestion = wrongQueue[0];
+            // Remove it from queue
+            setWrongQueue(prev => prev.slice(1));
+            // Reset cycle count
+            setCycleCount(0);
+        } else {
+            // Fetch from API
+            try {
+                const res = await fetch(`${apiUrl}/questions/random`);
+                nextQuestion = await res.json();
+            } catch (err) {
+                console.error("Failed to fetch next question:", err);
+                return;
+            }
+            // Increment cycle count
+            setCycleCount(prev => prev + 1);
         }
 
-        // update question **while still invisible**
-        setQuestionData(nextQuestion);
-        setCurrentIndex(prev => prev + 1);
+        // 5️⃣ Update question while invisible
+        if (nextQuestion) setQuestionData(nextQuestion);
 
-        // wait a tiny bit for DOM to update
-        await new Promise(resolve => setTimeout(resolve, 50));
+        // 6️⃣ Scroll to top
+        if (scrollContainerRef?.current) scrollContainerRef.current.scrollTop = 0;
+        window.scrollTo({ top: 0, behavior: "instant" });
 
-        // SCROLL TO TOP using both container and window (iOS fix)
-        if (scrollContainerRef?.current) {
-            scrollContainerRef.current.scrollTop = 0;
-        }
-        window.scrollTo({ top: 0, behavior: "instant" }); // instant ensures iOS scroll works
-
-        // fade-in smoothly
+        // 7️⃣ Fade-in
         setFade(true);
     };
-
-
-
 
 
     // Handle answer click
@@ -184,18 +171,19 @@ export default function QuizSampleSection({
                 correct = result.correct;
                 answer = result.answer;
                 explanation = result.explanation || questionData.explanation;
-
-                if (!correct) {
-                    setWrongQueue?.(prev => [...prev, questionData]);
-                }
             } else {
                 correct = option === questionData.answer;
-                if (!correct) setWrongQueue?.(prev => [...prev, questionData]);
+            }
+
+            // ✅ Only add to wrongQueue if answered wrong
+            if (!correct && setWrongQueue) {
+                setWrongQueue(prev => [...prev, questionData]);
             }
 
             setAnswerResult({ correct, answer, explanation });
         }
     };
+
 
     return (
         <div className="flex-1 flex flex-col items-center justify-start p-6 md:p-8 min-h-[50vh] md:h-auto bg-black-200 w-full">
