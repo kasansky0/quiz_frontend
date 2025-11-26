@@ -16,13 +16,14 @@ export interface QuestionType {
     explanation: string;
 }
 
-function scrollToTop(container?: React.RefObject<HTMLElement>) {
+function scrollToTop(container?: React.RefObject<HTMLElement | null>) {
     if (container?.current) {
         container.current.scrollTo({ top: 0, behavior: "smooth" });
     } else {
         window.scrollTo({ top: 0, behavior: "smooth" });
     }
 }
+
 
 
 interface QuizSampleSectionProps {
