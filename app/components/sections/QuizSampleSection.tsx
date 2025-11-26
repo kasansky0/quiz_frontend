@@ -103,52 +103,42 @@ export default function QuizSampleSection({
 
 
     // Handle when user clicks "Next"
+    async function fetchRandomQuestion() {
+        if (!apiUrl) return null;
+        try {
+            const res = await fetch(`${apiUrl}/questions/random`);
+            return await res.json();
+        } catch (err) {
+            console.error("Failed to fetch question:", err);
+            return null;
+        }
+    }
+
     const handleNextQuestion = async () => {
-        if (!apiUrl) return;
-
-        // 1️⃣ Start fade-out
         setFade(false);
-
-        // 2️⃣ Wait for fade-out
         await new Promise(res => setTimeout(res, 500));
 
-        // 3️⃣ Reset selections and answer result
         setSelectedOption(null);
         setAnswerResult(null);
 
         let nextQuestion: QuestionType | null = null;
 
-        // 4️⃣ Decide: fetch or wrong question
-        if (cycleCount === 2 && wrongQueue && wrongQueue.length > 0 && setWrongQueue) {
-            // Pull first wrong question
+        if (cycleCount === 2 && wrongQueue?.length && setWrongQueue) {
             nextQuestion = wrongQueue[0];
-            // Remove it from queue
             setWrongQueue(prev => prev.slice(1));
-            // Reset cycle count
             setCycleCount(0);
         } else {
-            // Fetch from API
-            try {
-                const res = await fetch(`${apiUrl}/questions/random`);
-                nextQuestion = await res.json();
-            } catch (err) {
-                console.error("Failed to fetch next question:", err);
-                return;
-            }
-            // Increment cycle count
+            nextQuestion = await fetchRandomQuestion();
             setCycleCount(prev => prev + 1);
         }
 
-        // 5️⃣ Update question while invisible
         if (nextQuestion) setQuestionData(nextQuestion);
 
-        // 6️⃣ Scroll to top
-        if (scrollContainerRef?.current) scrollContainerRef.current.scrollTop = 0;
-        window.scrollTo({ top: 0, behavior: "instant" });
+        scrollToTop(scrollContainerRef);
 
-        // 7️⃣ Fade-in
         setFade(true);
     };
+
 
 
     // Handle answer click
