@@ -65,33 +65,24 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <html lang="en" className="h-full w-full bg-black">
+        <html
+            lang="en"
+            className="h-full w-full"
+            style={{ backgroundColor: '#000000' }} // ← ensures initial black paint
+        >
         <body
             className={cn(
-                'h-full w-full bg-black font-sans antialiased overflow-x-hidden',
+                'h-full w-full min-h-screen font-sans antialiased overflow-x-hidden',
                 FontSans.variable
             )}
+            style={{ backgroundColor: '#000000' }} // ← fallback for body
         >
-
-        {/* Google Analytics */}
-        <Script
-            strategy="afterInteractive"
-            src={`https://www.googletagmanager.com/gtag/js?id=G-8TYPXH8EQF`}
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-            {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-8TYPXH8EQF');
-          `}
-        </Script>
-
         <Providers>
-            {children}  {/* all pages/components inside here */}
+            {children}
         </Providers>
         </body>
         </html>
     );
 }
+
 

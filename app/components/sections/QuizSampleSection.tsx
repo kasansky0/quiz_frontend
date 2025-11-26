@@ -8,7 +8,7 @@ import { HeroCard } from "../quiz/HeroCard";
 import { ScrollHint } from "../quiz/ScrollHint";
 import { Button } from "@/app/components/ui/Button";
 
-interface QuestionType {
+export interface QuestionType {
     id: number;
     question: string;
     options: string[];
@@ -48,9 +48,13 @@ export default function QuizSampleSection({
     const [currentIndex, setCurrentIndex] = useState(0);
     const optionsRef = useRef<HTMLDivElement>(null);
     const [nextQuestionPrefetch, setNextQuestionPrefetch] = useState<QuestionType | null>(null);
-    const [displayedQuestion, setDisplayedQuestion] = useState<QuestionType | null>(null);
 
 
+    async function fetchNextQuestion(): Promise<QuestionType> {
+        if (!apiUrl) throw new Error("API URL not provided");
+        const res = await fetch(`${apiUrl}/questions/random`);
+        return res.json();
+    }
 
 
     // Scroll to options when selected
@@ -123,7 +127,14 @@ export default function QuizSampleSection({
         setAnswerResult(null);
 
         // get next question
-        let nextQuestion = nextQuestionPrefetch ?? (await fetchNextQuestion());
+        let nextQuestion: QuestionType;
+        try {
+            nextQuestion = nextQuestionPrefetch ?? (await fetchNextQuestion());
+        } catch (err) {
+            console.error("Failed to fetch next question:", err);
+            return; // stop execution if fetch fails
+        }
+
 
         // update question **while still invisible**
         setQuestionData(nextQuestion);
