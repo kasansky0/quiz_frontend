@@ -16,21 +16,26 @@ export interface QuestionType {
     explanation: string;
 }
 
-export function scrollToTop(container?: React.RefObject<HTMLElement | null>) {
-    if (container?.current instanceof HTMLElement) {
-        setTimeout(() => {
-            container.current?.scrollTo({ top: 0, behavior: "smooth" });
-        }, 50);
-        return;
-    }
+export function scrollToTopChild(container?: React.RefObject<HTMLElement | null>) {
+    if (!container?.current) return;
 
-    if (typeof window !== "undefined") {
-        setTimeout(() => {
-            window.scrollTo({ top: 0, behavior: "smooth" });
-        }, 50);
+    const topChild = container.current.firstElementChild as HTMLElement | null;
+
+    if (topChild) {
+        // Get the child's offset relative to the container
+        const containerTop = container.current.getBoundingClientRect().top;
+        const childTop = topChild.getBoundingClientRect().top;
+        const scrollOffset = childTop - containerTop + container.current.scrollTop;
+
+        container.current.scrollTo({
+            top: scrollOffset,
+            behavior: "smooth",
+        });
+    } else {
+        // fallback to container itself
+        container.current.scrollTo({ top: 0, behavior: "smooth" });
     }
 }
-
 
 
 interface QuizSampleSectionProps {
@@ -138,12 +143,10 @@ export default function QuizSampleSection({
 
         if (nextQuestion) setQuestionData(nextQuestion);
 
-        scrollToTop(scrollContainerRef);
+        scrollToTopChild(scrollContainerRef);
 
         setFade(true);
     };
-
-
 
     // Handle answer click
     const handleAnswerClick = async (option: string) => {
