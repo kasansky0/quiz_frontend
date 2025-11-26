@@ -16,9 +16,14 @@ export interface QuestionType {
     explanation: string;
 }
 
-function scrollToTop() {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+function scrollToTop(container?: React.RefObject<HTMLElement>) {
+    if (container?.current) {
+        container.current.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
 }
+
 
 interface QuizSampleSectionProps {
     isLoggedIn: boolean;
@@ -30,6 +35,7 @@ interface QuizSampleSectionProps {
     userId?: string | number;
     loadingDone?: boolean;
     style?: React.CSSProperties;
+    scrollContainerRef?: React.RefObject<HTMLElement>;
 }
 
 
@@ -41,6 +47,7 @@ export default function QuizSampleSection({
                                               setWrongQueue,
                                               apiUrl,
                                               loadingDone,
+                                              scrollContainerRef,
                                           }: QuizSampleSectionProps) {
     const [questionData, setQuestionData] = useState<QuestionType | null>(null);
     const [fade, setFade] = useState(true);
@@ -120,8 +127,8 @@ export default function QuizSampleSection({
         // start fade-out
         setFade(false);
 
-        // wait for fade-out to complete (match duration)
-        await new Promise(resolve => setTimeout(resolve, 500)); // same as CSS duration
+        // wait for fade-out to complete (match CSS duration)
+        await new Promise(resolve => setTimeout(resolve, 500));
 
         // reset selections and answer result
         setSelectedOption(null);
@@ -136,19 +143,23 @@ export default function QuizSampleSection({
             return; // stop execution if fetch fails
         }
 
-
         // update question **while still invisible**
         setQuestionData(nextQuestion);
         setCurrentIndex(prev => prev + 1);
 
-        scrollToTop();
-
-        // wait a tiny bit to ensure browser registers DOM change
+        // wait a tiny bit for DOM to update
         await new Promise(resolve => setTimeout(resolve, 50));
+
+        // SCROLL TO TOP using both container and window (iOS fix)
+        if (scrollContainerRef?.current) {
+            scrollContainerRef.current.scrollTop = 0;
+        }
+        window.scrollTo({ top: 0, behavior: "instant" }); // instant ensures iOS scroll works
 
         // fade-in smoothly
         setFade(true);
     };
+
 
 
 

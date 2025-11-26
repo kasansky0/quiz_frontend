@@ -23,6 +23,8 @@ export default function LoggedInPage() {
     const sidebarRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null); // ref for toggle button
 
+    const mainRef = useRef<HTMLElement>(null);
+
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
     // ✅ Wake backend to prevent cold start
@@ -126,7 +128,9 @@ export default function LoggedInPage() {
                 </button>
 
                 {/* QUIZ SECTION */}
-                <main className="flex-1 flex flex-col items-center justify-start p-6 md:p-8 overflow-y-auto min-h-[50vh]">
+                <main
+                    ref={mainRef}
+                    className="flex-1 flex flex-col items-center justify-start p-6 md:p-8 overflow-y-auto min-h-[50vh]">
                     {loading || !apiUrl || !session?.user ? (
                         <LoadingBanner />
                     ) : (
@@ -142,6 +146,7 @@ export default function LoggedInPage() {
                             }}
                             loadingDone={!loading}
                             style={{ minHeight: "300px" }} // optional: reserve height
+                            scrollContainerRef={mainRef}
                         />
                     )}
                 </main>
