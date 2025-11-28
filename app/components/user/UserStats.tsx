@@ -2,25 +2,32 @@
 
 import { useSession, signOut } from "next-auth/react";
 import { motion } from "framer-motion";
+import { useState } from "react";        // ✅ React hook
 import { Button } from "../ui/Button";
 
 export default function UserStats() {
     const { data: session } = useSession();
+    const [calcInput, setCalcInput] = useState("");
+    const [calcResult, setCalcResult] = useState<number | null>(null);
+
 
     if (!session) return null;
 
     return (
         <div className="flex flex-col items-center w-full text-white font-sans">
 
-            {/* Avatar */}
+            {/* Avatar
             <div className="relative w-20 h-20 rounded-full bg-gradient-to-tr from-gray-700 to-gray-900 flex items-center justify-center text-3xl font-bold text-white shadow-md">
                 {session.user?.name?.[0] ?? "?"}
-            </div>
+            </div> */}
 
             {/* Username */}
-            <h2 className="text-xl font-semibold mt-4 tracking-wide">
-                {session.user?.name || "User"}
+            <h2 className="text-2xl font-semibold mt-4 tracking-wide text-center">
+                <span className="bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">
+                    {session.user?.name || "User"}
+                </span>
             </h2>
+
 
             {/* Styled Google Sign-Out Button (matches sign-in button) */}
             <motion.div whileHover={{scale: 1.05}} whileTap={{scale: 0.95}} className="mt-6">
@@ -64,7 +71,7 @@ export default function UserStats() {
 
             </div>
 
-            <div className="w-full mt-6 p-6 bg-black/70 backdrop-blur-xl border border-green-400/20 rounded-2xl shadow-lg relative
+            <div className="w-full mt-6 p-4 bg-black/70 backdrop-blur-xl border border-green-400/20 rounded-2xl shadow-lg relative
                 h-64 flex flex-col">
 
                 {/* Heading (fixed) */}
@@ -72,12 +79,15 @@ export default function UserStats() {
                     Formula Sheet
                 </h2>
 
-                {/* Formula List (scrollable) */}
-                <ul className="w-full text-xs font-mono space-y-2 overflow-y-auto flex-1"
+                {/* Formula List (scrollable & isolated) */}
+                <ul
+                    className="w-full text-xs font-mono space-y-1 overflow-y-auto flex-1 overscroll-contain"
                     style={{
                         scrollbarWidth: "none", // Firefox
                         msOverflowStyle: "none" // IE 10+
-                    }}>
+                    }}
+                    onWheel={(e) => e.stopPropagation()} // prevent parent scroll when scrolling formulas
+                >
                     <li>
                         <span className="text-green-300 font-medium">Ohm's Law:</span>
                         <div className="text-green-100 ml-2">V = IR</div>
@@ -116,9 +126,86 @@ export default function UserStats() {
                         <span className="text-green-300 font-medium">Capacitive Z :</span>
                         <div className="text-green-100 ml-2">XC=1/2πfC</div>
                     </li>
-                    {/* Add more formulas, scroll will appear */}
+                    {/* Add more formulas here */}
                 </ul>
             </div>
+
+            {/* Basic Calculator */}
+            <div className="w-full mt-6 p-4 bg-black/70 backdrop-blur-xl border border-green-400/20 rounded-2xl shadow-lg flex flex-col items-center">
+                <h2 className="text-green-300 text-sm font-medium mb-3 text-center">
+                    Calculator
+                </h2>
+
+                {/* Display */}
+                <input
+                    type="text"
+                    className="w-full bg-black/50 text-black-200 px-3 py-2 rounded-md text-right mb-2 focus:outline-none border border-green-400/20 font-bold"
+                    placeholder="0"
+                    value={calcResult !== null ? String(calcResult) : calcInput}
+                    readOnly
+                />
+
+                {/* Buttons */}
+                <div className="grid grid-cols-4 gap-2 w-full">
+                    {["7","8","9","C",
+                        "4","5","6","=",
+                        "1","2","3","-",
+                        "0",".","√","+",
+                        "(",")","/","*",
+                        "⌫","x²","sin","cos"].map((btn) => (
+                        <button
+                            key={btn}
+                            className="px-3 py-2 bg-green-500/70 hover:bg-green-600/80 rounded-md text-white font-bold flex items-center justify-center"
+                            onClick={() => {
+                                if (btn === "C") {
+                                    setCalcInput("");
+                                    setCalcResult(null);
+                                } else if (btn === "=") {
+                                    try {
+                                        // Replace any √(...) with Math.sqrt(...)
+                                        let expr = calcInput
+                                            .replace(/√\(([^)]+)\)/g, "Math.sqrt($1)")
+                                            .replace(/sin\(([^)]+)\)/g, "Math.sin($1)")
+                                            .replace(/cos\(([^)]+)\)/g, "Math.cos($1)");
+                                        const res = Function(`"use strict"; return (${expr})`)();
+                                        setCalcResult(res);
+                                        setCalcInput("");
+                                    } catch {
+                                        setCalcResult(NaN);
+                                    }
+                                } else if (btn === "√") {
+                                    setCalcInput((prev) => prev + "√"); // just insert the symbol
+                                    setCalcResult(null);
+                                } else if (btn === "x²") {
+                                        setCalcInput((prev) => prev + "**2");
+                                } else if (btn === "sin" || btn === "cos") {
+                                    setCalcInput((prev) => prev + btn + "("); // auto add opening parenthesis
+                                    setCalcResult(null);
+                                } else if (btn === "⌫") {
+                                    setCalcInput((prev) => {
+                                        if (prev.endsWith("√()")) return prev.slice(0, -3); // remove entire empty sqrt
+                                        return prev.slice(0, -1); // remove last char
+                                    });
+                                    setCalcResult(null);
+                                } else {
+                                    setCalcInput((prev) => {
+                                        if (prev.endsWith("√()")) {
+                                            return prev.slice(0, -1) + btn + ")";
+                                        }
+                                        return prev + btn;
+                                    });
+                                    setCalcResult(null);
+                                }
+                            }}
+                        >
+                            {btn}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+
+
 
         </div>
     );

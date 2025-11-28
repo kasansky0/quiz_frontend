@@ -1,6 +1,18 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 export default function LoadingBanner() {
+    const [showDelayMessage, setShowDelayMessage] = useState(false);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setShowDelayMessage(true);
+        }, 10000); // 10 seconds
+
+        return () => clearTimeout(timer);
+    }, []);
+
     return (
         <div className="w-full h-full flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
 
@@ -19,6 +31,16 @@ export default function LoadingBanner() {
                 <div className="mt-6 w-2/3 h-1 bg-green-400/20 rounded-full overflow-hidden relative">
                     <div className="absolute top-0 left-0 h-full w-1/3 bg-green-400/60 rounded-full animate-loading"></div>
                 </div>
+
+                {/* 👇 Appears after 9 seconds */}
+                {showDelayMessage && (
+                    <div className="mt-4 text-sm font-mono text-green-400/40 text-center leading-snug">
+                        <p>This may take a few more seconds,</p>
+                        <p>Please wait...</p>
+                    </div>
+                )}
+
+
             </div>
 
         </div>
