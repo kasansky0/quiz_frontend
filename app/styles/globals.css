@@ -355,3 +355,14 @@ html, body {
     overscroll-behavior: contain; /* Prevent iOS bounce showing white background */
 }
 
+/* Hide scrollbar on all browsers */
+.hide-scrollbar {
+    -ms-overflow-style: none;  /* IE 10+ */
+    scrollbar-width: none;     /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+}

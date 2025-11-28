@@ -131,7 +131,7 @@ export default function UserStats() {
             </div>
 
             {/* Basic Calculator */}
-            <div className="w-full mt-6 p-4 bg-black/70 backdrop-blur-xl border border-green-400/20 rounded-2xl shadow-lg flex flex-col items-center">
+            <div className="w-full mt-6 mb-10 p-4 bg-black/70 backdrop-blur-xl border border-green-400/20 rounded-2xl shadow-lg flex flex-col items-center">
                 <h2 className="text-green-300 text-sm font-medium mb-3 text-center">
                     Calculator
                 </h2>
