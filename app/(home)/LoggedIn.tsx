@@ -95,7 +95,7 @@ export default function LoggedInPage() {
 
         document.addEventListener("mousedown", handleClick);
         return () => document.removeEventListener("mousedown", handleClick);
-    }, []);
+    }, [sidebarOpen]);
 
 
     return (
@@ -118,7 +118,7 @@ export default function LoggedInPage() {
                 {/* MOBILE MENU BUTTON */}
                 <button
                     ref={buttonRef}
-                    className="md:hidden p-3 text-white absolute top-4 right-4 z-50
+                    className="md:hidden p-3 text-white fixed top-4 right-4 z-50
                                bg-black-400/60 backdrop-blur-sm rounded-full shadow-md
                                hover:bg-green-500/30 transition-colors duration-200"
                     onClick={() => setSidebarOpen(!sidebarOpen)}
