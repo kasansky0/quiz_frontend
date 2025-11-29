@@ -189,7 +189,9 @@ export default function QuizSampleSection({
 
 
     return (
-        <div className="flex-1 flex flex-col items-center justify-start p-6 md:p-8 min-h-[50vh] md:h-auto bg-black-200 w-full">
+        <div className="flex-1 flex flex-col items-center justify-start p-6 md:p-8 min-h-[50vh] md:h-auto bg-black-200 w-full no-select"
+             onContextMenu={(e) => e.preventDefault()}
+            >
             {!isLoggedIn ? (
                 <>
                     <div className="mb-4">

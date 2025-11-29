@@ -133,7 +133,6 @@ export default function LoggedInPage() {
                     {loading || !apiUrl || !session?.user ? (
                         <LoadingBanner/>
                     ) : (
-                        <div className="no-select" onContextMenu={(e) => e.preventDefault()}>
                             <QuizSampleSection
                                 isLoggedIn={true}
                                 wrongQueue={wrongQueue}
@@ -148,8 +147,6 @@ export default function LoggedInPage() {
                                 style={{minHeight: "300px"}} // optional: reserve height
                                 scrollContainerRef={mainRef}
                             />
-                        </div>
-
                     )}
                 </main>
 
