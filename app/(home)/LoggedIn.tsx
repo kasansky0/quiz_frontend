@@ -133,20 +133,23 @@ export default function LoggedInPage() {
                     {loading || !apiUrl || !session?.user ? (
                         <LoadingBanner/>
                     ) : (
-                        <QuizSampleSection
-                            isLoggedIn={true}
-                            wrongQueue={wrongQueue}
-                            setWrongQueue={setWrongQueue}
-                            apiUrl={apiUrl}
-                            userId={session.user.id}
-                            onClick={() => {
-                                setSidebarOpen(false);
-                                mainRef.current?.scrollTo({ top: 0, behavior: "smooth" });
-                            }}
-                            loadingDone={!loading}
-                            style={{minHeight: "300px"}} // optional: reserve height
-                            scrollContainerRef={mainRef}
-                        />
+                        <div className="no-select" onContextMenu={(e) => e.preventDefault()}>
+                            <QuizSampleSection
+                                isLoggedIn={true}
+                                wrongQueue={wrongQueue}
+                                setWrongQueue={setWrongQueue}
+                                apiUrl={apiUrl}
+                                userId={session.user.id}
+                                onClick={() => {
+                                    setSidebarOpen(false);
+                                    mainRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+                                }}
+                                loadingDone={!loading}
+                                style={{minHeight: "300px"}} // optional: reserve height
+                                scrollContainerRef={mainRef}
+                            />
+                        </div>
+
                     )}
                 </main>
 

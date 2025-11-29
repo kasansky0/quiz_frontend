@@ -71,7 +71,81 @@ export default function UserStats() {
 
             </div>
 
-            <div className="w-full mt-6 p-4 bg-black/70 backdrop-blur-xl border border-green-400/20 rounded-2xl shadow-lg relative
+            {/* Basic Calculator */}
+            <div className="w-full mt-4 mb-4 p-4 bg-black/70 backdrop-blur-xl border border-green-400/20 rounded-2xl shadow-lg flex flex-col items-center">
+                <h2 className="text-green-300 text-sm font-medium mb-3 text-center">
+                    Calculator
+                </h2>
+
+                {/* Display */}
+                <input
+                    type="text"
+                    className="w-full bg-black/50 text-black-200 px-3 py-2 rounded-md text-right mb-2 focus:outline-none border border-green-400/20 font-bold"
+                    placeholder="0"
+                    value={calcResult !== null ? String(calcResult) : calcInput}
+                    readOnly
+                />
+
+                {/* Buttons */}
+                <div className="grid grid-cols-4 gap-2 w-full">
+                    {["0","=","⌫","C",
+                        "1","2","3","+",
+                        "4","5","6","-",
+                        "7","8","9","*",
+                        "(",")","/",".",
+                        "√","x²","sin","cos"].map((btn) => (
+                        <button
+                            key={btn}
+                            className="px-3 py-2 bg-green-500/70 hover:bg-green-600/80 rounded-md text-white font-bold flex items-center justify-center"
+                            onClick={() => {
+                                if (btn === "C") {
+                                    setCalcInput("");
+                                    setCalcResult(null);
+                                } else if (btn === "=") {
+                                    try {
+                                        // Replace any √(...) with Math.sqrt(...)
+                                        let expr = calcInput
+                                            .replace(/√\(([^)]+)\)/g, "Math.sqrt($1)")
+                                            .replace(/sin\(([^)]+)\)/g, "Math.sin($1)")
+                                            .replace(/cos\(([^)]+)\)/g, "Math.cos($1)");
+                                        const res = Function(`"use strict"; return (${expr})`)();
+                                        setCalcResult(res);
+                                        setCalcInput("");
+                                    } catch {
+                                        setCalcResult(NaN);
+                                    }
+                                } else if (btn === "√") {
+                                    setCalcInput((prev) => prev + "√"); // just insert the symbol
+                                    setCalcResult(null);
+                                } else if (btn === "x²") {
+                                    setCalcInput((prev) => prev + "**2");
+                                } else if (btn === "sin" || btn === "cos") {
+                                    setCalcInput((prev) => prev + btn + "("); // auto add opening parenthesis
+                                    setCalcResult(null);
+                                } else if (btn === "⌫") {
+                                    setCalcInput((prev) => {
+                                        if (prev.endsWith("√()")) return prev.slice(0, -3); // remove entire empty sqrt
+                                        return prev.slice(0, -1); // remove last char
+                                    });
+                                    setCalcResult(null);
+                                } else {
+                                    setCalcInput((prev) => {
+                                        if (prev.endsWith("√()")) {
+                                            return prev.slice(0, -1) + btn + ")";
+                                        }
+                                        return prev + btn;
+                                    });
+                                    setCalcResult(null);
+                                }
+                            }}
+                        >
+                            {btn}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            <div className="w-full mt-1 p-4 bg-black/70 backdrop-blur-xl border border-green-400/20 rounded-2xl shadow-lg relative
                 h-64 flex flex-col">
 
                 {/* Heading (fixed) */}
@@ -130,79 +204,7 @@ export default function UserStats() {
                 </ul>
             </div>
 
-            {/* Basic Calculator */}
-            <div className="w-full mt-6 mb-10 p-4 bg-black/70 backdrop-blur-xl border border-green-400/20 rounded-2xl shadow-lg flex flex-col items-center">
-                <h2 className="text-green-300 text-sm font-medium mb-3 text-center">
-                    Calculator
-                </h2>
 
-                {/* Display */}
-                <input
-                    type="text"
-                    className="w-full bg-black/50 text-black-200 px-3 py-2 rounded-md text-right mb-2 focus:outline-none border border-green-400/20 font-bold"
-                    placeholder="0"
-                    value={calcResult !== null ? String(calcResult) : calcInput}
-                    readOnly
-                />
-
-                {/* Buttons */}
-                <div className="grid grid-cols-4 gap-2 w-full">
-                    {["7","8","9","C",
-                        "4","5","6","=",
-                        "1","2","3","-",
-                        "0",".","√","+",
-                        "(",")","/","*",
-                        "⌫","x²","sin","cos"].map((btn) => (
-                        <button
-                            key={btn}
-                            className="px-3 py-2 bg-green-500/70 hover:bg-green-600/80 rounded-md text-white font-bold flex items-center justify-center"
-                            onClick={() => {
-                                if (btn === "C") {
-                                    setCalcInput("");
-                                    setCalcResult(null);
-                                } else if (btn === "=") {
-                                    try {
-                                        // Replace any √(...) with Math.sqrt(...)
-                                        let expr = calcInput
-                                            .replace(/√\(([^)]+)\)/g, "Math.sqrt($1)")
-                                            .replace(/sin\(([^)]+)\)/g, "Math.sin($1)")
-                                            .replace(/cos\(([^)]+)\)/g, "Math.cos($1)");
-                                        const res = Function(`"use strict"; return (${expr})`)();
-                                        setCalcResult(res);
-                                        setCalcInput("");
-                                    } catch {
-                                        setCalcResult(NaN);
-                                    }
-                                } else if (btn === "√") {
-                                    setCalcInput((prev) => prev + "√"); // just insert the symbol
-                                    setCalcResult(null);
-                                } else if (btn === "x²") {
-                                        setCalcInput((prev) => prev + "**2");
-                                } else if (btn === "sin" || btn === "cos") {
-                                    setCalcInput((prev) => prev + btn + "("); // auto add opening parenthesis
-                                    setCalcResult(null);
-                                } else if (btn === "⌫") {
-                                    setCalcInput((prev) => {
-                                        if (prev.endsWith("√()")) return prev.slice(0, -3); // remove entire empty sqrt
-                                        return prev.slice(0, -1); // remove last char
-                                    });
-                                    setCalcResult(null);
-                                } else {
-                                    setCalcInput((prev) => {
-                                        if (prev.endsWith("√()")) {
-                                            return prev.slice(0, -1) + btn + ")";
-                                        }
-                                        return prev + btn;
-                                    });
-                                    setCalcResult(null);
-                                }
-                            }}
-                        >
-                            {btn}
-                        </button>
-                    ))}
-                </div>
-            </div>
 
 
 
