@@ -5,7 +5,11 @@ import { motion } from "framer-motion";
 import { useState } from "react";        // ✅ React hook
 import { Button } from "../ui/Button";
 
-export default function UserStats() {
+interface UserStatsProps {
+    userPercentage: number;
+}
+
+export default function UserStats({ userPercentage }: UserStatsProps) {
     const { data: session } = useSession();
     const [calcInput, setCalcInput] = useState("");
     const [calcResult, setCalcResult] = useState<number | null>(null);
@@ -56,11 +60,19 @@ export default function UserStats() {
             <div className="flex items-center space-x-3 mt-6">
 
                 {/* Percentage score */}
-                <div className="w-10 h-10 flex items-center justify-center bg-black/70 backdrop-blur-xl border border-green-400/20 rounded-full shadow-lg relative">
-                    <span className="text-green-300 text-xs font-medium flex flex-col items-center leading-tight">
-                        1%
-                    </span>
+                <div
+                    className="flex items-center justify-center bg-black/70 backdrop-blur-xl border border-green-400/20 rounded-full shadow-lg relative px-2"
+                    style={{
+                        width: `${Math.max(40, 12 * String(userPercentage).length)}px`, // dynamic width
+                        height: "40px", // fixed height
+                        transition: "width 0.3s ease", // smooth growth
+                    }}
+                >
+  <span className="text-green-300 text-xs font-medium flex items-center justify-center leading-tight">
+    {userPercentage.toFixed()}
+  </span>
                 </div>
+
 
                 {/* Percentage score */}
                 <div className="w-10 h-10 flex items-center justify-center bg-black/70 backdrop-blur-xl border border-green-400/20 rounded-full shadow-lg relative">

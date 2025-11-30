@@ -35,7 +35,7 @@ export default function LoadingBanner() {
                 {/* 👇 Appears after 9 seconds */}
                 {showDelayMessage && (
                     <div className="mt-4 text-sm font-mono text-green-400/40 text-center leading-snug">
-                        <p>Taking few more seconds,</p>
+                        <p>Taking few more seconds</p>
                         <p>Please wait...</p>
                     </div>
                 )}

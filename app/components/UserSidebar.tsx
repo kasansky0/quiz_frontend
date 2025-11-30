@@ -3,7 +3,11 @@
 import { useSession } from "next-auth/react";
 import UserStats from "./user/UserStats";
 
-export default function UserSidebar() {
+interface UserSidebarProps {
+    userPercentage: number;
+}
+
+export default function UserSidebar({ userPercentage }: UserSidebarProps) {
     const { data: session } = useSession();
 
     return (
@@ -19,7 +23,7 @@ export default function UserSidebar() {
             touch-pan-y
             font-sans
         ">
-            <UserStats />
+            <UserStats userPercentage={userPercentage} />
         </aside>
     );
 }

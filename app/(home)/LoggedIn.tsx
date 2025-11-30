@@ -14,18 +14,17 @@ export default function LoggedInPage() {
     const [loading, setLoading] = useState(true);
     const {data: session} = useSession();
     const [userStats, setUserStats] = useState(null);
-
-
-    // ✅ Wrong queue state for spaced repetition logic
     const [wrongQueue, setWrongQueue] = useState<QuestionType[]>([]);
-
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const sidebarRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null); // ref for toggle button
-
     const mainRef = useRef<HTMLElement>(null);
-
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const [answerCount, setAnswerCount] = useState(0);
+    const [answeredState, setAnsweredState] = useState<"correct" | "wrong" | null>(null);
+    const [userPercentage, setUserPercentage] = useState(0);
+
+
 
     // ✅ Wake backend to prevent cold start
     async function forceWakeAPI(apiUrl: string) {
@@ -97,6 +96,46 @@ export default function LoggedInPage() {
         return () => document.removeEventListener("mousedown", handleClick);
     }, [sidebarOpen]);
 
+    useEffect(() => {
+        if (answeredState === null) return; // skip on initial render
+
+        setUserPercentage(prev => {
+            if (answeredState === "correct") {
+                return +(prev + 1).toFixed(3); // add 0.009 for correct answer
+            } else if (answeredState === "wrong") {
+                return +(prev - 0.5).toFixed(3); // subtract 0.005 for wrong answer
+            }
+            return prev;
+        });
+    }, [answerCount, answeredState]);
+
+    useEffect(() => {
+        if (!userStats?.user_id || answerCount === 0 || answeredState === null) return;
+
+        // Every 5 answers, push to backend
+        if (answerCount % 5 === 0) {
+            fetch(`${apiUrl}/userPercentage/update`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    userId: userStats.user_id, // ✅ use DB user_id
+                    userPercentage: userPercentage,
+                }),
+            })
+                .then(res => res.json())
+                .then(data => console.log("User percentage updated:", data))
+                .catch(err => console.error("Failed to update user percentage:", err));
+        }
+    }, [answerCount, userPercentage, userStats]);
+
+    // 1️⃣ Add another useEffect to initialize userPercentage from DB
+    useEffect(() => {
+        if (!userStats?.user_id) return;
+
+        // Set initial percentage from DB
+        setUserPercentage(userStats.userPercentage ?? 0);
+    }, [userStats]);
+
 
     return (
         <div className="min-h-screen flex bg-black-200 relative">
@@ -110,7 +149,7 @@ export default function LoggedInPage() {
                     md:sticky md:top-0 md:translate-x-0 md:transition-none md:shadow-none md:z-auto
                 `}
             >
-                <UserSidebar/>
+                <UserSidebar userPercentage={userPercentage} />
             </div>
 
             {/* ======= MAIN PANEL ======= */}
@@ -146,6 +185,10 @@ export default function LoggedInPage() {
                                 loadingDone={!loading}
                                 style={{minHeight: "300px"}} // optional: reserve height
                                 scrollContainerRef={mainRef}
+                                onAnswer={(isCorrect) => {
+                                    setAnsweredState(isCorrect ? "correct" : "wrong");
+                                    setAnswerCount(prev => prev + 1); // always increments
+                                }}
                             />
                     )}
                 </main>

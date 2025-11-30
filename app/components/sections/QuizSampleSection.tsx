@@ -49,6 +49,7 @@ interface QuizSampleSectionProps {
     loadingDone?: boolean;
     style?: React.CSSProperties;
     scrollContainerRef?: React.RefObject<HTMLElement | null>;
+    onAnswer?: (isCorrect: boolean) => void;
 }
 
 
@@ -61,6 +62,7 @@ export default function QuizSampleSection({
                                               apiUrl,
                                               loadingDone,
                                               scrollContainerRef,
+                                              onAnswer = () => {}, // default no-op
                                           }: QuizSampleSectionProps) {
     const [questionData, setQuestionData] = useState<QuestionType | null>(null);
     const [fade, setFade] = useState(true);
@@ -69,6 +71,8 @@ export default function QuizSampleSection({
     const [currentIndex, setCurrentIndex] = useState(0);
     const optionsRef = useRef<HTMLDivElement>(null);
     const [cycleCount, setCycleCount] = useState(0);
+    const [lastQuestionId, setLastQuestionId] = useState<number | null>(null);
+
 
 
     // Scroll to options when an option is selected
@@ -118,38 +122,40 @@ export default function QuizSampleSection({
         }
     }
 
-    // Handle "Next" button click
     const handleNextQuestion = async () => {
-        // Fade out current question
         setFade(false);
         await new Promise(res => setTimeout(res, 500));
 
-        // Reset selected option and answer result
         setSelectedOption(null);
         setAnswerResult(null);
 
         let nextQuestion: QuestionType | null = null;
 
-        // Handle wrongQueue cycling
         if (cycleCount === 2 && wrongQueue?.length && setWrongQueue) {
-            nextQuestion = wrongQueue[0];
-            setWrongQueue(prev => prev.slice(1));
+            // Pick first wrong question that's NOT the same as last one
+            nextQuestion = wrongQueue.find(q => q.id !== lastQuestionId) || wrongQueue[0];
+            setWrongQueue(prev => prev.filter(q => q.id !== nextQuestion!.id));
             setCycleCount(0);
         } else {
-            nextQuestion = await fetchRandomQuestion();
+            let fetched = await fetchRandomQuestion();
+            // Avoid repeating last question
+            if (fetched?.id === lastQuestionId) {
+                fetched = await fetchRandomQuestion(); // try again
+            }
+            nextQuestion = fetched;
             setCycleCount(prev => prev + 1);
         }
 
-        // Set the new question
-        if (nextQuestion) setQuestionData(nextQuestion);
+        if (nextQuestion) {
+            setQuestionData(nextQuestion);
+            setLastQuestionId(nextQuestion.id);
+        }
 
-        // ✅ Reset scroll for container and viewport
         scrollContainerRef?.current?.scrollTo({ top: 0, behavior: "auto" });
         window.scrollTo({ top: 0, behavior: "auto" });
-
-        // Fade in new question
         setFade(true);
     };
+
 
 
     // Handle answer click
@@ -182,6 +188,8 @@ export default function QuizSampleSection({
                 // After you determine correctness and before updating wrongQueue
                 setWrongQueue(prev => [...prev, questionData]);
             }
+            if (onAnswer) onAnswer(correct);
+
 
             setAnswerResult({ correct, answer, explanation });
         }
