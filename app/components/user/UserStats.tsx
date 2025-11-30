@@ -10,6 +10,25 @@ interface UserStatsProps {
     nickname?: string;
 }
 
+function NicknameLoading() {
+    return (
+        <div className="w-32 h-4 bg-green-500/10 rounded overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-400/40 to-transparent animate-shimmer rounded" />
+        </div>
+    );
+}
+
+function PercentageLoading() {
+    return (
+        <div className="w-10 h-10 bg-green-500/10 rounded-full overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-400/40 to-transparent animate-shimmer rounded-full" />
+        </div>
+    );
+}
+
+
+
+
 export default function UserStats({ userPercentage, nickname }: UserStatsProps) {
     const { data: session } = useSession();
     const [calcInput, setCalcInput] = useState("");
@@ -27,10 +46,18 @@ export default function UserStats({ userPercentage, nickname }: UserStatsProps) 
             </div> */}
 
             <h2 className="font-semibold mt-4 tracking-wide text-center">
-                <span className="bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">
-                    {nickname || session.user?.name || "User"}
-                </span>
+
+                {/* Nickname shimmer while loading */}
+                {!nickname ? (
+                    <NicknameLoading />
+                ) : (
+                    <span className="bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">
+                        {nickname}
+                     </span>
+                )}
+
             </h2>
+
 
 
 
@@ -61,19 +88,24 @@ export default function UserStats({ userPercentage, nickname }: UserStatsProps) 
             {/* Row container */}
             <div className="flex items-center space-x-3 mt-6">
 
-                {/* Percentage score */}
                 <div
-                    className="flex items-center justify-center bg-black/70 backdrop-blur-xl border border-green-400/20 rounded-full shadow-lg relative px-2"
+                    className="flex items-center justify-center bg-black/70 backdrop-blur-xl border border-green-400/20
+                        rounded-full shadow-lg relative px-2"
                     style={{
-                        width: `${Math.max(40, 12 * String(userPercentage).length)}px`, // dynamic width
-                        height: "40px", // fixed height
-                        transition: "width 0.3s ease", // smooth growth
+                        width: `${Math.max(40, 12 * String(userPercentage).length)}px`,
+                        height: "40px",
+                        transition: "width 0.3s ease",
                     }}
                 >
-  <span className="text-green-300 text-xs font-medium flex items-center justify-center leading-tight">
-    {userPercentage.toFixed()}
-  </span>
+                    {userPercentage === 0 ? (
+                        <PercentageLoading />
+                    ) : (
+                        <span className="text-green-300 text-xs font-medium flex items-center justify-center leading-tight">
+                             {userPercentage.toFixed()}
+                        </span>
+                    )}
                 </div>
+
 
 
                 {/* Percentage score */}
