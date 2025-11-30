@@ -28,13 +28,18 @@ export default function LoadingBanner() {
 
         let formulaInterval: NodeJS.Timeout;
 
-        // Start formula rotation after 10s
+        // Start formula rotation at 11s
         setTimeout(() => {
+            // Show first formula immediately
+            const random = formulas[Math.floor(Math.random() * formulas.length)];
+            setCurrentFormula(random);
+
+            // Then rotate every 10 seconds
             formulaInterval = setInterval(() => {
                 const random = formulas[Math.floor(Math.random() * formulas.length)];
                 setCurrentFormula(random);
-            }, 10000); // Change formula every 3 seconds
-        }, 10000);
+            }, 10000);
+        }, 11000);
 
         return () => {
             clearTimeout(t1);
