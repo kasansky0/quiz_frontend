@@ -6,6 +6,7 @@ import UserSidebar from "../components/UserSidebar";
 import QuizSampleSection from "../components/sections/QuizSampleSection";
 import Footer from "../components/sections/Footer";
 import LoadingBanner from "../components/LoadingBanner";
+import type { UserStatsType } from "@/types/userStats"
 
 // ✅ Import your QuestionType if you have it
 import type {QuestionType} from "../components/sections/QuizSampleSection";
@@ -13,7 +14,7 @@ import type {QuestionType} from "../components/sections/QuizSampleSection";
 export default function LoggedInPage() {
     const [loading, setLoading] = useState(true);
     const {data: session} = useSession();
-    const [userStats, setUserStats] = useState(null);
+    const [userStats, setUserStats] = useState<UserStatsType | null>(null);
     const [wrongQueue, setWrongQueue] = useState<QuestionType[]>([]);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const sidebarRef = useRef<HTMLDivElement>(null);
@@ -101,9 +102,9 @@ export default function LoggedInPage() {
 
         setUserPercentage(prev => {
             if (answeredState === "correct") {
-                return +(prev + 1).toFixed(3); // add 0.009 for correct answer
+                return +(prev + 1).toFixed(3);
             } else if (answeredState === "wrong") {
-                return +(prev - 0.5).toFixed(3); // subtract 0.005 for wrong answer
+                return +(prev - 0.5).toFixed(3);
             }
             return prev;
         });
