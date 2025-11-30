@@ -55,6 +55,7 @@ export default function LoggedInPage() {
                     })
                 });
                 const data = await res.json();
+                console.log("userStats from backend:", data); // 🔍 see if nickname is there
                 setUserStats(data);
             } catch (err) {
                 console.error("❌ Failed to fetch user stats:", err);
@@ -104,7 +105,7 @@ export default function LoggedInPage() {
             if (answeredState === "correct") {
                 return +(prev + 1).toFixed(3);
             } else if (answeredState === "wrong") {
-                return +(prev - 0.5).toFixed(3);
+                return +(prev - 1).toFixed(3);
             }
             return prev;
         });
@@ -114,7 +115,7 @@ export default function LoggedInPage() {
         if (!userStats?.user_id || answerCount === 0 || answeredState === null) return;
 
         // Every 5 answers, push to backend
-        if (answerCount % 5 === 0) {
+       // if (answerCount % 5 === 0) {
             fetch(`${apiUrl}/userPercentage/update`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -126,7 +127,7 @@ export default function LoggedInPage() {
                 .then(res => res.json())
                 .then(data => console.log("User percentage updated:", data))
                 .catch(err => console.error("Failed to update user percentage:", err));
-        }
+       // }
     }, [answerCount, userPercentage, userStats]);
 
     // 1️⃣ Add another useEffect to initialize userPercentage from DB
@@ -150,7 +151,7 @@ export default function LoggedInPage() {
                     md:sticky md:top-0 md:translate-x-0 md:transition-none md:shadow-none md:z-auto
                 `}
             >
-                <UserSidebar userPercentage={userPercentage} />
+                <UserSidebar userPercentage={userPercentage} nickname={userStats?.nickname} />
             </div>
 
             {/* ======= MAIN PANEL ======= */}

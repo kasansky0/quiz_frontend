@@ -5,4 +5,5 @@ export interface UserStatsType {
     userPercentage: number;
     image?: string | null;
     google_id?: string | null;
+    nickname: string;
 }

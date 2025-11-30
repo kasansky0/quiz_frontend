@@ -7,9 +7,10 @@ import { Button } from "../ui/Button";
 
 interface UserStatsProps {
     userPercentage: number;
+    nickname?: string;
 }
 
-export default function UserStats({ userPercentage }: UserStatsProps) {
+export default function UserStats({ userPercentage, nickname }: UserStatsProps) {
     const { data: session } = useSession();
     const [calcInput, setCalcInput] = useState("");
     const [calcResult, setCalcResult] = useState<number | null>(null);
@@ -25,12 +26,13 @@ export default function UserStats({ userPercentage }: UserStatsProps) {
                 {session.user?.name?.[0] ?? "?"}
             </div> */}
 
-            {/* Username */}
-            <h2 className="text-2xl font-semibold mt-4 tracking-wide text-center">
+            <h2 className="font-semibold mt-4 tracking-wide text-center">
                 <span className="bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">
-                    {session.user?.name || "User"}
+                    {nickname || session.user?.name || "User"}
                 </span>
             </h2>
+
+
 
 
             {/* Styled Google Sign-Out Button (matches sign-in button) */}

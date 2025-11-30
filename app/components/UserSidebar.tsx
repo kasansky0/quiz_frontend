@@ -5,9 +5,10 @@ import UserStats from "./user/UserStats";
 
 interface UserSidebarProps {
     userPercentage: number;
+    nickname?: string;
 }
 
-export default function UserSidebar({ userPercentage }: UserSidebarProps) {
+export default function UserSidebar({ userPercentage, nickname }: UserSidebarProps) {
     const { data: session } = useSession();
 
     return (
@@ -23,7 +24,7 @@ export default function UserSidebar({ userPercentage }: UserSidebarProps) {
             touch-pan-y
             font-sans
         ">
-            <UserStats userPercentage={userPercentage} />
+            <UserStats userPercentage={userPercentage} nickname={nickname} />
         </aside>
     );
 }

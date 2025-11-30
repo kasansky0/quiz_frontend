@@ -33,7 +33,7 @@ export default function LoadingBanner() {
             formulaInterval = setInterval(() => {
                 const random = formulas[Math.floor(Math.random() * formulas.length)];
                 setCurrentFormula(random);
-            }, 3000); // Change formula every 3 seconds
+            }, 10000); // Change formula every 3 seconds
         }, 10000);
 
         return () => {
