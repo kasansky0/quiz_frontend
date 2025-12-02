@@ -134,11 +134,11 @@ export default function UserStats({ userPercentage, nickname }: UserStatsProps) 
 
                 {/* Buttons */}
                 <div className="grid grid-cols-4 gap-2 w-full">
-                    {["0","=","⌫","C",
-                        "1","2","3","+",
-                        "4","5","6","-",
+                    {["⌫","C","=","/",
                         "7","8","9","*",
-                        "(",")","/",".",
+                        "4","5","6","-",
+                        "1","2","3","+",
+                        "(","0",")",".",
                         "√","x²","sin","cos"].map((btn) => (
                         <button
                             key={btn}
@@ -176,13 +176,20 @@ export default function UserStats({ userPercentage, nickname }: UserStatsProps) 
                                     setCalcResult(null);
                                 } else {
                                     setCalcInput((prev) => {
-                                        if (prev.endsWith("√()")) {
-                                            return prev.slice(0, -1) + btn + ")";
+                                        // If calcInput is empty but we have a previous result and the user pressed an operator
+                                        let start = prev;
+                                        if (!prev && calcResult !== null && ["+", "-", "*", "/"].includes(btn)) {
+                                            start = String(calcResult);
                                         }
-                                        return prev + btn;
+
+                                        if (prev.endsWith("√()")) {
+                                            return start.slice(0, -1) + btn + ")";
+                                        }
+                                        return start + btn;
                                     });
                                     setCalcResult(null);
                                 }
+
                             }}
                         >
                             {btn}
