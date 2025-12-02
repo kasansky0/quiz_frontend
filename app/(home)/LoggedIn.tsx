@@ -159,13 +159,15 @@ export default function LoggedInPage() {
                 {/* MOBILE MENU BUTTON */}
                 <button
                     ref={buttonRef}
-                    className="md:hidden p-3 text-white fixed top-4 right-4 z-50
-                               bg-black-400/60 backdrop-blur-sm rounded-full shadow-md
-                               hover:bg-green-500/30 transition-colors duration-200"
+                    className="md:hidden p-2 text-green-300 fixed top-2 right-4 z-50
+               bg-transparent border border-green-400/30 rounded-full
+               hover:bg-green-500/10 hover:border-green-400/50
+               transition-all duration-200"
                     onClick={() => setSidebarOpen(!sidebarOpen)}
                 >
                     {sidebarOpen ? "→" : "☰"}
                 </button>
+
 
                 {/* QUIZ SECTION */}
                 <main

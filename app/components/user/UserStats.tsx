@@ -45,22 +45,6 @@ export default function UserStats({ userPercentage, nickname }: UserStatsProps) 
                 {session.user?.name?.[0] ?? "?"}
             </div> */}
 
-            <h2 className="font-semibold mt-4 tracking-wide text-center">
-
-                {/* Nickname shimmer while loading */}
-                {!nickname ? (
-                    <NicknameLoading />
-                ) : (
-                    <span className="bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">
-                        {nickname}
-                     </span>
-                )}
-
-            </h2>
-
-
-
-
 
             {/* Styled Google Sign-Out Button (matches sign-in button) */}
             <motion.div whileHover={{scale: 1.05}} whileTap={{scale: 0.95}} className="mt-6">
@@ -82,6 +66,19 @@ export default function UserStats({ userPercentage, nickname }: UserStatsProps) 
                     <span className="text-white font-medium">Sign out</span>
                 </button>
             </motion.div>
+
+            <h2 className="font-semibold mt-4 tracking-wide text-center">
+
+                {/* Nickname shimmer while loading */}
+                {!nickname ? (
+                    <NicknameLoading />
+                ) : (
+                    <span className="bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">
+                        {nickname}
+                     </span>
+                )}
+
+            </h2>
 
 
 
