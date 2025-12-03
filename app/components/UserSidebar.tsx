@@ -6,9 +6,11 @@ import UserStats from "./user/UserStats";
 interface UserSidebarProps {
     userPercentage: number;
     nickname?: string;
+    totalOnlineTime: number;
+    loading: boolean;
 }
 
-export default function UserSidebar({ userPercentage, nickname }: UserSidebarProps) {
+export default function UserSidebar({ userPercentage, nickname, totalOnlineTime, loading }: UserSidebarProps) {
     const { data: session } = useSession();
 
     return (
@@ -24,7 +26,7 @@ export default function UserSidebar({ userPercentage, nickname }: UserSidebarPro
             touch-pan-y
             font-sans
         ">
-            <UserStats userPercentage={userPercentage} nickname={nickname} />
+            <UserStats userPercentage={userPercentage} nickname={nickname} totalOnlineTime={totalOnlineTime} loading={loading} />
         </aside>
     );
 }

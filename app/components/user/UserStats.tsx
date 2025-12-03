@@ -8,7 +8,19 @@ import { Button } from "../ui/Button";
 interface UserStatsProps {
     userPercentage: number;
     nickname?: string;
+    totalOnlineTime: number;
+    loading: boolean;
 }
+
+// Format seconds into hours and minutes only
+function formatTime(seconds: number) {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+
+    if (h > 0) return `${h}h ${m}m`;
+    return `${m}m`;
+}
+
 
 function NicknameLoading() {
     return (
@@ -29,7 +41,7 @@ function PercentageLoading() {
 
 
 
-export default function UserStats({ userPercentage, nickname }: UserStatsProps) {
+export default function UserStats({ userPercentage, nickname, totalOnlineTime, loading }: UserStatsProps) {
     const { data: session } = useSession();
     const [calcInput, setCalcInput] = useState("");
     const [calcResult, setCalcResult] = useState<number | null>(null);
@@ -105,12 +117,27 @@ export default function UserStats({ userPercentage, nickname }: UserStatsProps) 
 
 
 
-                {/* Percentage score */}
-                <div className="w-10 h-10 flex items-center justify-center bg-black/70 backdrop-blur-xl border border-green-400/20 rounded-full shadow-lg relative">
-                    <span className="text-green-300 text-xs font-medium flex flex-col items-center leading-tight">
-                        10h
-                    </span>
+                {/* Total Online Time */}
+                <div
+                    className="flex items-center justify-center bg-black/70 backdrop-blur-xl border border-green-400/20 rounded-full shadow-lg relative px-2"
+                    style={{
+                        width: `${Math.max(50, totalOnlineTime ? 8 * formatTime(totalOnlineTime).length : 40)}px`,
+                        height: "40px",
+                        transition: "width 0.3s ease",
+                    }}
+                >
+                    {loading ? (
+                        <PercentageLoading />
+                    ) : (
+                        <span className="text-green-300 text-xs font-medium flex items-center justify-center leading-tight">
+                              {formatTime(totalOnlineTime)}
+                        </span>
+                    )}
+
                 </div>
+
+
+
 
             </div>
 

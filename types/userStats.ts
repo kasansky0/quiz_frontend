@@ -6,4 +6,6 @@ export interface UserStatsType {
     image?: string | null;
     google_id?: string | null;
     nickname: string;
+    totalOnlineTime: number;
+    loading: boolean;
 }

@@ -24,6 +24,9 @@ export default function LoggedInPage() {
     const [answerCount, setAnswerCount] = useState(0);
     const [answeredState, setAnsweredState] = useState<"correct" | "wrong" | null>(null);
     const [userPercentage, setUserPercentage] = useState(0);
+    // Track total online time (in seconds)
+    const [onlineTime, setOnlineTime] = useState(0);
+
 
 
 
@@ -36,6 +39,24 @@ export default function LoggedInPage() {
             console.error("❌ Wake failed:", err);
         }
     }
+
+    // Load existing time from DB into state
+    useEffect(() => {
+        if (!userStats) return;
+
+        setOnlineTime(userStats.totalOnlineTime ?? 0);
+    }, [userStats]);
+
+    useEffect(() => {
+        if (!session?.user || !userStats) return; // wait for both session and DB data
+
+        const interval = setInterval(() => {
+            setOnlineTime(prev => prev + 1); // +1 second
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [session?.user, userStats]);
+
 
     // ✅ Fetch user stats
     useEffect(() => {
@@ -116,15 +137,17 @@ export default function LoggedInPage() {
 
         // Every 5 answers, push to backend
        // if (answerCount % 5 === 0) {
-            fetch(`${apiUrl}/userPercentage/update`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    userId: userStats.user_id, // ✅ use DB user_id
-                    userPercentage: userPercentage,
-                }),
-            })
-                .then(res => res.json())
+        fetch(`${apiUrl}/userPercentage/update`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                userId: userStats.user_id,
+                userPercentage: userPercentage,
+                totalOnlineTime: onlineTime  // 👈 SEND UPDATED TIME
+            }),
+        })
+
+            .then(res => res.json())
                 .then(data => console.log("User percentage updated:", data))
                 .catch(err => console.error("Failed to update user percentage:", err));
        // }
@@ -151,7 +174,7 @@ export default function LoggedInPage() {
                     md:sticky md:top-0 md:translate-x-0 md:transition-none md:shadow-none md:z-auto
                 `}
             >
-                <UserSidebar userPercentage={userPercentage} nickname={userStats?.nickname} />
+                <UserSidebar userPercentage={userPercentage} nickname={userStats?.nickname} totalOnlineTime={onlineTime} loading={loading || !userStats} />
             </div>
 
             {/* ======= MAIN PANEL ======= */}
