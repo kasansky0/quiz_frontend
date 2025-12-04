@@ -3,18 +3,13 @@
 import { useEffect, useState } from "react";
 
 const formulas = [
-    // Ohm’s Law
     "Ohm’s Law: V = I × R",
-
-    // Single-phase power
-    "Real Power (1φ): P = V × I × PF",
-    "Apparent Power (1φ): S = V × I",
-    "Reactive Power (1φ): Q = V × I × sin(θ)",
-
-    // Three-phase power
-    "Real Power (3φ): P = √3 × V_L × I_L × PF",
-    "Apparent Power (3φ): S = √3 × V_L × I_L",
-    "Reactive Power (3φ): Q = √3 × V_L × I_L × sin(θ)",
+    "W (1φ): P = V × I × PF",
+    "VA (1φ): S = V × I",
+    "VAR (1φ): Q = V × I × sin(θ)",
+    "W (3φ): P = √3 × V × I × PF",
+    "VA (3φ): S = √3 × V × I",
+    "VAR (3φ): Q = √3 × V × I × sin(θ)",
 ];
 
 export default function LoadingBanner() {
@@ -24,12 +19,17 @@ export default function LoadingBanner() {
 
     useEffect(() => {
         const t1 = setTimeout(() => setShowStillLoading(true), 7000);
-        const t2 = setTimeout(() => setShowWhileWaiting(true), 10000);
+
+        const t2 = setTimeout(() => {
+            setShowStillLoading(false);  // 👈 REMOVE "Still loading..."
+            setShowWhileWaiting(true);   // Show next phase
+        }, 10000);
 
         let formulaInterval: NodeJS.Timeout;
+        let t3: NodeJS.Timeout;
 
         // Start formula rotation at 11s
-        setTimeout(() => {
+        t3 = setTimeout(() => {
             // Show first formula immediately
             const random = formulas[Math.floor(Math.random() * formulas.length)];
             setCurrentFormula(random);
@@ -44,8 +44,10 @@ export default function LoadingBanner() {
         return () => {
             clearTimeout(t1);
             clearTimeout(t2);
+            clearTimeout(t3);       // 👈 IMPORTANT: clear formula start timeout
             clearInterval(formulaInterval);
         };
+
     }, []);
 
     return (
@@ -53,7 +55,7 @@ export default function LoadingBanner() {
             <div className="w-full max-w-md md:max-w-lg p-6 md:p-8 bg-black/70 backdrop-blur-xl border border-green-400/20 rounded-2xl shadow-lg flex flex-col items-center">
 
                 <h1 className="text-2xl md:text-3xl font-bold text-green-400/70 tracking-wider uppercase mb-2 text-center">
-                    ⚡ NETA Level 2
+                    NETA Level 2
                 </h1>
 
                 <p className="text-md md:text-lg font-mono text-green-400/50 uppercase tracking-widest text-center">
