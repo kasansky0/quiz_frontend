@@ -79,37 +79,23 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                 </button>
             </motion.div>
 
-            <h2 className="font-semibold mt-4 tracking-wide text-center">
-
-                {/* Nickname shimmer while loading */}
-                {!nickname ? (
-                    <NicknameLoading />
-                ) : (
-                    <span className="bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">
-                        {nickname}
-                     </span>
-                )}
-
-            </h2>
-
-
-
             {/* Row container */}
             <div className="flex items-center space-x-3 mt-6">
 
                 <div
                     className="flex items-center justify-center bg-black/70 backdrop-blur-xl border border-green-400/20
-                        rounded-full shadow-lg relative px-2"
+                    rounded-full shadow-lg relative px-2"
                     style={{
                         width: `${Math.max(40, 12 * String(userPercentage).length)}px`,
                         height: "40px",
                         transition: "width 0.3s ease",
                     }}
                 >
-                    {userPercentage === 0 ? (
+
+                {userPercentage === 0 ? (
                         <PercentageLoading />
                     ) : (
-                        <span className="text-green-300 text-xs font-medium flex items-center justify-center leading-tight">
+                        <span className="text-green-300 text-xs font-medium flex items-center justify-center leading-tight whitespace-nowrap">
                              {userPercentage.toFixed()}
                         </span>
                     )}
@@ -119,22 +105,17 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
 
                 {/* Total Online Time */}
                 <div
-                    className="flex items-center justify-center bg-black/70 backdrop-blur-xl border border-green-400/20 rounded-full shadow-lg relative px-2"
+                    className="flex items-center justify-center bg-black/70 backdrop-blur-xl border border-green-400/20
+                     rounded-full shadow-lg relative px-3 whitespace-nowrap"
                     style={{
-                        width: `${Math.max(50, totalOnlineTime ? 8 * formatTime(totalOnlineTime).length : 40)}px`,
                         height: "40px",
-                        transition: "width 0.3s ease",
                     }}
                 >
-                    {loading ? (
-                        <PercentageLoading />
-                    ) : (
-                        <span className="text-green-300 text-xs font-medium flex items-center justify-center leading-tight">
-                              {formatTime(totalOnlineTime)}
-                        </span>
-                    )}
-
+                  <span className="text-green-300 text-xs font-medium leading-tight">
+                    {formatTime(totalOnlineTime)}
+                  </span>
                 </div>
+
 
 
 
