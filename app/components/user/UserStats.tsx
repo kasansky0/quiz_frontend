@@ -68,7 +68,7 @@ function cosDeg(x: number) {
 export default function UserStats({ userPercentage, nickname, totalOnlineTime, loading }: UserStatsProps) {
     const { data: session } = useSession();
     const [calcInput, setCalcInput] = useState("");
-    const [calcResult, setCalcResult] = useState<number | null>(null);
+    const [calcResult, setCalcResult] = useState<number | "Error" | null>(null);
     const displayRef = useRef<HTMLDivElement>(null);
     const [history, setHistory] = useState<string[]>([]);
     const [calcOpen, setCalcOpen] = useState(false);
