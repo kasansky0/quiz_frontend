@@ -367,8 +367,8 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                                     } else {
                                         setCalcInput(prev => {
                                             let start = prev;
-                                            if (!prev && calcResult !== null && ["+", "-", "*", "/"].includes(btn)) {
-                                                start = String(Number(calcResult.toFixed(2)));
+                                            if (!prev && typeof calcResult === "number" && ["+", "-", "*", "/"].includes(btn)) {
+                                                start = calcResult.toFixed(2); // safe, already a number
                                             }
                                             return start + btn;
                                         });
