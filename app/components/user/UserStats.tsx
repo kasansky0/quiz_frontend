@@ -52,11 +52,11 @@ function TimeLoading() {
     );
 }
 
-function sinDeg(x) {
+function sinDeg(x: number) {
     return Math.sin((x * Math.PI) / 180);
 }
 
-function cosDeg(x) {
+function cosDeg(x: number) {
     return Math.cos((x * Math.PI) / 180);
 }
 
