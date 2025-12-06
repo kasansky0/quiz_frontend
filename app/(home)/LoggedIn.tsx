@@ -26,6 +26,8 @@ export default function LoggedInPage() {
     const [userPercentage, setUserPercentage] = useState(0);
     // Track total online time (in seconds)
     const [onlineTime, setOnlineTime] = useState(0);
+    const [sessionExpired, setSessionExpired] = useState(false);
+
 
 
 
@@ -57,37 +59,64 @@ export default function LoggedInPage() {
         return () => clearInterval(interval);
     }, [session?.user, userStats]);
 
+    const fetchData = async () => {
+        if (!session?.user) return; // exit if session or user is undefined
+
+        try {
+            const res = await fetch(`${apiUrl}/user/`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: session.user.name,
+                    email: session.user.email,
+                    image: session.user.image,
+                    google_id: session.user.id ?? null
+                })
+            });
+
+            if (!res.ok) {
+                if (res.status === 401) {
+                    // Session expired
+                    setSessionExpired(true); // trigger modal or toast
+                    return;
+                } else {
+                    throw new Error(`Failed to fetch user stats: ${res.statusText}`);
+                }
+            }
+
+
+            const data = await res.json();
+            console.log("userStats from backend:", data);
+            setUserStats(data);
+
+        } catch (err) {
+            console.error("❌ Failed to fetch user stats:", err);
+            setSessionExpired(true); // triggers the modal instead of alert/reload
+        } finally {
+            // Minimum 3-second loading
+            setTimeout(() => setLoading(false), 2300);
+        }
+
+    };
 
     // ✅ Fetch user stats
     useEffect(() => {
         if (!session || !session.user || !session.user.email) return;
         if (!apiUrl) return console.error("❌ NEXT_PUBLIC_API_URL is not set");
 
-        const fetchData = async () => {
-            try {
-                const res = await fetch(`${apiUrl}/user/`, {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({
-                        name: session.user.name,
-                        email: session.user.email,
-                        image: session.user.image,
-                        google_id: session.user.id ?? null
-                    })
-                });
-                const data = await res.json();
-                console.log("userStats from backend:", data); // 🔍 see if nickname is there
-                setUserStats(data);
-            } catch (err) {
-                console.error("❌ Failed to fetch user stats:", err);
-            } finally {
-                // Minimum 3-second loading
-                setTimeout(() => setLoading(false), 2300);
-            }
-        };
-
         fetchData();
     }, [session, apiUrl]);
+
+    // 3️⃣ Visibility-change useEffect
+    useEffect(() => {
+        const handleVisibility = () => {
+            if (document.visibilityState === "visible") {
+                fetchData(); // refetch when user comes back
+            }
+        };
+        document.addEventListener("visibilitychange", handleVisibility);
+        return () => document.removeEventListener("visibilitychange", handleVisibility);
+    }, [session, apiUrl]); // fetchData depends on session and apiUrl
 
     // ✅ Progressive wake retry
     useEffect(() => {
@@ -164,6 +193,28 @@ export default function LoggedInPage() {
 
     return (
         <div className="min-h-screen flex bg-black-200 relative">
+
+            {sessionExpired && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
+                    <div className="bg-black/70 border border-green-400/40 shadow-lg rounded-2xl max-w-md w-full p-6 text-center backdrop-blur-md">
+                        <h2 className="text-green-400 text-lg font-semibold mb-2 drop-shadow-[0_0_12px_rgba(36,174,124,0.8)]">
+                            Session Expired
+                        </h2>
+                        <p className="text-green-200 text-sm mb-6">
+                            Your session has expired. Please reload the page to continue.
+                        </p>
+                        <button
+                            onClick={() => window.location.reload()}
+                            className="px-5 py-2 bg-green-500 text-black font-medium rounded-full hover:bg-green-400 transition"
+                        >
+                            Reload
+                        </button>
+                    </div>
+                </div>
+            )}
+
+
+
             {/* ======= SLIDE-IN SIDEBAR ======= */}
             <div
                 ref={sidebarRef}
