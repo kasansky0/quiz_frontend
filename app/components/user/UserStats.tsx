@@ -52,6 +52,15 @@ function TimeLoading() {
     );
 }
 
+function sinDeg(x) {
+    return Math.sin((x * Math.PI) / 180);
+}
+
+function cosDeg(x) {
+    return Math.cos((x * Math.PI) / 180);
+}
+
+
 
 
 
@@ -63,6 +72,8 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
     const displayRef = useRef<HTMLDivElement>(null);
     const [history, setHistory] = useState<string[]>([]);
     const [calcOpen, setCalcOpen] = useState(false);
+    const calcRef = useRef<HTMLDivElement>(null);
+
 
 
 
@@ -74,6 +85,16 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
     }, [calcInput, calcResult]);
 
     if (!session) return null;
+
+    useEffect(() => {
+        if (calcOpen && calcRef.current) {
+            calcRef.current.scrollIntoView({
+                behavior: "smooth", // smooth scrolling animation
+                block: "start",     // align top of element with top of viewport
+            });
+        }
+    }, [calcOpen]);
+
 
     return (
         <div className="flex flex-col items-center w-full text-white font-sans">
@@ -108,8 +129,8 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                         <NicknameLoading />
                     ) : (
                         <span className="text-green-300 text-sm font-medium">
-      {nickname ?? session.user?.name ?? "User"}
-    </span>
+                            {nickname ?? session.user?.name ?? "User"}
+                        </span>
                     )}
                 </div>
 
@@ -120,7 +141,7 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                     {/* Score circle */}
                     <div
                         className={`flex items-center justify-center bg-black/70 backdrop-blur-xl border border-green-400/20
-              rounded-full shadow-lg relative px-2 frame-shimmer`}
+                               rounded-full shadow-lg relative px-2 frame-shimmer`}
                         style={{
                             width: loading
                                 ? "40px"
@@ -133,8 +154,8 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                             <PercentageLoading />
                         ) : (
                             <span className="text-green-300 text-xs font-medium">
-      {userPercentage.toFixed()}
-    </span>
+                                 {userPercentage.toFixed()}
+                            </span>
                         )}
                     </div>
 
@@ -152,8 +173,8 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                             </div>
                         ) : (
                             <span className="text-green-300 text-xs font-medium">
-      {formatTime(totalOnlineTime)}
-    </span>
+                                 {formatTime(totalOnlineTime)}
+                            </span>
                         )}
                     </div>
 
@@ -169,18 +190,51 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
             {/* Premium Calculator */}
 
             {/* Title */}
-            <div className="w-full mt-4 cursor-pointer" onClick={() => setCalcOpen(prev => !prev)}>
-                <h2 className="text-green-300 text-sm font-medium mb-2 text-center tracking-wide select-none">
-                    Calculator {calcOpen ? "▲" : "▼"}
-                </h2>
+            <div ref={calcRef} className="w-full">
+                <div
+                    className="w-full flex justify-center mt-6 mb-4 cursor-pointer"
+                    onClick={() => setCalcOpen(prev => !prev)}
+                >
+                    {/* Centered flex row for text + arrow */}
+                    <div className="flex items-center gap-2">
+                        <h2 className="text-green-300 text-sm font-medium select-none">
+                            Calculator
+                        </h2>
+
+                        <motion.div
+                            className="w-6 h-6 flex items-center justify-center"
+                            animate={{ y: [0, 4, 0] }}
+                            transition={{ repeat: Infinity, duration: 1.2 }}
+                        >
+                            <div className="relative w-6 h-6 bg-black/70 border border-green-400/20 rounded-full frame-shimmer flex items-center justify-center">
+                                <svg
+                                    className="w-3 h-3 text-yellow-400"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth={2}
+                                    viewBox="0 0 24 24"
+                                >
+                                    {calcOpen ? (
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+                                    ) : (
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                                    )}
+                                </svg>
+                            </div>
+                        </motion.div>
+                    </div>
+                </div>
+
             </div>
+
+
 
             <AnimatePresence>
                 {calcOpen && (
                     <motion.div
                         initial={{ scaleY: 0, opacity: 0 }}
                         animate={{ scaleY: 1, opacity: 1 }}
-                        exit={{ scaleY: 0, opacity: 0 }}
+                        exit={{ scaleY: 0, opacity: 0, transition: { duration: 0.25, ease: "easeInOut" } }}
                         transition={{ duration: 0.25, ease: "easeInOut" }}
                         style={{ transformOrigin: "top" }}
                         className="w-full mb-4 p-4 bg-black/50 backdrop-blur-xl border border-green-400/20 rounded-2xl shadow-2xl flex flex-col items-center overflow-hidden"
@@ -221,16 +275,17 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                         {/* Display */}
                         <div
                             ref={displayRef}
-                            className="w-full bg-black text-green-400 px-4 py-3 rounded-xl mb-3 text-right font-bold text-lg overflow-x-auto whitespace-nowrap hide-scrollbar
-                            border border-green-400/20"
+                            className={`w-full px-4 py-3 rounded-xl mb-3 text-right font-bold text-lg overflow-x-auto whitespace-nowrap hide-scrollbar
+                            border ${calcResult === "Error" || isNaN(Number(calcResult)) ? "border-red-500 shadow-[0_0_20px_rgba(255,0,0,0.5)] text-red-500" : "border-green-400/20 text-green-400"}
+                            bg-black`}
                         >
                             {calcResult !== null
-                                ? isNaN(calcResult)
+                                ? calcResult === "Error" || isNaN(Number(calcResult))
                                     ? "Error"
-                                    : formatNumber(calcResult) // use conditional formatting
+                                    : formatNumber(Number(calcResult)) // use conditional formatting
                                 : calcInput || "0"}
-
                         </div>
+
 
 
 
@@ -281,16 +336,22 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                                     } else if (btn === "=") {
                                         try {
                                             let expr = calcInput
-                                                .replace(/√\(([^)]+)\)/g, "Math.sqrt($1)")
-                                                .replace(/sin\(([^)]+)\)/g, "Math.sin($1)")
-                                                .replace(/cos\(([^)]+)\)/g, "Math.cos($1)")
-                                                .replace(/([0-9]+)²/g, "($1**2)");
-                                            const res = Function(`"use strict"; return (${expr})`)();
+                                                .replace(/([0-9]+)²/g, "($1**2)")
+                                                .replace(/sin\(([^)]+)\)/g, "sinDeg($1)")
+                                                .replace(/cos\(([^)]+)\)/g, "cosDeg($1)")
+                                                .replace(/√\(([^)]+)\)/g, "Math.sqrt($1)");
+
+                                            const res = Function(
+                                                "sinDeg",
+                                                "cosDeg",
+                                                `"use strict"; return (${expr})`
+                                            )(sinDeg, cosDeg);
+
                                             setHistory(prev => [`${calcInput} = ${res}`, ...prev].slice(0, 3));
                                             setCalcResult(res);
                                             setCalcInput("");
-                                        } catch {
-                                            setCalcResult(null);
+                                        } catch (err) {
+                                            setCalcResult("Error");
                                         }
                                     } else if (btn === "√") {
                                         setCalcInput(prev => prev + "√(");
