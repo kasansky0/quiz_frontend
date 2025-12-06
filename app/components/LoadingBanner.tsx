@@ -62,9 +62,10 @@ export default function LoadingBanner() {
                     Loading...
                 </p>
 
-                <div className="mt-6 w-2/3 h-1 bg-green-400/20 rounded-full overflow-hidden relative">
-                    <div className="absolute top-0 left-0 h-full w-1/3 bg-green-400/60 rounded-full animate-loading"></div>
+                <div className="mt-6 w-2/3 h-4 bg-green-500/10 rounded overflow-hidden relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-400/40 to-transparent animate-shimmer rounded" />
                 </div>
+
 
                 <div className="mt-4 text-sm font-mono text-green-400/40 text-center leading-snug min-h-[60px]">
                     {showStillLoading && <p>Still loading...</p>}

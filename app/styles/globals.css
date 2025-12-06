@@ -381,5 +381,40 @@ html, body {
     animation: shimmer 1.5s linear infinite;
 }
 
+/* -------------------------
+   Frame Shimmer / Shining
+------------------------- */
+
+/* Keyframes for shimmer animation */
+@keyframes frame-shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Apply this class to any frame you want shimmering */
+.frame-shimmer {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Shimmer overlay */
+.frame-shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0; /* covers entire frame */
+    border-radius: inherit; /* match parent rounding */
+    background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(16, 185, 129, 0.2),
+            transparent
+    );
+    animation: frame-shimmer 5s linear infinite;
+    pointer-events: none; /* doesn't block interactions */
+}
 
 

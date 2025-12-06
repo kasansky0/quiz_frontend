@@ -1,8 +1,9 @@
 "use client";
 
 import { useSession, signOut } from "next-auth/react";
-import { motion } from "framer-motion";
 import { useState } from "react";        // ✅ React hook
+import { useRef, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "../ui/Button";
 
 interface UserStatsProps {
@@ -10,6 +11,10 @@ interface UserStatsProps {
     nickname?: string;
     totalOnlineTime: number;
     loading: boolean;
+}
+
+function formatNumber(num: number) {
+    return Number.isInteger(num) ? num.toString() : num.toFixed(2);
 }
 
 // Format seconds into hours and minutes only
@@ -32,11 +37,21 @@ function NicknameLoading() {
 
 function PercentageLoading() {
     return (
-        <div className="w-10 h-10 bg-green-500/10 rounded-full overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-400/40 to-transparent animate-shimmer rounded-full" />
+        <div className="w-16 h-4 bg-green-500/10 rounded overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-400/40 to-transparent animate-shimmer rounded" />
         </div>
     );
 }
+
+
+function TimeLoading() {
+    return (
+        <div className="w-16 h-4 bg-green-500/10 rounded overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-400/40 to-transparent animate-shimmer rounded" />
+        </div>
+    );
+}
+
 
 
 
@@ -45,18 +60,23 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
     const { data: session } = useSession();
     const [calcInput, setCalcInput] = useState("");
     const [calcResult, setCalcResult] = useState<number | null>(null);
+    const displayRef = useRef<HTMLDivElement>(null);
+    const [history, setHistory] = useState<string[]>([]);
+    const [calcOpen, setCalcOpen] = useState(false);
 
+
+
+
+    useEffect(() => {
+        if (displayRef.current) {
+            displayRef.current.scrollLeft = displayRef.current.scrollWidth;
+        }
+    }, [calcInput, calcResult]);
 
     if (!session) return null;
 
     return (
         <div className="flex flex-col items-center w-full text-white font-sans">
-
-            {/* Avatar
-            <div className="relative w-20 h-20 rounded-full bg-gradient-to-tr from-gray-700 to-gray-900 flex items-center justify-center text-3xl font-bold text-white shadow-md">
-                {session.user?.name?.[0] ?? "?"}
-            </div> */}
-
 
             {/* Styled Google Sign-Out Button (matches sign-in button) */}
             <motion.div whileHover={{scale: 1.05}} whileTap={{scale: 0.95}} className="mt-6">
@@ -79,129 +99,231 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                 </button>
             </motion.div>
 
-            {/* Row container */}
-            <div className="flex items-center space-x-3 mt-6">
+            <div className="flex flex-col items-center space-y-4 mt-6 w-full">
 
-                <div
-                    className="flex items-center justify-center bg-black/70 backdrop-blur-xl border border-green-400/20
-                    rounded-full shadow-lg relative px-2"
-                    style={{
-                        width: `${Math.max(40, 12 * String(userPercentage).length)}px`,
-                        height: "40px",
-                        transition: "width 0.3s ease",
-                    }}
-                >
-
-                {userPercentage === 0 ? (
-                        <PercentageLoading />
+            {/* Nickname badge */}
+                <div className="flex items-center justify-center bg-black/70 backdrop-blur-xl border border-green-400/20
+                rounded-full shadow-lg px-3 h-8 min-w-[80px] frame-shimmer">
+                    {loading ? (
+                        <NicknameLoading />
                     ) : (
-                        <span className="text-green-300 text-xs font-medium flex items-center justify-center leading-tight whitespace-nowrap">
-                             {userPercentage.toFixed()}
-                        </span>
+                        <span className="text-green-300 text-sm font-medium">
+      {nickname ?? session.user?.name ?? "User"}
+    </span>
                     )}
                 </div>
 
 
 
-                {/* Total Online Time */}
-                <div
-                    className="flex items-center justify-center bg-black/70 backdrop-blur-xl border border-green-400/20
-                     rounded-full shadow-lg relative px-3 whitespace-nowrap"
-                    style={{
-                        height: "40px",
-                    }}
-                >
-                  <span className="text-green-300 text-xs font-medium leading-tight">
-                    {formatTime(totalOnlineTime)}
-                  </span>
+                {/* Score + Total Time row */}
+                <div className="flex items-center space-x-3">
+                    {/* Score circle */}
+                    <div
+                        className={`flex items-center justify-center bg-black/70 backdrop-blur-xl border border-green-400/20
+              rounded-full shadow-lg relative px-2 frame-shimmer`}
+                        style={{
+                            width: loading
+                                ? "40px"
+                                : `${Math.max(40, 12 * String(userPercentage).length)}px`,
+                            height: "40px",
+                            transition: "width 0.3s ease"
+                        }}
+                    >
+                        {loading ? (
+                            <PercentageLoading />
+                        ) : (
+                            <span className="text-green-300 text-xs font-medium">
+      {userPercentage.toFixed()}
+    </span>
+                        )}
+                    </div>
+
+
+
+                    {/* Total Online Time */}
+                    <div
+                        className="flex items-center justify-center bg-black/70 backdrop-blur-xl border border-green-400/20
+             rounded-full shadow-lg relative px-3 whitespace-nowrap frame-shimmer"
+                        style={{ height: "40px" }}
+                    >
+                        {loading ? (
+                            <div className="w-12 h-3 bg-green-500/10 rounded overflow-hidden relative">
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-400/40 to-transparent animate-shimmer rounded" />
+                            </div>
+                        ) : (
+                            <span className="text-green-300 text-xs font-medium">
+      {formatTime(totalOnlineTime)}
+    </span>
+                        )}
+                    </div>
+
+
                 </div>
-
-
-
-
 
             </div>
 
-            {/* Basic Calculator */}
-            <div className="w-full mt-4 mb-4 p-4 bg-black/70 backdrop-blur-xl border border-green-400/20 rounded-2xl shadow-lg flex flex-col items-center">
-                <h2 className="text-green-300 text-sm font-medium mb-3 text-center">
-                    Calculator
+
+
+
+
+            {/* Premium Calculator */}
+
+            {/* Title */}
+            <div className="w-full mt-4 cursor-pointer" onClick={() => setCalcOpen(prev => !prev)}>
+                <h2 className="text-green-300 text-sm font-medium mb-2 text-center tracking-wide select-none">
+                    Calculator {calcOpen ? "▲" : "▼"}
                 </h2>
+            </div>
 
-                {/* Display */}
-                <input
-                    type="text"
-                    className="w-full bg-black/50 text-black-200 px-3 py-2 rounded-md text-right mb-2 focus:outline-none border border-green-400/20 font-bold"
-                    placeholder="0"
-                    value={calcResult !== null ? String(calcResult) : calcInput}
-                    readOnly
-                />
+            <AnimatePresence>
+                {calcOpen && (
+                    <motion.div
+                        initial={{ scaleY: 0, opacity: 0 }}
+                        animate={{ scaleY: 1, opacity: 1 }}
+                        exit={{ scaleY: 0, opacity: 0 }}
+                        transition={{ duration: 0.25, ease: "easeInOut" }}
+                        style={{ transformOrigin: "top" }}
+                        className="w-full mb-4 p-4 bg-black/50 backdrop-blur-xl border border-green-400/20 rounded-2xl shadow-2xl flex flex-col items-center overflow-hidden"
+                    >
+                {/* History */}
+                        <div className="text-green-200 text-xs mb-2 overflow-y-auto max-h-16 hide-scrollbar w-full px-2 flex flex-col-reverse">
+                            {history.map((item, i) => {
+                                const parts = item.split(" = ");
+                                const rawResult = parts[1] ?? parts[0]; // original value
 
-                {/* Buttons */}
-                <div className="grid grid-cols-4 gap-2 w-full">
-                    {["⌫","C","=","/",
+                                // Use formatNumber to format the result
+                                const formattedResult = !isNaN(Number(rawResult)) ? formatNumber(Number(rawResult)) : rawResult;
+
+                                // Build display text
+                                const displayText = parts[1] ? `${parts[0]} = ${formattedResult}` : formattedResult;
+
+                                return (
+                                    <div
+                                        key={i}
+                                        className="cursor-pointer hover:text-green-100 transition-colors whitespace-nowrap overflow-hidden truncate"
+                                        onClick={() =>
+                                            // append formatted result to input
+                                            setCalcInput(prev => prev + (!isNaN(Number(rawResult)) ? formatNumber(Number(rawResult)) : rawResult))
+                                        }
+                                        title={displayText} // show formatted text on hover
+                                    >
+                                        {displayText}
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+
+
+
+
+
+                        {/* Display */}
+                        <div
+                            ref={displayRef}
+                            className="w-full bg-black text-green-400 px-4 py-3 rounded-xl mb-3 text-right font-bold text-lg overflow-x-auto whitespace-nowrap hide-scrollbar
+                            border border-green-400/20"
+                        >
+                            {calcResult !== null
+                                ? isNaN(calcResult)
+                                    ? "Error"
+                                    : formatNumber(calcResult) // use conditional formatting
+                                : calcInput || "0"}
+
+                        </div>
+
+
+
+
+
+                        {/* Buttons */}
+                <div className="grid grid-cols-4 gap-3 w-full">
+                    {[
+                        "⌫","C","=","/",
                         "7","8","9","*",
                         "4","5","6","-",
                         "1","2","3","+",
                         "(","0",")",".",
-                        "√","x²","sin","cos"].map((btn) => (
-                        <button
-                            key={btn}
-                            className="px-3 py-2 bg-green-500/70 hover:bg-green-600/80 rounded-md text-white font-bold flex items-center justify-center"
-                            onClick={() => {
-                                if (btn === "C") {
-                                    setCalcInput("");
-                                    setCalcResult(null);
-                                } else if (btn === "=") {
-                                    try {
-                                        // Replace any √(...) with Math.sqrt(...)
-                                        let expr = calcInput
-                                            .replace(/√\(([^)]+)\)/g, "Math.sqrt($1)")
-                                            .replace(/sin\(([^)]+)\)/g, "Math.sin($1)")
-                                            .replace(/cos\(([^)]+)\)/g, "Math.cos($1)");
-                                        const res = Function(`"use strict"; return (${expr})`)();
-                                        setCalcResult(res);
+                        "√","x²","sin","cos"
+                    ].map((btn) => {
+                        // Dynamic button classes
+                        const base = "h-12 rounded-xl font-medium text-base flex items-center justify-center transition-all duration-150 active:scale-95";
+                        const colorClasses =
+                            btn === "="
+                                ? "bg-green-500/80 text-black font-bold shadow-[0_0_20px_rgba(0,255,120,0.5)] hover:bg-green-400"
+                                : btn === "C"
+                                    ? "bg-red-500/70 text-white hover:bg-red-600/80"
+                                    : btn === "⌫"
+                                        ? "bg-yellow-500/60 text-black hover:bg-yellow-400/70"
+                                        : ["/","*","-","+"].includes(btn)
+                                            ? "bg-white/10 text-green-300 hover:bg-white/20"
+                                            : ["√","x²","sin","cos"].includes(btn)
+                                                ? "bg-white/10 text-blue-300 hover:bg-white/20"
+                                                : "bg-white/5 text-white hover:bg-white/10";
+
+                        return (
+                            <button
+                                key={btn}
+                                className={`${base} ${colorClasses} backdrop-blur-xl`}
+                                onClick={() => {
+                                    // Prevent "=" on empty input
+                                    if (btn === "=" && !calcInput.trim()) return;
+
+                                    // Prevent multiple consecutive operators
+                                    if (["+", "-", "*", "/"].includes(btn) && /[+\-*/]$/.test(calcInput)) return;
+
+                                    // Prevent ")" if there is no matching "("
+                                    if (btn === ")" && (calcInput.split("(").length <= calcInput.split(")").length)) return;
+
+                                    if (btn === "C") {
                                         setCalcInput("");
-                                    } catch {
-                                        setCalcResult(NaN);
+                                        setCalcResult(null);
+                                    } else if (btn === "=") {
+                                        try {
+                                            let expr = calcInput
+                                                .replace(/√\(([^)]+)\)/g, "Math.sqrt($1)")
+                                                .replace(/sin\(([^)]+)\)/g, "Math.sin($1)")
+                                                .replace(/cos\(([^)]+)\)/g, "Math.cos($1)")
+                                                .replace(/([0-9]+)²/g, "($1**2)");
+                                            const res = Function(`"use strict"; return (${expr})`)();
+                                            setHistory(prev => [`${calcInput} = ${res}`, ...prev].slice(0, 3));
+                                            setCalcResult(res);
+                                            setCalcInput("");
+                                        } catch {
+                                            setCalcResult(null);
+                                        }
+                                    } else if (btn === "√") {
+                                        setCalcInput(prev => prev + "√(");
+                                        setCalcResult(null);
+                                    } else if (btn === "x²") {
+                                        setCalcInput(prev => prev + "²");
+                                    } else if (btn === "sin" || btn === "cos") {
+                                        setCalcInput(prev => prev + btn + "(");
+                                        setCalcResult(null);
+                                    } else if (btn === "⌫") {
+                                        setCalcInput(prev => prev.slice(0, -1));
+                                        setCalcResult(null);
+                                    } else {
+                                        setCalcInput(prev => {
+                                            let start = prev;
+                                            if (!prev && calcResult !== null && ["+", "-", "*", "/"].includes(btn)) {
+                                                start = String(Number(calcResult.toFixed(2)));
+                                            }
+                                            return start + btn;
+                                        });
+                                        setCalcResult(null);
                                     }
-                                } else if (btn === "√") {
-                                    setCalcInput((prev) => prev + "√"); // just insert the symbol
-                                    setCalcResult(null);
-                                } else if (btn === "x²") {
-                                    setCalcInput((prev) => prev + "**2");
-                                } else if (btn === "sin" || btn === "cos") {
-                                    setCalcInput((prev) => prev + btn + "("); // auto add opening parenthesis
-                                    setCalcResult(null);
-                                } else if (btn === "⌫") {
-                                    setCalcInput((prev) => {
-                                        if (prev.endsWith("√()")) return prev.slice(0, -3); // remove entire empty sqrt
-                                        return prev.slice(0, -1); // remove last char
-                                    });
-                                    setCalcResult(null);
-                                } else {
-                                    setCalcInput((prev) => {
-                                        // If calcInput is empty but we have a previous result and the user pressed an operator
-                                        let start = prev;
-                                        if (!prev && calcResult !== null && ["+", "-", "*", "/"].includes(btn)) {
-                                            start = String(calcResult);
-                                        }
-
-                                        if (prev.endsWith("√()")) {
-                                            return start.slice(0, -1) + btn + ")";
-                                        }
-                                        return start + btn;
-                                    });
-                                    setCalcResult(null);
-                                }
-
-                            }}
-                        >
-                            {btn}
-                        </button>
-                    ))}
+                                }}
+                            >
+                                {btn}
+                            </button>
+                        );
+                    })}
                 </div>
-            </div>
+                    </motion.div>
+                )}
+                </AnimatePresence>
+
 
             <div className="w-full mt-1 p-4 bg-black/70 backdrop-blur-xl border border-green-400/20 rounded-2xl shadow-lg relative
                 h-64 flex flex-col">
