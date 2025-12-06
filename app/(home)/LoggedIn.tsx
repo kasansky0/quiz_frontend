@@ -27,6 +27,8 @@ export default function LoggedInPage() {
     // Track total online time (in seconds)
     const [onlineTime, setOnlineTime] = useState(0);
     const [sessionExpired, setSessionExpired] = useState(false);
+    const [errorState, setErrorState] = useState<string | null>(null);
+
 
 
 
@@ -76,13 +78,13 @@ export default function LoggedInPage() {
 
             if (!res.ok) {
                 if (res.status === 401) {
-                    // Session expired
-                    setSessionExpired(true); // trigger modal or toast
-                    return;
+                    setSessionExpired(true);
                 } else {
-                    throw new Error(`Failed to fetch user stats: ${res.statusText}`);
+                    setErrorState(`Failed to fetch user stats: ${res.status} ${res.statusText}`);
                 }
+                return; // stop further processing
             }
+
 
 
             const data = await res.json();
@@ -91,7 +93,7 @@ export default function LoggedInPage() {
 
         } catch (err) {
             console.error("❌ Failed to fetch user stats:", err);
-            setSessionExpired(true); // triggers the modal instead of alert/reload
+            setErrorState("Network or backend error. Please reload the page.");
         } finally {
             // Minimum 3-second loading
             setTimeout(() => setLoading(false), 2300);
@@ -194,14 +196,16 @@ export default function LoggedInPage() {
     return (
         <div className="min-h-screen flex bg-black-200 relative">
 
-            {sessionExpired && (
+            {(sessionExpired || errorState) && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
                     <div className="bg-black/70 border border-green-400/40 shadow-lg rounded-2xl max-w-md w-full p-6 text-center backdrop-blur-md">
                         <h2 className="text-green-400 text-lg font-semibold mb-2 drop-shadow-[0_0_12px_rgba(36,174,124,0.8)]">
-                            Session Expired
+                            {sessionExpired ? "Session Expired" : "Error"}
                         </h2>
                         <p className="text-green-200 text-sm mb-6">
-                            Your session has expired. Please reload the page to continue.
+                            {sessionExpired
+                                ? "Your session has expired. Please reload the page to continue."
+                                : errorState}
                         </p>
                         <button
                             onClick={() => window.location.reload()}
@@ -212,6 +216,7 @@ export default function LoggedInPage() {
                     </div>
                 </div>
             )}
+
 
 
 
