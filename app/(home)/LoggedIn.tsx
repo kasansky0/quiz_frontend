@@ -1,7 +1,7 @@
 "use client";
 
 import {useSession} from "next-auth/react";
-import {useEffect, useState, useRef} from "react";
+import {useEffect, useState, useRef, useCallback} from "react";
 import UserSidebar from "../components/UserSidebar";
 import QuizSampleSection from "../components/sections/QuizSampleSection";
 import Footer from "../components/sections/Footer";
@@ -61,7 +61,7 @@ export default function LoggedInPage() {
         return () => clearInterval(interval);
     }, [session?.user, userStats]);
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         if (!session?.user) return; // exit if session or user is undefined
 
         try {
@@ -82,10 +82,8 @@ export default function LoggedInPage() {
                 } else {
                     setErrorState(`Failed to fetch user stats: ${res.status} ${res.statusText}`);
                 }
-                return; // stop further processing
+                return;
             }
-
-
 
             const data = await res.json();
             console.log("userStats from backend:", data);
@@ -95,11 +93,10 @@ export default function LoggedInPage() {
             console.error("❌ Failed to fetch user stats:", err);
             setErrorState("Network or backend error. Please reload the page.");
         } finally {
-            // Minimum 3-second loading
             setTimeout(() => setLoading(false), 2300);
         }
+    }, [session, apiUrl]);
 
-    };
 
     // ✅ Fetch user stats
     useEffect(() => {
@@ -109,16 +106,43 @@ export default function LoggedInPage() {
         fetchData();
     }, [session, apiUrl]);
 
-    // 3️⃣ Visibility-change useEffect
+    // ✅ Session check on tab visibility or focus
     useEffect(() => {
         const handleVisibility = () => {
             if (document.visibilityState === "visible") {
-                fetchData(); // refetch when user comes back
+                fetchData();
             }
         };
+
+        const handleFocus = () => {
+            fetchData();
+        };
+
         document.addEventListener("visibilitychange", handleVisibility);
-        return () => document.removeEventListener("visibilitychange", handleVisibility);
-    }, [session, apiUrl]); // fetchData depends on session and apiUrl
+        window.addEventListener("focus", handleFocus);
+
+        return () => {
+            document.removeEventListener("visibilitychange", handleVisibility);
+            window.removeEventListener("focus", handleFocus);
+        };
+    }, [session, apiUrl]);
+
+    useEffect(() => {
+        const lastTime = { current: performance.now() };
+
+        const interval = setInterval(() => {
+            const now = performance.now();
+            if (now - lastTime.current > 20000) { // 20s pause => tab was frozen
+                console.log("Tab inactive/frozen, refetching user stats");
+                fetchData();
+            }
+            lastTime.current = now;
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [fetchData]);
+
+
 
     // ✅ Progressive wake retry
     useEffect(() => {
