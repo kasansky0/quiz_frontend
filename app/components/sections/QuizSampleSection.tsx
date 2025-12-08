@@ -49,7 +49,7 @@ interface QuizSampleSectionProps {
     loadingDone?: boolean;
     style?: React.CSSProperties;
     scrollContainerRef?: React.RefObject<HTMLElement | null>;
-    onAnswer?: (isCorrect: boolean) => void;
+    onAnswer?: (isCorrect: boolean, questionId: number) => void;
 }
 
 
@@ -58,6 +58,7 @@ export default function QuizSampleSection({
                                               onClick,
                                               staticQuestion,
                                               wrongQueue,
+                                              userId,
                                               setWrongQueue,
                                               apiUrl,
                                               loadingDone,
@@ -97,30 +98,45 @@ export default function QuizSampleSection({
 
         async function fetchFirstQuestion() {
             try {
-                const res = await fetch(`${apiUrl}/questions/random`);
+                const url = isLoggedIn && userId
+                    ? `${apiUrl}/questions/next?user_id=${userId}`
+                    : `${apiUrl}/questions/random`;
+
+                const res = await fetch(url);
                 const data: QuestionType = await res.json();
-                if (isMounted) setQuestionData(data);
+                if (!data?.options?.length) {
+                    console.warn("Invalid question received", data);
+                    return;
+                }
+                setQuestionData(data);
+
             } catch (err) {
                 console.error(err);
             }
         }
 
+
         fetchFirstQuestion();
 
         return () => { isMounted = false };
-    }, [loadingDone, apiUrl]);
+    }, [loadingDone, apiUrl, isLoggedIn, userId]);
 
     // Handle when user clicks "Next"
     async function fetchRandomQuestion() {
         if (!apiUrl) return null;
         try {
-            const res = await fetch(`${apiUrl}/questions/random`);
+            const url = isLoggedIn && userId
+                ? `${apiUrl}/questions/next?user_id=${userId}`
+                : `${apiUrl}/questions/random`;
+
+            const res = await fetch(url);
             return await res.json();
         } catch (err) {
             console.error("Failed to fetch question:", err);
             return null;
         }
     }
+
 
     const handleNextQuestion = async () => {
         setFade(false);
@@ -131,18 +147,28 @@ export default function QuizSampleSection({
 
         let nextQuestion: QuestionType | null = null;
 
-        if (cycleCount === 2 && wrongQueue?.length && setWrongQueue) {
-            // Pick first wrong question that's NOT the same as last one
-            nextQuestion = wrongQueue.find(q => q.id !== lastQuestionId) || wrongQueue[0];
-            setWrongQueue(prev => prev.filter(q => q.id !== nextQuestion!.id));
+        // 1️⃣ Show wrongQueue question if 2 DB questions passed
+        if (cycleCount >= 2 && wrongQueue?.length && setWrongQueue) {
+            // Always take the first question from the front of the queue
+            nextQuestion = wrongQueue[0];
+
+            // Remove it from the front
+            setWrongQueue(prev => prev.slice(1));
+
+            // Reset DB cycle count after showing a wrongQueue question
             setCycleCount(0);
         } else {
+            // 2️⃣ Fetch next question from DB
             let fetched = await fetchRandomQuestion();
+
             // Avoid repeating last question
             if (fetched?.id === lastQuestionId) {
-                fetched = await fetchRandomQuestion(); // try again
+                fetched = await fetchRandomQuestion();
             }
+
             nextQuestion = fetched;
+
+            // Increment cycleCount only for DB questions
             setCycleCount(prev => prev + 1);
         }
 
@@ -156,13 +182,10 @@ export default function QuizSampleSection({
         setFade(true);
     };
 
-
-
-    // Handle answer click
+// 3️⃣ Handle answer click
     const handleAnswerClick = async (option: string) => {
         if (!selectedOption && questionData) {
             setSelectedOption(option);
-            if (onClick) onClick();
 
             let correct = false;
             let answer = questionData.answer;
@@ -172,7 +195,11 @@ export default function QuizSampleSection({
                 const res = await fetch(`${apiUrl}/answer/check`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ question_id: questionData.id, selected_option: option }),
+                    body: JSON.stringify({
+                        question_id: questionData.id,
+                        selected_option: option,
+                        user_id: String(userId),
+                    }),
                 });
                 const result = await res.json();
                 correct = result.correct;
@@ -182,18 +209,17 @@ export default function QuizSampleSection({
                 correct = option === questionData.answer;
             }
 
-
-            // ✅ Only add to wrongQueue if answered wrong
+            // ✅ Add to the back of the queue if wrong
             if (!correct && setWrongQueue) {
-                // After you determine correctness and before updating wrongQueue
                 setWrongQueue(prev => [...prev, questionData]);
             }
-            if (onAnswer) onAnswer(correct);
 
+            if (onAnswer && questionData) onAnswer(correct, questionData.id);
 
             setAnswerResult({ correct, answer, explanation });
         }
     };
+
 
 
     return (
@@ -220,12 +246,12 @@ export default function QuizSampleSection({
 
                         {/* Options */}
                         <div ref={optionsRef} className="flex flex-col gap-3">
-                            {questionData.options.map(option => (
+                            {questionData?.options?.map(option => (
                                 <Option
                                     key={option}
                                     text={option}
                                     isSelected={selectedOption === option}
-                                    isAnswer={answerResult ? option === answerResult.answer : false}
+                                    isAnswer={answerResult?.answer === option}
                                     disabled={!!selectedOption}
                                     onClick={() => handleAnswerClick(option)}
                                 />

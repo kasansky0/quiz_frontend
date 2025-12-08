@@ -279,12 +279,12 @@ export default function LoggedInPage() {
                     {loading || !apiUrl || !session?.user ? (
                         <LoadingBanner/>
                     ) : (
-                            <QuizSampleSection
+                        <QuizSampleSection
                                 isLoggedIn={true}
                                 wrongQueue={wrongQueue}
                                 setWrongQueue={setWrongQueue}
                                 apiUrl={apiUrl}
-                                userId={session.user.id}
+                                userId={userStats?.user_id}
                                 onClick={() => {
                                     setSidebarOpen(false);
                                     mainRef.current?.scrollTo({ top: 0, behavior: "smooth" });
@@ -292,11 +292,39 @@ export default function LoggedInPage() {
                                 loadingDone={!loading}
                                 style={{minHeight: "300px"}} // optional: reserve height
                                 scrollContainerRef={mainRef}
-                                onAnswer={(isCorrect) => {
+                                onAnswer={async (isCorrect, questionId) => {
                                     setAnsweredState(isCorrect ? "correct" : "wrong");
-                                    setAnswerCount(prev => prev + 1); // always increments
+                                    setAnswerCount(prev => prev + 1);
+
+                                    if (!apiUrl || !userStats?.user_id) {
+                                        console.warn("Missing API URL or user ID; answer not recorded");
+                                        return;
+                                    }
+
+                                    try {
+                                        const res = await fetch(`${apiUrl}/answer/record`, {
+                                            method: "POST",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({
+                                                user_id: userStats.user_id,
+                                                question_id: questionId,
+                                                correct: isCorrect
+                                            }),
+                                        });
+
+                                        if (!res.ok) {
+                                            throw new Error(`Failed to record answer: HTTP ${res.status}`);
+                                        }
+
+                                        console.log("Answer recorded successfully");
+                                    } catch (err) {
+                                        console.error("Failed to record answer:", err);
+                                    }
                                 }}
-                            />
+
+
+
+                        />
                     )}
                 </main>
 
