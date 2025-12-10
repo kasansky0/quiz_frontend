@@ -66,13 +66,15 @@ export default function QuizSampleSection({
                                               onAnswer = () => {}, // default no-op
                                           }: QuizSampleSectionProps) {
     const [questionData, setQuestionData] = useState<QuestionType | null>(null);
-    const [fade, setFade] = useState(true);
+    const [fade, setFade] = useState(false);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [answerResult, setAnswerResult] = useState<{ correct: boolean; answer: string; explanation: string } | null>(null);
     const [currentIndex, setCurrentIndex] = useState(0);
     const optionsRef = useRef<HTMLDivElement>(null);
     const [cycleCount, setCycleCount] = useState(0);
     const [lastQuestionId, setLastQuestionId] = useState<number | null>(null);
+    const [fetchError, setFetchError] = useState(false); // <-- track fetch failures
+
 
 
 
@@ -90,7 +92,6 @@ export default function QuizSampleSection({
         }
     }, [loadingDone]);
 
-    // Fetch first question on mount
     useEffect(() => {
         if (!loadingDone || !apiUrl) return;
 
@@ -108,18 +109,24 @@ export default function QuizSampleSection({
                     console.warn("Invalid question received", data);
                     return;
                 }
-                setQuestionData(data);
+
+                if (isMounted) {
+                    setQuestionData(data);
+
+                    // Fade in after question is loaded
+                    setTimeout(() => setFade(true), 100);
+                }
 
             } catch (err) {
                 console.error(err);
             }
         }
 
-
         fetchFirstQuestion();
 
         return () => { isMounted = false };
     }, [loadingDone, apiUrl, isLoggedIn, userId]);
+
 
     // Handle when user clicks "Next"
     async function fetchRandomQuestion() {
@@ -149,38 +156,49 @@ export default function QuizSampleSection({
 
         // 1️⃣ Show wrongQueue question if 2 DB questions passed
         if (cycleCount >= 2 && wrongQueue?.length && setWrongQueue) {
-            // Always take the first question from the front of the queue
-            nextQuestion = wrongQueue[0];
+            let nextWrong = wrongQueue[0];
 
-            // Remove it from the front
-            setWrongQueue(prev => prev.slice(1));
+            if (nextWrong.id === lastQuestionId && wrongQueue.length > 1) {
+                nextWrong = wrongQueue[1];
+                setWrongQueue(prev => [prev[0], ...prev.slice(2)]);
+            } else {
+                setWrongQueue(prev => prev.slice(1));
+            }
 
-            // Reset DB cycle count after showing a wrongQueue question
+            nextQuestion = nextWrong;
             setCycleCount(0);
         } else {
-            // 2️⃣ Fetch next question from DB
-            let fetched = await fetchRandomQuestion();
+            // 2️⃣ Fetch next question from DB with a max retry limit
+            const maxRetries = 5;
+            let attempts = 0;
+            let fetched: QuestionType | null = null;
 
-            // Avoid repeating last question
-            if (fetched?.id === lastQuestionId) {
+            while (attempts < maxRetries) {
                 fetched = await fetchRandomQuestion();
+                if (!fetched) break; // if fetch failed
+                if (fetched.id !== lastQuestionId) break; // valid next question
+                attempts++;
             }
 
             nextQuestion = fetched;
-
-            // Increment cycleCount only for DB questions
             setCycleCount(prev => prev + 1);
         }
 
         if (nextQuestion) {
             setQuestionData(nextQuestion);
             setLastQuestionId(nextQuestion.id);
+        } else {
+            // fallback: keep the current question if fetch failed
+            console.warn("Failed to get a new question, keeping the current one");
+            setFetchError(true);
         }
 
         scrollContainerRef?.current?.scrollTo({ top: 0, behavior: "auto" });
         window.scrollTo({ top: 0, behavior: "auto" });
         setFade(true);
     };
+
+
 
 // 3️⃣ Handle answer click
     const handleAnswerClick = async (option: string) => {
@@ -192,19 +210,28 @@ export default function QuizSampleSection({
             let explanation = questionData.explanation;
 
             if (isLoggedIn && apiUrl) {
-                const res = await fetch(`${apiUrl}/answer/check`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        question_id: questionData.id,
-                        selected_option: option,
-                        user_id: String(userId),
-                    }),
-                });
-                const result = await res.json();
-                correct = result.correct;
-                answer = result.answer;
-                explanation = result.explanation || questionData.explanation;
+                try {
+                    const res = await fetch(`${apiUrl}/answer/check`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            question_id: questionData.id,
+                            selected_option: option,
+                            user_id: String(userId),
+                        }),
+                    });
+
+                    if (!res.ok) throw new Error("API failed");
+
+                    const result = await res.json();
+                    correct = result.correct;
+                    answer = result.answer;
+                    explanation = result.explanation || questionData.explanation;
+                } catch (err) {
+                    console.error("Answer fetch failed:", err);
+                    setFetchError(true); // show the reload overlay
+                    return; // stop further processing
+                }
             } else {
                 correct = option === questionData.answer;
             }
@@ -222,10 +249,33 @@ export default function QuizSampleSection({
 
 
 
+
     return (
-        <div className="flex-1 flex flex-col items-center justify-start p-6 md:p-8 min-h-[50vh] md:h-auto bg-black-200 w-full no-select"
-             onContextMenu={(e) => e.preventDefault()}
-            >
+        <div
+            className="flex-1 flex flex-col items-center justify-start p-6 md:p-8 min-h-[50vh] md:h-auto bg-black-200 w-full no-select"
+            onContextMenu={(e) => e.preventDefault()}
+        >
+            {/* Reload overlay if fetch failed */}
+            {fetchError && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
+                    <div className="bg-black/70 border border-green-400/40 shadow-lg rounded-2xl max-w-md w-full p-6 text-center backdrop-blur-md">
+                        <h2 className="text-green-400 text-lg font-semibold mb-2 drop-shadow-[0_0_12px_rgba(36,174,124,0.8)]">
+                            Error
+                        </h2>
+                        <p className="text-green-200 text-sm mb-6">
+                            Failed to load the next question. Please reload the page to continue.
+                        </p>
+                        <button
+                            onClick={() => window.location.reload()}
+                            className="px-5 py-2 bg-green-500 text-black font-medium rounded-full hover:bg-green-400 transition"
+                        >
+                            Reload
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Quiz content */}
             {!isLoggedIn ? (
                 <>
                     <div className="mb-4">
@@ -246,7 +296,7 @@ export default function QuizSampleSection({
 
                         {/* Options */}
                         <div ref={optionsRef} className="flex flex-col gap-3">
-                            {questionData?.options?.map(option => (
+                            {questionData.options.map((option) => (
                                 <Option
                                     key={option}
                                     text={option}
@@ -257,6 +307,7 @@ export default function QuizSampleSection({
                                 />
                             ))}
                         </div>
+
                         {/* NEXT BUTTON */}
                         {selectedOption && (
                             <div className="mt-4 flex flex-col items-center gap-2 w-full">
@@ -264,8 +315,8 @@ export default function QuizSampleSection({
                                 <div className="flex flex-col items-center mt-2 text-center">
                                     <ScrollHint />
                                     <span className="text-white text-sm opacity-80 mt-1">
-            Study the explanation below ⬇️
-          </span>
+                  Study the explanation below ⬇️
+                </span>
                                 </div>
                             </div>
                         )}
@@ -280,8 +331,8 @@ export default function QuizSampleSection({
                         )}
                     </div>
                 )
-
             )}
         </div>
     );
+
 }
