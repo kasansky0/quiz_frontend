@@ -72,8 +72,9 @@ export default function QuizSampleSection({
     const [currentIndex, setCurrentIndex] = useState(0);
     const optionsRef = useRef<HTMLDivElement>(null);
     const [cycleCount, setCycleCount] = useState(0);
-    const [lastQuestionId, setLastQuestionId] = useState<number | null>(null);
     const [fetchError, setFetchError] = useState(false); // <-- track fetch failures
+    const QUESTIONS_BEFORE_REVIEW = 2;
+
 
 
 
@@ -155,38 +156,33 @@ export default function QuizSampleSection({
         let nextQuestion: QuestionType | null = null;
 
         // 1️⃣ Show wrongQueue question if 2 DB questions passed
-        if (cycleCount >= 2 && wrongQueue?.length && setWrongQueue) {
-            let nextWrong = wrongQueue[0];
+        if (
+            cycleCount === QUESTIONS_BEFORE_REVIEW &&
+            wrongQueue &&
+            wrongQueue.length > 0 &&
+            setWrongQueue
+        ) {
+            // Serve ONE wrong question (FIFO)
+            nextQuestion = wrongQueue[0];
 
-            if (nextWrong.id === lastQuestionId && wrongQueue.length > 1) {
-                nextWrong = wrongQueue[1];
-                setWrongQueue(prev => [prev[0], ...prev.slice(2)]);
-            } else {
-                setWrongQueue(prev => prev.slice(1));
-            }
-
-            nextQuestion = nextWrong;
-            setCycleCount(0);
+            setWrongQueue(prev => prev.slice(1)); // remove served
+            setCycleCount(0); // reset cycle AFTER review
         } else {
-            // 2️⃣ Fetch next question from DB with a max retry limit
-            const maxRetries = 5;
-            let attempts = 0;
-            let fetched: QuestionType | null = null;
+            // Fetch DB question
+            const fetched = await fetchRandomQuestion();
 
-            while (attempts < maxRetries) {
-                fetched = await fetchRandomQuestion();
-                if (!fetched) break; // if fetch failed
-                if (fetched.id !== lastQuestionId) break; // valid next question
-                attempts++;
+            if (!fetched) {
+                console.warn("DB fetch failed");
+                return;
             }
 
             nextQuestion = fetched;
-            setCycleCount(prev => prev + 1);
+            setCycleCount(prev => prev + 1); // ONLY DB increments
         }
+
 
         if (nextQuestion) {
             setQuestionData(nextQuestion);
-            setLastQuestionId(nextQuestion.id);
         } else {
             // fallback: keep the current question if fetch failed
             console.warn("Failed to get a new question, keeping the current one");
@@ -237,8 +233,11 @@ export default function QuizSampleSection({
             }
 
             // ✅ Add to the back of the queue if wrong
-            if (!correct && setWrongQueue) {
-                setWrongQueue(prev => [...prev, questionData]);
+            if (!correct && setWrongQueue && questionData) {
+                setWrongQueue(prev => {
+                    if (prev.some(q => q.id === questionData.id)) return prev;
+                    return [...prev, questionData];
+                });
             }
 
             if (onAnswer && questionData) onAnswer(correct, questionData.id);

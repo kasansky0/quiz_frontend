@@ -3,13 +3,17 @@
 import { useEffect, useState } from "react";
 
 const formulas = [
-    "Ohm’s Law: V = I × R",
-    "W (1φ): P = V × I × PF",
-    "VA (1φ): S = V × I",
-    "VAR (1φ): Q = V × I × sin(θ)",
-    "W (3φ): P = √3 × V × I × PF",
-    "VA (3φ): S = √3 × V × I",
-    "VAR (3φ): Q = √3 × V × I × sin(θ)",
+    "Ohm’s Law: \nV = I × R",
+    "Ohm’s Law: \nI = V / R",
+    "Ohm’s Law: \nR = V / I",
+    "W (1φ): \nP = V × I × PF",
+    "VA (1φ): \nS = V × I",
+    "W (1φ): \nS = I² × R",
+    "W (1φ): \nS = V² / R",
+    "VAR (1φ): \nQ = V × I × sin(θ)",
+    "W (3φ): \nP = √3 × V × I × PF",
+    "VA (3φ): \nS = √3 × V × I",
+    "VAR (3φ): \nQ = √3 × V × I × sin(θ)",
 ];
 
 export default function LoadingBanner() {

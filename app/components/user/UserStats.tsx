@@ -14,8 +14,9 @@ interface UserStatsProps {
 }
 
 function formatNumber(num: number) {
-    return Number.isInteger(num) ? num.toString() : num.toFixed(2);
+    return parseFloat(num.toPrecision(10)).toString();
 }
+
 
 // Format seconds into hours and minutes only
 function formatTime(seconds: number) {
@@ -299,7 +300,8 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                         "4","5","6","-",
                         "1","2","3","+",
                         "(","0",")",".",
-                        "√","x²","sin","cos"
+                        "√","x²","sin","cos",
+                        "√3","π"
                     ].map((btn) => {
                         // Dynamic button classes
                         const base = "h-12 rounded-xl font-medium text-base flex items-center justify-center transition-all duration-150 active:scale-95";
@@ -339,7 +341,9 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                                                 .replace(/([0-9]+)²/g, "($1**2)")
                                                 .replace(/sin\(([^)]+)\)/g, "sinDeg($1)")
                                                 .replace(/cos\(([^)]+)\)/g, "cosDeg($1)")
-                                                .replace(/√\(([^)]+)\)/g, "Math.sqrt($1)");
+                                                .replace(/√\(([^)]+)\)/g, "Math.sqrt($1)")
+                                                .replace(/π/g, "Math.PI")       // replace π with number
+                                                .replace(/√3/g, "Math.sqrt(3)"); // replace √3 with number
 
                                             const res = Function(
                                                 "sinDeg",
@@ -361,6 +365,10 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                                     } else if (btn === "sin" || btn === "cos") {
                                         setCalcInput(prev => prev + btn + "(");
                                         setCalcResult(null);
+                                    } else if (btn === "π") {
+                                        setCalcInput(prev => prev + "π");
+                                    } else if (btn === "√3") {
+                                        setCalcInput(prev => prev + "√3");
                                     } else if (btn === "⌫") {
                                         setCalcInput(prev => prev.slice(0, -1));
                                         setCalcResult(null);
@@ -368,7 +376,7 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                                         setCalcInput(prev => {
                                             let start = prev;
                                             if (!prev && typeof calcResult === "number" && ["+", "-", "*", "/"].includes(btn)) {
-                                                start = calcResult.toFixed(2); // safe, already a number
+                                                start = Number.isInteger(calcResult) ? calcResult.toString() : calcResult.toFixed(5);
                                             }
                                             return start + btn;
                                         });
