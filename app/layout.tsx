@@ -77,6 +77,25 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             )}
             style={{ backgroundColor: '#000000' }} // ← fallback for body
         >
+
+        {/* Google Analytics */}
+        <Script
+            strategy="afterInteractive"
+            src={`https://www.googletagmanager.com/gtag/js?id=G-8TYPXH8EQF`}
+        />
+        <Script
+            id="google-analytics"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+                __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-8TYPXH8EQF', { page_path: window.location.pathname });
+            `,
+            }}
+        />
+
         <Providers>
             {children}
         </Providers>
