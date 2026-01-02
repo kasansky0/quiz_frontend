@@ -8,9 +8,9 @@ export default function LoggedOutPage() {
         <div className="min-h-screen flex flex-col md:flex-row bg-black-200">
 
             {/* LEFT SIDE (login + metrics) */}
-            <main className="md:flex-1 flex flex-col w-full min-h-screen justify-between p-0">
+            <main className="md:flex-1 flex flex-col w-full justify-between p-0 min-h-[100dvh]">
 
-                <div className="w-full flex justify-center mt-6 md:mt-10 mb-6 z-4">
+            <div className="w-full flex justify-center mt-6 md:mt-10 mb-6 z-4">
                     <img
                         src="/images/android-chrome-512x512.png"
                         alt="NetaPrep Logo"
