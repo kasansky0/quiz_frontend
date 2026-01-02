@@ -1,3 +1,16 @@
+/* ===== Viewport stability (iOS Safari fix) ===== */
+html,
+body {
+    height: 100%;
+}
+
+@supports (-webkit-touch-callout: none) {
+    body {
+        min-height: -webkit-fill-available;
+    }
+}
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
