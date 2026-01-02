@@ -10,7 +10,7 @@ export default function LoggedOutPage() {
             {/* LEFT SIDE (login + metrics) */}
             <main className="md:flex-1 flex flex-col w-full min-h-screen p-0">
 
-                <div className="w-full flex justify-center mt-10 md:mt-20 mb-6 z-10">
+                <div className="w-full flex justify-center mt-6 md:mt-10 mb-6 z-4">
                     <img
                         src="/images/android-chrome-512x512.png"
                         alt="NetaPrep Logo"
@@ -20,10 +20,10 @@ export default function LoggedOutPage() {
 
 
                 {/* Top content wrapper */}
-                <div className="flex flex-col items-center flex-1 justify-center w-full">
+                <div className="flex flex-col items-center w-full">
                     <LoginSection />
 
-                    <div className="mt-4 flex flex-row justify-center gap-4 text-center w-full">
+                    <div className="mt-2 flex flex-row justify-center gap-4 text-center w-full">
                         <div className="flex flex-col text-white items-center">
                             <span className="text-2xl md:text-3xl font-bold">90%</span>
                             <span className="text-green-200 text-sm md:text-base font-normal">Pass Rate</span>
@@ -36,7 +36,7 @@ export default function LoggedOutPage() {
                 </div>
 
                 {/* Footer always at bottom */}
-                <div className="mt-auto w-full mt-4 md:mt-0">
+                <div className="w-full mt-4 md:mt-6">
                     <Footer />
                 </div>
             </main>
