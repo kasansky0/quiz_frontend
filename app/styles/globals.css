@@ -1,14 +1,11 @@
-/* ===== Viewport stability (iOS Safari fix) ===== */
-html,
-body {
+html, body {
     height: 100%;
+    margin: 0;
+    padding: 0;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
 }
 
-@supports (-webkit-touch-callout: none) {
-    body {
-        min-height: -webkit-fill-available;
-    }
-}
 
 
 @tailwind base;

@@ -8,7 +8,7 @@ export default function LoggedOutPage() {
         <div className="min-h-screen flex flex-col md:flex-row bg-black-200">
 
             {/* LEFT SIDE (login + metrics) */}
-            <main className="md:flex-1 flex flex-col w-full min-h-screen p-0">
+            <main className="md:flex-1 flex flex-col w-full min-h-[100vh] p-0">
 
                 <div className="w-full flex justify-center mt-6 md:mt-10 mb-6 z-4">
                     <img
