@@ -9,6 +9,16 @@ export default function LoggedOutPage() {
 
             {/* LEFT SIDE (login + metrics) */}
             <main className="md:flex-1 flex flex-col w-full min-h-screen p-0">
+
+                <div className="w-full flex justify-center mt-10 md:mt-20 mb-6 z-10">
+                    <img
+                        src="/images/android-chrome-512x512.png"
+                        alt="NetaPrep Logo"
+                        className="w-24 md:w-32"
+                    />
+                </div>
+
+
                 {/* Top content wrapper */}
                 <div className="flex flex-col items-center flex-1 justify-center w-full">
                     <LoginSection />
@@ -19,7 +29,7 @@ export default function LoggedOutPage() {
                             <span className="text-green-200 text-sm md:text-base font-normal">Pass Rate</span>
                         </div>
                         <div className="flex flex-col text-white items-center">
-                            <span className="text-2xl md:text-3xl font-bold">570+</span>
+                            <span className="text-2xl md:text-3xl font-bold">600+</span>
                             <span className="text-green-200 text-sm md:text-base font-normal">Practice Questions</span>
                         </div>
                     </div>

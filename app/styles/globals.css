@@ -1,3 +1,16 @@
+/* ===== Viewport stability (iOS Safari fix) ===== */
+html,
+body {
+    height: 100%;
+}
+
+@supports (-webkit-touch-callout: none) {
+    body {
+        min-height: -webkit-fill-available;
+    }
+}
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -417,4 +430,19 @@ html, body {
     pointer-events: none; /* doesn't block interactions */
 }
 
+/* ===== FADE-IN ANIMATION FOR LOGGED OUT COMPONENT */
+.animate-fadeIn {
+    animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
