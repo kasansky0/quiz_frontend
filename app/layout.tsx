@@ -54,6 +54,7 @@ export const metadata: Metadata = {
             { url: "/favicon-16x16.png", type: "image/png", sizes: "16x16" },
             { url: "/favicon-32x32.png", type: "image/png", sizes: "32x32" },
             { url: "/favicon-48x48.png", type: "image/png", sizes: "48x48" },
+            { url: "/android-chrome-512x512.png", type: "image/png", sizes: "512x512" }, // <-- ADD THIS LINE
         ],
         apple: "/apple-touch-icon.png",
         shortcut: "/favicon.ico",
