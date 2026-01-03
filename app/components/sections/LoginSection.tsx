@@ -12,36 +12,36 @@ export default function LoginSection() {
             className="flex flex-col items-center gap-5 md:gap-7 text-center relative"
         >
             {/* Hero Title */}
-            <h1 className="text-3xl md:text-5xl font-semibold tracking-tight text-white">
+            <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-white text-center">
                 Welcome to{" "}
                 <span className="bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">
-                  NetaPrep
+                     NetaPrep
                 </span>
             </h1>
 
-            {/* Hero Description */}
-            <p className="text-sm md:text-base font-semibold tracking-tight text-white">
-              <span className="bg-gradient-to-r from-green-500 to-green-900 bg-clip-text text-transparent">
-                NETA Level 2 quizzes — with clear explanations.
-              </span>
+            {/* Hero Tagline */}
+            <p className="mt-3 text-sm md:text-base font-medium text-green-400/90 text-center leading-relaxed">
+                Completely Free, No Ads
+                <br/>
+                Non-stop NETA Level 2 Quizzes with clear explanations
+            </p>
+
+            <p className="mt-2 text-sm md:text-base text-white/70 text-center">
+                Practice anytime, anywhere with hundreds of questions
             </p>
 
 
 
 
 
-            {/* Value Statement */}
-            <p className="text-xs text-white/80 mt-1 md:mt-2">
-                Quick login. Start practicing immediately.
-                <br />
-                Mobile-friendly and optimized for on-the-go learning.
-            </p>
+
+
 
 
 
 
             {/* Google Sign-in Button */}
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <motion.div className="mt-6" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <button
                     onClick={() => signIn("google")}
                     className="flex items-center gap-3 px-4 py-2 rounded-full bg-black/70 backdrop-blur-xl border border-green-400/20 shadow-lg hover:bg-black/60"
@@ -59,7 +59,10 @@ export default function LoginSection() {
 
             {/* Security & Credibility */}
             <div className="flex flex-col gap-1 text-xs text-white/70 text-center">
-                <span>🔒 Secure login with Google OAuth 2.0</span>
+                <span>🔒 Quick, secure login with Google OAuth 2.0</span>
+
+
+
             </div>
         </motion.div>
     );

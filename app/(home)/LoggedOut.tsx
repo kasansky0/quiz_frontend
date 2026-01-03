@@ -8,7 +8,7 @@ export default function LoggedOutPage() {
         <div className="min-h-screen flex flex-col md:flex-row bg-black-200">
 
             {/* LEFT SIDE (login + metrics) */}
-            <main className="md:flex-1 flex flex-col w-full justify-between p-0 min-h-[100dvh]">
+            <main role="main" className="md:flex-1 flex flex-col w-full justify-between p-0 min-h-[100dvh]">
 
             <div className="w-full flex justify-center mt-6 md:mt-10 mb-6 z-4">
                     <img
@@ -23,7 +23,7 @@ export default function LoggedOutPage() {
                 <div className="flex flex-col items-center w-full">
                     <LoginSection />
 
-                    <div className="mt-2 flex flex-row justify-center gap-4 text-center w-full">
+                    <div className="mt-20 flex flex-row justify-center gap-4 text-center w-full">
                         <div className="flex flex-col text-white items-center">
                             <span className="text-2xl md:text-3xl font-bold">90%</span>
                             <span className="text-green-200 text-sm md:text-base font-normal">Pass Rate</span>
@@ -34,6 +34,8 @@ export default function LoggedOutPage() {
                         </div>
                     </div>
                 </div>
+
+
 
                 {/* Footer always at bottom */}
                 <div className="w-full">
