@@ -29,7 +29,7 @@ export default function LoggedOutPage() {
                             <span className="text-green-200 text-sm md:text-base font-normal">Pass Rate</span>
                         </div>
                         <div className="flex flex-col text-white items-center">
-                            <span className="text-2xl md:text-3xl font-bold">600+</span>
+                            <span className="text-2xl md:text-3xl font-bold">700+</span>
                             <span className="text-green-200 text-sm md:text-base font-normal">Practice Questions</span>
                         </div>
                     </div>

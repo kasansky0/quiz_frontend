@@ -6,11 +6,17 @@ import { useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "../ui/Button";
 
+
+
+
+
 interface UserStatsProps {
     userPercentage: number;
     nickname?: string;
     totalOnlineTime: number;
     loading: boolean;
+    /*mainView: "quiz" | "chat";
+    setMainView: React.Dispatch<React.SetStateAction<"quiz" | "chat">>;*/
 }
 
 function formatNumber(num: number) {
@@ -61,12 +67,17 @@ function cosDeg(x: number) {
     return Math.cos((x * Math.PI) / 180);
 }
 
+function tanDeg(x: number) {
+    return Math.tan((x * Math.PI) / 180);
+}
 
 
 
 
 
-export default function UserStats({ userPercentage, nickname, totalOnlineTime, loading }: UserStatsProps) {
+
+
+export default function UserStats({ userPercentage, nickname, totalOnlineTime, loading, /*mainView, setMainView*/ }: UserStatsProps) {
     const { data: session } = useSession();
     const [calcInput, setCalcInput] = useState("");
     const [calcResult, setCalcResult] = useState<number | "Error" | null>(null);
@@ -74,6 +85,7 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
     const [history, setHistory] = useState<string[]>([]);
     const [calcOpen, setCalcOpen] = useState(false);
     const calcRef = useRef<HTMLDivElement>(null);
+
 
 
 
@@ -123,7 +135,9 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
 
             <div className="flex flex-col items-center space-y-4 mt-6 w-full">
 
-            {/* Nickname badge */}
+
+
+                {/* Nickname badge */}
                 <div className="flex items-center justify-center bg-black/70 backdrop-blur-xl border border-green-400/20
                 rounded-full shadow-lg px-3 h-8 min-w-[80px] frame-shimmer">
                     {loading ? (
@@ -135,7 +149,28 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                     )}
                 </div>
 
-
+                {/*
+                <button
+                    onClick={() =>
+                        setMainView((prev) => (prev === "quiz" ? "chat" : "quiz"))
+                    }
+                    className="
+                        flex items-center justify-center
+                        bg-black/70 backdrop-blur-xl
+                        border border-green-400/20
+                        rounded-full shadow-lg
+                        px-4 h-8 min-w-[100px]
+                        frame-shimmer
+                        transition
+                        hover:bg-green-500/10
+                        active:scale-95
+                    "
+                >
+                    <span className="text-green-300 text-sm font-medium">
+                        {mainView === "quiz" ? "Chat" : "Quiz"}
+                    </span>
+                </button>
+                */}
 
                 {/* Score + Total Time row */}
                 <div className="flex items-center space-x-3">
@@ -165,7 +200,7 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                     {/* Total Online Time */}
                     <div
                         className="flex items-center justify-center bg-black/70 backdrop-blur-xl border border-green-400/20
-             rounded-full shadow-lg relative px-3 whitespace-nowrap frame-shimmer"
+                            rounded-full shadow-lg relative px-3 whitespace-nowrap frame-shimmer"
                         style={{ height: "40px" }}
                     >
                         {loading ? (
@@ -299,9 +334,9 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                         "7","8","9","*",
                         "4","5","6","-",
                         "1","2","3","+",
-                        "(","0",")",".",
-                        "√","x²","sin","cos",
-                        "√3","π"
+                        "(",")","0",".",
+                        "√","tan","sin","cos",
+                        "√3","π","x²"
                     ].map((btn) => {
                         // Dynamic button classes
                         const base = "h-12 rounded-xl font-medium text-base flex items-center justify-center transition-all duration-150 active:scale-95";
@@ -312,9 +347,9 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                                     ? "bg-red-500/70 text-white hover:bg-red-600/80"
                                     : btn === "⌫"
                                         ? "bg-yellow-500/60 text-black hover:bg-yellow-400/70"
-                                        : ["/","*","-","+"].includes(btn)
+                                        : ["/","*","-","+","."].includes(btn)
                                             ? "bg-white/10 text-green-300 hover:bg-white/20"
-                                            : ["√","x²","sin","cos"].includes(btn)
+                                            : ["√","x²","sin","cos","√3","π","tan"].includes(btn)
                                                 ? "bg-white/10 text-blue-300 hover:bg-white/20"
                                                 : "bg-white/5 text-white hover:bg-white/10";
 
@@ -341,15 +376,17 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                                                 .replace(/([0-9]+)²/g, "($1**2)")
                                                 .replace(/sin\(([^)]+)\)/g, "sinDeg($1)")
                                                 .replace(/cos\(([^)]+)\)/g, "cosDeg($1)")
+                                                .replace(/tan\(([^)]+)\)/g, "tanDeg($1)")
                                                 .replace(/√\(([^)]+)\)/g, "Math.sqrt($1)")
-                                                .replace(/π/g, "Math.PI")       // replace π with number
-                                                .replace(/√3/g, "Math.sqrt(3)"); // replace √3 with number
+                                                .replace(/π/g, "Math.PI")
+                                                .replace(/√3/g, "Math.sqrt(3)");
 
                                             const res = Function(
                                                 "sinDeg",
                                                 "cosDeg",
+                                                "tanDeg", // <--- add this
                                                 `"use strict"; return (${expr})`
-                                            )(sinDeg, cosDeg);
+                                            )(sinDeg, cosDeg, tanDeg);
 
                                             setHistory(prev => [`${calcInput} = ${res}`, ...prev].slice(0, 3));
                                             setCalcResult(res);
@@ -364,6 +401,9 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                                         setCalcInput(prev => prev + "²");
                                     } else if (btn === "sin" || btn === "cos") {
                                         setCalcInput(prev => prev + btn + "(");
+                                        setCalcResult(null);
+                                    } else if (btn === "tan") {
+                                        setCalcInput(prev => prev + "tan(");
                                         setCalcResult(null);
                                     } else if (btn === "π") {
                                         setCalcInput(prev => prev + "π");
@@ -404,7 +444,7 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
 
                 {/* Formula List (scrollable & isolated) */}
                 <ul
-                    className="w-full text-xs font-mono space-y-1 overflow-y-auto flex-1 overscroll-contain"
+                    className="w-full text-xs font-mono space-y-1 overflow-y-auto flex-1 overscroll-contain hide-scrollbar"
                     style={{
                         scrollbarWidth: "none", // Firefox
                         msOverflowStyle: "none" // IE 10+
@@ -412,18 +452,32 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                     onWheel={(e) => e.stopPropagation()} // prevent parent scroll when scrolling formulas
                 >
                     <li>
+                        <span className="text-green-300 font-medium">Find kVA:</span>
+                        <div className="text-green-100 ml-2">1φ kVA = VI / 1k</div>
+                        <div className="text-green-100 ml-2">3φ kVA = √3VI / 1k</div>
+                        <div className="text-green-100 ml-2">kVA = kW / pf</div>
+                        <div className="text-green-100 ml-2">kVA = kW / cosθ</div>
+                        <div className="text-green-100 ml-2">kVA = √(kW² + kVAR²)</div>
+
+                        <span className="text-green-300 font-medium">Find kW:</span>
+                        <div className="text-green-100 ml-2">1φ kW = VIpf / 1k</div>
+                        <div className="text-green-100 ml-2">3φ kW = √3VIpf / 1k</div>
+                        <div className="text-green-100 ml-2">kW = kVA × pf</div>
+                        <div className="text-green-100 ml-2">kW = kVA × cosθ</div>
+
+                        <span className="text-green-300 font-medium">Find kVAR:</span>
+                        <div className="text-green-100 ml-2">kVAR = √(kVA² − kW²)</div>
+                        <div className="text-green-100 ml-2">kVAR = kW × tanθ</div>
+                        <div className="text-green-100 ml-2">kVAR = kVA × sinθ</div>
+
+                        <span className="text-green-300 font-medium">Find pf & Angle:</span>
+                        <div className="text-green-100 ml-2">PF = kW / kVA</div>
+                        <div className="text-green-100 ml-2">PF = cosθ</div>
+                        <div className="text-green-100 ml-2">sinθ = √(1 − pf²)</div>
+                    </li>
+                    <li>
                         <span className="text-green-300 font-medium">Ohm's Law:</span>
                         <div className="text-green-100 ml-2">V = IR</div>
-                    </li>
-                    <li>
-                        <span className="text-green-300 font-medium">Power single phase:</span>
-                        <div className="text-green-100 ml-2">P(kVA) = VI / 1000</div>
-                        <div className="text-green-100 ml-2">P(kW) = VIpf / 1000</div>
-                    </li>
-                    <li>
-                        <span className="text-green-300 font-medium">Power three phase:</span>
-                        <div className="text-green-100 ml-2">P(kVA) = √3VI / 1000</div>
-                        <div className="text-green-100 ml-2">P(kW) = √3VIpf / 1000</div>
                     </li>
                     <li>
                         <span className="text-green-300 font-medium">Capacitance:</span>
@@ -433,6 +487,12 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                         <span className="text-green-300 font-medium">Inductance:</span>
                         <div className="text-green-100 ml-2">V = L × (dI/dt)</div>
                     </li>
+                    <li>
+                        <span className="text-green-300 font-medium">Inductor Energy:</span>
+                        <div className="text-green-100 ml-2">W = ½ L I²</div>
+                        <div className="text-green-100 ml-2">L = 2W / I²</div>
+                    </li>
+
                     <li>
                         <span className="text-green-300 font-medium">Series R :</span>
                         <div className="text-green-100 ml-2">Rₛ = R₁ + R₂ + ...</div>
