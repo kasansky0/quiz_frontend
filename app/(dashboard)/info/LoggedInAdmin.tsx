@@ -219,7 +219,9 @@ export default function LoggedInAdmin() {
                     sortedUsers.map((user, index) => (
                         <div
                             key={user.user_id}
-                            ref={el => (userRefs.current[index] = el)}
+                            ref={(el) => {
+                                userRefs.current[index] = el;
+                            }}
                             className="bg-gray-900 p-3 sm:p-6 rounded mb-4 sm:mb-6 border border-green-500 text-sm sm:text-base"
                         >
                             {/* User info */}
