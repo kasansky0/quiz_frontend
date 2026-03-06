@@ -117,10 +117,10 @@ export default function ChatStats() {
 
             // keep only valid local comments
             const localOnlyComments = prev.comments.filter(
-                c =>
+                (c: Comment & { _isLocal?: boolean }) => // <-- added type assertion
                     c._isLocal &&
-                    c.id &&                      // must have id
-                    c.text &&                    // must have comment text
+                    c.id &&                            // must have id
+                    c.message &&                       // must have comment text
                     !updated.comments.some(uc => uc.id === c.id)
             );
 
@@ -601,8 +601,8 @@ export default function ChatStats() {
                 if (a.pinned && !b.pinned) return -1;
                 if (!a.pinned && b.pinned) return 1;
 
-                // Then newest posts first
-                return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+                // Newest posts first (fallback to 0 if timestamp missing)
+                return (new Date(b.timestamp ?? 0).getTime()) - (new Date(a.timestamp ?? 0).getTime());
             });
     }, [posts, searchQuery]);
 
@@ -875,7 +875,6 @@ export default function ChatStats() {
 
 
                                                         <button
-                                                            variant="ghost"
                                                             onClick={() => setEditingPostId(null)}
                                                         >
                                                             <svg
@@ -895,7 +894,6 @@ export default function ChatStats() {
                                                         </button>
 
                                                         <button
-                                                            variant="solid"
                                                             onClick={handleEditPost}
                                                             disabled={!editMessage.trim()}
                                                         >
@@ -1140,7 +1138,7 @@ export default function ChatStats() {
                                                 if (!a.pinned && b.pinned) return 1;
 
                                                 // Otherwise, newest first
-                                                return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+                                                return (new Date(b.timestamp ?? 0).getTime()) - (new Date(a.timestamp ?? 0).getTime());
                                             })
 
                                             .map((comment) => {
@@ -1165,9 +1163,9 @@ export default function ChatStats() {
                                                                     {/* reactions go here */}
                                                                     {comment.reactions?.length > 0 && (
                                                                         <span className="ml-2 flex gap-1">
-                                                                          {comment.reactions.map((r, idx) => (
-                                                                              <span key={r.id ?? idx}>{r.emoji}</span>
-                                                                          ))}
+                                                                            {comment.reactions.map((r, idx) => (
+                                                                                <span key={r.id ?? idx}>{r.emoji}</span>
+                                                                            ))}
                                                                         </span>
                                                                     )}
 
