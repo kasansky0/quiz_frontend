@@ -68,6 +68,7 @@ export default function LoggedInAdmin() {
     const [currentUserIndex, setCurrentUserIndex] = useState(0);
     const userRefs = useRef<(HTMLDivElement | null)[]>([]);
     const { showError } = useError();
+    const userName = session?.user?.name ?? "Unknown";
 
 
     useEffect(() => {
@@ -162,7 +163,7 @@ export default function LoggedInAdmin() {
                 <h1 className="text-2xl sm:text-3xl font-bold text-white-400 mb-2">
                     Admin Dashboard
                 </h1>
-                <p className="text-white-200 text-sm sm:text-base mb-2">Logged in as {session.user?.name}</p>
+                <p className="text-white-200 text-sm sm:text-base mb-2">Logged in as {userName}</p>
 
                 {!usersLoading && users.length > 0 && (
                     <>
