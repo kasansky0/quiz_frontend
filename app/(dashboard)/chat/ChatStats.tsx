@@ -59,8 +59,8 @@ export default function ChatStats() {
     const fetcher = (url: string) =>
         fetch(url, { credentials: "include" }).then(res => res.json());
 
-    const { data: posts = [], error: postsError } = useSWR(`${apiUrl}/posts/`, fetcher, {
-        refreshInterval: 10000, // poll every 10s
+    const { data: posts = [], error: postsError } = useSWR<Post[]>(`${apiUrl}/posts/`, fetcher, {
+        refreshInterval: 10000,
     });
 
 
@@ -109,7 +109,7 @@ export default function ChatStats() {
     useEffect(() => {
         if (!activePost) return;
 
-        const updated = posts.find(p => p.id === activePost.id);
+        const updated = posts.find((p: Post) => p.id === activePost.id);
         if (!updated) return;
 
         setActivePost(prev => {
