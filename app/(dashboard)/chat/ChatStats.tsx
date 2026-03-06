@@ -1161,9 +1161,9 @@ export default function ChatStats() {
                                                                         {comment.nickname}
 
                                                                     {/* reactions go here */}
-                                                                    {comment.reactions?.length > 0 && (
+                                                                    {(comment.reactions?.length ?? 0) > 0 && (
                                                                         <span className="ml-2 flex gap-1">
-                                                                            {comment.reactions.map((r, idx) => (
+                                                                            {comment.reactions?.map((r, idx) => (
                                                                                 <span key={r.id ?? idx}>{r.emoji}</span>
                                                                             ))}
                                                                         </span>
