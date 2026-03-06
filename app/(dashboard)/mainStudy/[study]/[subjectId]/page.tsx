@@ -9,7 +9,10 @@ export default function SubjectPage() {
     const { subjectId } = useParams();
     const router = useRouter(); // <-- add router
 
-    const { subject, loading, error } = useSubjectById(apiUrl, subjectId ?? "");
+    const { subject, loading, error } = useSubjectById(
+        apiUrl,
+        Array.isArray(subjectId) ? subjectId[0] : subjectId ?? ""
+    );
 
     if (!subjectId)
         return <div className="p-6 text-white">Invalid subject ID</div>;

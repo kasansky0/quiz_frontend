@@ -156,13 +156,13 @@ export default function ChatStats() {
 
         // 🗑️ If empty → DELETE instead of PATCH
         if (trimmed === "") {
-            const res = await fetch(
-                `${apiUrl}/posts/${activePost.id}/comments/${editingCommentId}`,
-                {
-                    method: "DELETE",
-                    credentials: "include",
-                }
-            );
+                const res = await fetch(
+                    `${apiUrl}/posts/${activePost.id}/comments/${editingCommentId}`,
+                    {
+                        method: "DELETE",
+                        credentials: "include",
+                    }
+                );
 
             if (!res.ok) {
                 if (res.status === 401) {
