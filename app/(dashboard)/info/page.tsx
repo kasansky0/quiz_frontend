@@ -5,7 +5,7 @@ import { useEffect, useState, useCallback } from "react";
 import LoggedInAdmin from "./LoggedInAdmin";
 import { useRouter } from "next/navigation";
 
-const apiUrl = "http://localhost:8000/api";
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 // Info & Formulas Component
 const InfoAndFormulas = () => {

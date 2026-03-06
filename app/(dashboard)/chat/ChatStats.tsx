@@ -14,7 +14,7 @@ import DOMPurify from 'dompurify';
 
 
 
-const apiUrl = "http://localhost:8000/api"; // <-- include /api
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export default function ChatStats() {
     const [activePost, setActivePost] = useState<Post | null>(null);

@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import { useError } from "@/app/ErrorProvider";
 
 
-const apiUrl = "http://localhost:8000/api";
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 
 function LoggedOut() {

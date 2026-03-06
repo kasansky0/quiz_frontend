@@ -125,7 +125,7 @@ export function useUserSidebarData({
 
         async function sendToken() {
             try {
-                const res = await fetch("http://localhost:8000/api/auth/google", {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/google`, {
                     method: "POST",
                     headers: {"Content-Type": "application/json"},
                     body: JSON.stringify({token: session.idToken}),

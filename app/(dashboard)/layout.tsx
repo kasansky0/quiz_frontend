@@ -29,7 +29,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const [userPercentage, setUserPercentage] = useState(0);
     const [onlineTime, setOnlineTime] = useState(0);
     const [errorState, setErrorState] = useState<string | null>(null);
-    const [mainView, setMainView] = useState<MainView>("quiz");
     const tokenSentRef = useRef(false);
     const isAdmin = session?.user?.email === "zeckdepends@gmail.com";
     const [loggedOut, setLoggedOut] = useState(false);
@@ -135,17 +134,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
     useEffect(() => {
-        if (!session?.idToken) return;
+        if (!(session as any)?.idToken) return;
         if (tokenSentRef.current) return; // 🚫 already sent
 
         tokenSentRef.current = true; // ✅ lock immediately
 
         async function sendToken() {
             try {
-                const res = await fetch("http://localhost:8000/api/auth/google", {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/google`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ token: session.idToken }),
+                    body: JSON.stringify({ token: (session as any).idToken }),
                     credentials: "include",
                 });
 
@@ -159,7 +158,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         }
 
         sendToken();
-    }, [session?.idToken]);
+    }, [(session as any)?.idToken]);
 
 
 
@@ -434,14 +433,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }, [status, session, router, showError]);
 
 // Show loader while checking session
-    if (status === "loading" || (!session && status !== "loading")) {
+    if (status !== "authenticated") {
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
-
 
 
 
@@ -628,8 +626,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         nickname={userStats?.nickname}
                         totalOnlineTime={onlineTime}
                         loading={loading || !userStats}
-                        mainView={mainView}
-                        setMainView={setMainView}
                         onLinkClick={() => {}}
                     />
                 </aside>
@@ -684,8 +680,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                 nickname={userStats?.nickname}
                                 totalOnlineTime={onlineTime}
                                 loading={loading || !userStats}
-                                mainView={mainView}
-                                setMainView={setMainView}
                                 onLinkClick={() => setActiveSheet(null)}
                             /> }
 
