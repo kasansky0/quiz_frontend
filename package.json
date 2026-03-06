@@ -27,7 +27,12 @@
     "swr": "^2.4.0",
     "tailwind-merge": "^3.4.0",
     "tailwind-variants": "^3.1.1",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "@emnapi/core": "^1.7.1",
+    "@emnapi/runtime": "^1.7.1",
+    "@emnapi/wasi-threads": "^1.1.0",
+    "@napi-rs/wasm-runtime": "^0.2.12",
+    "@tybys/wasm-util": "^0.10.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
