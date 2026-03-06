@@ -37,12 +37,12 @@ export function HeroCard({ question }: { question: any }) {
             <QuestionOptions options={question.options} />
 
             <div className="mt-4">
-                <p className="text-sm font-bold text-green-100">Correct Answer:</p>
+                <p className="text-sm font-bold text-white-100">Correct Answer:</p>
                 <p className="text-sm mt-1">{question.answer}</p>
             </div>
 
             <div className="mt-3">
-                <p className="text-sm font-bold text-green-100">Explanation:</p>
+                <p className="text-sm font-bold text-white-100">Explanation:</p>
                 <p className="text-xs mt-1 leading-relaxed">
                     {question.explanation}
                 </p>

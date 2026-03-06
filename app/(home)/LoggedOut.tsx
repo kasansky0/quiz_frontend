@@ -1,11 +1,11 @@
 "use client";
 
-import LoginSection from "../components/sections/LoginSection";
-import Footer from "@/app/components/sections/Footer";
+import LoginSection from "./LoginSection";
+import Footer from "@/app/(home)/Footer";
 
 export default function LoggedOutPage() {
     return (
-        <div className="min-h-screen flex flex-col md:flex-row bg-black-200">
+        <div className="min-h-screen flex flex-col md:flex-row bg-dark-300">
 
             {/* LEFT SIDE (login + metrics) */}
             <main role="main" className="md:flex-1 flex flex-col w-full justify-between p-0 min-h-[100dvh]">

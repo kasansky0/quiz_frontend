@@ -1,8 +1,8 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import LoggedIn from "./LoggedIn";
 import LoggedOut from "./LoggedOut";
+import DashboardLayout from "@/app/(dashboard)/layout";
 
 export default function Page() {
     const { data: session, status } = useSession();
@@ -15,5 +15,5 @@ export default function Page() {
         );
     }
 
-    return session ? <LoggedIn /> : <LoggedOut />;
+    return session ? <DashboardLayout /> : <LoggedOut />;
 }

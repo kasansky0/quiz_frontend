@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 export function ScrollHint() {
     return (
         <motion.div
-            className="mt-6 flex justify-center md:hidden"
+            className="flex justify-center md:hidden"
             animate={{ y: [0, 6, 0] }}
             transition={{ repeat: Infinity, duration: 1.2 }}
         >

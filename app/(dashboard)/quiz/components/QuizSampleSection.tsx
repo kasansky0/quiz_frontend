@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Question from "../quiz/Question";
-import Option from "../quiz/Options";
-import Comment from "../quiz/Comment";
-import { HeroCard } from "../quiz/HeroCard";
-import { ScrollHint } from "../quiz/ScrollHint";
+import Question from "./Question";
+import Option from "./Options";
+import Comment from "./Comment";
+import { HeroCard } from "./HeroCard";
+import { ScrollHint } from "./ScrollHint";
 import { Button } from "@/app/components/ui/Button";
+import { useError } from "@/app/ErrorProvider";
+
 
 export interface QuestionType {
     id: number;
@@ -50,6 +52,7 @@ interface QuizSampleSectionProps {
     style?: React.CSSProperties;
     scrollContainerRef?: React.RefObject<HTMLElement | null>;
     onAnswer?: (isCorrect: boolean, questionId: number) => void;
+    subjectId?: string; // <-- add this
 }
 
 
@@ -63,6 +66,7 @@ export default function QuizSampleSection({
                                               apiUrl,
                                               loadingDone,
                                               scrollContainerRef,
+                                              subjectId,
                                               onAnswer = () => {}, // default no-op
                                           }: QuizSampleSectionProps) {
     const [questionData, setQuestionData] = useState<QuestionType | null>(null);
@@ -74,6 +78,8 @@ export default function QuizSampleSection({
     const [cycleCount, setCycleCount] = useState(0);
     const [fetchError, setFetchError] = useState(false); // <-- track fetch failures
     const QUESTIONS_BEFORE_REVIEW = 2;
+    const { showError } = useError();
+
 
 
 
@@ -100,45 +106,57 @@ export default function QuizSampleSection({
 
         async function fetchFirstQuestion() {
             try {
-                const url = isLoggedIn && userId
-                    ? `${apiUrl}/questions/next?user_id=${userId}`
-                    : `${apiUrl}/questions/random`;
+                const res = await fetch(`${apiUrl}/questions/next`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        user_id: isLoggedIn ? userId : null,
+                        subject_id: subjectId ?? null,
+                    }),
+                });
 
-                const res = await fetch(url);
+                if (!res.ok) showError("Failed to fetch question"); // 🔴 show banner
+
                 const data: QuestionType = await res.json();
-                if (!data?.options?.length) {
-                    console.warn("Invalid question received", data);
-                    return;
-                }
+
+                if (!data?.options?.length) return;
 
                 if (isMounted) {
                     setQuestionData(data);
-
-                    // Fade in after question is loaded
                     setTimeout(() => setFade(true), 100);
                 }
 
             } catch (err) {
                 console.error(err);
+                setFetchError(true);
             }
         }
 
         fetchFirstQuestion();
 
         return () => { isMounted = false };
-    }, [loadingDone, apiUrl, isLoggedIn, userId]);
+    }, [loadingDone, apiUrl, isLoggedIn, userId, subjectId]);
 
 
-    // Handle when user clicks "Next"
-    async function fetchRandomQuestion() {
+    // Handle when sidebar clicks "Next"
+    async function fetchNextQuestion() {
         if (!apiUrl) return null;
-        try {
-            const url = isLoggedIn && userId
-                ? `${apiUrl}/questions/next?user_id=${userId}`
-                : `${apiUrl}/questions/random`;
 
-            const res = await fetch(url);
-            return await res.json();
+        try {
+            const res = await fetch(`${apiUrl}/questions/next`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    user_id: isLoggedIn ? userId : null,
+                    subject_id: subjectId ?? null,
+                }),
+            });
+
+            if (!res.ok) showError("Failed to fetch question"); // 🔴 show banner
+
+            const data: QuestionType = await res.json();
+            return data;
+
         } catch (err) {
             console.error("Failed to fetch question:", err);
             return null;
@@ -155,43 +173,32 @@ export default function QuizSampleSection({
 
         let nextQuestion: QuestionType | null = null;
 
-        // 1️⃣ Show wrongQueue question if 2 DB questions passed
+        // Check if wrongQueue review is needed
         if (
             cycleCount === QUESTIONS_BEFORE_REVIEW &&
             wrongQueue &&
             wrongQueue.length > 0 &&
             setWrongQueue
         ) {
-            // Serve ONE wrong question (FIFO)
             nextQuestion = wrongQueue[0];
-
-            setWrongQueue(prev => prev.slice(1)); // remove served
-            setCycleCount(0); // reset cycle AFTER review
+            setWrongQueue(prev => prev.slice(1));
+            setCycleCount(0);
         } else {
-            // Fetch DB question
-            const fetched = await fetchRandomQuestion();
-
+            // Decide if this fetch is general or topic-specific
+            const fetched = await fetchNextQuestion();
             if (!fetched) {
-                console.warn("DB fetch failed");
+                setFetchError(true);
                 return;
             }
-
             nextQuestion = fetched;
-            setCycleCount(prev => prev + 1); // ONLY DB increments
+            setCycleCount(prev => prev + 1);
         }
 
-
-        if (nextQuestion) {
-            setQuestionData(nextQuestion);
-        } else {
-            // fallback: keep the current question if fetch failed
-            console.warn("Failed to get a new question, keeping the current one");
-            setFetchError(true);
-        }
+        if (nextQuestion) setQuestionData(nextQuestion);
+        setFade(true);
 
         scrollContainerRef?.current?.scrollTo({ top: 0, behavior: "auto" });
         window.scrollTo({ top: 0, behavior: "auto" });
-        setFade(true);
     };
 
 
@@ -217,7 +224,7 @@ export default function QuizSampleSection({
                         }),
                     });
 
-                    if (!res.ok) throw new Error("API failed");
+                    if (!res.ok) showError("API failed"); // 🔴 show banner
 
                     const result = await res.json();
                     correct = result.correct;
@@ -251,13 +258,13 @@ export default function QuizSampleSection({
 
     return (
         <div
-            className="flex-1 flex flex-col items-center justify-start p-6 md:p-8 min-h-[50vh] md:h-auto bg-black-200 w-full no-select"
+            className="flex-1 flex flex-col items-center justify-start p-5 sm:p-5 md:p-8 min-h-[50vh] md:h-auto bg-dark-400 w-full no-select"
             onContextMenu={(e) => e.preventDefault()}
         >
             {/* Reload overlay if fetch failed */}
             {fetchError && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
-                    <div className="bg-black/70 border border-green-400/40 shadow-lg rounded-2xl max-w-md w-full p-6 text-center backdrop-blur-md">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-dark-300/90 backdrop-blur-sm p-4">
+                    <div className="bg-dark-400/80 border border-green-400/40 shadow-lg rounded-2xl max-w-md w-full p-6 text-center backdrop-blur-md">
                         <h2 className="text-green-400 text-lg font-semibold mb-2 drop-shadow-[0_0_12px_rgba(36,174,124,0.8)]">
                             Error
                         </h2>
@@ -309,14 +316,20 @@ export default function QuizSampleSection({
 
                         {/* NEXT BUTTON */}
                         {selectedOption && (
-                            <div className="mt-4 flex flex-col items-center gap-2 w-full">
-                                <Button onClick={handleNextQuestion}>Next</Button>
-                                <div className="flex flex-col items-center mt-2 text-center">
+                            <div className="flex flex-col items-center gap-2 w-full">
+                                <Button
+                                    onClick={handleNextQuestion}
+                                    className="px-4 py-2 text-sm sm:px-6 sm:py-2.5 sm:text-base"
+                                >
+                                    Next
+                                </Button>
+                                <div className="flex flex-col items-center text-center">
                                     <ScrollHint />
-                                    <span className="text-white text-sm opacity-80 mt-1">
-                  Study the explanation below ⬇️
-                </span>
+                                    <span className="text-xs sm:text-sm text-light-200 opacity-80 mt-1">
+                                        Study the explanation below ⬇️
+                                    </span>
                                 </div>
+
                             </div>
                         )}
 

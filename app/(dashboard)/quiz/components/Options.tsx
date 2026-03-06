@@ -10,7 +10,7 @@ interface OptionProps {
 
 export default function Option({ text, isSelected, isAnswer, disabled, onClick }: OptionProps) {
     let baseClass =
-        "p-3 rounded-xl border text-white font-medium cursor-pointer transition-all duration-300 shadow-sm select-none";
+        "p-2 sm:p-3 rounded-xl border text-white text-sm sm:text-base font-medium cursor-pointer transition-all duration-300 shadow-sm select-none";
 
     if (disabled) {
         if (isSelected && isAnswer) {

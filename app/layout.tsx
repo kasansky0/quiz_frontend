@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { cn } from '@/lib/utils'
 import "./styles/globals.css";
-import Footer from "@/app/components/sections/Footer"
-import Providers from "@/app/components/Providers"; // <-- make sure this line exists
+import Footer from "@/app/(home)/Footer"
+import Providers from "@/app/Providers"; // <-- make sure this line exists
 import Script from "next/script";
 
 const FontSans = Plus_Jakarta_Sans({
@@ -17,12 +17,12 @@ const FontSans = Plus_Jakarta_Sans({
 
 
 export const metadata: Metadata = {
-    title: "NETA Level 2 Practice Exam & Study Guide | Netaprep", // Keyword upfront
-    description: "Prepare for the NETA Level 2 certification exam with realistic practice questions, detailed explanations, and study guides to help you pass on the first try.", // Longer + CTA
+    title: "Free NETA Level 2 Practice Exam (No Ads) | Netaprep",
+    description: "Free NETA Level 2 practice exam with no ads. Realistic questions, clear explanations, and [study] guides to help you pass on the first try.",
     keywords: [
         "NETA Level 2",
         "NETA practice exam",
-        "NETA study guide",
+        "NETA [study] guide",
         "electrical testing certification",
         "NETA Level 2 exam prep",
         "NETA certification practice"
@@ -80,17 +80,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <html
-            lang="en"
-            className="h-full w-full"
-            style={{ backgroundColor: '#000000' }}
-        >
+        <html lang="en" className="h-full bg-black-200">
         <body
             className={cn(
-                'h-full w-full min-h-screen font-sans antialiased overflow-x-hidden',
+                "h-full min-h-screen bg-black-200 font-sans antialiased overflow-x-hidden",
                 FontSans.variable
             )}
-            style={{ backgroundColor: '#000000' }}
         >
 
         {/* Google Analytics */}
@@ -121,7 +116,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     "@context": "https://schema.org",
                     "@type": "Course",
                     "name": "NETA Level 2 Practice Exam",
-                    "description": "Prepare for the NETA Level 2 certification exam with realistic practice questions, explanations, and study guides.",
+                    "description": "Prepare for the NETA Level 2 certification exam with realistic practice questions, explanations, and [study] guides.",
                     "provider": {
                         "@type": "Organization",
                         "name": "Netaprep",
@@ -146,9 +141,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
 
 
+
+
         <Providers>
-            {/* ------------------ ADD H1 IN PAGE COMPONENTS ------------------ */}
-            {/* Every page should have one H1 matching main keyword */}
             {children}
         </Providers>
 

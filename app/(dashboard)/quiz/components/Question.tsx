@@ -6,8 +6,9 @@ interface QuestionProps {
 
 export default function Question({ question }: QuestionProps) {
     return (
-        <h2 className="text-xl md:text-3xl font-semibold text-white mb-4 border-l-4 border-green-500 pl-3">
+        <h2 className="text-base sm:text-xl md:text-3xl font-semibold text-white mb-4 border-l-4 border-green-500 pl-3">
             {question}
         </h2>
+
     );
 }

@@ -2,6 +2,28 @@ import NextAuth, { NextAuthOptions, Session } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { JWT } from "next-auth/jwt";
 
+// 1️⃣ Extend JWT type
+declare module "next-auth/jwt" {
+    interface JWT {
+        accessToken?: string;
+        idToken?: string;
+    }
+}
+
+// 2️⃣ Extend Session type
+declare module "next-auth" {
+    interface Session {
+        accessToken?: string;
+        idToken?: string;
+        user: {
+            id: string;
+            name?: string | null;
+            email?: string | null;
+            image?: string | null;
+        };
+    }
+}
+
 export const authOptions: NextAuthOptions = {
     providers: [
         GoogleProvider({
@@ -14,10 +36,19 @@ export const authOptions: NextAuthOptions = {
         maxAge: 30 * 24 * 60 * 60, // 30 days
     },
     callbacks: {
-        async session({ session, token }: { session: Session; token: JWT }) {
-            if (session.user) {
-                session.user.id = token.sub as string; // now TypeScript knows about session.user
+        async jwt({ token, account }) {
+            if (account?.id_token) {
+                token.idToken = account.id_token;
             }
+            return token;
+        }
+        ,
+        async session({ session, token }) {
+            if (session.user) {
+                session.user.id = token.sub as string;
+                session.accessToken = token.accessToken; // now TS knows about it
+            }
+            session.idToken = token.idToken;
             return session;
         },
     },
