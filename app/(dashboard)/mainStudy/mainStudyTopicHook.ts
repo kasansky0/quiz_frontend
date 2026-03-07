@@ -21,7 +21,7 @@ export function useMainTopics(apiUrl: string) {
                             .map((s: any) => s.main_topic)
                             .filter((t: unknown): t is string => typeof t === "string" && t.length > 0) // ✅ fixed type
                     )
-                );
+                ) as string[];
                 setMainTopics(topics);
             } catch (err: any) {
                 console.error(err);
