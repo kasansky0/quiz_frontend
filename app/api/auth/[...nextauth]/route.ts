@@ -32,6 +32,17 @@ export const authOptions: NextAuthOptions = {
         }),
     ],
     secret: process.env.NEXTAUTH_SECRET, // ✅ add this line
+    cookies: {
+        sessionToken: {
+            name: `__Secure-next-auth.session-token`,
+            options: {
+                httpOnly: true,
+                sameSite: "none",
+                secure: true,
+                path: "/",
+            },
+        },
+    },
     session: {
         strategy: "jwt",
         maxAge: 30 * 24 * 60 * 60, // 30 days
