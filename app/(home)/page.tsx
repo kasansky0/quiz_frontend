@@ -15,5 +15,11 @@ export default function Page() {
         );
     }
 
-    return session ? <DashboardLayout /> : <LoggedOut />;
+    return session ? (
+        <DashboardLayout>
+            <div>Welcome to your dashboard!</div>
+        </DashboardLayout>
+    ) : (
+        <LoggedOut />
+    );
 }
