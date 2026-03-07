@@ -25,6 +25,7 @@ declare module "next-auth" {
 }
 
 export const authOptions: NextAuthOptions = {
+    secret: process.env.NEXTAUTH_SECRET, // ✅ add this line
     providers: [
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -36,19 +37,10 @@ export const authOptions: NextAuthOptions = {
         maxAge: 30 * 24 * 60 * 60, // 30 days
     },
     callbacks: {
-        async jwt({ token, account }) {
-            if (account?.id_token) {
-                token.idToken = account.id_token;
-            }
-            return token;
-        }
-        ,
-        async session({ session, token }) {
+        async session({ session, token }: { session: Session; token: JWT }) {
             if (session.user) {
                 session.user.id = token.sub as string;
-                session.accessToken = token.accessToken; // now TS knows about it
             }
-            session.idToken = token.idToken;
             return session;
         },
     },
