@@ -14,16 +14,12 @@ export function useMainTopics(apiUrl: string) {
 
                 const data = await res.json();
 
-                console.log("📦 Raw data received:", data);
-                console.log("📊 Data length:", data.length);
-                console.log("🔎 First item:", data[0]);
-
                 // extract unique main_topic values from subjects array
                 const topics = Array.from(
                     new Set(
                         data
                             .map((s: any) => s.main_topic)
-                            .filter((t): t is string => typeof t === "string" && t.length > 0) // ✅ type guard
+                            .filter((t: unknown): t is string => typeof t === "string" && t.length > 0) // ✅ fixed type
                     )
                 );
                 setMainTopics(topics);
