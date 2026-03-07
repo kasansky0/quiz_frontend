@@ -148,7 +148,11 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                         </svg>
 
                         {/* Nickname text */}
-                        <span>{loading ? <NicknameLoading /> : nickname ?? session.user?.name ?? "User"}</span>
+                        <span>
+                          {loading
+                              ? <NicknameLoading />
+                              : nickname ?? session?.user?.name ?? "User"}
+                        </span>
                     </div>
 
                     {/*
