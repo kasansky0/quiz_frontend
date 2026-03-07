@@ -4,16 +4,17 @@
     import { useState } from "react";
     import QuizSampleSection from "@/app/(dashboard)/quiz/components/QuizSampleSection";
     import { useSearchParams } from "next/navigation"; // <-- import
+    import type { QuestionType } from "@/app/(dashboard)/quiz/components/QuizSampleSection"; // ✅ import type
 
     export default function QuizPage() {
         const { data: session } = useSession();
-        const [wrongQueue, setWrongQueue] = useState([]);
+        const [wrongQueue, setWrongQueue] = useState<QuestionType[]>([]); // ✅ typed array
         const [answerCount, setAnswerCount] = useState(0);
         const apiUrl = process.env.NEXT_PUBLIC_API_URL;
         const userId = session?.user?.id;
 
         const searchParams = useSearchParams(); // 🔹 get search params
-        const subjectId = searchParams.get("subjectId"); // 🔹 read subjectId from URL
+        const subjectId = searchParams.get("subjectId") ?? ""; // 🔹 read subjectId from URL
 
         return (
             <QuizSampleSection
