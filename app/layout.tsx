@@ -57,7 +57,6 @@ export const metadata: Metadata = {
         shortcut: "/favicon.ico",
     },
     manifest: "/site.webmanifest",
-    themeColor: "#ffffff",
     authors: [{ name: "Netaprep", url: "https://netaprep.com" }],
     category: "Education",
     robots: {
@@ -71,6 +70,11 @@ export const metadata: Metadata = {
             "max-video-preview": -1
         }
     },
+};
+
+
+export const viewport = {
+    themeColor: "#ffffff",
 };
 
 

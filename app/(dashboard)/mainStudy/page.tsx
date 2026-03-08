@@ -7,7 +7,12 @@ export default function MainStudyPage() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
     const { mainTopics, loading, error } = useMainTopics(apiUrl);
 
-    if (loading) return <div className="p-6 text-white">Loading main topics...</div>;
+    if (loading)
+        return (
+            <div className="min-h-screen flex items-center justify-center text-white">
+                <p className="text-xl">Loading...</p>
+            </div>
+        );
     if (error) return <div className="p-6 text-red-400">{error}</div>;
     if (!mainTopics.length) return <div className="p-6 text-white">No main topics found.</div>;
 

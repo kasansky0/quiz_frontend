@@ -31,7 +31,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const [errorState, setErrorState] = useState<string | null>(null);
     const tokenSentRef = useRef(false);
     const isAdmin = session?.user?.email === "zeckdepends@gmail.com";
-    const [loggedOut, setLoggedOut] = useState(false);
     const [cooldownSeconds, setCooldownSeconds] = useState<number | null>(null);
     const { setUserId } = useUser();
     type MobileSheet = "calculator" | "formula" | "sidebar" | null;
@@ -80,37 +79,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     const handleSessionExpired = async () => {
         await signOut({ redirect: false }); // clear session
-        setLoggedOut(true); // optional if you want local state
         setCooldownSeconds(null);
         setErrorState(null);
     };
 
 
 
-
-
-
-
-    function LoggedOut() {
-        return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
-                <div className="bg-black/70 border border-green-400/40 shadow-lg rounded-2xl max-w-md w-full text-center backdrop-blur-md">
-                    <h2 className="text-green-400 text-lg font-semibold mb-2 drop-shadow-[0_0_12px_rgba(36,174,124,0.8)]">
-                        Session Expired
-                    </h2>
-                    <p className="text-green-200 text-sm mb-6">
-                        Your session has expired. Please log in again to continue.
-                    </p>
-                    <button
-                        onClick={() => signIn("google")}
-                        className="px-5 py-2 bg-green-500 text-black font-medium rounded-full hover:bg-green-400 transition"
-                    >
-                        Log In
-                    </button>
-                </div>
-            </div>
-        );
-    }
 
 
 
@@ -188,6 +162,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
+
+
     useEffect(() => {
         if (!session?.user || !userStats) return; // wait for both session and DB data
 
@@ -206,8 +182,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
     const fetchData = useCallback(async () => {
-        if (loggedOut) return;
-
         if (!session?.user?.email) {
             handleSessionExpired();
             return;
@@ -239,6 +213,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             }
 
             const data = await res.json();
+            console.log("📦 Initial user data:", data);
             setUserStats(data);
 
         } catch {
@@ -247,7 +222,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         } finally {
             setLoading(false);
         }
-    }, [session, apiUrl, loggedOut]);
+    }, [session, apiUrl]);
 
 
 
@@ -273,10 +248,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
-
-
-
-
+    {/*
     // ✅ Fetch sidebar stats
     useEffect(() => {
         if (!session || !session.user || !session.user.email) return;
@@ -284,6 +256,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         fetchData();
     }, [session, apiUrl]);
+    */}
 
 
 
@@ -321,6 +294,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
+    {/*
     useEffect(() => {
         const lastTime = { current: performance.now() };
 
@@ -335,7 +309,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         return () => clearInterval(interval);
     }, [fetchData]);
-
+    */}
 
 
 
@@ -424,15 +398,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
     // Redirect if not logged in
-    // Redirect if not logged in
     useEffect(() => {
         if (status !== "loading" && !session) {
-            showError("Your session has expired. Log in again.");
             setTimeout(() => router.push("/"), 2000); // wait 2s so user can see message
         }
     }, [status, session, router, showError]);
 
-// Show loader while checking session
+    // Show loader while checking session
     if (status !== "authenticated") {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -623,6 +595,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 >
                     <UserSidebar
                         userPercentage={userPercentage}
+                        seenQuestions={userStats?.seenQuestions}
                         nickname={userStats?.nickname}
                         totalOnlineTime={onlineTime}
                         loading={loading || !userStats}
@@ -677,6 +650,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
                             { activeSheet === "sidebar" && <UserSidebar
                                 userPercentage={userPercentage}
+                                seenQuestions={userStats?.seenQuestions}
                                 nickname={userStats?.nickname}
                                 totalOnlineTime={onlineTime}
                                 loading={loading || !userStats}

@@ -218,6 +218,7 @@ export function useUserSidebarData({
     }, [fetchData]);
 
 
+
     useEffect(() => {
         if (!userStats?.user_id || answerCount === 0 || answeredState === null) return;
 

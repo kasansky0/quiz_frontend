@@ -6,18 +6,93 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation"; // make sure this is at the top
 import Calculator from "./calculator"
 import FormulaSheet from "./formulasSheet"
+import { useMotionValue, useTransform, animate } from "framer-motion";
+import { useEffect, useRef } from "react";
 
 
 
-
+interface SeenQuestionsType {
+    [questionId: string]: {
+        answered_correctly: boolean;
+        attempts: number;
+    };
+}
 
 interface UserStatsProps {
     userPercentage: number;
     nickname?: string;
     totalOnlineTime: number;
     loading: boolean;
-    onLinkClick?: () => void; // ✅ optional callback
+    onLinkClick?: () => void;
+    seenQuestions?: SeenQuestionsType; // ✅ new optional prop
 }
+
+
+
+
+
+function calculateQuestionStats(seenQuestions?: SeenQuestionsType) {
+    if (!seenQuestions) return { total: 0, correct: 0, wrong: 0 };
+
+    let total = 0;
+    let correct = 0;
+
+    // Loop through each question's attempts
+    for (const attempts of Object.values(seenQuestions)) {
+        if (!Array.isArray(attempts)) continue;
+
+        for (const attempt of attempts) {
+            total += 1;
+            if (attempt.answered_correctly) correct += 1;
+        }
+    }
+
+    const wrong = total - correct;
+
+    return { total, correct, wrong };
+}
+
+
+
+function PercentageBar({ correct, total }: { correct: number; total: number }) {
+    const [percent, setPercent] = useState(0);
+    const progress = (correct / total) * 100;
+
+    useEffect(() => {
+        const controls = animate(0, progress, {
+            duration: 2,
+            ease: "easeInOut",
+            onUpdate(value) {
+                setPercent(Math.round(value));
+            },
+        });
+        return () => controls.stop();
+    }, [progress]);
+
+    return (
+        <div className="flex flex-col w-full space-y-1 mt-1">
+            {/* Label above */}
+            <span className="text-white/50 text-sm">Progress bar</span>
+
+            {/* Progress bar container */}
+            <div className="w-full h-6 bg-white/20 rounded overflow-hidden relative">
+                {/* Animated filled bar */}
+                <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progress}%` }}
+                    transition={{ duration: 2, ease: "easeInOut" }}
+                    className="h-full bg-green-500 rounded"
+                />
+
+                {/* Percentage text */}
+                <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white/50 text-sm font-medium">
+      {percent}%
+    </span>
+            </div>
+        </div>
+    );
+}
+
 
 
 
@@ -67,10 +142,16 @@ function TimeLoading() {
 
 
 
-export default function UserStats({ userPercentage, nickname, totalOnlineTime, loading, onLinkClick }: UserStatsProps) {
+export default function UserStats({ userPercentage, nickname, totalOnlineTime, loading, onLinkClick, seenQuestions }: UserStatsProps) {
     const { data: session } = useSession();
     const router = useRouter(); // <-- initialize router here
     const [showStats, setShowStats] = useState(false);
+    const questionStats = calculateQuestionStats(seenQuestions); // ✅ calculate stats
+
+
+
+
+
     const sidebarLink = `
                           w-full
                           text-left
@@ -121,14 +202,26 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                 </div>
             </motion.div>
 
-            <div className="flex flex-col items-center space-y-4 w-full">
+            <div className="flex flex-col space-y-1 w-full mb-5">
 
 
 
                 {/* Nickname badge with icon and arrow */}
                 <div
                     onClick={() => setShowStats(prev => !prev)} // toggle stats
-                    className={sidebarLink + " cursor-pointer flex items-center justify-between"}
+                    className={`
+                      w-full
+                      text-left
+                      px-2 py-1
+                      text-white/70
+                      font-medium
+                      text-sm sm:text-base md:text-lg lg:text-xl
+                      rounded
+                      transition-colors
+                      hover:text-white
+                      cursor-pointer
+                      flex items-center gap-2
+                    `}
                 >
                     {/* Left Icon */}
                     <div className="flex items-center gap-2">
@@ -155,7 +248,7 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                         </span>
                     </div>
 
-                    {/*
+
                     <svg
                         className={`w-4 h-4 ml-2 transition-transform duration-200 ${showStats ? "rotate-180" : ""}`}
                         fill="none"
@@ -165,23 +258,65 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                     >
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                     </svg>
-                    */}
+
                 </div>
 
 
 
-                {/*
-                {showStats && (
-                    <div className="flex flex-col space-y-1">
-                        <div className={sidebarLink}>
-                            {loading ? <PercentageLoading /> : `Score: ${userPercentage.toFixed()}`}
-                        </div>
-                        <div className={sidebarLink}>
-                            {loading ? <TimeLoading /> : `Online: ${formatTime(totalOnlineTime)}`}
-                        </div>
-                    </div>
-                )}
-                */}
+
+                {/* Stats dropdown */}
+                <AnimatePresence>
+                    {showStats && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="flex flex-col pl-9 space-y-2"
+                        >
+                            {/* ✅ Stats Table */}
+                            {loading ? (
+                                <>
+                                    <PercentageLoading />
+                                    <PercentageLoading />
+                                    <PercentageLoading />
+                                </>
+                            ) : seenQuestions && Object.keys(seenQuestions).length > 0 ? (
+                                <div className="flex flex-col space-y-1 text-white/70 text-sm sm:text-base md:text-lg lg:text-xl">
+
+                                    {/* Total Questions */}
+                                    <div className="flex justify-between w-full">
+                                        <span>Total Questions:</span>
+                                        <span>{questionStats.total}</span>
+                                    </div>
+
+                                    {/* Correct */}
+                                    <div className="flex justify-between w-full">
+                                        <span>Correct:</span>
+                                        <span>{questionStats.correct}</span>
+                                    </div>
+
+                                    {/* Wrong */}
+                                    <div className="flex justify-between w-full">
+                                        <span>Wrong:</span>
+                                        <span>{questionStats.wrong}</span>
+                                    </div>
+
+                                    {/* Percentage Bar with animated number */}
+                                    <PercentageBar correct={questionStats.correct} total={questionStats.total} />
+
+                                    {/* Online Time */}
+                                    <div className="flex justify-between w-full">
+                                        <span>Online:</span>
+                                        <span>{formatTime(totalOnlineTime)}</span>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="text-white/70">No questions answered yet</div>
+                            )}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
             </div>
 
 
