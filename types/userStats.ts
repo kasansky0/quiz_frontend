@@ -8,5 +8,10 @@ export interface UserStatsType {
     nickname: string;
     totalOnlineTime: number;
     loading: boolean;
-    seenQuestions?: string[];
+    seenQuestions?: {
+        [questionId: string]: {
+            answered_correctly: boolean;
+            seen_at: { $date: string };
+        }[];
+    };
 }
