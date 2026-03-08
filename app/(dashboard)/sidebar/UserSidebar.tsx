@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import UserStats from "@/app/(dashboard)/sidebar/UserStats";
 import { useRouter } from "next/navigation";
 
-interface SeenQuestionsType {
+export interface SeenQuestionsType {
     [questionId: string]: {
         answered_correctly: boolean;
         attempts: number;

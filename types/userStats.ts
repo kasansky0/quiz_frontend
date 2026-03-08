@@ -8,4 +8,5 @@ export interface UserStatsType {
     nickname: string;
     totalOnlineTime: number;
     loading: boolean;
+    seenQuestions?: string[];
 }
