@@ -61,6 +61,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
+
+
+
+
     useEffect(() => {
         if (session) {
             // Only redirect if current path is exactly "/dashboard" (or wherever this layout is)

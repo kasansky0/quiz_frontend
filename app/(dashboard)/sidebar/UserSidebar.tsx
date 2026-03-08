@@ -4,12 +4,12 @@ import { useSession } from "next-auth/react";
 import UserStats from "@/app/(dashboard)/sidebar/UserStats";
 import { useRouter } from "next/navigation";
 
-export interface SeenQuestionsType {
+export type SeenQuestionsType = {
     [questionId: string]: {
         answered_correctly: boolean;
-        attempts: number;
-    };
-}
+        seen_at: { $date: string };
+    }[];
+};
 
 interface UserSidebarProps {
     userPercentage: number;
