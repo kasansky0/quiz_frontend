@@ -8,15 +8,10 @@ import Calculator from "./calculator"
 import FormulaSheet from "./formulasSheet"
 import { useMotionValue, useTransform, animate } from "framer-motion";
 import { useEffect, useRef } from "react";
+import { SeenQuestionsType } from "@/types/userStats";
 
 
 
-interface SeenQuestionsType {
-    [questionId: string]: {
-        answered_correctly: boolean;
-        attempts: number;
-    };
-}
 
 interface UserStatsProps {
     userPercentage: number;
