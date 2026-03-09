@@ -826,7 +826,7 @@ export default function ChatStats() {
 
 
 
-                <div className={`mx-auto max-w-4xl transition-opacity duration-500 ease-in-out ${listFade ? "opacity-100" : "opacity-0"}`}>
+                <div className={`transition-opacity duration-500 ease-in-out ${listFade ? "opacity-100" : "opacity-0"} w-full flex-1`}>
                     {activePost && (
                         <div className="flex flex-col w-full h-full min-h-0">
 
