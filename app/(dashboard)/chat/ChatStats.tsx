@@ -713,7 +713,7 @@ export default function ChatStats() {
                     <>
 
 
-                        <div className={`mx-auto max-w-4xl transition-opacity duration-500 ease-in-out ${listFade ? "opacity-100" : "opacity-0"}`}>
+
 
                             <div className="w-full flex items-center gap-3">
 
@@ -748,7 +748,7 @@ export default function ChatStats() {
 
 
 
-
+                        <div className={`mx-auto max-w-4xl transition-opacity duration-500 ease-in-out ${listFade ? "opacity-100" : "opacity-0"}`}>
 
                             <div className="flex-1 overflow-y-auto space-y-4">
                                 {filteredPosts.map((post, idx) => (
