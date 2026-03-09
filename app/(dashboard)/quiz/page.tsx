@@ -4,7 +4,7 @@
     import { useState } from "react";
     import QuizSampleSection from "@/app/(dashboard)/quiz/components/QuizSampleSection";
     import { useSearchParams } from "next/navigation"; // <-- import
-    import type { QuestionType } from "@/app/(dashboard)/quiz/components/QuizSampleSection"; // ✅ import type
+    import type { QuestionType } from "@/app/(dashboard)/quiz/components/QuizSampleSection";
 
     export default function QuizPage() {
         const { data: session } = useSession();

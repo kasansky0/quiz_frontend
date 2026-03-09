@@ -6,7 +6,7 @@ import Option from "./Options";
 import Comment from "./Comment";
 import { HeroCard } from "./HeroCard";
 import { ScrollHint } from "./ScrollHint";
-import { Button } from "@/app/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { useError } from "@/app/ErrorProvider";
 
 

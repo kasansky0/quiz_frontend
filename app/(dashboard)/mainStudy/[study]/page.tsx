@@ -3,6 +3,7 @@
 import { useSubjects } from "@/app/(dashboard)/mainStudy/[study]/subjectsHook";
 import {useParams, useRouter} from "next/navigation"; // get dynamic route
 import Link from "next/link";
+import { useState, useEffect } from "react";
 
 
 export default function StudyPage() {
@@ -11,50 +12,85 @@ export default function StudyPage() {
     const mainTopic = params.study as string;
     const router = useRouter(); // <-- add router
 
-
-
     const { subjects, loadingSubjects, errorSubjects } = useSubjects(apiUrl, mainTopic);
 
-    if (loadingSubjects) return <div className="p-6 text-white">Loading subjects...</div>;
-    if (errorSubjects) return <div className="p-6 text-red-400">{errorSubjects}</div>;
-    if (!subjects.length) return <div className="p-6 text-white">No subjects found.</div>;
+
+    // Delayed loading
+    const [showLoading, setShowLoading] = useState(false);
+    // Fade-in effect
+    const [fade, setFade] = useState(false);
+
+    // Handle delayed loading display
+    useEffect(() => {
+        let timer: NodeJS.Timeout;
+
+        if (loadingSubjects) {
+            timer = setTimeout(() => setShowLoading(true), 5000);
+        } else {
+            setShowLoading(false);
+        }
+
+        return () => clearTimeout(timer);
+    }, [loadingSubjects]);
+
+    // Trigger fade after subjects are ready
+    useEffect(() => {
+        if (!loadingSubjects && subjects.length) {
+            const timer = setTimeout(() => setFade(true), 50);
+            return () => clearTimeout(timer);
+        }
+    }, [loadingSubjects, subjects]);
 
     return (
-        <div className="p-4 md:p-4 text-white">
+        <div className="p-4 md:p-4 text-white relative min-h-screen">
 
-            <button
-                onClick={() => router.back()}
-                title="Back"
-                className="p-0 m-0 flex items-center justify-center pb-3"
-            >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="2 2 21 21"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-8 h-8 block"
+            {/* Loading screen */}
+            {loadingSubjects && showLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black text-white transition-opacity duration-700 ease-in-out">
+                    <p className="text-xl">Loading subjects...</p>
+                </div>
+            )}
+
+            <div className={`mx-auto max-w-4xl transition-opacity duration-700 ease-in-out ${
+                fade ? "opacity-100" : "opacity-0"
+            }`}>
+                {errorSubjects && <div className="p-6 text-red-400">{errorSubjects}</div>}
+                {!errorSubjects && subjects.length === 0 && <div className="p-6 text-white">No subjects found.</div>}
+
+                <button
+                    onClick={() => router.back()}
+                    title="Back"
+                    className="p-0 m-0 flex items-center justify-center pb-3"
                 >
-                    <path
-                        strokeLinecap="butt"
-                        strokeLinejoin="miter"
-                        d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                    />
-                </svg>
-            </button>
-
-            <h1 className="text-2xl font-bold mb-6">{mainTopic} Subjects</h1>
-            <div className="flex flex-col space-y-4">
-                {subjects.map(subject => (
-                    <Link
-                        key={subject.id}
-                        href={`/mainStudy/${mainTopic}/${subject.id}`}
-                        className="rounded-lg bg-dark-300/60 hover:bg-dark-300 transition p-4"
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="2 2 21 21"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-8 h-8 block"
                     >
-                        <h2 className="font-semibold text-blue-500">{subject.title}</h2>
-                        <p className="text-sm text-gray-300">{subject.description}</p>
-                    </Link>
-                ))}
+                        <path
+                            strokeLinecap="butt"
+                            strokeLinejoin="miter"
+                            d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                        />
+                    </svg>
+                </button>
+
+                <h1 className="text-2xl font-bold mb-6">{mainTopic} Subjects</h1>
+                <div className="flex flex-col space-y-4">
+                    {subjects.map(subject => (
+                        <Link
+                            key={subject.id}
+                            href={`/mainStudy/${mainTopic}/${subject.id}`}
+                            className="rounded-lg bg-dark-300/60 hover:bg-dark-300 transition p-4"
+                        >
+                            <h2 className="font-semibold text-blue-500">{subject.title}</h2>
+                            <p className="text-sm text-gray-300">{subject.description}</p>
+                        </Link>
+                    ))}
+                </div>
             </div>
         </div>
     );

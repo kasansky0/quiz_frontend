@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Textarea } from "../../components/ui/Textarea";
+import { useState, useEffect } from "react";
+import { Textarea } from "@/components/ui/Textarea";
 
 interface CreatePostProps {
     onSubmit: (post: { title: string; message: string }) => void;
@@ -11,26 +11,25 @@ interface CreatePostProps {
 export default function CreatePost({ onSubmit, onCancel }: CreatePostProps) {
     const [message, setMessage] = useState("");
     const [title, setTitle] = useState("");
-
     const [passedNETA, setPassedNETA] = useState(false);
-
     const [errors, setErrors] = useState<{ title?: string; message?: string }>({});
-
+    const [fade, setFade] = useState(false); // fade-in animation
+    const [isSending, setIsSending] = useState(false);
     const TITLE_LIMIT = 100;
     const MESSAGE_LIMIT = 500;
 
-    const handleSubmit = (e: React.FormEvent) => {
+    useEffect(() => {
+        const timer = setTimeout(() => setFade(true), 50);
+        return () => clearTimeout(timer);
+    }, []);
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         const newErrors: { title?: string; message?: string } = {};
 
-        if (!title.trim()) {
-            newErrors.title = "Topic is required";
-        }
-
-        if (!message.trim()) {
-            newErrors.message = "Message is required";
-        }
+        if (!title.trim()) newErrors.title = "Topic is required";
+        if (!message.trim()) newErrors.message = "Message is required";
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
@@ -41,11 +40,17 @@ export default function CreatePost({ onSubmit, onCancel }: CreatePostProps) {
         const cleanedTitle = title.replace(/\n/g, " ");
         const cleanedMessage = message.replace(/\s*\n\s*/g, " ");
 
-        onSubmit({ title: cleanedTitle, message: cleanedMessage });
+        // Show loading screen
+        setIsSending(true);
 
-        setTitle("");
-        setMessage("");
-        setErrors({});
+        // Wait for onSubmit to complete (if async)
+        await onSubmit({ title: cleanedTitle, message: cleanedMessage });
+
+        // Optionally hide form or reset fields after submission
+        // setTitle("");
+        // setMessage("");
+        // setErrors({});
+        // setIsSending(false); // You might leave it if parent navigates
     };
 
     const handlePassNETA = () => {
@@ -57,106 +62,115 @@ export default function CreatePost({ onSubmit, onCancel }: CreatePostProps) {
 
     return (
         <div className="w-full max-w-3xl min-h-screen flex flex-col space-y-4 rounded-xl bg-black">
-            <form className="w-full flex flex-col space-y-4" onSubmit={handleSubmit}>
+
+            {isSending && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/80 text-white text-lg font-semibold z-50">
+                    Sending post...
+                </div>
+            )}
+
+            <div className={`w-full max-w-3xl transition-opacity duration-500 ease-in-out ${fade ? "opacity-100" : "opacity-0"}`}>
+                <form className="w-full flex flex-col space-y-4" onSubmit={handleSubmit}>
 
 
-                <div className="flex justify-start gap-2">
-                    <button
-                        type="button"
-                        onClick={onCancel}
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                            className="w-8 h-8"
+                    <div className="flex justify-start gap-2">
+                        <button
+                            type="button"
+                            onClick={onCancel}
                         >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                            />
-                        </svg>
-                    </button>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="w-8 h-8"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                />
+                            </svg>
+                        </button>
 
-                    <button
-                        type="submit"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                            className="w-8 h-8"
+                        <button
+                            type="submit"
                         >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                            />
-                        </svg>
-                    </button>
-                </div>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="w-8 h-8"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                />
+                            </svg>
+                        </button>
+                    </div>
 
 
-                {/* Topic Field */}
-                <div className="flex flex-col">
-                    <Textarea
-                        placeholder="Title..."
-                        value={title}
-                        onChange={(e) => {
-                            const value = e.target.value;
-                            if (value.length <= TITLE_LIMIT) setTitle(value);
+                    {/* Topic Field */}
+                    <div className="flex flex-col">
+                        <Textarea
+                            placeholder="Title..."
+                            value={title}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                if (value.length <= TITLE_LIMIT) setTitle(value);
 
-                            if (errors.title) {
-                                setErrors((prev) => ({...prev, title: undefined}));
-                            }
-                        }}
-                        rows={3}
-                        className={`w-full rounded-xl px-3 py-2 text-lg font-semibold resize-none text-white bg-transparent border ${
-                            errors.title ? "border-red-500" : "border-white"
-                        }`}
-                    />
-                    {errors.title && (
-                        <p className="text-red-500 text-xs mt-1">{errors.title}</p>
-                    )}
-                    <span className="text-white/60 text-sm self-end">
-                        {title.length}/{TITLE_LIMIT}
-                    </span>
-                </div>
-
-
-                {/* Main Body */}
-                <div className="flex flex-col">
-                    <Textarea
-                        placeholder="Body text..."
-                        value={message}
-                        onChange={(e) => {
-                            const value = e.target.value;
-                            if (value.length <= MESSAGE_LIMIT) setMessage(value);
-
-                            if (errors.message) {
-                                setErrors((prev) => ({...prev, message: undefined}));
-                            }
-                        }}
-                        rows={15}
-                        className={`w-full rounded-xl px-2 py-2 text-base resize-none text-white bg-transparent border ${
-                            errors.message ? "border-red-500" : "border-white"
-                        }`}
-                    />
-                    {errors.message && (
-                        <p className="text-red-500 text-xs mt-1">{errors.message}</p>
-                    )}
-                    <span className="text-white/60 text-sm self-end">
-                        {message.length}/{MESSAGE_LIMIT}
-                    </span>
-                </div>
+                                if (errors.title) {
+                                    setErrors((prev) => ({...prev, title: undefined}));
+                                }
+                            }}
+                            rows={3}
+                            className={`w-full rounded-xl px-3 py-2 text-lg font-semibold resize-none text-white bg-transparent border ${
+                                errors.title ? "border-red-500" : "border-white"
+                            }`}
+                        />
+                        {errors.title && (
+                            <p className="text-red-500 text-xs mt-1">{errors.title}</p>
+                        )}
+                        <span className="text-white/60 text-sm self-end">
+                            {title.length}/{TITLE_LIMIT}
+                        </span>
+                    </div>
 
 
-            </form>
+                    {/* Main Body */}
+                    <div className="flex flex-col">
+                        <Textarea
+                            placeholder="Body text..."
+                            value={message}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                if (value.length <= MESSAGE_LIMIT) setMessage(value);
+
+                                if (errors.message) {
+                                    setErrors((prev) => ({...prev, message: undefined}));
+                                }
+                            }}
+                            rows={15}
+                            className={`w-full rounded-xl px-2 py-2 text-base resize-none text-white bg-transparent border ${
+                                errors.message ? "border-red-500" : "border-white"
+                            }`}
+                        />
+                        {errors.message && (
+                            <p className="text-red-500 text-xs mt-1">{errors.message}</p>
+                        )}
+                        <span className="text-white/60 text-sm self-end">
+                            {message.length}/{MESSAGE_LIMIT}
+                        </span>
+                    </div>
+
+
+                </form>
+            </div>
         </div>
     );
 }

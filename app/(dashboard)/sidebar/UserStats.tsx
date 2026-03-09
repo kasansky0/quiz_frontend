@@ -299,11 +299,6 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                                     {/* Percentage Bar with animated number */}
                                     <PercentageBar correct={questionStats.correct} total={questionStats.total} />
 
-                                    {/* Online Time */}
-                                    <div className="flex justify-between w-full">
-                                        <span>Online:</span>
-                                        <span>{formatTime(totalOnlineTime)}</span>
-                                    </div>
                                 </div>
                             ) : (
                                 <div className="text-white/70">No questions answered yet</div>
