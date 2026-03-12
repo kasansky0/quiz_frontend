@@ -31,15 +31,16 @@ export const authOptions: NextAuthOptions = {
             clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
         }),
     ],
-    secret: process.env.NEXTAUTH_SECRET, // ✅ add this line
+    secret: process.env.NEXTAUTH_SECRET,
     cookies: {
         sessionToken: {
-            name: `__Secure-next-auth.session-token`,
+            name: "__Secure-next-auth.session-token", // recommended for prod
             options: {
                 httpOnly: true,
-                sameSite: "none",
-                secure: true,
+                sameSite: "none",  // allows cross-subdomain
+                secure: true,      // HTTPS required
                 path: "/",
+                domain: ".netaprep.com", // optional; NextAuth uses the current domain by default
             },
         },
     },
@@ -49,8 +50,10 @@ export const authOptions: NextAuthOptions = {
     },
     callbacks: {
         async jwt({ token, account }) {
-            if (account?.id_token) {
-                token.idToken = account.id_token;
+            // Only run on first sign in
+            if (account) {
+                token.accessToken = account.access_token; // ← add this line
+                token.idToken = account.id_token;         // ← keep this
             }
             return token;
         }
