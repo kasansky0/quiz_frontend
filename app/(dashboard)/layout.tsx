@@ -216,10 +216,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
     const fetchData = useCallback(async () => {
-        if (!session?.user?.email) {
-            handleSessionExpired();
-            return;
-        }
+        if (!session?.user?.email) return;
 
         try {
             const res = await fetch(`${apiUrl}/user/`, {
