@@ -65,11 +65,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
+
+
+
+
+
+
+
+
     useEffect(() => {
         if (session) {
             // Only redirect if current path is exactly "/dashboard" (or wherever this layout is)
             if (window.location.pathname === "/") {
-                router.push("/quiz");
+                router.push("/info");
             }
         }
     }, [session, router]);
@@ -93,6 +101,29 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
+    // inside your UserStats component
+    const refreshStats = useCallback(async () => {
+        setLoading(true);
+
+        try {
+            const res = await fetch("/api/questionStats");
+            const data = await res.json();
+
+            // Update userStats with the new question stats
+            setUserStats(prev => prev ? { ...prev, ...data } : data);
+        } catch (err: any) {
+            showError("Failed to refresh stats: " + (err?.message || err));
+        }
+
+        setLoading(false);
+    }, []);
+
+
+
+    useEffect(() => {
+        if (answerCount === 0 || answeredState === null) return; // skip initial render
+        refreshStats();
+    }, [answerCount, answeredState, refreshStats]);
 
 
 
@@ -127,11 +158,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 });
 
                 const data = await res.json();
-                console.log("✅ Google auth response:", data);
 
                 fetchData(); // safe to call after auth
-            } catch (err) {
-                console.error("❌ Failed to send Google token:", err);
+            } catch (err: any) {
+                console.log("❌ Failed to send Google token:", err?.message || err);
             }
         }
 
@@ -186,10 +216,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
     const fetchData = useCallback(async () => {
-        if (!session?.user?.email) {
-            handleSessionExpired();
-            return;
-        }
+        if (!session?.user) return;
 
         try {
             const res = await fetch(`${apiUrl}/user/`, {
@@ -212,21 +239,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             // Other backend errors → do NOT log out
             if (!res.ok) {
+                // Backend returned error → show message but keep dashboard
                 setErrorState("Unable to load sidebar data.");
+                showError("❌ Failed to fetch user data from server.");
                 return;
             }
 
             const data = await res.json();
-            console.log("📦 Initial user data:", data);
             setUserStats(data);
-
-        } catch {
-            // 🚨 Network / fetch failed → treat as logged out
-            handleSessionExpired();
+            setErrorState(null); // clear previous error
+        } catch (err: any) {
+            // Network failure → show error but keep dashboard
+            setErrorState("Network error: unable to load sidebar data.");
+            showError("❌ Network error: " + (err?.message || err));
         } finally {
             setLoading(false);
         }
-    }, [session, apiUrl]);
+    }, [session, apiUrl, showError]);
 
 
 
@@ -370,9 +399,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             }),
         })
             .then(res => res.json())
-            .then(data => console.log("User percentage updated:", data))
-            .catch(err => console.error("Failed to update sidebar percentage:", err));
-    }, [answerCount, userPercentage, answeredState, userStats?.user_id, onlineTime]);
+            .then(data => showError("✅ User percentage updated: " + JSON.stringify(data)))
+            .catch(err => showError("❌ Failed to update sidebar percentage: " + (err?.message || err)));
+    }, [answerCount, userPercentage, answeredState, userStats?.user_id, onlineTime, showError]);
 
 
 
@@ -408,19 +437,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         }
     }, [status, session, router, showError]);
 
-    // Show loader while checking session
-    if (status !== "authenticated") {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-        );
-    }
-
-
-
-
-
 
 
 
@@ -428,7 +444,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
     return (
-        <div className="h-screen flex flex-col bg-dark-400 text-white">
+        <div className="h-screen flex flex-col bg-black-200 text-white">
+
 
 
             {/* ===== TOP BAR ===== */}
@@ -640,7 +657,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             exit={{ y: "100%" }}
                             transition={{ type: "tween", duration: 0.3 }}
                             className="fixed bottom-0 left-0 right-0 z-50 md:hidden
-                           bg-dark-400 border-t border-green-500
+                           bg-black-200 border-t border-green-500
                            rounded-t-2xl p-4 shadow-2xl
                            max-h-[45vh] overflow-y-auto"
                         >
