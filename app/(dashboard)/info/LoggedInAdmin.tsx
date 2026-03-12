@@ -372,8 +372,8 @@ export default function LoggedInAdmin() {
                                                 setBlockUserId(user._id);
                                                 topRef.current?.scrollIntoView({ behavior: "smooth" });
                                             }}
-                                            title="Copy user ID"
                                         >
+                                            <title>"Copy user ID"</title>
                                             <path
                                                 strokeLinecap="round"
                                                 strokeLinejoin="round"
