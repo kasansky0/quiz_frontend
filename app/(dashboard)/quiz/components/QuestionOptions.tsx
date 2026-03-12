@@ -1,3 +1,5 @@
+"use client";
+
 export function QuestionOptions({ options = [] }: { options?: string[] }) {
     return (
         <ul className="space-y-2">
