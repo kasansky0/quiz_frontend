@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import { Suspense } from "react";
 import { useState } from "react";
 import QuizSampleSection from "@/app/(dashboard)/quiz/components/QuizSampleSection";
 import { useSearchParams } from "next/navigation"; // <-- import
@@ -18,29 +19,37 @@ export default function QuizPage() {
     const subjectId = searchParams.get("subjectId") ?? ""; // 🔹 read subjectId from URL
 
     return (
-        <QuizSampleSection
-            isLoggedIn={!!session}
-            wrongQueue={wrongQueue}
-            setWrongQueue={setWrongQueue}
-            apiUrl={apiUrl}
-            userId={userId}
-            loadingDone={true}
-            subjectId={subjectId} // 🔹 pass it here
-            onAnswer={async (isCorrect, questionId) => {
-                setAnswerCount(prev => prev + 1);
+        <Suspense
+            fallback={
+                <div className="flex items-center justify-center w-full h-64 text-lg text-gray-400">
+                    Loading quiz...
+                </div>
+            }
+        >
+            <QuizSampleSection
+                isLoggedIn={!!session}
+                wrongQueue={wrongQueue}
+                setWrongQueue={setWrongQueue}
+                apiUrl={apiUrl}
+                userId={userId}
+                loadingDone={true}
+                subjectId={subjectId} // 🔹 pass it here
+                onAnswer={async (isCorrect, questionId) => {
+                    setAnswerCount(prev => prev + 1);
 
-                if (!apiUrl || !userId) return;
+                    if (!apiUrl || !userId) return;
 
-                await fetch(`${apiUrl}/answer/record`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        user_id: userId,
-                        question_id: questionId,
-                        correct: isCorrect
-                    }),
-                });
-            }}
-        />
+                    await fetch(`${apiUrl}/answer/record`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            user_id: userId,
+                            question_id: questionId,
+                            correct: isCorrect
+                        }),
+                    });
+                }}
+            />
+        </Suspense>
     );
 }
