@@ -4,6 +4,8 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState, useCallback } from "react";
 import LoggedInAdmin from "./LoggedInAdmin";
 import { useRouter } from "next/navigation";
+import { useError } from "@/app/ErrorProvider";
+
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -11,8 +13,17 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 const InfoAndFormulas = () => {
     const router = useRouter(); // initialize router for back button
 
+
     return (
         <div className="text-black min-h-screen flex flex-col justify-start items-center p-5">
+
+            {/* Hiring Banner */}
+            <div className="w-full bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 text-gray-900 font-semibold text-center py-4 px-6 rounded-xl shadow-md border border-yellow-500 mb-8 flex flex-col sm:flex-row items-center justify-center gap-2">
+                <span className="text-lg sm:text-xl">🧲 Welcome!</span>
+                <span className="text-md sm:text-lg hover:underline">
+        Check out the study guide and targeted questions for the topic
+    </span>
+            </div>
 
             {/* Page Title & Introduction */}
             <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-white-400 mb-6 text-left">
@@ -121,7 +132,9 @@ export default function AdminPage() {
     const [loadingAdmin, setLoadingAdmin] = useState<boolean>(false);
     const [minLoading, setMinLoading] = useState<boolean>(true);
 
-    // Fetch admin status
+    const { showError } = useError() as { showError: (msg: string | object) => void };
+
+    // fetchAdminStatus.ts
     const fetchAdminStatus = useCallback(async () => {
         if (!session) return;
 
@@ -130,12 +143,15 @@ export default function AdminPage() {
         try {
             const res = await fetch(`${apiUrl}/admin/check`, {
                 method: "GET",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    // send the Google ID token from session
+                    "Authorization": `Bearer ${session.idToken}`,
+                },
             });
+
             setIsAdmin(res.status === 200);
-        } catch (err) {
-            console.error("Failed to check admin status:", err);
+        } catch (err: any) {
             setIsAdmin(false);
         } finally {
             setLoadingAdmin(false);
@@ -150,15 +166,6 @@ export default function AdminPage() {
         const timer = setTimeout(() => setMinLoading(false), 800);
         return () => clearTimeout(timer);
     }, [session, fetchAdminStatus]);
-
-    // Show loading if session is still loading OR admin check is ongoing OR min loading not finished
-    if (status === "loading" || loadingAdmin || minLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center text-white bg-black">
-                <p className="text-xl">Loading...</p>
-            </div>
-        );
-    }
 
     // Admin → dashboard
     if (isAdmin) return <LoggedInAdmin />;
