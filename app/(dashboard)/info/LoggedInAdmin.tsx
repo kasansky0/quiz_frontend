@@ -67,16 +67,19 @@ export default function LoggedInAdmin() {
     const [expandedQuestions, setExpandedQuestions] = useState<Record<string, boolean>>({});
     const [currentUserIndex, setCurrentUserIndex] = useState(0);
     const userRefs = useRef<(HTMLDivElement | null)[]>([]);
+    const topRef = useRef<HTMLDivElement | null>(null);
     const { showError } = useError();
     const userName = session?.user?.name ?? "Unknown";
+    const [blockUserId, setBlockUserId] = useState<string>("");
+    const fetchedRef = useRef(0);
 
 
     useEffect(() => {
-        if (!session) return;
+        if (!session || fetchedRef.current >= 2) return; // allow up to 2 fetches
+        fetchedRef.current += 1;
 
         const fetchUsers = async () => {
             setUsersLoading(true);
-
             try {
                 const res = await fetch(`${apiUrl}/info/users`, {
                     method: "GET",
@@ -84,29 +87,34 @@ export default function LoggedInAdmin() {
                     headers: { "Content-Type": "application/json" },
                 });
 
-                // 🔴 If unauthorized → show LoggedOut
+                console.log("Admin fetch /info/users:", res.status);
+
                 if (res.status === 401 || res.status === 403) {
-                    setSessionExpired(true);
+                    console.warn("Fetch /info/users unauthorized", res);
+                    // Don't immediately expire the session
                     return;
                 }
 
                 if (!res.ok) {
-                    showError("Fetch failed"); // 🔴 show banner
+                    showError(`Failed to fetch users: ${res.status}`);
+                    setUsersLoading(false);
                     return;
                 }
 
                 const data = await res.json();
+                console.log("Admin fetch /info/users data:", data);
 
-                if (!data?.users) {
-                    setSessionExpired(true);
+                if (!Array.isArray(data?.users)) {
+                    showError("No users returned from backend");
+                    setUsers([]); // don't mark session expired
+                    setUsersLoading(false);
                     return;
                 }
 
                 setUsers(data.users);
-
             } catch (err) {
-                console.error(err);
-                setSessionExpired(true); // 🔴 network/backend error
+                console.error("Fetch error:", err);
+                showError("Network error fetching users");
             } finally {
                 setUsersLoading(false);
             }
@@ -152,18 +160,112 @@ export default function LoggedInAdmin() {
         (a, b) => new Date(b.last_login).getTime() - new Date(a.last_login).getTime()
     );
 
-    if (sessionExpired) {
-        return <LoggedOut />;
-    }
-
     return (
-        <div className="min-h-screen bg-black text-white relative">
+        <div ref={topRef} className="min-h-screen bg-black text-white relative">
             <div className="mx-auto max-w-2xl p-4 sm:p-10">
                 {/* Header */}
                 <h1 className="text-2xl sm:text-3xl font-bold text-white-400 mb-2">
                     Admin Dashboard
                 </h1>
                 <p className="text-white-200 text-sm sm:text-base mb-2">Logged in as {userName}</p>
+
+
+
+                {/* --- Block User by Email --- */}
+                <div className="my-6 p-4 bg-gray-900 rounded border border-red-500">
+                    <h2 className="text-lg font-bold text-red-400 mb-2">Admin Block User (24h)</h2>
+                    <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+                        <input
+                            type="text"
+                            placeholder="Mongo _id"
+                            value={blockUserId}
+                            onChange={(e) => setBlockUserId(e.target.value)}
+                            className="p-2 rounded bg-gray-800 text-white flex-1 border border-gray-700"
+                        />
+                        <button
+                            className="p-2 bg-red-600 rounded hover:bg-red-700 text-white font-semibold"
+                            onClick={async () => {
+                                if (!blockUserId) return alert("Enter a user ID");
+
+                                try {
+                                    const res = await fetch(`${apiUrl}/posts/admin/block-user`, {
+                                        method: "POST",
+                                        credentials: "include",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                        },
+                                        body: JSON.stringify({
+                                            user_id: blockUserId,
+                                            admin_key: "YOUR_SECRET_ADMIN_KEY"
+                                        }),
+                                    });
+
+                                    if (!res.ok) {
+                                        const data = await res.json();
+                                        alert(`Failed: ${data.detail || "Unknown error"}`);
+                                        return;
+                                    }
+
+                                    const result = await res.json();
+                                    alert(`✅ User blocked until ${new Date(result.blocked_until).toLocaleString()}`);
+                                    setBlockUserId("");
+                                } catch (err) {
+                                    console.error(err);
+                                    alert("Error occurred while blocking user.");
+                                }
+                            }}
+                        >
+                            Block User
+                        </button>
+                    </div>
+                </div>
+
+
+
+                {/* Archive Deleted SVG */}
+                <div className="my-4">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="white"
+                        className="w-6 h-6 cursor-pointer text-blue-600 hover:text-blue-700"
+                        onClick={async () => {
+                            if (!confirm("Are you sure you want to archive all deleted posts and comments?")) return;
+
+                            try {
+                                const res = await fetch(`${apiUrl}/posts/admin/archive-deleted`, {
+                                    method: "POST",
+                                    credentials: "include",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                    },
+                                });
+
+                                if (!res.ok) {
+                                    const data = await res.json();
+                                    alert(`Failed: ${data.detail || "Unknown error"}`);
+                                    return;
+                                }
+
+                                const result = await res.json();
+                                alert(`Archived ${result.posts_archived} posts and ${result.comments_archived} comments.`);
+                            } catch (err) {
+                                console.error(err);
+                                alert("Error occurred while archiving.");
+                            }
+                        }}
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0-3-3m3 3 3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"
+                        />
+                    </svg>
+                </div>
+
+
 
                 {!usersLoading && users.length > 0 && (
                     <>
@@ -224,7 +326,6 @@ export default function LoggedInAdmin() {
                             }}
                             className="bg-gray-900 p-3 sm:p-6 rounded mb-4 sm:mb-6 border border-green-500 text-sm sm:text-base"
                         >
-                            {/* User info */}
                             {/* User info with profile image */}
                             <div className="flex items-center mb-3 sm:mb-4">
                                 <div className="mr-4">
@@ -255,6 +356,31 @@ export default function LoggedInAdmin() {
                                     <p className="font-bold">{user.name}</p>
                                     <p className="font-bold">({user.nickname})</p>
                                     <p className="text-gray-400 text-xs sm:text-sm">{user.email}</p>
+                                    <p className="text-gray-400 text-xs sm:text-sm flex items-center gap-1 flex-nowrap">
+                                        <strong className="whitespace-nowrap">User ID:</strong>
+
+                                        <span className="whitespace-nowrap">{user._id}</span>
+
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="white"
+                                            strokeWidth="1.5"
+                                            className="w-4 h-4 cursor-pointer hover:text-green-400 shrink-0"
+                                            onClick={() => {
+                                                setBlockUserId(user._id);
+                                                topRef.current?.scrollIntoView({ behavior: "smooth" });
+                                            }}
+                                            title="Copy user ID"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                d="M8 16h8M8 12h8M8 8h8M4 6.75A2.75 2.75 0 0 1 6.75 4h10.5A2.75 2.75 0 0 1 20 6.75v10.5A2.75 2.75 0 0 1 17.25 20H6.75A2.75 2.75 0 0 1 4 17.25V6.75Z"
+                                            />
+                                        </svg>
+                                    </p>
                                 </div>
                             </div>
 
@@ -335,43 +461,29 @@ export default function LoggedInAdmin() {
 
 
 
-                    {/* Previous */}
-                    <button
+                    {/* Previous as SVG */}
+                    <div
                         onClick={() => scrollToUser(Math.max(0, currentUserIndex - 1))}
-                        className="
-                          flex items-center justify-center
-                          bg-black/70 backdrop-blur-xl
-                          border border-green-400/20
-                          rounded-full shadow-lg
-                          px-4 h-8 min-w-[80px]
-                          frame-shimmer
-                          transition
-                          hover:bg-green-500/10
-                          active:scale-95
-                          text-white-300 text-sm font-medium
-                        "
                     >
-                        ↑ Prev
-                    </button>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
+                             stroke="currentColor" className="size-12">
+                            <path strokeLinecap="round" strokeLinejoin="round"
+                                  d="m15 11.25-3-3m0 0-3 3m3-3v7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                        </svg>
 
-                    {/* Next */}
-                    <button
+                    </div>
+
+                    {/* Next as SVG */}
+                    <div
                         onClick={() => scrollToUser(Math.min(users.length - 1, currentUserIndex + 1))}
-                        className="
-                          flex items-center justify-center
-                          bg-black/70 backdrop-blur-xl
-                          border border-green-400/20
-                          rounded-full shadow-lg
-                          px-4 h-8 min-w-[80px]
-                          frame-shimmer
-                          transition
-                          hover:bg-green-500/10
-                          active:scale-95
-                          text-green-300 text-sm font-medium
-                        "
                     >
-                        ↓ Next
-                    </button>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
+                             stroke="currentColor" className="size-12">
+                            <path strokeLinecap="round" strokeLinejoin="round"
+                                  d="m9 12.75 3 3m0 0 3-3m-3 3v-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                        </svg>
+
+                    </div>
 
                 </div>
 
