@@ -38,6 +38,8 @@ export default function ChatStats() {
 
 
 
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
+
 
     const { posts, setPosts, fetchPostComments, commentSkips } = chatApis({ apiUrl });
 
@@ -556,7 +558,7 @@ export default function ChatStats() {
                                 <>
                                     <ActivePost
                                         post={activePost}
-                                        comments={activePostComments}
+                                        comments={{ comments: activePostComments, total: activePost.commentCount ?? 0 }}
                                         userId={userId}
                                         onBack={handleBackToList}
                                         totalComments={activePost.commentCount ?? 0}

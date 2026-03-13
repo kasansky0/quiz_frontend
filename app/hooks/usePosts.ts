@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 
 export interface Comment {
-    _id?: string;
+    _id: string;
     id: string;
     userId: string;
     nickname: string;
@@ -17,7 +17,7 @@ export interface Comment {
 }
 
 export interface Post {
-    _id?: string;
+    _id: string;
     id: string;
     title: string;
     userId: string;
@@ -28,6 +28,7 @@ export interface Post {
     comments: Comment[];
     pinned?: boolean;
     commentCount?: number;
+    totalComments: number;
 }
 
 export function usePosts(initialPosts: Post[] = []) {

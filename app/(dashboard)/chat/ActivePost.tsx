@@ -14,7 +14,8 @@ import useSWR, { mutate as globalMutate } from "swr";
 
 
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
 const COMMENTS_PAGE_SIZE = 10;
 const commentsKey = (postId: string, skip: number) => `${apiUrl}/posts/${postId}/comments?skip=${skip}&limit=${COMMENTS_PAGE_SIZE}`;
 
@@ -24,7 +25,7 @@ const fetcher = (url: string) =>
 
 type Props = {
     post: Post;
-    totalComments: number; // <-- new prop
+    totalComments: number;
     userId?: string | null;
     onBack: () => void;
     comments: {
@@ -57,6 +58,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMoreComments, setHasMoreComments] = useState(totalComments > COMMENTS_PAGE_SIZE);
     const [displayedComments, setDisplayedComments] = useState<Comment[]>([]);
+
+
 
 
 
