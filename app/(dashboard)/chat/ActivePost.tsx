@@ -4,7 +4,6 @@ import {Comment, Post} from "../../hooks/usePosts";
 import { useState, useEffect, useRef } from "react";
 import DOMPurify from "dompurify";
 import {useError} from "@/app/ErrorProvider";
-import {signOut} from "next-auth/react";
 import { chatApis } from '@/app/hooks/chatApis'; // adjust path as needed
 import useSWR, { mutate as globalMutate } from "swr";
 import { useSession, signOut } from "next-auth/react"; // ✅ add useSession
