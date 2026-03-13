@@ -162,11 +162,10 @@ function TimeLoading() {
 
 
 export default function UserStats({ nickname, loading, onLinkClick, seenQuestions }: UserStatsProps) {
-    const { data: session } = useSession();
+    const { data: session, update } = useSession();
     const router = useRouter(); // <-- initialize router here
     const [showStats, setShowStats] = useState(false);
     const questionStats = calculateQuestionStats(seenQuestions); // ✅ calculate stats
-
 
 
 
@@ -206,10 +205,13 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className=" w-full">
                 <div
                     onClick={() =>
-                        signOut({
-                            redirect: true,   // ensures NextAuth handles redirect
-                            callbackUrl: "/"  // or any page you want to go after logout
-                        })
+                        signOut({ redirect: false })
+                            .finally(() => {
+                                // clear session cache on client
+                                update?.(null);
+                                // force full reload
+                                window.location.href = "/";
+                            })
                     }
                     className={`flex items-center gap-2 ${sidebarLink}`}
                 >
