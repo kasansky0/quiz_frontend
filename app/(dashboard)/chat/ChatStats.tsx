@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import CreatePost from "./CreatePost";
 import { signOut } from "next-auth/react";
-import { Post } from "../../hooks/usePosts";  // <-- import these
+import { Post, Comment } from "../../hooks/usePosts";  // <-- import these
 import { useUser } from "../../UserContext";
 import { useRouter } from "next/navigation";
 import useSWR, { mutate as globalMutate } from "swr";
@@ -557,11 +557,14 @@ export default function ChatStats() {
                             {activePost && (
                                 <>
                                     <ActivePost
-                                        post={activePost}
-                                        comments={{ comments: activePostComments, total: activePost.commentCount ?? 0 }}
+                                        post={activePost as Post} // tell TS it's not null
+                                        comments={{
+                                            comments: activePostComments,
+                                            total: Number(activePost.commentCount ?? 0),
+                                        }}
                                         userId={userId}
                                         onBack={handleBackToList}
-                                        totalComments={activePost.commentCount ?? 0}
+                                        totalComments={Number(activePost.commentCount ?? 0)}
                                     />
                                 </>
                             )}

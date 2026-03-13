@@ -25,13 +25,10 @@ const fetcher = (url: string) =>
 
 type Props = {
     post: Post;
-    totalComments: number;
+    comments: { comments: Comment[]; total: number }
     userId?: string | null;
     onBack: () => void;
-    comments: {
-        comments: Comment[];
-        total: number;
-    };
+    totalComments: number;
 };
 
 export default function ActivePost({ post, comments, userId, onBack, totalComments }: Props) {
