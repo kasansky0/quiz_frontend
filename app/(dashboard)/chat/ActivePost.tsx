@@ -7,6 +7,7 @@ import {useError} from "@/app/ErrorProvider";
 import {signOut} from "next-auth/react";
 import { chatApis } from '@/app/hooks/chatApis'; // adjust path as needed
 import useSWR, { mutate as globalMutate } from "swr";
+import { useSession, signOut } from "next-auth/react"; // ✅ add useSession
 
 
 
@@ -55,6 +56,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMoreComments, setHasMoreComments] = useState(totalComments > COMMENTS_PAGE_SIZE);
     const [displayedComments, setDisplayedComments] = useState<Comment[]>([]);
+    const { data: session } = useSession(); // ✅ get session here
 
 
 
@@ -286,12 +288,21 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         const sanitizedMessage = DOMPurify.sanitize(message.trim());
 
         try {
-            // 1️⃣ Send to backend first
+            // 1️⃣ Grab the idToken from session
+            const idToken = session?.idToken;
+            if (!idToken) {
+                console.error("No session token available");
+                await handleSessionExpired();
+                return;
+            }
+            // 2️⃣ Send to backend
             const res = await fetch(`${apiUrl}/posts/${activePost.id}/comments`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${idToken}` // ✅ send token
+                },
                 body: JSON.stringify({ message: sanitizedMessage }),
-                credentials: "include",
             });
 
             // 2️⃣ Handle errors exactly as before
