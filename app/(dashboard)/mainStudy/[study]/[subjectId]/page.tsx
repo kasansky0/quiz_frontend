@@ -46,7 +46,7 @@ export default function SubjectPage() {
 
     // Function to handle quiz button click
     const handleQuizClick = () => {
-        router.push(`/quiz?subjectId=${subjectId}`);
+        router.push(`/quiz/${subjectId}`); // ✅ dynamic route
     };
 
     return (

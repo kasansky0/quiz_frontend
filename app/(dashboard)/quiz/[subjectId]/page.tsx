@@ -3,7 +3,7 @@
     import { useSession } from "next-auth/react";
     import { useState } from "react";
     import QuizSampleSection from "@/app/(dashboard)/quiz/components/QuizSampleSection";
-    import { useSearchParams } from "next/navigation"; // <-- import
+    import { useParams } from "next/navigation"; // <-- import
     import type { QuestionType } from "@/app/(dashboard)/quiz/components/QuizSampleSection";
 
     export default function QuizPage() {
@@ -14,8 +14,9 @@
         const userId = session?.user?.id;
 
 
-        const searchParams = useSearchParams(); // 🔹 get search params
-        const subjectId = searchParams.get("subjectId") ?? ""; // 🔹 read subjectId from URL
+        const { subjectId: param } = useParams();
+        const subjectId = Array.isArray(param) ? param[0] : param; // type: string | undefined
+        if (!subjectId) return <div className="p-6 text-white">No subject specified</div>;
 
         return (
             <QuizSampleSection
@@ -25,7 +26,7 @@
                 apiUrl={apiUrl}
                 userId={userId}
                 loadingDone={true}
-                subjectId={subjectId} // 🔹 pass it here
+                subjectId={subjectId} // pass dynamic param here
                 onAnswer={async (isCorrect, questionId) => {
                     setAnswerCount(prev => prev + 1);
 
