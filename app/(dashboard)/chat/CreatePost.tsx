@@ -2,19 +2,30 @@
 
 import { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/Textarea";
+import { useError } from "@/app/ErrorProvider";
+
 
 interface CreatePostProps {
     onSubmit: (post: { title: string; message: string }) => void;
     onCancel: () => void;
+    isBlocked?: boolean;          // ✅ new prop
+    blockMessage?: string;        // ✅ new prop
+    blockSeconds?: number;        // ✅ new prop
 }
 
-export default function CreatePost({ onSubmit, onCancel }: CreatePostProps) {
+export default function CreatePost({
+                                       onSubmit,
+                                       onCancel,
+                                       isBlocked,
+                                       blockMessage,
+                                       blockSeconds,}: CreatePostProps) {
     const [message, setMessage] = useState("");
     const [title, setTitle] = useState("");
     const [passedNETA, setPassedNETA] = useState(false);
     const [errors, setErrors] = useState<{ title?: string; message?: string }>({});
     const [fade, setFade] = useState(false); // fade-in animation
     const [isSending, setIsSending] = useState(false);
+    const { showError } = useError();
     const TITLE_LIMIT = 100;
     const MESSAGE_LIMIT = 500;
 
@@ -44,7 +55,17 @@ export default function CreatePost({ onSubmit, onCancel }: CreatePostProps) {
         setIsSending(true);
 
         // Wait for onSubmit to complete (if async)
-        await onSubmit({ title: cleanedTitle, message: cleanedMessage });
+        setIsSending(true);
+
+        try {
+            await onSubmit({ title: cleanedTitle, message: cleanedMessage });
+        } catch (err: any) {
+            // Use showError from props or context if needed
+            const msg = "Network error: " + (err?.message || err);
+            showError(msg);     // ✅ display in global error banner
+        } finally {
+            setIsSending(false);
+        }
 
         // Optionally hide form or reset fields after submission
         // setTitle("");
@@ -140,6 +161,14 @@ export default function CreatePost({ onSubmit, onCancel }: CreatePostProps) {
                             {title.length}/{TITLE_LIMIT}
                         </span>
                     </div>
+
+
+                    {/* --- Blocked Banner Between Title and Message --- */}
+                    {isBlocked && blockMessage && (
+                        <div className="mb-2 text-red-400 text-xs sm:text-sm text-center">
+                            {blockMessage} {blockSeconds ? `Wait ${blockSeconds} second(s).` : null}
+                        </div>
+                    )}
 
 
                     {/* Main Body */}

@@ -1,10 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useError } from "@/app/ErrorProvider";
+
 
 export function useMainTopics(apiUrl: string) {
     const [mainTopics, setMainTopics] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { showError } = useError();
+
 
     useEffect(() => {
         const fetchMainTopics = async () => {
@@ -24,8 +28,8 @@ export function useMainTopics(apiUrl: string) {
                 ) as string[];
                 setMainTopics(topics);
             } catch (err: any) {
-                console.error(err);
-                setError(err.message || "Unknown error");
+                const msg = "❌ Failed to fetch main topics: " + (err?.message || err);
+                setError(msg);        // now MainStudyPage sees error
             } finally {
                 setLoading(false);
             }

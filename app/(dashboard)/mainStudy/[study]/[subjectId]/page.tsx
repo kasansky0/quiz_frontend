@@ -93,7 +93,7 @@ export default function SubjectPage() {
                 {/* ✅ Quiz note if isQuiz is true */}
                 {subject.isQuiz && (
                     <p className="mb-6 text-sm text-yellow-400 text-center">
-                        Build muscle memory on this topic with targeted questions at the end.
+                        Strengthen your knowledge of this topic with focused practice questions at the end.
                     </p>
                 )}
 

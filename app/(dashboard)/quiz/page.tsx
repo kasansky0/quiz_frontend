@@ -1,33 +1,25 @@
-"use client";
+    "use client";
 
-import { useSession } from "next-auth/react";
-import { Suspense } from "react";
-import { useState } from "react";
-import QuizSampleSection from "@/app/(dashboard)/quiz/components/QuizSampleSection";
-import { useSearchParams } from "next/navigation"; // <-- import
-import type { QuestionType } from "@/app/(dashboard)/quiz/components/QuizSampleSection";
+    import { useSession } from "next-auth/react";
+    import { useState } from "react";
+    import QuizSampleSection from "@/app/(dashboard)/quiz/components/QuizSampleSection";
+    import { useSearchParams } from "next/navigation"; // <-- import
+    import type { QuestionType } from "@/app/(dashboard)/quiz/components/QuizSampleSection";
 
-export default function QuizPage() {
-    const { data: session } = useSession();
-    const [wrongQueue, setWrongQueue] = useState<QuestionType[]>([]); // ✅ typed array
-    const [answerCount, setAnswerCount] = useState(0);
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-    const userId = session?.user?.id;
+    export default function QuizPage() {
+        const { data: session } = useSession();
+        const [wrongQueue, setWrongQueue] = useState<QuestionType[]>([]); // ✅ typed array
+        const [answerCount, setAnswerCount] = useState(0);
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        const userId = session?.user?.id;
 
 
-    const searchParams = useSearchParams(); // 🔹 get search params
-    const subjectId = searchParams.get("subjectId") ?? ""; // 🔹 read subjectId from URL
+        const searchParams = useSearchParams(); // 🔹 get search params
+        const subjectId = searchParams.get("subjectId") ?? ""; // 🔹 read subjectId from URL
 
-    return (
-        <Suspense
-            fallback={
-                <div className="flex items-center justify-center w-full h-64 text-lg text-gray-400">
-                    Loading quiz...
-                </div>
-            }
-        >
+        return (
             <QuizSampleSection
-                isLoggedIn={!!session}
+                isLoggedIn={true}
                 wrongQueue={wrongQueue}
                 setWrongQueue={setWrongQueue}
                 apiUrl={apiUrl}
@@ -50,6 +42,5 @@ export default function QuizPage() {
                     });
                 }}
             />
-        </Suspense>
-    );
-}
+        );
+    }

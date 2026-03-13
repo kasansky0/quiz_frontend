@@ -124,6 +124,10 @@ module.exports = {
     		},
 
             keyframes: {
+                loadingDots: {
+                    '0%, 80%, 100%': { transform: 'scale(0)', opacity: '0.3' },
+                    '40%': { transform: 'scale(1)', opacity: '1' },
+                },
                 'accordion-down': {
                     from: { height: '0' },
                     to: { height: 'var(--radix-accordion-content-height)' }
@@ -144,6 +148,7 @@ module.exports = {
                 }
             },
             animation: {
+                'dot-bounce': 'loadingDots 1.4s infinite ease-in-out both',
                 'accordion-down': 'accordion-down 0.2s ease-out',
                 'accordion-up': 'accordion-up 0.2s ease-out',
                 'caret-blink': 'caret-blink 1.25s ease-out infinite',

@@ -160,6 +160,10 @@ export default function LoggedInAdmin() {
         (a, b) => new Date(b.last_login).getTime() - new Date(a.last_login).getTime()
     );
 
+    if (sessionExpired) {
+        return <LoggedOut />;
+    }
+
     return (
         <div ref={topRef} className="min-h-screen bg-black text-white relative">
             <div className="mx-auto max-w-2xl p-4 sm:p-10">
@@ -372,8 +376,8 @@ export default function LoggedInAdmin() {
                                                 setBlockUserId(user._id);
                                                 topRef.current?.scrollIntoView({ behavior: "smooth" });
                                             }}
+                                            title="Copy user ID"
                                         >
-                                            <title>"Copy user ID"</title>
                                             <path
                                                 strokeLinecap="round"
                                                 strokeLinejoin="round"

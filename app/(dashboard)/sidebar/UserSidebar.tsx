@@ -12,7 +12,7 @@ interface UserSidebarProps {
     totalOnlineTime: number;
     loading: boolean;
     onLinkClick?: () => void;
-    seenQuestions?: SeenQuestionsType; // ✅ new optional prop
+    seenQuestions?: SeenQuestionsType;
 }
 
 export default function UserSidebar({ userPercentage, nickname, totalOnlineTime, loading, onLinkClick, seenQuestions }: UserSidebarProps) {
@@ -22,7 +22,7 @@ export default function UserSidebar({ userPercentage, nickname, totalOnlineTime,
     if (!session) return null;
 
     return (
-        <aside className="flex flex-col w-64 h-full bg-dark-400/80 backdrop-blur-xl space-y-4 text-white p-4">
+        <aside className="flex flex-col w-64 h-full bg-black-200 backdrop-blur-xl space-y-4 text-white p-4">
             <UserStats
                 userPercentage={userPercentage}
                 seenQuestions={seenQuestions}

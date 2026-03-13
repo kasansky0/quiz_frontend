@@ -5,6 +5,8 @@ import type { UserStatsType } from "@/types/userStats";
 import type { QuestionType } from "@/app/(dashboard)/quiz/components/QuizSampleSection";
 import { useUser } from "@/app/UserContext";
 import {signIn, signOut} from "next-auth/react";
+import { useError } from "@/app/ErrorProvider";
+
 
 
 
@@ -37,6 +39,7 @@ export function useUserSidebarData({
     const {setUserId} = useUser();
     const [errorState, setErrorState] = useState<string | null>(null);
     const [isLoggedOut, setIsLoggedOut] = useState(false);
+    const { showError } = useError() as { showError: (msg: string | object) => void };
 
 
 
@@ -78,13 +81,14 @@ export function useUserSidebarData({
             const data = await res.json();
             setUserStats(data);
 
-        } catch {
-            // 🚨 Network / fetch failed → treat as logged out
-            handleSessionExpired();
+        } catch (err) {
+            console.error("Network error:", err);
+            setErrorState("Network error");
+            // do NOT log out user here unless you really want
         } finally {
             setLoading(false);
         }
-    }, [session, apiUrl, isLoggedOut]);
+    }, [session, apiUrl, isLoggedOut, showError]);
 
 
 
@@ -133,16 +137,16 @@ export function useUserSidebarData({
                 });
 
                 const data = await res.json();
-                console.log("✅ Google auth response:", data);
+                showError("✅ Google auth response: " + JSON.stringify(data));
 
                 fetchData(); // safe to call after auth
-            } catch (err) {
-                console.error("❌ Failed to send Google token:", err);
+            } catch (err: any) {
+                showError("Failed to send Google token: " + (err?.message || err));
             }
         }
 
         sendToken();
-    }, [session?.idToken]);
+    }, [session?.idToken, showError]);
 
 
     // Load existing time from DB into state
@@ -174,10 +178,10 @@ export function useUserSidebarData({
     // ✅ Fetch sidebar stats
     useEffect(() => {
         if (!session || !session.user || !session.user.email) return;
-        if (!apiUrl) return console.error("❌ NEXT_PUBLIC_API_URL is not set");
+        if (!apiUrl) return showError("NEXT_PUBLIC_API_URL is not set");
 
         fetchData();
-    }, [session, apiUrl]);
+    }, [session, apiUrl, showError]);
 
 
     // ✅ Session check on tab visibility or focus
@@ -208,7 +212,7 @@ export function useUserSidebarData({
         const interval = setInterval(() => {
             const now = performance.now();
             if (now - lastTime.current > 20000) { // 20s pause => tab was frozen
-                console.log("Tab inactive/frozen, refetching sidebar stats");
+                showError("Tab inactive/frozen, refetching sidebar stats");
                 fetchData();
             }
             lastTime.current = now;
@@ -234,10 +238,10 @@ export function useUserSidebarData({
         })
 
             .then(res => res.json())
-            .then(data => console.log("User percentage updated:", data))
-            .catch(err => console.error("Failed to update sidebar percentage:", err));
+            .then(data => showError("User percentage updated: " + JSON.stringify(data)))
+            .catch(err => showError("Failed to update sidebar percentage: " + (err?.message || err)));
         // }
-    }, [answerCount, userPercentage, userStats]);
+    }, [answerCount, userPercentage, userStats, showError]);
 
 
     // 1️⃣ Add another useEffect to initialize userPercentage from DB

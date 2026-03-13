@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useError } from "@/app/ErrorProvider";
 
+
 export interface Subject {
     id: string;
     title: string;
@@ -44,12 +45,13 @@ export function useSubjects(apiUrl: string, mainTopic: string) {
 
             setSubjects(filtered);
         } catch (err: any) {
-            console.error("❌ Error fetching subjects:", err);
-            setErrorSubjects(err.message || "Unknown error");
+            const message = err.message || "Unknown error fetching subjects";
+            setErrorSubjects(message);
+            showError(`❌ ${message}`);
         } finally {
             setLoadingSubjects(false);
         }
-    }, [apiUrl, mainTopic]);
+    }, [apiUrl, mainTopic, showError]);
 
     useEffect(() => {
         fetchSubjects();

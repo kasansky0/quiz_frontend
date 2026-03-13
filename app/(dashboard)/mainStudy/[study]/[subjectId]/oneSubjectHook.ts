@@ -57,8 +57,9 @@ export function useSubjectById(apiUrl: string, subjectId: string) {
                 setSubject(data);
             })
             .catch(err => {
-                console.error("❌ Error fetching subject:", err);
-                setError(err.message);
+                const message = err.message || "Unknown error fetching subject";
+                setError(message);
+                showError(`❌ ${message}`); // 🔴 show banner
             })
             .finally(() => setLoading(false));
     }, [apiUrl, subjectId]);

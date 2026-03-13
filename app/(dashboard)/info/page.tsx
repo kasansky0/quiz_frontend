@@ -134,7 +134,7 @@ export default function AdminPage() {
 
     const { showError } = useError() as { showError: (msg: string | object) => void };
 
-    // fetchAdminStatus.ts
+    // Fetch admin status
     const fetchAdminStatus = useCallback(async () => {
         if (!session) return;
 
@@ -143,20 +143,16 @@ export default function AdminPage() {
         try {
             const res = await fetch(`${apiUrl}/admin/check`, {
                 method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    // send the Google ID token from session
-                    "Authorization": `Bearer ${session.idToken}`,
-                },
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
             });
-
             setIsAdmin(res.status === 200);
         } catch (err: any) {
             setIsAdmin(false);
         } finally {
             setLoadingAdmin(false);
         }
-    }, [session]);
+    }, [session, showError]);
 
     useEffect(() => {
         if (session) fetchAdminStatus();

@@ -5,7 +5,7 @@ import Footer from "@/app/(home)/Footer";
 
 export default function LoggedOutPage() {
     return (
-        <div className="min-h-screen flex flex-col md:flex-row bg-dark-300">
+        <div className="min-h-screen flex flex-col md:flex-row bg-black-200">
 
             {/* LEFT SIDE (login + metrics) */}
             <main role="main" className="md:flex-1 flex flex-col w-full justify-between p-0 min-h-[100dvh]">

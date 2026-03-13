@@ -3,11 +3,12 @@
 import { useState, useRef } from "react";
 
 export interface Comment {
+    _id?: string;
     id: string;
     userId: string;
     nickname: string;
     message: string;
-    timestamp?: string;
+    timestamp: string;
     edited?: string;       // timestamp of last edit
     pinned?: boolean;      // whether comment is pinned
     _isLocal?: boolean;  // used in useEffect to keep local-only comments
@@ -16,6 +17,7 @@ export interface Comment {
 }
 
 export interface Post {
+    _id?: string;
     id: string;
     title: string;
     userId: string;
@@ -25,6 +27,7 @@ export interface Post {
     timestamp?: string;
     comments: Comment[];
     pinned?: boolean;
+    commentCount?: number;
 }
 
 export function usePosts(initialPosts: Post[] = []) {

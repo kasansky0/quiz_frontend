@@ -9,40 +9,60 @@ export default function MainStudyPage() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
     const { mainTopics, loading, error } = useMainTopics(apiUrl);
 
+
     // Delayed loading
-    const [showLoading, setShowLoading] = useState(false);
+    const [showLoading, setShowLoading] = useState(true);
     // Fade in effect
     const [fade, setFade] = useState(false);
 
+
+
+
+
+
     useEffect(() => {
-        let timer: NodeJS.Timeout;
-
-        if (loading) {
-            timer = setTimeout(() => setShowLoading(true), 5000);
+        if (loading || error) {
+            // Always show spinner while loading or on error
+            setShowLoading(true);
         } else {
-            setShowLoading(false);
+            // Only hide spinner when loading finished successfully
+            const timer = setTimeout(() => setShowLoading(false), 1500);
+            return () => clearTimeout(timer);
         }
+    }, [loading, error]);
 
-        return () => clearTimeout(timer);
-    }, [loading]);
+
+
+
 
     // Trigger fade after topics are ready
     useEffect(() => {
-        if (!loading && mainTopics.length) {
+        if (!loading && mainTopics.length && !showLoading) {
             const timer = setTimeout(() => setFade(true), 50);
             return () => clearTimeout(timer);
         }
-    }, [loading, mainTopics]);
+    }, [loading, mainTopics, showLoading]);
+
+
+
+
 
     return (
         <div className="p-4 md:p-4 text-white relative min-h-screen">
 
             {/* Loading screen */}
-            {loading && showLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black text-white transition-opacity duration-700 ease-in-out">
-                    <p className="text-xl">Loading...</p>
+            {showLoading ? (
+                <div className="min-h-screen flex items-center justify-center text-white bg-black">
+                    <p className="text-xl flex items-center">
+                        Loading
+                        <span className="ml-2 flex space-x-1">
+                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
+                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                        </span>
+                    </p>
                 </div>
-            )}
+                ):(
 
             <div className={`mx-auto max-w-4xl transition-opacity duration-700 ease-in-out ${
                 fade ? "opacity-100" : "opacity-0"
@@ -73,6 +93,7 @@ export default function MainStudyPage() {
                     ))}
                 </div>
             </div>
+            )}
         </div>
     );
 }

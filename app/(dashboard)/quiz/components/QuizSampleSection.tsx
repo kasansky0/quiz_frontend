@@ -79,6 +79,23 @@ export default function QuizSampleSection({
     const [fetchError, setFetchError] = useState(false); // <-- track fetch failures
     const QUESTIONS_BEFORE_REVIEW = 2;
     const { showError } = useError();
+    const [showLoading, setShowLoading] = useState(true);
+
+
+
+
+
+
+    useEffect(() => {
+        if (!loadingDone) {
+            setShowLoading(true);
+        } else if (questionData) {
+            // ensure loading shows at least 1500ms
+            const timer = setTimeout(() => setShowLoading(false), 1500);
+            return () => clearTimeout(timer);
+        }
+    }, [loadingDone, questionData]);
+
 
 
 
@@ -115,7 +132,7 @@ export default function QuizSampleSection({
                     }),
                 });
 
-                if (!res.ok) showError("Failed to fetch question"); // 🔴 show banner
+                // if (!res.ok) showError("Failed to fetch question"); // 🔴 show banner
 
                 const data: QuestionType = await res.json();
 
@@ -127,8 +144,8 @@ export default function QuizSampleSection({
                 }
 
             } catch (err) {
-                console.error(err);
-                setFetchError(true);
+                // showError("Unable to load question. Please try again later."); //
+                setQuestionData(null);
             }
         }
 
@@ -152,13 +169,13 @@ export default function QuizSampleSection({
                 }),
             });
 
-            if (!res.ok) showError("Failed to fetch question"); // 🔴 show banner
+            // if (!res.ok) showError("Failed to fetch question"); // 🔴 show banner
 
             const data: QuestionType = await res.json();
             return data;
 
         } catch (err) {
-            console.error("Failed to fetch question:", err);
+            // showError("Unable to load question. Please check your connection or try again later.");
             return null;
         }
     }
@@ -224,15 +241,15 @@ export default function QuizSampleSection({
                         }),
                     });
 
-                    if (!res.ok) showError("API failed"); // 🔴 show banner
+                    // if (!res.ok) showError("API failed"); // 🔴 show banner
 
                     const result = await res.json();
                     correct = result.correct;
                     answer = result.answer;
                     explanation = result.explanation || questionData.explanation;
                 } catch (err) {
-                    console.error("Answer fetch failed:", err);
-                    setFetchError(true); // show the reload overlay
+                    // Show user-friendly error only
+                    // showError("Failed to check answer. Please check your connection or try again.");
                     return; // stop further processing
                 }
             } else {
@@ -258,91 +275,109 @@ export default function QuizSampleSection({
 
     return (
         <div
-            className="flex-1 flex flex-col items-center justify-start p-5 sm:p-5 md:p-8 min-h-[50vh] md:h-auto bg-dark-400 w-full no-select"
+            className="flex-1 flex flex-col items-center justify-start p-5 sm:p-5 md:p-8 min-h-[50vh] md:h-auto bg-black-200 w-full no-select"
             onContextMenu={(e) => e.preventDefault()}
         >
-            {/* Reload overlay if fetch failed */}
-            {fetchError && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-dark-300/90 backdrop-blur-sm p-4">
-                    <div className="bg-dark-400/80 border border-green-400/40 shadow-lg rounded-2xl max-w-md w-full p-6 text-center backdrop-blur-md">
-                        <h2 className="text-green-400 text-lg font-semibold mb-2 drop-shadow-[0_0_12px_rgba(36,174,124,0.8)]">
-                            Error
-                        </h2>
-                        <p className="text-green-200 text-sm mb-6">
-                            Failed to load the next question. Please reload the page to continue.
-                        </p>
-                        <button
-                            onClick={() => window.location.reload()}
-                            className="px-5 py-2 bg-green-500 text-black font-medium rounded-full hover:bg-green-400 transition"
-                        >
-                            Reload
-                        </button>
-                    </div>
+
+            {showLoading ? (
+                <div className="min-h-screen flex flex-col items-center justify-center text-white bg-black">
+                    <p className="text-xl flex items-center">
+                        Loading
+                        <span className="ml-2 flex space-x-1">
+                            <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
+                            <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                            <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                        </span>
+                    </p>
+                    {/* blockMessage removed */}
                 </div>
-            )}
-
-            {/* Quiz content */}
-            {!isLoggedIn ? (
-                <>
-                    <div className="mb-4">
-                        <ScrollHint />
-                    </div>
-                    {questionData && <HeroCard question={questionData} />}
-                </>
             ) : (
-                questionData && (
-                    <div
-                        key={questionData.id}
-                        className={`w-full max-w-xl flex flex-col gap-6 justify-start transition-opacity duration-700 ease-in-out ${
-                            fade ? "opacity-100" : "opacity-0"
-                        }`}
-                    >
-                        {/* Question */}
-                        <Question question={questionData.question} />
 
-                        {/* Options */}
-                        <div ref={optionsRef} className="flex flex-col gap-3">
-                            {questionData.options.map((option) => (
-                                <Option
-                                    key={option}
-                                    text={option}
-                                    isSelected={selectedOption === option}
-                                    isAnswer={answerResult?.answer === option}
-                                    disabled={!!selectedOption}
-                                    onClick={() => handleAnswerClick(option)}
-                                />
-                            ))}
-                        </div>
-
-                        {/* NEXT BUTTON */}
-                        {selectedOption && (
-                            <div className="flex flex-col items-center gap-2 w-full">
-                                <Button
-                                    onClick={handleNextQuestion}
-                                    className="px-4 py-2 text-sm sm:px-6 sm:py-2.5 sm:text-base"
-                                >
-                                    Next
-                                </Button>
-                                <div className="flex flex-col items-center text-center">
-                                    <ScrollHint />
-                                    <span className="text-xs sm:text-sm text-light-200 opacity-80 mt-1">
-                                        Study the explanation below ⬇️
-                                    </span>
+                <>
+                        {/* Reload overlay if fetch failed */}
+                        {fetchError && (
+                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-dark-300/90 backdrop-blur-sm p-4">
+                                <div className="bg-dark-400/80 border border-green-400/40 shadow-lg rounded-2xl max-w-md w-full p-6 text-center backdrop-blur-md">
+                                    <h2 className="text-green-400 text-lg font-semibold mb-2 drop-shadow-[0_0_12px_rgba(36,174,124,0.8)]">
+                                        Error
+                                    </h2>
+                                    <p className="text-green-200 text-sm mb-6">
+                                        Failed to load the next question. Please reload the page to continue.
+                                    </p>
+                                    <button
+                                        onClick={() => window.location.reload()}
+                                        className="px-5 py-2 bg-green-500 text-black font-medium rounded-full hover:bg-green-400 transition"
+                                    >
+                                        Reload
+                                    </button>
                                 </div>
-
                             </div>
                         )}
 
-                        {/* Explanation */}
-                        {answerResult && selectedOption && (
-                            <Comment
-                                isCorrect={answerResult.correct}
-                                text={answerResult.explanation}
-                                correctAnswer={questionData.answer}
-                            />
+                        {/* Quiz content */}
+                        {!isLoggedIn ? (
+                            <>
+                                <div className="mb-4">
+                                    <ScrollHint />
+                                </div>
+                                {questionData && <HeroCard question={questionData} />}
+                            </>
+                        ) : (
+                            questionData && (
+                                <div
+                                    key={questionData.id}
+                                    className={`w-full max-w-xl flex flex-col gap-6 justify-start transition-opacity duration-700 ease-in-out ${
+                                        fade ? "opacity-100" : "opacity-0"
+                                    }`}
+                                >
+                                    {/* Question */}
+                                    <Question question={questionData.question} />
+
+                                    {/* Options */}
+                                    <div ref={optionsRef} className="flex flex-col gap-3">
+                                        {questionData.options.map((option) => (
+                                            <Option
+                                                key={option}
+                                                text={option}
+                                                isSelected={selectedOption === option}
+                                                isAnswer={answerResult?.answer === option}
+                                                disabled={!!selectedOption}
+                                                onClick={() => handleAnswerClick(option)}
+                                            />
+                                        ))}
+                                    </div>
+
+                                    {/* NEXT BUTTON */}
+                                    {selectedOption && (
+                                        <div className="flex flex-col items-center gap-2 w-full">
+                                            <Button
+                                                onClick={handleNextQuestion}
+                                                className="px-4 py-2 text-sm sm:px-6 sm:py-2.5 sm:text-base"
+                                            >
+                                                Next
+                                            </Button>
+                                            <div className="flex flex-col items-center text-center">
+                                                <ScrollHint />
+                                                <span className="text-xs sm:text-sm text-light-200 opacity-80 mt-1">
+                                                    Study the explanation below ⬇️
+                                                </span>
+                                            </div>
+
+                                        </div>
+                                    )}
+
+                                    {/* Explanation */}
+                                    {answerResult && selectedOption && (
+                                        <Comment
+                                            isCorrect={answerResult.correct}
+                                            text={answerResult.explanation}
+                                            correctAnswer={questionData.answer}
+                                        />
+                                    )}
+                                </div>
+                            )
                         )}
-                    </div>
-                )
+                </>
             )}
         </div>
     );

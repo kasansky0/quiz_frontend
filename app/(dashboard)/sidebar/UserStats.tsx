@@ -9,6 +9,7 @@ import FormulaSheet from "./formulasSheet"
 import { useMotionValue, useTransform, animate } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { SeenQuestionsType } from "@/types/userStats";
+import { useMemo } from "react";
 
 
 
@@ -19,10 +20,33 @@ interface UserStatsProps {
     totalOnlineTime: number;
     loading: boolean;
     onLinkClick?: () => void;
-    seenQuestions?: SeenQuestionsType; // ✅ new optional prop
+    seenQuestions?: SeenQuestionsType;
+    onRefreshStats?: () => void;
 }
 
 
+
+
+
+
+function DotLoader({ size = 2, color = "white" }: { size?: number; color?: string }) {
+    return (
+        <span className="flex items-center space-x-1">
+      <span
+          className={`w-${size} h-${size} bg-${color} rounded-full animate-dot-bounce`}
+          style={{ animationDelay: "0s" }}
+      />
+      <span
+          className={`w-${size} h-${size} bg-${color} rounded-full animate-dot-bounce`}
+          style={{ animationDelay: "0.2s" }}
+      />
+      <span
+          className={`w-${size} h-${size} bg-${color} rounded-full animate-dot-bounce`}
+          style={{ animationDelay: "0.4s" }}
+      />
+    </span>
+    );
+}
 
 
 
@@ -49,11 +73,15 @@ function calculateQuestionStats(seenQuestions?: SeenQuestionsType) {
 
 
 
-function PercentageBar({ correct, total }: { correct: number; total: number }) {
+function PercentageBar({ correct, total, onRefreshStats }: { correct: number; total: number; onRefreshStats?: () => void }) {
     const [percent, setPercent] = useState(0);
     const progress = (correct / total) * 100;
 
     useEffect(() => {
+        if (onRefreshStats) {
+            onRefreshStats();
+        }
+
         const controls = animate(0, progress, {
             duration: 2,
             ease: "easeInOut",
@@ -61,28 +89,23 @@ function PercentageBar({ correct, total }: { correct: number; total: number }) {
                 setPercent(Math.round(value));
             },
         });
+
         return () => controls.stop();
-    }, [progress]);
+    }, [progress, onRefreshStats]); // ✅ both stable
 
     return (
         <div className="flex flex-col w-full space-y-1 mt-1">
-            {/* Label above */}
             <span className="text-white/50 text-sm">Progress bar</span>
-
-            {/* Progress bar container */}
             <div className="w-full h-6 bg-white/20 rounded overflow-hidden relative">
-                {/* Animated filled bar */}
                 <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${progress}%` }}
                     transition={{ duration: 2, ease: "easeInOut" }}
                     className="h-full bg-green-500 rounded"
                 />
-
-                {/* Percentage text */}
                 <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white/50 text-sm font-medium">
-      {percent}%
-    </span>
+                    {percent}%
+                </span>
             </div>
         </div>
     );
@@ -104,18 +127,19 @@ function formatTime(seconds: number) {
 
 function NicknameLoading() {
     return (
-        <div className="w-32 h-4 bg-green-500/10 rounded overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-400/40 to-transparent animate-shimmer rounded" />
-        </div>
+        <span className="flex items-center space-x-1">
+      <span>Loading</span>
+      <span className="flex space-x-1">
+        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
+        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+      </span>
+    </span>
     );
 }
 
 function PercentageLoading() {
-    return (
-        <div className="w-16 h-4 bg-green-500/10 rounded overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-400/40 to-transparent animate-shimmer rounded" />
-        </div>
-    );
+    return <DotLoader />;
 }
 
 
@@ -137,11 +161,12 @@ function TimeLoading() {
 
 
 
-export default function UserStats({ userPercentage, nickname, totalOnlineTime, loading, onLinkClick, seenQuestions }: UserStatsProps) {
+export default function UserStats({ nickname, loading, onLinkClick, seenQuestions }: UserStatsProps) {
     const { data: session } = useSession();
     const router = useRouter(); // <-- initialize router here
     const [showStats, setShowStats] = useState(false);
     const questionStats = calculateQuestionStats(seenQuestions); // ✅ calculate stats
+
 
 
 
@@ -173,13 +198,19 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
 
 
 
+
     return (
         <div className="flex flex-col items-center w-full text-white font-sans">
 
             {/* Styled Google Sign-Out (icon left, text right) */}
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className=" w-full">
                 <div
-                    onClick={() => signOut()}
+                    onClick={() =>
+                        signOut({
+                            redirect: true,   // ensures NextAuth handles redirect
+                            callbackUrl: "/"  // or any page you want to go after logout
+                        })
+                    }
                     className={`flex items-center gap-2 ${sidebarLink}`}
                 >
                     <svg
@@ -296,8 +327,11 @@ export default function UserStats({ userPercentage, nickname, totalOnlineTime, l
                                         <span>{questionStats.wrong}</span>
                                     </div>
 
-                                    {/* Percentage Bar with animated number */}
-                                    <PercentageBar correct={questionStats.correct} total={questionStats.total} />
+                                    {/* Percentage bar */}
+                                    <div className="flex-1 mr-2">
+                                        <PercentageBar correct={questionStats.correct} total={questionStats.total} />
+                                    </div>
+
 
                                 </div>
                             ) : (

@@ -31,16 +31,15 @@ export const authOptions: NextAuthOptions = {
             clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
         }),
     ],
-    secret: process.env.NEXTAUTH_SECRET,
+    secret: process.env.NEXTAUTH_SECRET, // ✅ add this line
     cookies: {
         sessionToken: {
-            name: "__Secure-next-auth.session-token", // recommended for prod
+            name: `__Secure-next-auth.session-token`,
             options: {
                 httpOnly: true,
-                sameSite: "none",  // allows cross-subdomain
-                secure: true,      // HTTPS required
+                sameSite: "none",
+                secure: true,
                 path: "/",
-                domain: ".netaprep.com", // optional; NextAuth uses the current domain by default
             },
         },
     },
