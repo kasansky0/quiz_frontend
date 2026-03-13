@@ -31,5 +31,7 @@ export default function Page() {
         );
     }
 
-    return session ? <DashboardLayout /> : <LoggedOut />;
+    return session ? <DashboardLayout>
+        <div />
+    </DashboardLayout> : <LoggedOut />;
 }
