@@ -1,9 +1,33 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 
 export default function LoginSection() {
+
+    const { data: session } = useSession();
+
+    // Sync backend whenever session.idToken is available
+    useEffect(() => {
+        const syncBackend = async () => {
+            if (session?.idToken) {
+                try {
+                    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/google`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        credentials: "include", // important so cookie is set
+                        body: JSON.stringify({ token: session.idToken }),
+                    });
+                } catch (err) {
+                    console.error("Failed to sync backend session:", err);
+                }
+            }
+        };
+
+        syncBackend();
+    }, [session?.idToken]);
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 14 }}

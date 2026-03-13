@@ -94,7 +94,7 @@ export default function CreatePost({
                 <form className="w-full flex flex-col space-y-4" onSubmit={handleSubmit}>
 
 
-                    <div className="flex justify-start gap-2">
+                    <div className="flex items-center justify-start">
                         <button
                             type="button"
                             onClick={onCancel}
@@ -133,6 +133,12 @@ export default function CreatePost({
                                 />
                             </svg>
                         </button>
+
+                        {/* Future Ads / Message */}
+                        <div className="w-full text-center text-sm py-2">
+                            Promoted: CBS Electrical Contractors <br/> Hiring NETA 2 Techs 📍Raleigh NC
+                        </div>
+
                     </div>
 
 

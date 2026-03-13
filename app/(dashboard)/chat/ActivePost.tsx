@@ -690,6 +690,12 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                 />
                             </svg>
                         </button>
+
+                        {/* Future Ads / Message */}
+                        <div className="w-full text-center text-sm py-2">
+                            Promoted: CBS Electrical Contractors <br/> Hiring NETA 2 Techs 📍Raleigh NC
+                        </div>
+
                     </div>
 
 

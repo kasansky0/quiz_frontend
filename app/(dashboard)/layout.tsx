@@ -583,7 +583,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 {/* LOGO (RIGHT SIDE) */}
                 <div className="flex items-center">
                     <button
-                        onClick={() => router.push("/quiz")}
+                        onClick={() => router.push("/quiz/all")}
                         className="transition hover:scale-105 active:scale-95"
                     >
                         <img

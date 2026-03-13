@@ -38,6 +38,7 @@ export default function ChatStats() {
 
 
 
+
     const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
 
 
@@ -442,7 +443,7 @@ export default function ChatStats() {
 
 
 
-                                    <div className="w-full flex items-center gap-3">
+                                <div className="flex items-center justify-start">
 
                                         {/* Create Post Button */}
                                         <button
@@ -463,6 +464,12 @@ export default function ChatStats() {
                                                 />
                                             </svg>
                                         </button>
+
+                                        {/* Future Ads / Message */}
+                                    <div className="w-full text-center text-sm py-2">
+                                            Promoted: CBS Electrical Contractors <br/> Hiring NETA 2 Techs 📍Raleigh NC
+                                        </div>
+
                                     </div>
 
 
