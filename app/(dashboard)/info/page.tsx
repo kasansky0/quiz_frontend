@@ -143,8 +143,10 @@ export default function AdminPage() {
         try {
             const res = await fetch(`${apiUrl}/admin/check`, {
                 method: "GET",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${session.idToken}`, // send same token as comment
+                },
             });
             setIsAdmin(res.status === 200);
         } catch (err: any) {

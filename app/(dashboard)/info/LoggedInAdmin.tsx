@@ -75,17 +75,26 @@ export default function LoggedInAdmin() {
 
 
     useEffect(() => {
-        if (!session || fetchedRef.current >= 2) return; // allow up to 2 fetches
+        if (status !== "authenticated") return; // wait for NextAuth to finish
+        if (fetchedRef.current >= 2) return;
         fetchedRef.current += 1;
 
         const fetchUsers = async () => {
             setUsersLoading(true);
+            if (!session?.idToken) {
+                console.warn("Session ID token not yet available");
+                setUsersLoading(false);
+                return;
+            }
             try {
                 const res = await fetch(`${apiUrl}/info/users`, {
                     method: "GET",
-                    credentials: "include",
-                    headers: { "Content-Type": "application/json" },
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${session.idToken}`, // same as admin check
+                    },
                 });
+
 
                 console.log("Admin fetch /info/users:", res.status);
 
