@@ -465,3 +465,9 @@ textarea, input, select {
     font-size: 16px !important;
 }
 
+/* In globals.css */
+.full-screen {
+    height: 100dvh; /* dynamic viewport height for iOS Safari */
+}
+
+

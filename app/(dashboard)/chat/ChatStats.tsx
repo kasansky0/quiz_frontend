@@ -404,7 +404,7 @@ export default function ChatStats() {
         <div className="flex-1 flex flex-col items-center justify-start w-full min-h-0">
 
             {(showLoading || !fetchedPosts || postsLoading) ? (
-                <div className="min-h-screen flex items-center justify-center text-white bg-black">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white">
                     <p className="text-xl flex items-center">
                         Loading
                         <span className="ml-2 flex space-x-1">
