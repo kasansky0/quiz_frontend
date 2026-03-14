@@ -72,6 +72,8 @@ export default function LoggedInAdmin() {
     const userName = session?.user?.name ?? "Unknown";
     const [blockUserId, setBlockUserId] = useState<string>("");
     const fetchedRef = useRef(0);
+    const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
+
 
 
     useEffect(() => {
@@ -366,7 +368,14 @@ export default function LoggedInAdmin() {
                                     )}
                                 </div>
                                 <div>
-                                    <p className="font-bold">{user.name}</p>
+                                    <div>
+                                        <p className="font-bold cursor-pointer text-blue-400 hover:underline"
+                                           onClick={() => setSelectedUser(user)}>
+                                            {user.name}
+                                        </p>
+                                        <p className="font-bold">({user.nickname})</p>
+                                        <p className="text-gray-400 text-xs sm:text-sm">{user.email}</p>
+                                    </div>
                                     <p className="font-bold">({user.nickname})</p>
                                     <p className="text-gray-400 text-xs sm:text-sm">{user.email}</p>
                                     <p className="text-gray-400 text-xs sm:text-sm flex items-center gap-1 flex-nowrap">
@@ -410,10 +419,21 @@ export default function LoggedInAdmin() {
                             <p><strong>User Percentage:</strong> {user.userPercentage}</p>
                             <p><strong>IP Address:</strong> {user.ip_address}</p>
 
-                            {/* Seen Questions Table */}
-                            <h3 className="text-white-400 font-bold mt-3 mb-2 text-sm sm:text-base">
-                                Seen Questions ({Object.keys(user.seenQuestions).length} unique, {Object.values(user.seenQuestions).flat().length} total attempts)
-                            </h3>
+                        </div>
+                    ))
+                )}
+
+
+                {/*
+                {selectedUser && (
+                    <div className="mt-6 p-4 bg-gray-900 rounded border border-green-500">
+                        <h2 className="text-lg font-bold text-white mb-2">
+                            Seen Questions for {selectedUser.name}
+                        </h2>
+
+                        {Object.keys(selectedUser.seenQuestions).length === 0 ? (
+                            <p>No questions seen yet.</p>
+                        ) : (
                             <div className="overflow-x-auto">
                                 <table className="min-w-full text-left border border-gray-700 text-xs sm:text-sm">
                                     <thead>
@@ -423,37 +443,19 @@ export default function LoggedInAdmin() {
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    {Object.entries(user.seenQuestions).map(([qid, attemptsRaw]) => {
-                                        const key = `${user.user_id}-${qid}`;
+                                    {Object.entries(selectedUser.seenQuestions).map(([qid, attemptsRaw]) => {
                                         const attempts: SeenQuestion[] = Array.isArray(attemptsRaw)
                                             ? attemptsRaw
                                             : Object.values(attemptsRaw || {});
-                                        const sortedAttempts = [...attempts].sort(
-                                            (a, b) => new Date(b.seen_at).getTime() - new Date(a.seen_at).getTime()
-                                        );
-                                        const isExpanded = !!expandedQuestions[key];
-                                        const displayedAttempts = isExpanded ? sortedAttempts : sortedAttempts.slice(0, 10);
-
                                         return (
-                                            <tr key={key} className="border-b border-gray-700 align-top">
+                                            <tr key={qid} className="border-b border-gray-700 align-top">
                                                 <td className="px-2 sm:px-4 py-1 sm:py-2">{qid}</td>
                                                 <td className="px-2 sm:px-4 py-1 sm:py-2">
-                                                    <div className="flex flex-col">
-                                                        {displayedAttempts.map((a, i) => (
-                                                            <div key={i} className="mb-1">
-                                                                {a.answered_correctly ? "✅" : "❌"} at {formatDate(a.seen_at)} {formatTime(a.seen_at)}
-                                                            </div>
-                                                        ))}
-
-                                                        {attempts.length > 10 && (
-                                                            <button
-                                                                className={`text-xs mt-1 hover:underline ${isExpanded ? 'text-red-400' : 'text-white-400'}`}
-                                                                onClick={() => setExpandedQuestions(prev => ({ ...prev, [key]: !prev[key] }))}
-                                                            >
-                                                                {isExpanded ? 'Collapse' : `Show all (${attempts.length} attempts)`}
-                                                            </button>
-                                                        )}
-                                                    </div>
+                                                    {attempts.map((a, i) => (
+                                                        <div key={i}>
+                                                            {a.answered_correctly ? "✅" : "❌"} at {formatDate(a.seen_at)} {formatTime(a.seen_at)}
+                                                        </div>
+                                                    ))}
                                                 </td>
                                             </tr>
                                         );
@@ -461,9 +463,20 @@ export default function LoggedInAdmin() {
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
-                    ))
+                        )}
+
+                        <button
+                            className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                            onClick={() => setSelectedUser(null)}
+                        >
+                            Close
+                        </button>
+                    </div>
                 )}
+
+                */}
+
+
             </div>
 
             {/* Sticky navigation buttons */}
