@@ -373,8 +373,6 @@ export default function LoggedInAdmin() {
                                            onClick={() => setSelectedUser(user)}>
                                             {user.name}
                                         </p>
-                                        <p className="font-bold">({user.nickname})</p>
-                                        <p className="text-gray-400 text-xs sm:text-sm">{user.email}</p>
                                     </div>
                                     <p className="font-bold">({user.nickname})</p>
                                     <p className="text-gray-400 text-xs sm:text-sm">{user.email}</p>

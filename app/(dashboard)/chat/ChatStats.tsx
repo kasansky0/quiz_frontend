@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import CreatePost from "./CreatePost";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { Post, Comment } from "../../hooks/usePosts";  // <-- import these
 import { useUser } from "../../UserContext";
 import { useRouter } from "next/navigation";
@@ -12,6 +12,7 @@ import { useMemo } from "react";
 import DOMPurify from 'dompurify';
 import ActivePost from "./ActivePost";
 import { chatApis } from '@/app/hooks/chatApis'; // adjust path as needed
+
 
 
 
@@ -32,6 +33,8 @@ export default function ChatStats() {
     const [activePostComments, setActivePostComments] = useState<Comment[]>([]);
     const [serverError, setServerError] = useState<string | null>(null);
     const [showLoading, setShowLoading] = useState(true);
+    const { data: session } = useSession(); // ✅ get session here
+
 
 
 
@@ -273,48 +276,66 @@ export default function ChatStats() {
 
 
 
-    // Create post
+// --- CREATE POST ---
+
     const handleCreatePost = async ({ title, message }: { title: string; message: string }) => {
-        const sanitizedTitle = DOMPurify.sanitize(title.trim());
-        const sanitizedMessage = DOMPurify.sanitize(message.trim());
 
-        const res = await fetch(`${apiUrl}/posts/`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ title: sanitizedTitle, message: sanitizedMessage }),
-            credentials: "include",
-        });
-
-        if (!res.ok) {
-            if (res.status === 401) {
-                await handleSessionExpired();
-                return;
-            }
-
-            const err = await res.json().catch(() => null);
-
-            // Convert backend error into a string for the banner
-            let msg = "Failed to create post";
-            if (err?.detail) {
-                if (typeof err.detail === "string") msg = err.detail;
-                else if (typeof err.detail === "object" && err.detail.error) msg = err.detail.error;
-            } else if (err?.error) {
-                msg = err.error;
-            }
-
-            setServerError(msg);
+        if (!session?.idToken) {
+            console.error("No session token available");
+            await handleSessionExpired();
             return;
         }
 
-        const newPost: Post = await res.json();
+        const idToken = session.idToken;
 
-        // Optimistically update SWR cache
-        globalMutate(
-            `${apiUrl}/posts/`,
-            (posts: Post[] = []) => [newPost, ...posts],
-            false
-        );
-        setCreatingPost(false);
+        const sanitizedTitle = DOMPurify.sanitize(title.trim());
+        const sanitizedMessage = DOMPurify.sanitize(message.trim());
+
+        try {
+            const res = await fetch(`${apiUrl}/posts/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${idToken}`, // ✅ use token like delete comment
+                },
+                body: JSON.stringify({ title: sanitizedTitle, message: sanitizedMessage }),
+            });
+
+            if (!res.ok) {
+                if (res.status === 401) {
+                    await handleSessionExpired();
+                    return;
+                }
+
+                const err = await res.json().catch(() => null);
+
+                let msg = "Failed to create post";
+                if (err?.detail) {
+                    if (typeof err.detail === "string") msg = err.detail;
+                    else if (typeof err.detail === "object" && err.detail.error) msg = err.detail.error;
+                } else if (err?.error) {
+                    msg = err.error;
+                }
+
+                showError(msg);
+                return;
+            }
+
+            const newPost: Post = await res.json();
+
+            // Optimistically update SWR cache
+            globalMutate(
+                `${apiUrl}/posts/`,
+                (posts: Post[] = []) => [newPost, ...posts],
+                false
+            );
+            setCreatingPost(false);
+
+        } catch (err: any) {
+            console.error("Create post error:", err);
+            showError("Network error while creating post"); // ✅ show in global banner
+        }
+
     };
 
 

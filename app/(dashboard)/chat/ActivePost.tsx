@@ -372,15 +372,24 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const handleDeleteComment = async (comment: Comment) => {
         if (!activePost) return;
         if (!comment._id) return;
-        if (cooldownSeconds) return; // disable during cooldown
 
         // 1️⃣ Optimistic UI update — remove comment immediately
         setDisplayedComments(prev => prev.filter(c => c.id !== comment.id));
 
         try {
+            const idToken = session?.idToken;
+            if (!idToken) {
+                console.error("No session token available");
+                await handleSessionExpired();
+                return;
+            }
+
+            // 3️⃣ Send DELETE request with token
             const res = await fetch(`${apiUrl}/posts/${activePost.id}/comments/${comment.id}`, {
                 method: "DELETE",
-                credentials: "include",
+                headers: {
+                    "Authorization": `Bearer ${idToken}`, // ✅ send token
+                },
             });
 
             if (!res.ok) {
@@ -388,27 +397,6 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                     await handleSessionExpired();
                     return;
                 }
-
-                // Start cooldown banner
-                const cooldown = 5;
-                setCooldownSeconds(cooldown);
-
-                if (cooldownIntervalRef.current) clearInterval(cooldownIntervalRef.current);
-
-                let remaining = cooldown;
-                showError(`Slow down. Please wait ${remaining} second${remaining > 1 ? "s" : ""}.`);
-
-                cooldownIntervalRef.current = setInterval(() => {
-                    remaining -= 1;
-                    if (remaining <= 0) {
-                        clearInterval(cooldownIntervalRef.current!);
-                        cooldownIntervalRef.current = null;
-                        setCooldownSeconds(null);
-                        hideError();
-                    } else {
-                        showError(`Slow down. Please wait ${remaining} second${remaining > 1 ? "s" : ""}.`);
-                    }
-                }, 1000);
 
                 // Optional rollback: refetch comments
                 const data = await fetchPostComments(activePost.id, 0, COMMENTS_PAGE_SIZE);
@@ -440,6 +428,13 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const handleEditComment = async () => {
         if (!activePost || !editingCommentId) return;
 
+        const idToken = session?.idToken;
+        if (!idToken) {
+            console.error("No session token available");
+            await handleSessionExpired();
+            return;
+        }
+
         let trimmed = editCommentMessage.trim();
 
         // ✅ enforce 500-character limit
@@ -457,7 +452,9 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 `${apiUrl}/posts/${activePost.id}/comments/${editingCommentId}`,
                 {
                     method: "DELETE",
-                    credentials: "include",
+                    headers: {
+                        "Authorization": `Bearer ${idToken}`
+                    }
                 }
             );
 
@@ -480,11 +477,14 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             `${apiUrl}/posts/${activePost.id}/comments/${editingCommentId}`,
             {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${idToken}`, // add token here
+                },
                 body: JSON.stringify({ message: sanitizedMessage }),
-                credentials: "include",
             }
         );
+
 
         if (!res.ok) {
             if (res.status === 401) {
@@ -554,22 +554,43 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 // POST DELETE AND UPDATE UI //
 
     const handleDeletePost = async (postId: string) => {
-        const res = await fetch(`${apiUrl}/posts/${postId}`, {
-            method: "DELETE",
-            credentials: "include",
-        });
 
-        if (!res.ok) {
-            if (res.status === 401) await handleSessionExpired();
-            showError("Delete failed"); // 🔴 show banner
+        if (!session?.idToken) {
+            console.error("No session token available");
+            await handleSessionExpired();
             return;
         }
 
-        globalMutate(`${apiUrl}/posts/`, (posts: Post[] = []) =>
-            posts.filter(p => p.id !== postId)
-        );
+        const idToken = session.idToken;
 
-        onBack();
+        try {
+            const res = await fetch(`${apiUrl}/posts/${postId}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${idToken}`, // ✅ use token
+                },
+            });
+
+            if (!res.ok) {
+                if (res.status === 401) {
+                    await handleSessionExpired();
+                    return;
+                }
+                showError("Delete post failed"); // 🔴 show global banner
+                return;
+            }
+
+            // ✅ Optimistically update SWR cache
+            globalMutate(`${apiUrl}/posts/`, (posts: Post[] = []) =>
+                posts.filter(p => p.id !== postId)
+            );
+
+            onBack(); // optional: go back to list
+
+        } catch (err: any) {
+            console.error("Delete post error:", err);
+            showError("Network error while deleting post"); // 🔴 global banner
+        }
     };
 
 // POST EDIT SAVE EDITS TO A POST AND UPDATE UI //
@@ -577,41 +598,59 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const handleEditPost = async () => {
         if (!editingPostId) return;
 
+        if (!session?.idToken) {
+            console.error("No session token available");
+            await handleSessionExpired();
+            return;
+        }
+
+        const idToken = session.idToken;
+
         // Sanitize input
         const sanitizedTitle = DOMPurify.sanitize(editTitle.trim());
         const sanitizedMessage = DOMPurify.sanitize(editMessage.trim());
 
-        const res = await fetch(`${apiUrl}/posts/${editingPostId}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ title: sanitizedTitle, message: sanitizedMessage }),
-            credentials: "include",
-        });
+        try {
+            const res = await fetch(`${apiUrl}/posts/${editingPostId}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${idToken}`, // ✅ send token
+                },
+                body: JSON.stringify({ title: sanitizedTitle, message: sanitizedMessage }),
+            });
 
-        if (!res.ok) {
-            if (res.status === 401) await handleSessionExpired();
-            const err = await res.json().catch(() => null);
-            showError(err?.detail || err?.error || "Edit failed");
-            return;
+            if (!res.ok) {
+                if (res.status === 401) {
+                    await handleSessionExpired();
+                    return;
+                }
+                const err = await res.json().catch(() => null);
+                showError(err?.detail || err?.error || "Edit post failed");
+                return;
+            }
+
+            const updatedPost: Post = await res.json();
+
+            // ✅ Optimistically update SWR cache
+            globalMutate(
+                `${apiUrl}/posts/`,
+                (posts: Post[] = []) =>
+                    posts.map(p => (p.id === updatedPost.id ? updatedPost : p)),
+                false
+            );
+
+            // ✅ Update local activePost so UI reflects changes immediately
+            setActivePost(updatedPost);
+
+            // ✅ Exit edit mode
+            setEditingPostId(null);
+            hideError();
+
+        } catch (err: any) {
+            console.error("Edit post error:", err);
+            showError("Network error while editing post"); // 🔴 global banner
         }
-
-        const updatedPost: Post = await res.json();
-
-        globalMutate(
-            `${apiUrl}/posts/`,
-            (posts: Post[] = []) =>
-                posts.map(p =>
-                    p.id === updatedPost.id ? updatedPost : p
-                ),
-            false
-        );
-
-        // ✅ Update local activePost so UI reflects changes immediately
-        setActivePost(updatedPost);
-
-        // ✅ Update active post and exit edit mode
-        setEditingPostId(null);
-        hideError();
     };
 
 // POST EDIT INITIALIZE POST EDITING (POPULATE FORM) //
