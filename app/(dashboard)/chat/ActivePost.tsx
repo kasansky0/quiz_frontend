@@ -6,7 +6,7 @@ import DOMPurify from "dompurify";
 import {useError} from "@/app/ErrorProvider";
 import { chatApis } from '@/app/hooks/chatApis'; // adjust path as needed
 import useSWR, { mutate as globalMutate } from "swr";
-import { useSession, signOut } from "next-auth/react"; // ✅ add useSession
+import { useSession, signOut, getSession } from "next-auth/react"; // ✅ add useSession
 
 
 
@@ -67,6 +67,49 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
 
 
+// --- HELPER FUNCTION TO REVALIDATE THE TOKEN BEFORE IT IS EXPIRED ---
+
+    async function refreshToken() {
+        const session = await getSession();
+
+        if (!session?.idToken) {
+            await handleSessionExpired();
+            throw new Error("No session after refresh");
+        }
+
+        return session.idToken;
+    }
+
+    async function fetchWithToken(url: string, options: RequestInit = {}, retries = 1) {
+        const currentSession = await getSession();
+        let idToken = currentSession?.idToken;
+        if (!idToken) {
+            await handleSessionExpired();
+            throw new Error("No session token");
+        }
+
+        options.headers = {
+            ...(options.headers || {}),
+            "Authorization": `Bearer ${idToken}`,
+        };
+
+        let res = await fetch(url, options);
+
+        if (res.status === 401 && retries > 0) {
+            idToken = await refreshToken();   // get new token
+
+            await new Promise(r => setTimeout(r, 200));
+
+            options.headers = {
+                ...(options.headers as Record<string, string> || {}),
+                Authorization: `Bearer ${idToken}`,
+            };
+
+            return fetchWithToken(url, options, retries - 1);
+        }
+
+        return res;
+    }
 
 
 
@@ -86,7 +129,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const { data: polledData, error } = useSWR(
         commentsKey(post.id, 0), // always fetch from skip=0 to get latest
         fetcher,
-        { refreshInterval: 1000 } // fetch every 5 seconds
+        { refreshInterval: 3000 } // fetch every 5 seconds
     );
 
 
@@ -287,37 +330,19 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         const sanitizedMessage = DOMPurify.sanitize(message.trim());
 
         try {
-            // 1️⃣ Grab the idToken from session
-            const idToken = session?.idToken;
-            if (!idToken) {
-                console.error("No session token available");
-                await handleSessionExpired();
-                return;
-            }
-            // 2️⃣ Send to backend
-            const res = await fetch(`${apiUrl}/posts/${activePost.id}/comments`, {
+            const res = await fetchWithToken(`${apiUrl}/posts/${activePost.id}/comments`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${idToken}` // ✅ send token
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message: sanitizedMessage }),
             });
 
-            // 2️⃣ Handle errors exactly as before
             if (!res.ok) {
-                if (res.status === 401) {
-                    await handleSessionExpired();
-                    return;
-                }
-
                 const err = await res.json().catch(() => null);
 
-                // 🚨 If backend says rate limit
                 if (res.status === 429) {
                     const errDetail = err?.detail;
                     if (errDetail?.blocked) {
-                        setBlockMessage(errDetail.error); // show backend message
+                        setBlockMessage(errDetail.error);
                         if (errDetail.remaining) setBlockSeconds(errDetail.remaining);
                         setIsBlocked(true);
                         return;
@@ -334,10 +359,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 return;
             }
 
-            // 3️⃣ Receive the comment from backend (with real _id)
             const newComment: Comment = await res.json();
 
-            // 5️⃣ Update SWR cache only, post will sync automatically
             globalMutate(
                 `${apiUrl}/posts/`,
                 (posts: Post[] = []) =>
@@ -350,21 +373,19 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             );
 
             setCurrentPage(1);
-
-            // 7️⃣ Increment skip
             setCommentsSkip(prev => prev + 1);
-
-            // 9️⃣ Reset input and hide error
             setCommentMessage("");
             if (commentInputRef.current) commentInputRef.current.style.height = "auto";
             hideError();
-        } catch (err) {
-            // Do nothing here — no red error banner
+
+        } catch (err: any) {
             console.error("Failed to post comment:", err);
+            showError("Network error while adding comment"); // 🔴 global banner
         } finally {
             setIsSending(false);
         }
     };
+
 
 
 // COMMENT DELETE //
@@ -377,20 +398,13 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         setDisplayedComments(prev => prev.filter(c => c.id !== comment.id));
 
         try {
-            const idToken = session?.idToken;
-            if (!idToken) {
-                console.error("No session token available");
-                await handleSessionExpired();
-                return;
-            }
-
             // 3️⃣ Send DELETE request with token
-            const res = await fetch(`${apiUrl}/posts/${activePost.id}/comments/${comment.id}`, {
-                method: "DELETE",
-                headers: {
-                    "Authorization": `Bearer ${idToken}`, // ✅ send token
-                },
-            });
+            const res = await fetchWithToken(
+                `${apiUrl}/posts/${activePost.id}/comments/${comment.id}`,
+                {
+                    method: "DELETE",
+                }
+            );
 
             if (!res.ok) {
                 if (res.status === 401) {
@@ -428,13 +442,6 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const handleEditComment = async () => {
         if (!activePost || !editingCommentId) return;
 
-        const idToken = session?.idToken;
-        if (!idToken) {
-            console.error("No session token available");
-            await handleSessionExpired();
-            return;
-        }
-
         let trimmed = editCommentMessage.trim();
 
         // ✅ enforce 500-character limit
@@ -448,15 +455,9 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
         // 🗑️ If empty → DELETE instead of PATCH
         if (trimmed === "") {
-            const res = await fetch(
-                `${apiUrl}/posts/${activePost.id}/comments/${editingCommentId}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        "Authorization": `Bearer ${idToken}`
-                    }
-                }
-            );
+            const res = await fetchWithToken(`${apiUrl}/posts/${activePost.id}/comments/${editingCommentId}`, {
+                method: "DELETE",
+            });
 
             if (!res.ok) {
                 if (res.status === 401) {
@@ -473,17 +474,13 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         }
 
         // ✏️ Otherwise → normal edit
-        const res = await fetch(
-            `${apiUrl}/posts/${activePost.id}/comments/${editingCommentId}`,
-            {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${idToken}`, // add token here
-                },
-                body: JSON.stringify({ message: sanitizedMessage }),
-            }
-        );
+        const res = await fetchWithToken(`${apiUrl}/posts/${activePost.id}/comments/${editingCommentId}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ message: sanitizedMessage }),
+        });
 
 
         if (!res.ok) {
@@ -555,20 +552,9 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
     const handleDeletePost = async (postId: string) => {
 
-        if (!session?.idToken) {
-            console.error("No session token available");
-            await handleSessionExpired();
-            return;
-        }
-
-        const idToken = session.idToken;
-
         try {
-            const res = await fetch(`${apiUrl}/posts/${postId}`, {
+            const res = await fetchWithToken(`${apiUrl}/posts/${postId}`, {
                 method: "DELETE",
-                headers: {
-                    "Authorization": `Bearer ${idToken}`, // ✅ use token
-                },
             });
 
             if (!res.ok) {
@@ -598,26 +584,20 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const handleEditPost = async () => {
         if (!editingPostId) return;
 
-        if (!session?.idToken) {
-            console.error("No session token available");
-            await handleSessionExpired();
-            return;
-        }
-
-        const idToken = session.idToken;
-
         // Sanitize input
         const sanitizedTitle = DOMPurify.sanitize(editTitle.trim());
         const sanitizedMessage = DOMPurify.sanitize(editMessage.trim());
 
         try {
-            const res = await fetch(`${apiUrl}/posts/${editingPostId}`, {
+            const res = await fetchWithToken(`${apiUrl}/posts/${editingPostId}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${idToken}`, // ✅ send token
                 },
-                body: JSON.stringify({ title: sanitizedTitle, message: sanitizedMessage }),
+                body: JSON.stringify({
+                    title: sanitizedTitle,
+                    message: sanitizedMessage,
+                }),
             });
 
             if (!res.ok) {
