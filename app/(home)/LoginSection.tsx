@@ -2,26 +2,32 @@
 
 import { signIn, useSession } from "next-auth/react";
 import { motion } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { fetchWithToken } from "@/app/hooks/refreshToken";
 
 export default function LoginSection() {
 
     const { data: session } = useSession();
+    const tokenSentRef = useRef(false); // prevent duplicate calls
 
     // Sync backend whenever session.idToken is available
     useEffect(() => {
         const syncBackend = async () => {
-            if (session?.idToken) {
-                try {
-                    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/google`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        credentials: "include", // important so cookie is set
-                        body: JSON.stringify({ token: session.idToken }),
-                    });
-                } catch (err) {
-                    console.error("Failed to sync backend session:", err);
-                }
+            if (!session?.idToken || tokenSentRef.current) return;
+            tokenSentRef.current = true;
+
+            try {
+                const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+                if (!apiUrl) throw new Error("NEXT_PUBLIC_API_URL is missing");
+
+                await fetchWithToken(`${apiUrl}/auth/google`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({ token: session.idToken }),
+                });
+            } catch (err: unknown) {
+                console.error("Failed to sync backend session:", err);
             }
         };
 

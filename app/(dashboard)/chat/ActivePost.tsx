@@ -7,6 +7,7 @@ import {useError} from "@/app/ErrorProvider";
 import { chatApis } from '@/app/hooks/chatApis'; // adjust path as needed
 import useSWR, { mutate as globalMutate } from "swr";
 import { useSession, signOut, getSession } from "next-auth/react"; // ✅ add useSession
+import { fetchWithToken, handleSessionExpired } from "@/app/hooks/refreshToken";
 
 
 
@@ -58,58 +59,6 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const { data: session } = useSession(); // ✅ get session here
 
 
-
-
-
-
-
-
-
-
-
-// --- HELPER FUNCTION TO REVALIDATE THE TOKEN BEFORE IT IS EXPIRED ---
-
-    async function refreshToken() {
-        const session = await getSession();
-
-        if (!session?.idToken) {
-            await handleSessionExpired();
-            throw new Error("No session after refresh");
-        }
-
-        return session.idToken;
-    }
-
-    async function fetchWithToken(url: string, options: RequestInit = {}, retries = 1) {
-        const currentSession = await getSession();
-        let idToken = currentSession?.idToken;
-        if (!idToken) {
-            await handleSessionExpired();
-            throw new Error("No session token");
-        }
-
-        options.headers = {
-            ...(options.headers || {}),
-            "Authorization": `Bearer ${idToken}`,
-        };
-
-        let res = await fetch(url, options);
-
-        if (res.status === 401 && retries > 0) {
-            idToken = await refreshToken();   // get new token
-
-            await new Promise(r => setTimeout(r, 200));
-
-            options.headers = {
-                ...(options.headers as Record<string, string> || {}),
-                Authorization: `Bearer ${idToken}`,
-            };
-
-            return fetchWithToken(url, options, retries - 1);
-        }
-
-        return res;
-    }
 
 
 

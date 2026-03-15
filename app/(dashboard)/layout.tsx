@@ -1,6 +1,6 @@
 "use client";
 
-import {signIn, signOut, useSession} from "next-auth/react";
+import {getSession, signIn, signOut, useSession} from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect, useCallback } from "react";
 import UserSidebar from "./sidebar/UserSidebar";
@@ -11,6 +11,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Calculator from "@/app/(dashboard)/sidebar/calculator"
 import FormulaSheet from "@/app/(dashboard)/sidebar/formulasSheet"
 import { useError } from "@/app/ErrorProvider";
+import { fetchWithToken, handleSessionExpired } from "@/app/hooks/refreshToken";
 
 
 
@@ -23,6 +24,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const [wrongQueue, setWrongQueue] = useState<QuestionType[]>([]);
     const buttonRef = useRef<HTMLButtonElement>(null);
     const mainRef = useRef<HTMLElement>(null);
+    const fetchingRef = useRef(false);
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     const [answerCount, setAnswerCount] = useState(0);
     const [answeredState, setAnsweredState] = useState<"correct" | "wrong" | null>(null);
@@ -30,24 +32,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const [onlineTime, setOnlineTime] = useState(0);
     const [errorState, setErrorState] = useState<string | null>(null);
     const tokenSentRef = useRef(false);
-    const isAdmin = session?.user?.email === "zeckdepends@gmail.com";
     const [cooldownSeconds, setCooldownSeconds] = useState<number | null>(null);
     const { setUserId } = useUser();
     type MobileSheet = "calculator" | "formula" | "sidebar" | null;
     const [activeSheet, setActiveSheet] = useState<MobileSheet>(null);
     const { showError } = useError();
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -89,13 +78,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
-    const handleSessionExpired = async () => {
-        await signOut({ redirect: false }); // clear session
-        setCooldownSeconds(null);
-        setErrorState(null);
-    };
-
-
 
 
 
@@ -116,7 +98,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         }
 
         setLoading(false);
-    }, []);
+    }, [showError]);
 
 
 
@@ -136,54 +118,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
-
-
-
-
-
-
-    useEffect(() => {
-        if (!(session as any)?.idToken) return;
-        if (tokenSentRef.current) return; // 🚫 already sent
-
-        tokenSentRef.current = true; // ✅ lock immediately
-
-        async function sendToken() {
-            try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/google`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ token: (session as any).idToken }),
-                    credentials: "include",
-                });
-
-                const data = await res.json();
-
-                fetchData(); // safe to call after auth
-            } catch (err: any) {
-                console.log("❌ Failed to send Google token:", err?.message || err);
-            }
-        }
-
-        sendToken();
-    }, [(session as any)?.idToken]);
-
-
-
-
-
-
-
-
-
-
-
     // Load existing time from DB into state
     useEffect(() => {
-        if (!userStats) return;
-
-        setOnlineTime(userStats.totalOnlineTime ?? 0);
-    }, [userStats]);
+        if (!userStats?.totalOnlineTime) return;
+        setOnlineTime(userStats.totalOnlineTime);
+    }, [userStats?.totalOnlineTime]);
 
 
 
@@ -216,16 +155,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
     const fetchData = useCallback(async () => {
+        if (fetchingRef.current) return; // 🚫 prevent duplicate fetches
+        fetchingRef.current = true;
+
         if (!session?.user?.email) {
             handleSessionExpired();
+            fetchingRef.current = false;
+            return;
+        }
+
+        if (!apiUrl) {
+            console.error("NEXT_PUBLIC_API_URL missing");
+            fetchingRef.current = false;
             return;
         }
 
         try {
-            const res = await fetch(`${apiUrl}/user/`, {
+            const res = await fetchWithToken(`${apiUrl}/user/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                credentials: "include",
                 body: JSON.stringify({
                     name: session.user.name,
                     email: session.user.email,
@@ -233,12 +181,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     google_id: session.user.id ?? null,
                 }),
             });
-
-            // Auth/session expired
-            if (res.status === 401) {
-                handleSessionExpired();
-                return;
-            }
 
             // Other backend errors → do NOT log out
             if (!res.ok) {
@@ -270,6 +212,69 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
+    useEffect(() => {
+        // Type your session
+        interface ExtendedSession {
+            idToken?: string;
+            user: {
+                name?: string;
+                email?: string;
+                image?: string;
+                id?: string;
+            };
+        }
+
+        const extendedSession = session as ExtendedSession;
+
+        if (!extendedSession?.idToken) return;
+        if (tokenSentRef.current) return; // 🚫 already sent
+
+        tokenSentRef.current = true; // ✅ lock immediately
+
+        const sendToken = async () => {
+            try {
+                const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+                if (!apiUrl) throw new Error("NEXT_PUBLIC_API_URL is missing");
+
+                const res = await fetch(`${apiUrl}/auth/google`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ token: extendedSession.idToken }),
+                    credentials: "include",
+                });
+
+                if (!res.ok) throw new Error("Failed to authenticate with Google token");
+
+                // Wait for token verification before fetching user data
+                await fetchData();
+            } catch (err: unknown) {
+                const message = err instanceof Error ? err.message : String(err);
+                console.error("❌ Failed to send Google token:", message);
+                showError("❌ Authentication failed. Please refresh.");
+                // Optional: log to Sentry or any error tracking service
+                // Sentry.captureException(err);
+            }
+        };
+
+        sendToken();
+    }, [session?.idToken, fetchData, showError]);
+
+
+    useEffect(() => {
+        tokenSentRef.current = false; // reset on session change
+    }, [session?.user?.email]);
+
+
+
+
+
+
+
+
+
+
+
+
 
     useEffect(() => {
         if (userStats?.user_id) {
@@ -284,25 +289,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
-    {/*
-    // ✅ Fetch sidebar stats
-    useEffect(() => {
-        if (!session || !session.user || !session.user.email) return;
-        if (!apiUrl) return console.error("❌ NEXT_PUBLIC_API_URL is not set");
-
-        fetchData();
-    }, [session, apiUrl]);
-    */}
-
-
-
-
-
-
-
-
-
-    // ✅ Session check on tab visibility or focus
+    // ✅ Session check when tab becomes visible again
     useEffect(() => {
         const handleVisibility = () => {
             if (document.visibilityState === "visible") {
@@ -310,42 +297,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             }
         };
 
-        const handleFocus = () => {
-            fetchData();
-        };
-
         document.addEventListener("visibilitychange", handleVisibility);
-        window.addEventListener("focus", handleFocus);
 
         return () => {
             document.removeEventListener("visibilitychange", handleVisibility);
-            window.removeEventListener("focus", handleFocus);
         };
-    }, [session, apiUrl]);
-
-
-
-
-
-
-
-
-    {/*
-    useEffect(() => {
-        const lastTime = { current: performance.now() };
-
-        const interval = setInterval(() => {
-            const now = performance.now();
-            if (now - lastTime.current > 20000) { // 20s pause => tab was frozen
-                console.log("Tab inactive/frozen, refetching sidebar stats");
-                fetchData();
-            }
-            lastTime.current = now;
-        }, 1000);
-
-        return () => clearInterval(interval);
     }, [fetchData]);
-    */}
+
 
 
 
@@ -390,21 +348,31 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
     useEffect(() => {
+        if (!apiUrl) return;
         if (!userStats?.user_id || answerCount === 0 || answeredState === null) return;
 
-        fetch(`${apiUrl}/userPercentage/update`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                userId: userStats.user_id,
-                userPercentage: userPercentage,
-                totalOnlineTime: onlineTime
-            }),
-        })
-            .then(res => res.json())
-            .then(data => showError("✅ User percentage updated: " + JSON.stringify(data)))
-            .catch(err => showError("❌ Failed to update sidebar percentage: " + (err?.message || err)));
-    }, [answerCount, userPercentage, answeredState, userStats?.user_id, onlineTime, showError]);
+        const updatePercentage = async () => {
+            try {
+                const res = await fetchWithToken(`${apiUrl}/userPercentage/update`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        userId: userStats.user_id,
+                        userPercentage: userPercentage,
+                        totalOnlineTime: onlineTime
+                    }),
+                });
+
+                const data = await res.json();
+                showError("✅ User percentage updated");
+            } catch (err: any) {
+                showError("❌ Failed to update sidebar percentage: " + (err?.message || err));
+            }
+        };
+
+        updatePercentage();
+
+    }, [answerCount, answeredState, userStats?.user_id, onlineTime, apiUrl]);
 
 
 
@@ -425,6 +393,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
+    // Handle loading and unauthenticated state
+    if (status === "loading") {
+        return (
+            <div className="flex items-center justify-center h-screen text-white">
+                Loading...
+            </div>
+        );
+    }
+
+    if (!session) {
+        router.push("/"); // immediate redirect
+        return (
+            <div className="flex items-center justify-center h-screen text-white">
+                Redirecting to login...
+            </div>
+        );
+    }
 
 
 
@@ -433,12 +418,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
-    // Redirect if not logged in
-    useEffect(() => {
-        if (status !== "loading" && !session) {
-            setTimeout(() => router.push("/"), 2000); // wait 2s so user can see message
-        }
-    }, [status, session, router, showError]);
 
 
 
