@@ -18,7 +18,7 @@ export default function Page() {
     // While NextAuth is loading OR minimum loader time not passed
     if (status === "loading" || showLoader) {
         return (
-            <div className="min-h-screen flex items-center justify-center text-white bg-black">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
