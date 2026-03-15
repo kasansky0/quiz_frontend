@@ -4,6 +4,8 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { useError } from "@/app/ErrorProvider";
+import { fetchWithToken, handleSessionExpired } from "@/app/hooks/refreshToken";
+
 
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -83,46 +85,34 @@ export default function LoggedInAdmin() {
 
         const fetchUsers = async () => {
             setUsersLoading(true);
-            if (!session?.idToken) {
-                console.warn("Session ID token not yet available");
-                setUsersLoading(false);
-                return;
-            }
             try {
-                const res = await fetch(`${apiUrl}/info/users`, {
+                const res = await fetchWithToken(`${apiUrl}/info/users`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${session.idToken}`, // same as admin check
                     },
                 });
 
-
-                console.log("Admin fetch /info/users:", res.status);
-
-                if (res.status === 401 || res.status === 403) {
-                    console.warn("Fetch /info/users unauthorized", res);
-                    // Don't immediately expire the session
-                    return;
-                }
-
                 if (!res.ok) {
-                    showError(`Failed to fetch users: ${res.status}`);
-                    setUsersLoading(false);
+                    const err = await res.json().catch(() => null);
+                    if (res.status === 401 || res.status === 403) {
+                        await handleSessionExpired(); // uses the same logic as in add comment
+                        return;
+                    }
+                    showError(err?.detail || `Failed to fetch users: ${res.status}`);
+                    setUsers([]);
                     return;
                 }
 
                 const data = await res.json();
-                console.log("Admin fetch /info/users data:", data);
-
                 if (!Array.isArray(data?.users)) {
                     showError("No users returned from backend");
-                    setUsers([]); // don't mark session expired
-                    setUsersLoading(false);
+                    setUsers([]);
                     return;
                 }
 
                 setUsers(data.users);
+
             } catch (err) {
                 console.error("Fetch error:", err);
                 showError("Network error fetching users");
@@ -187,52 +177,66 @@ export default function LoggedInAdmin() {
 
 
                 {/* --- Block User by Email --- */}
-                <div className="my-6 p-4 bg-gray-900 rounded border border-red-500">
-                    <h2 className="text-lg font-bold text-red-400 mb-2">Admin Block User (24h)</h2>
-                    <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
-                        <input
-                            type="text"
-                            placeholder="Mongo _id"
-                            value={blockUserId}
-                            onChange={(e) => setBlockUserId(e.target.value)}
-                            className="p-2 rounded bg-gray-800 text-white flex-1 border border-gray-700"
-                        />
-                        <button
-                            className="p-2 bg-red-600 rounded hover:bg-red-700 text-white font-semibold"
-                            onClick={async () => {
-                                if (!blockUserId) return alert("Enter a user ID");
+                <div className="my-6 flex items-center gap-2 max-w-md">
+                    {/* Input with very thin white rounded-full border */}
+                    <input
+                        type="text"
+                        placeholder="Admin Block User (24h)"
+                        value={blockUserId}
+                        onChange={(e) => setBlockUserId(e.target.value)}
+                        className="flex-1 px-4 h-12 border border-white/20 rounded-full text-white placeholder-white bg-transparent focus:outline-none focus:border-white/40"
+                    />
 
-                                try {
-                                    const res = await fetch(`${apiUrl}/posts/admin/block-user`, {
-                                        method: "POST",
-                                        credentials: "include",
-                                        headers: {
-                                            "Content-Type": "application/json",
-                                        },
-                                        body: JSON.stringify({
-                                            user_id: blockUserId,
-                                            admin_key: "YOUR_SECRET_ADMIN_KEY"
-                                        }),
-                                    });
+                    {/* SVG Button floating next to input, matching height */}
+                    <button
+                        onClick={async () => {
+                            if (!blockUserId) return alert("Enter a user ID");
 
-                                    if (!res.ok) {
-                                        const data = await res.json();
-                                        alert(`Failed: ${data.detail || "Unknown error"}`);
+                            try {
+                                const res = await fetchWithToken(`${apiUrl}/posts/admin/block-user`, {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({
+                                        user_id: blockUserId,
+                                        admin_key: "YOUR_SECRET_ADMIN_KEY",
+                                    }),
+                                });
+
+                                if (!res.ok) {
+                                    const err = await res.json().catch(() => null);
+                                    if (res.status === 401 || res.status === 403) {
+                                        await handleSessionExpired();
                                         return;
                                     }
-
-                                    const result = await res.json();
-                                    alert(`✅ User blocked until ${new Date(result.blocked_until).toLocaleString()}`);
-                                    setBlockUserId("");
-                                } catch (err) {
-                                    console.error(err);
-                                    alert("Error occurred while blocking user.");
+                                    alert(`Failed: ${err?.detail || "Unknown error"}`);
+                                    return;
                                 }
-                            }}
+
+                                const result = await res.json();
+                                alert(`✅ User blocked until ${new Date(result.blocked_until).toLocaleString()}`);
+                                setBlockUserId("");
+                            } catch (err) {
+                                console.error(err);
+                                alert("Error occurred while blocking user.");
+                            }
+                        }}
+                        className="flex items-center justify-center h-12 w-12 text-white hover:text-green-400"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-6 h-6"
                         >
-                            Block User
-                        </button>
-                    </div>
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636"
+                            />
+                        </svg>
+                    </button>
                 </div>
 
 
@@ -250,17 +254,20 @@ export default function LoggedInAdmin() {
                             if (!confirm("Are you sure you want to archive all deleted posts and comments?")) return;
 
                             try {
-                                const res = await fetch(`${apiUrl}/posts/admin/archive-deleted`, {
+                                const res = await fetchWithToken(`${apiUrl}/posts/admin/archive-deleted`, {
                                     method: "POST",
-                                    credentials: "include",
                                     headers: {
                                         "Content-Type": "application/json",
                                     },
                                 });
 
                                 if (!res.ok) {
-                                    const data = await res.json();
-                                    alert(`Failed: ${data.detail || "Unknown error"}`);
+                                    const err = await res.json().catch(() => null);
+                                    if (res.status === 401 || res.status === 403) {
+                                        await handleSessionExpired();
+                                        return;
+                                    }
+                                    alert(`Failed: ${err?.detail || "Unknown error"}`);
                                     return;
                                 }
 
