@@ -169,22 +169,21 @@ export default function LoggedInAdmin() {
         <div ref={topRef} className="min-h-screen bg-black text-white relative">
             <div className="mx-auto max-w-2xl p-4 sm:p-10">
                 {/* Header */}
-                <h1 className="text-2xl sm:text-3xl font-bold text-white-400 mb-2">
+                <h1 className="text-2xl sm:text-3xl font-bold text-white-400">
                     Admin Dashboard
                 </h1>
-                <p className="text-white-200 text-sm sm:text-base mb-2">Logged in as {userName}</p>
 
 
 
                 {/* --- Block User by Email --- */}
-                <div className="my-6 flex items-center gap-2 max-w-md">
+                <div className="my-6 flex items-center max-w-md">
                     {/* Input with very thin white rounded-full border */}
                     <input
                         type="text"
                         placeholder="Admin Block User (24h)"
                         value={blockUserId}
                         onChange={(e) => setBlockUserId(e.target.value)}
-                        className="flex-1 px-4 h-12 border border-white/20 rounded-full text-white placeholder-white bg-transparent focus:outline-none focus:border-white/40"
+                        className="px-4 h-12 w-[270px] border border-white/20 rounded-full text-white placeholder-white bg-transparent focus:outline-none focus:border-white/40"
                     />
 
                     {/* SVG Button floating next to input, matching height */}
@@ -242,7 +241,7 @@ export default function LoggedInAdmin() {
 
 
                 {/* Archive Deleted SVG */}
-                <div className="my-4">
+                <div className="mb-2">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -301,8 +300,8 @@ export default function LoggedInAdmin() {
                             {(() => {
                                 // Get all months
                                 const monthNames = [
-                                    "January", "February", "March", "April", "May", "June",
-                                    "July", "August", "September", "October", "November", "December"
+                                    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                                    "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"
                                 ];
 
                                 // Group users by month/year
@@ -346,7 +345,7 @@ export default function LoggedInAdmin() {
                             ref={(el) => {
                                 userRefs.current[index] = el;
                             }}
-                            className="bg-gray-900 p-3 sm:p-6 rounded mb-4 sm:mb-6 border border-green-500 text-sm sm:text-base"
+                            className="bg-black/90 p-4 sm:p-6 rounded-xl mb-4 sm:mb-6 border border-white text-sm sm:text-base"
                         >
                             {/* User info with profile image */}
                             <div className="flex items-center mb-3 sm:mb-4">
@@ -490,31 +489,6 @@ export default function LoggedInAdmin() {
                 bg-black/70 backdrop-blur-sm p-2 sm:p-3 rounded
                 grid grid-cols-2 gap-2 sm:gap-4">
 
-
-
-                    {/* Previous as SVG */}
-                    <div
-                        onClick={() => scrollToUser(Math.max(0, currentUserIndex - 1))}
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
-                             stroke="currentColor" className="size-12">
-                            <path strokeLinecap="round" strokeLinejoin="round"
-                                  d="m15 11.25-3-3m0 0-3 3m3-3v7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                        </svg>
-
-                    </div>
-
-                    {/* Next as SVG */}
-                    <div
-                        onClick={() => scrollToUser(Math.min(users.length - 1, currentUserIndex + 1))}
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
-                             stroke="currentColor" className="size-12">
-                            <path strokeLinecap="round" strokeLinejoin="round"
-                                  d="m9 12.75 3 3m0 0 3-3m-3 3v-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                        </svg>
-
-                    </div>
 
                 </div>
 
