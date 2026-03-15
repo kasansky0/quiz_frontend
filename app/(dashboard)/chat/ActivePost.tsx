@@ -51,7 +51,6 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const [showLoading, setShowLoading] = useState(true);
     const { fetchPostComments } = chatApis({ apiUrl });
     const [commentsSkip, setCommentsSkip] = useState(0); // number of comments already loaded
-    const COMMENTS_PAGE_SIZE = 10;
     const commentsArray = comments?.comments ?? [];
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMoreComments, setHasMoreComments] = useState(totalComments > COMMENTS_PAGE_SIZE);
@@ -344,7 +343,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         if (!comment._id) return;
 
         // 1️⃣ Optimistic UI update — remove comment immediately
-        setDisplayedComments(prev => prev.filter(c => c.id !== comment.id));
+        setDisplayedComments(prev => prev.filter(c => c._id !== comment._id));
 
         try {
             // 3️⃣ Send DELETE request with token
@@ -644,7 +643,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
 
 
-            <div className="flex flex-col w-full h-full min-h-0">
+                <div className="flex flex-col w-full">
 
 
                     {/* Back button like Reddit, aligned left */}
@@ -677,11 +676,11 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                     </div>
 
 
-                    <div className="flex flex-col h-full min-h-0 w-full">
-                        <div className="flex-1 overflow-y-auto space-y-3 p-2 pb-16 hide-scrollbar">
+
+                        <div className="space-y-3 pb-16">
 
                             {/* Post */}
-                            <div className="z-10 px-1 sm:px-2 py-2 rounded-xl bg-transparent mb-2">
+                            <div className="z-10 sm:px-2 py-2 rounded-xl bg-transparent mb-2">
 
 
                                 <div className="flex justify-between items-center pb-3">
@@ -801,6 +800,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                         {/* Edit Title */}
                                         <textarea
                                             value={editTitle}
+                                            style={{ WebkitOverflowScrolling: "touch" }}
                                             onChange={(e) => {
                                                 const value = e.target.value;
                                                 if (value.length <= 100) setEditTitle(value); // 100 char limit
@@ -816,6 +816,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                         {/* Edit Message */}
                                         <textarea
                                             value={editMessage}
+                                            style={{ WebkitOverflowScrolling: "touch" }}
                                             onChange={(e) => {
                                                 const value = e.target.value;
                                                 if (value.length <= 500) setEditMessage(value); // 500 char limit
@@ -866,6 +867,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                 >
                                                     <textarea
                                                         ref={commentInputRef}
+                                                        style={{ WebkitOverflowScrolling: "touch" }}
                                                         onInput={(e) => {
                                                             const el = e.currentTarget;
                                                             el.style.height = "auto";
@@ -929,15 +931,15 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                             </div>
 
 
-                            {/* Comments */}
-
-                            <div className="flex flex-col flex-1 min-h-0 w-full">
 
 
                                 {/* Comments */}
+
+
+
                                 <div
                                     id="comments-container"
-                                    className="flex-1 space-y-3 overscroll-contain hide-scrollbar"
+                                    className="space-y-3"
                                 >
                                     {displayedComments.map((comment) => {
 
@@ -1117,11 +1119,11 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                         })}
 
                                 </div>
-                            </div>
                             {/* Load more button */}
                             {hasMoreComments && (
                                 <button
                                     onClick={handleLoadMore}
+                                    style={{ touchAction: "manipulation" }}
                                     className="w-full flex justify-center items-center py-3 bg-blue-50 hover:bg-blue-100 rounded-xl mt-2 transition"
                                 >
                                     <svg
@@ -1144,10 +1146,6 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                         </div>
 
 
-
-
-
-                    </div>
 
                 </div>
             )}

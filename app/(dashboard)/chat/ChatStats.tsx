@@ -422,7 +422,7 @@ export default function ChatStats() {
 
     return (
 
-        <div className="flex-1 flex flex-col items-center justify-start w-full min-h-0">
+        <div className="w-full max-w-4xl mx-auto">
 
             {(showLoading || !fetchedPosts || postsLoading) ? (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white">
@@ -439,7 +439,7 @@ export default function ChatStats() {
 
 
 
-                    <div className="w-full max-w-4xl mx-auto flex flex-col h-full min-h-0">
+                    <div className="w-full max-w-4xl mx-auto flex flex-col">
 
 
 
@@ -505,7 +505,7 @@ export default function ChatStats() {
 
                                 <div className={`mx-auto max-w-4xl transition-opacity duration-500 ease-in-out ${listFade ? "opacity-100" : "opacity-0"}`}>
 
-                                    <div className="flex-1 overflow-y-auto space-y-4">
+                                    <div className="space-y-4">
                                         {filteredPosts.map(post => (
                                             <div
                                                 key={post.id}
