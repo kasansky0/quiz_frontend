@@ -6,9 +6,10 @@ interface InlineStatusTextProps {
     message: string;
     type?: "error" | "loading" | "success";
     onClose?: () => void;
+    inline?: boolean;
 }
 
-const InlineStatusText: FC<InlineStatusTextProps> = ({ message, type = "loading", onClose }) => {
+const InlineStatusText: FC<InlineStatusTextProps> = ({ message, type = "loading", onClose, inline = false }) => {
     // Optional: auto-hide after 3 seconds
     useEffect(() => {
         if (!onClose) return;
