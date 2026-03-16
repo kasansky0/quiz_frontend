@@ -38,12 +38,16 @@ export async function fetchWithToken(url: string, options: RequestInit = {}, ret
         let res = await fetch(url, options);
 
         // Retry once on 401
+        // Retry once on 401
         if (res.status === 401 && retries > 0) {
-            idToken = await refreshToken();
-            if (!idToken) {
+            const newToken = await refreshToken();
+
+            if (!newToken) {
                 console.error("Failed to refresh token");
-                return null;
+                return null; // exit early if refresh fails
             }
+
+            idToken = newToken; // now safe to assign
 
             await new Promise(r => setTimeout(r, 200));
 
