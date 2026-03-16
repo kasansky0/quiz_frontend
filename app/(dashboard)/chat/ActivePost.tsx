@@ -360,8 +360,11 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 // COMMENT DELETE //
 
     const handleDeleteComment = async (comment: Comment) => {
-        if (!activePost) return;
-        if (!comment._id) return;
+        if (!activePost || !comment._id) return;
+
+        // ✅ Add confirmation before deleting
+        const confirmed = window.confirm("Are you sure you want to delete this comment?");
+        if (!confirmed) return;
 
         // 1️⃣ Optimistic UI update — remove comment immediately
         setDisplayedComments(prev => prev.filter(c => c._id !== comment._id));
@@ -536,6 +539,10 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 // POST DELETE AND UPDATE UI //
 
     const handleDeletePost = async (postId: string) => {
+
+        // ✅ Add confirmation before deleting
+        const confirmed = window.confirm("Are you sure you want to delete this post?");
+        if (!confirmed) return;
 
         try {
             const res = await fetchWithToken(`${apiUrl}/posts/${postId}`, {
