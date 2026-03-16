@@ -377,6 +377,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     }),
                 });
 
+                if (!res) {
+                    showError("❌ Could not reach the server. Please try again.");
+                    return;
+                }
+
+                if (!res.ok) {
+                    showError("❌ Failed to update user percentage. Server returned an error.");
+                    return;
+                }
+
                 const data = await res.json();
                 showError("✅ User percentage updated");
             } catch (err: any) {
