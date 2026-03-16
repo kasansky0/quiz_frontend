@@ -26,7 +26,7 @@ export function useSubjects(apiUrl: string, mainTopic: string) {
             const res = await fetch(`${apiUrl}/subjects/?main_topic=${encodeURIComponent(mainTopic)}`);
             if (!res.ok) {
                 showError("Failed to fetch subjects");
-                throw new Error("Failed to fetch subjects");
+                return null;
             }
 
             const data = await res.json();

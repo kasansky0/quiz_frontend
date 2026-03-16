@@ -18,7 +18,9 @@ export default function LoginSection() {
 
             try {
                 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-                if (!apiUrl) throw new Error("NEXT_PUBLIC_API_URL is missing");
+                if (!apiUrl) {
+                    console.error("NEXT_PUBLIC_API_URL is missing");
+                }
 
                 await fetchWithToken(`${apiUrl}/auth/google`, {
                     method: "POST",

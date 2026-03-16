@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/Textarea";
 import { useError } from "@/app/ErrorProvider";
+import StatusBanner from "@/app/positiveBanner"
 
 
 interface CreatePostProps {
@@ -81,14 +82,25 @@ export default function CreatePost({
         }
     };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     return (
         <div className="w-full max-w-3xl min-h-screen flex flex-col space-y-4 rounded-xl bg-black">
 
-            {isSending && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/80 text-white text-lg font-semibold z-50">
-                    Sending post...
-                </div>
-            )}
+            {isSending && (<StatusBanner type="loading" message="Sending post..." />)}
 
             <div className={`w-full max-w-3xl transition-opacity duration-500 ease-in-out ${fade ? "opacity-100" : "opacity-0"}`}>
                 <form className="w-full flex flex-col space-y-4" onSubmit={handleSubmit}>

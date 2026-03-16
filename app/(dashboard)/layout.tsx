@@ -182,9 +182,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 }),
             });
 
-            // Other backend errors → do NOT log out
+            // Handle fetch failure (null) separately
+            if (!res) {
+                setErrorState("Network error: unable to reach server.");
+                showError("❌ Network error: server unreachable.");
+                return;
+            }
+
+            // Backend returned error → show message
             if (!res.ok) {
-                // Backend returned error → show message but keep dashboard
                 setErrorState("Unable to load sidebar data.");
                 showError("❌ Failed to fetch user data from server.");
                 return;
@@ -234,7 +240,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         const sendToken = async () => {
             try {
                 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-                if (!apiUrl) throw new Error("NEXT_PUBLIC_API_URL is missing");
+                if (!apiUrl) {
+                    console.error("NEXT_PUBLIC_API_URL is missing");
+                    return;
+                }
 
                 const res = await fetch(`${apiUrl}/auth/google`, {
                     method: "POST",
@@ -243,7 +252,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     credentials: "include",
                 });
 
-                if (!res.ok) throw new Error("Failed to authenticate with Google token");
+                if (!res.ok) {
+                    const text = await res.text().catch(() => "");
+                    console.warn("Google token auth failed:", res.status, text);
+                    // do NOT call showError here
+                    return;
+                }
 
                 // Wait for token verification before fetching user data
                 await fetchData();

@@ -8,6 +8,8 @@ import { chatApis } from '@/app/hooks/chatApis'; // adjust path as needed
 import useSWR, { mutate as globalMutate } from "swr";
 import { useSession, signOut, getSession } from "next-auth/react"; // ✅ add useSession
 import { fetchWithToken, handleSessionExpired } from "@/app/hooks/refreshToken";
+import StatusBanner from "@/app/positiveBanner";
+
 
 
 
@@ -56,9 +58,17 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const [hasMoreComments, setHasMoreComments] = useState(totalComments > COMMENTS_PAGE_SIZE);
     const [displayedComments, setDisplayedComments] = useState<Comment[]>([]);
     const { data: session } = useSession(); // ✅ get session here
+    const [statusBanner, setStatusBanner] = useState<{ message: string; type?: "loading" | "success" | "error" } | null>(null);
 
 
 
+
+
+
+    const showStatusBanner = (message: string, type: "loading" | "success" | "error" = "loading") => {
+        setStatusBanner({ message, type });
+        setTimeout(() => setStatusBanner(null), 3000); // hide after 3 seconds
+    };
 
 
 
@@ -278,11 +288,21 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         const sanitizedMessage = DOMPurify.sanitize(message.trim());
 
         try {
+            showStatusBanner("Sending comment...", "loading");
             const res = await fetchWithToken(`${apiUrl}/posts/${activePost.id}/comments`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message: sanitizedMessage }),
             });
+            setCommentMessage("");
+            showStatusBanner("Comment sent!", "success");
+
+            // Handle null / network failure
+            if (!res) {
+                showError("We couldn't send your comment. Please check your internet and try again.");
+                showStatusBanner("Failed to send comment", "error");
+                return;
+            }
 
             if (!res.ok) {
                 const err = await res.json().catch(() => null);
@@ -328,7 +348,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
         } catch (err: any) {
             console.error("Failed to post comment:", err);
-            showError("Network error while adding comment"); // 🔴 global banner
+            showError("We couldn't send your comment. Please try again."); // 🔴 friendly
+            showStatusBanner("Failed to send comment", "error");
         } finally {
             setIsSending(false);
         }
@@ -353,6 +374,12 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                     method: "DELETE",
                 }
             );
+
+            // handle null / network failure
+            if (!res) {
+                showError("We couldn't delete the comment. Please check your connection and try again.");
+                return;
+            }
 
             if (!res.ok) {
                 if (res.status === 401) {
@@ -407,12 +434,18 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 method: "DELETE",
             });
 
+            // handle null / network failure
+            if (!res) {
+                showError("We couldn't update your comment. Please check your connection and try again.");
+                return;
+            }
+
             if (!res.ok) {
                 if (res.status === 401) {
                     await handleSessionExpired();
                     return;
                 }
-                showError("Delete comment failed"); // 🔴 show banner
+                showError("We couldn't update your comment. Please try again.");
                 return;
             }
 
@@ -430,13 +463,17 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             body: JSON.stringify({ message: sanitizedMessage }),
         });
 
+        if (!res) {
+            showError("Network error: unable to reach server.");
+            return;
+        }
 
         if (!res.ok) {
             if (res.status === 401) {
                 await handleSessionExpired();
                 return;
             }
-            showError("Edit comment failed"); // 🔴 show banner
+            showError("We couldn't delete your comment. Please try again.");
             return;
         }
 
@@ -505,12 +542,17 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 method: "DELETE",
             });
 
+            if (!res) {
+                showError("We couldn't delete the post. Please check your internet and try again.");
+                return;
+            }
+
             if (!res.ok) {
                 if (res.status === 401) {
                     await handleSessionExpired();
                     return;
                 }
-                showError("Delete post failed"); // 🔴 show global banner
+                showError("We couldn't delete the post. Please try again.");
                 return;
             }
 
@@ -523,7 +565,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
         } catch (err: any) {
             console.error("Delete post error:", err);
-            showError("Network error while deleting post"); // 🔴 global banner
+            showError("We couldn't delete the post. Please try again.");
         }
     };
 
@@ -548,13 +590,17 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 }),
             });
 
+            if (!res) {
+                showError("We couldn't save your changes. Please check your internet and try again.");
+                return;
+            }
+
             if (!res.ok) {
                 if (res.status === 401) {
                     await handleSessionExpired();
                     return;
                 }
-                const err = await res.json().catch(() => null);
-                showError(err?.detail || err?.error || "Edit post failed");
+                showError("We couldn't save your changes. Please try again.");
                 return;
             }
 
@@ -577,7 +623,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
         } catch (err: any) {
             console.error("Edit post error:", err);
-            showError("Network error while editing post"); // 🔴 global banner
+            showError("We couldn't save your changes. Please try again.");
         }
     };
 
@@ -621,7 +667,6 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
     return (
         <div className={`transition-opacity duration-500 ease-in-out ${fade ? "opacity-100" : "opacity-0"}`}>
-
 
             {showLoading ? (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white">
@@ -855,6 +900,16 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                     <div className="mb-2 text-red-400 text-xs sm:text-sm text-center">
                                         {blockMessage} {blockSeconds ? `Wait ${blockSeconds} second(s).` : null}
                                     </div>
+                                )}
+
+                                {/* --- Inline Status Banner --- */}
+                                {statusBanner && (
+                                    <StatusBanner
+                                        message={statusBanner.message}
+                                        type={statusBanner.type}
+                                        onClose={() => setStatusBanner(null)}
+                                        inline={true} // show above textarea
+                                    />
                                 )}
 
                                 <form

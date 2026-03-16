@@ -14,7 +14,10 @@ export function useMainTopics(apiUrl: string) {
         const fetchMainTopics = async () => {
             try {
                 const res = await fetch(`${apiUrl}/subjects/`);
-                if (!res.ok) throw new Error("Failed to fetch subjects");
+                if (!res.ok) {
+                    showError("Failed to fetch subjects");
+                    return null;
+                }
 
                 const data = await res.json();
 

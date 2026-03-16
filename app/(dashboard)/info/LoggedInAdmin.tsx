@@ -93,6 +93,12 @@ export default function LoggedInAdmin() {
                     },
                 });
 
+                // ✅ Handle null first
+                if (!res) {
+                    showError("⚠️ Unable to reach the server. Please check your connection and try again.");
+                    return;
+                }
+
                 if (!res.ok) {
                     const err = await res.json().catch(() => null);
                     if (res.status === 401 || res.status === 403) {
@@ -201,13 +207,20 @@ export default function LoggedInAdmin() {
                                     }),
                                 });
 
+                                // ✅ Handle null first
+                                if (!res) {
+                                    showError("⚠️ Network error. Please try again.");
+                                    return;
+                                }
+
+                                // ✅ Now res is guaranteed not null
                                 if (!res.ok) {
                                     const err = await res.json().catch(() => null);
                                     if (res.status === 401 || res.status === 403) {
                                         await handleSessionExpired();
                                         return;
                                     }
-                                    alert(`Failed: ${err?.detail || "Unknown error"}`);
+                                    showError(`Failed: ${err?.detail || "Unknown error"}`);
                                     return;
                                 }
 
@@ -260,13 +273,20 @@ export default function LoggedInAdmin() {
                                     },
                                 });
 
+                                // ✅ TypeScript-safe null check
+                                if (!res) {
+                                    showError("⚠️ Network error. Please try again.");
+                                    return;
+                                }
+
+                                // Now TypeScript knows res is not null
                                 if (!res.ok) {
                                     const err = await res.json().catch(() => null);
                                     if (res.status === 401 || res.status === 403) {
                                         await handleSessionExpired();
                                         return;
                                     }
-                                    alert(`Failed: ${err?.detail || "Unknown error"}`);
+                                    showError(`Failed: ${err?.detail || "Unknown error"}`);
                                     return;
                                 }
 

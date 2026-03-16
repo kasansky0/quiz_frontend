@@ -3,6 +3,14 @@ import { NextResponse } from "next/server";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL; // e.g. https://api.netaprep.com
 
 export async function GET() {
+    if (!API_BASE) {
+        console.error("NEXT_PUBLIC_API_URL is not set");
+        return NextResponse.json(
+            { error: "Server misconfiguration: API base URL not set" },
+            { status: 500 }
+        );
+    }
+
     try {
         const res = await fetch(`${API_BASE}/questions/random`);
 
@@ -24,6 +32,14 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+    if (!API_BASE) {
+        console.error("NEXT_PUBLIC_API_URL is not set");
+        return NextResponse.json(
+            { error: "Server misconfiguration: API base URL not set" },
+            { status: 500 }
+        );
+    }
+
     try {
         const body = await req.json();
 
@@ -43,3 +59,4 @@ export async function POST(req: Request) {
         );
     }
 }
+`
