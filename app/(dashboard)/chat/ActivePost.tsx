@@ -59,6 +59,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const [displayedComments, setDisplayedComments] = useState<Comment[]>([]);
     const { data: session } = useSession(); // ✅ get session here
     const [statusBanner, setStatusBanner] = useState<{ message: string; type?: "loading" | "success" | "error" } | null>(null);
+    const [isButtonLoading, setIsButtonLoading] = useState(false);
+    const [loadError, setLoadError] = useState<string | null>(null);
 
 
 
@@ -1184,17 +1186,26 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                             {/* Load more button */}
                             {hasMoreComments && (
                                 <button
-                                    onClick={handleLoadMore}
+                                    onClick={() => {
+                                        setIsButtonLoading(true); // start visual loading
+                                        setTimeout(() => {
+                                            setIsButtonLoading(false); // stop loading after 1s (or any delay)
+                                            handleLoadMore(); // still call your real handler
+                                        }, 1000); // 1 second delay
+                                    }}
                                     style={{ touchAction: "manipulation" }}
                                     className="w-full flex justify-center items-center py-3 bg-blue-50 hover:bg-blue-100 rounded-xl mt-2 transition"
                                 >
+                                    {/* Icon: spins when loading */}
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         fill="none"
                                         viewBox="0 0 24 24"
                                         strokeWidth={1.5}
                                         stroke="currentColor"
-                                        className="w-6 h-6 text-blue-600"
+                                        className={`w-6 h-6 text-blue-600 transition-transform ${
+                                            isButtonLoading ? "animate-spin" : ""
+                                        }`}
                                     >
                                         <path
                                             strokeLinecap="round"
@@ -1202,7 +1213,9 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                             d="m9 12.75 3 3m0 0 3-3m-3 3v-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
                                         />
                                     </svg>
-                                    <span className="ml-2 text-blue-600 font-medium text-sm sm:text-base">Load More</span>
+                                    <span className="ml-2 text-blue-600 font-medium text-sm sm:text-base">
+                                      {isButtonLoading ? "Loading..." : "Load More"}
+                                    </span>
                                 </button>
                             )}
                         </div>
