@@ -148,6 +148,72 @@ export default function ChatStats() {
         );
     }
 
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        let delay = 5000;
+        let controller: AbortController | null = null;
+
+        const poll = async () => {
+            // ⛔ skip if tab not visible OR inside a post OR loading more
+            if (document.hidden || activePost || loadingMore) {
+                interval = setTimeout(poll, delay);
+                return;
+            }
+
+            // Abort previous fetch if still running
+            if (controller) controller.abort();
+            controller = new AbortController();
+
+            try {
+                const data = await fetchPosts(0, postLimit);
+
+                setAllPosts(prev => {
+                    const map = new Map<string, Post>();
+
+                    // fresh data first
+                    data.posts.forEach(p => map.set(p.id, p));
+
+                    // keep existing posts
+                    prev.forEach(p => {
+                        if (!map.has(p.id)) map.set(p.id, p);
+                    });
+
+                    return Array.from(map.values());
+                });
+
+                setTotalPosts(data.total);
+
+                // ⬆️ gradually slow down polling
+                delay = Math.min(delay + 2000, 30000);
+
+            } catch (err: any) {
+                if (err.name === "AbortError") {
+                    // Fetch was aborted → ignore
+                } else {
+                    console.error("Post polling failed", err);
+                }
+            }
+
+            interval = setTimeout(poll, delay);
+        };
+
+        const handleVisibilityChange = () => {
+            if (!document.hidden) {
+                delay = 5000; // reset polling speed
+            }
+        };
+
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+
+        poll();
+
+        return () => {
+            clearTimeout(interval);
+            if (controller) controller.abort();
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
+        };
+    }, [activePost, loadingMore, postLimit]);
+
     const formatLocalDate = (dateString?: string, editedString?: string) => {
         if (!dateString) return "";
         let isoString = dateString.split(".")[0] + "Z";
