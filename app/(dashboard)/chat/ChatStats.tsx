@@ -38,7 +38,7 @@ export default function ChatStats() {
 
     // Fetch posts from API with skip & limit
     const fetchPosts = async (skip: number, limit: number) => {
-        const res = await fetch(`${apiUrl}/posts?skip=${skip}&limit=${limit}`, { credentials: "include" });
+        const res = await fetch(`${apiUrl}/posts/?skip=${skip}&limit=${limit}`, { credentials: "include" });
         const data = await res.json();
         return data as { posts: Post[]; total: number };
     };
