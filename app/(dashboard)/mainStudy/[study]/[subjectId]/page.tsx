@@ -66,33 +66,39 @@ export default function SubjectPage() {
                     {error && <div className="p-6 text-red-400">Error: {error}</div>}
                     {!error && !subject && <div className="p-6 text-white">Subject not found</div>}
 
-                    <button
-                        onClick={() => router.back()}
-                        title="Back"
-                        className="p-0 m-0 flex items-center justify-center pb-3"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="2 2 21 21"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                            className="w-8 h-8 block"
+                    <div className="flex items-center justify-start mb-4">
+                        <button
+                            onClick={() => router.back()}
+                            title="Back"
+                            className="p-0 m-0 flex items-center justify-center mr-4"
                         >
-                            <path
-                                strokeLinecap="butt"
-                                strokeLinejoin="miter"
-                                d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                            />
-                        </svg>
-                    </button>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="2 2 21 21"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="w-8 h-8 block"
+                            >
+                                <path
+                                    strokeLinecap="butt"
+                                    strokeLinejoin="miter"
+                                    d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                />
+                            </svg>
+                        </button>
+
+                        <div className="text-sm sm:text-base">
+                            Promoted: CBS Electrical Contractors <br /> Hiring NETA 2 Techs 📍Raleigh NC
+                        </div>
+                    </div>
 
                 <h1 className="text-3xl font-bold mb-6 text-blue-500">{subject.title}</h1>
                 <p className="mb-8 text-gray-300">{subject.description}</p>
 
                 {/* ✅ Quiz note if isQuiz is true */}
                 {subject.isQuiz && (
-                    <p className="mb-6 text-sm text-yellow-400 text-center">
+                    <p className="mb-6 text-sm text-orange-400 text-center">
                         Strengthen your knowledge of this topic with focused practice questions at the end.
                     </p>
                 )}
@@ -155,12 +161,30 @@ export default function SubjectPage() {
 
                 {/* ✅ Take Quiz Button at the bottom of the page */}
                 {subject.isQuiz && (
-                    <div className="flex justify-center mt-8">
+                    <div className="flex justify-center my-4 w-full pb-16">
                         <button
                             onClick={handleQuizClick}
-                            className="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-md text-base font-medium transition-colors"
+                            style={{ touchAction: "manipulation" }}
+                            className="w-full flex justify-center items-center py-3 bg-blue-50 hover:bg-blue-100 rounded-xl transition"
                         >
-                            {`Practice "${subject.title}" Quiz`}
+                            {/* New SVG */}
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="w-6 h-6 text-blue-600 transition-transform"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
+                                />
+                            </svg>
+                            <span className="ml-2 text-blue-600 font-medium text-sm sm:text-base">
+                                {`Practice "${subject.title}" Quiz`}
+                            </span>
                         </button>
                     </div>
                 )}

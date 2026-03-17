@@ -57,34 +57,40 @@ export default function StudyPage() {
                 {errorSubjects && <div className="p-6 text-red-400">{errorSubjects}</div>}
                 {!errorSubjects && subjects.length === 0 && <div className="p-6 text-white">No subjects found.</div>}
 
-                <button
-                    onClick={() => router.back()}
-                    title="Back"
-                    className="p-0 m-0 flex items-center justify-center pb-3"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="2 2 21 21"
-                        strokeWidth={1.5}
-                        stroke="currentColor"
-                        className="w-8 h-8 block"
+                <div className="flex items-center justify-start mb-4">
+                    <button
+                        onClick={() => router.back()}
+                        title="Back"
+                        className="p-0 m-0 flex items-center justify-center mr-4"
                     >
-                        <path
-                            strokeLinecap="butt"
-                            strokeLinejoin="miter"
-                            d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                        />
-                    </svg>
-                </button>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="2 2 21 21"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-8 h-8 block"
+                        >
+                            <path
+                                strokeLinecap="butt"
+                                strokeLinejoin="miter"
+                                d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                            />
+                        </svg>
+                    </button>
 
-                <h1 className="text-2xl font-bold mb-6">{mainTopic} Subjects</h1>
+                    <div className="text-sm sm:text-base">
+                        Promoted: CBS Electrical Contractors <br /> Hiring NETA 2 Techs 📍Raleigh NC
+                    </div>
+                </div>
+
+                <h1 className="text-2xl font-bold mb-2">{mainTopic} Subjects</h1>
                 <div className="flex flex-col space-y-4">
                     {subjects.map(subject => (
                         <Link
                             key={subject.id}
                             href={`/mainStudy/${mainTopic}/${subject.id}`}
-                            className="rounded-lg bg-dark-300/60 hover:bg-dark-300 transition p-4"
+                            className="rounded-lg bg-dark-300/60 hover:bg-dark-300 transition p-2"
                         >
                             <h2 className="font-semibold text-blue-500">{subject.title}</h2>
                             <p className="text-sm text-gray-300">{subject.description}</p>

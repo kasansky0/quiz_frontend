@@ -28,13 +28,16 @@ const fetcher = (url: string) =>
 
 type Props = {
     post: Post;
-    comments: { comments: Comment[]; total: number }
+    comments: { comments: Comment[]; total: number };
     userId?: string | null;
     onBack: () => void;
     totalComments: number;
+    onPostUpdate?: (updatedPost: Post) => void;   // <-- new
+    onPostDelete?: (deletedPostId: string) => void; // <-- new
+    onCommentCountChange?: (postId: string, newCount: number) => void; // ← new
 };
 
-export default function ActivePost({ post, comments, userId, onBack, totalComments }: Props) {
+export default function ActivePost({ post, comments, userId, onBack, totalComments, onPostDelete, onPostUpdate, onCommentCountChange }: Props) {
     if (!userId) {
         signOut({ redirect: true });
         return null;
@@ -73,7 +76,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
     const showStatusBanner = (message: string, type: "loading" | "success" | "error" = "loading") => {
         setStatusBanner({ message, type });
-        setTimeout(() => setStatusBanner(null), 3000); // hide after 3 seconds
+        setTimeout(() => setStatusBanner(null), 1000); // hide after 3 seconds
     };
 
 
@@ -93,7 +96,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const { data: polledData, error } = useSWR(
         commentsKey(post.id, 0), // always fetch from skip=0 to get latest
         fetcher,
-        { refreshInterval: 3000 } // fetch every 5 seconds
+        { refreshInterval: 1000 } // fetch every 5 seconds
     );
 
 
@@ -334,16 +337,9 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
             const newComment: Comment = await res.json();
 
-            globalMutate(
-                `${apiUrl}/posts/`,
-                (posts: Post[] = []) =>
-                    posts.map(p =>
-                        p.id === activePost?.id
-                            ? { ...p, comments: [newComment, ...(p.comments ?? [])] }
-                            : p
-                    ),
-                false
-            );
+            // COMMENT ADD
+            onCommentCountChange?.(activePost.id, (totalComments || 0) + 1);
+
 
             setCurrentPage(1);
             setCommentsSkip(prev => prev + 1);
@@ -367,55 +363,59 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const handleDeleteComment = async (comment: Comment) => {
         if (!activePost || !comment._id) return;
 
-        // ✅ Add confirmation before deleting
         const confirmed = window.confirm("Are you sure you want to delete this comment?");
         if (!confirmed) return;
 
-        // 1️⃣ Optimistic UI update — remove comment immediately
+        // Store previous state for rollback
+        const previousComments = [...displayedComments];
+
+        // Optimistically mark as deleted locally (filter out)
         setDisplayedComments(prev => prev.filter(c => c._id !== comment._id));
+        onCommentCountChange?.(activePost.id, (totalComments || 1) - 1);
 
+        // Update SWR cache optimistically
+        globalMutate(`${apiUrl}/posts/`, (cachedData: { posts: Post[]; total: number } | undefined) => {
+            if (!cachedData) return cachedData;
+            const updatedPosts = cachedData.posts.map(p =>
+                p.id === activePost.id
+                    ? { ...p, comments: p.comments?.filter(c => c._id !== comment._id) }
+                    : p
+            );
+            return { ...cachedData, posts: updatedPosts };
+        }, false);
+
+        globalMutate(`${apiUrl}/posts/${activePost.id}`, (cachedPost: Post | undefined) => {
+            if (!cachedPost) return cachedPost;
+            return { ...cachedPost, comments: cachedPost.comments?.filter(c => c._id !== comment._id) };
+        }, false);
+
+        // Call backend
         try {
-            // 3️⃣ Send DELETE request with token
             const res = await fetchWithToken(
-                `${apiUrl}/posts/${activePost.id}/comments/${comment.id}`,
-                {
-                    method: "DELETE",
-                }
+                `${apiUrl}/posts/${activePost.id}/comments/${comment._id}`,
+                { method: "DELETE" }
             );
 
-            // handle null / network failure
-            if (!res) {
-                showError("We couldn't delete the comment. Please check your connection and try again.");
-                return;
-            }
+            if (!res || !res.ok) {
+                // Rollback UI & counts
+                setDisplayedComments(previousComments);
+                onCommentCountChange?.(activePost.id, totalComments || 0);
 
-            if (!res.ok) {
-                if (res.status === 401) {
+                if (res?.status === 403) {
+                    showError("You are not allowed to delete this comment.");
+                } else if (res?.status === 401) {
                     await handleSessionExpired();
-                    return;
+                } else {
+                    showError("Failed to delete comment. It will reappear on next refresh.");
                 }
-
-                // Optional rollback: refetch comments
-                const data = await fetchPostComments(activePost.id, 0, COMMENTS_PAGE_SIZE);
-                setDisplayedComments(data?.comments || []);
-
-                return;
             }
-
-            // ✅ Optionally, update SWR cache for posts if you track comment counts
-            globalMutate(`${apiUrl}/posts/`, (posts: Post[] = []) =>
-                posts.map(p =>
-                    p.id === activePost.id
-                        ? { ...p, totalComments: (p.totalComments || 1) - 1 } // adjust if you track count
-                        : p
-                )
-            );
 
         } catch (err) {
-            console.error(err);
-            // Optionally rollback optimistic update here too
-            const data = await fetchPostComments(activePost.id, 0, COMMENTS_PAGE_SIZE);
-            setDisplayedComments(data?.comments || []);
+            // Rollback UI & counts
+            setDisplayedComments(previousComments);
+            onCommentCountChange?.(activePost.id, totalComments || 0);
+            console.error("Delete comment error:", err);
+            showError("Network error. Comment will reappear on next refresh.");
         }
     };
 
@@ -504,16 +504,22 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 )
             };
         });
-        globalMutate(`${apiUrl}/posts/`, (prev: Post[] = []) =>
-            prev.map(p =>
+        globalMutate(`${apiUrl}/posts/`, (cachedData: { posts: Post[]; total: number } | undefined) => {
+            if (!cachedData) return { posts: [], total: 0 };
+
+            const newPosts = cachedData.posts.map(p =>
                 p.id === activePost.id
-                    ? { ...p, comments: (p.comments || []).map(c =>
+                    ? {
+                        ...p,
+                        comments: (p.comments || []).map(c =>
                             c._id === updatedComment._id ? updatedComment : c
-                        ),
+                        )
                     }
                     : p
-            )
-        );
+            );
+
+            return { ...cachedData, posts: newPosts };
+        }, false);
 
         setEditingCommentId(null);
     };
@@ -568,10 +574,16 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 return;
             }
 
+            // Push change to parent
+            onPostDelete?.(postId);
+
             // ✅ Optimistically update SWR cache
-            globalMutate(`${apiUrl}/posts/`, (posts: Post[] = []) =>
-                posts.filter(p => p.id !== postId)
-            );
+            globalMutate(`${apiUrl}/posts/`, (cachedData: { posts: Post[]; total: number } | undefined) => {
+                if (!cachedData) return { posts: [], total: 0 };
+
+                const newPosts = cachedData.posts.filter(p => p.id !== postId);
+                return { posts: newPosts, total: cachedData.total - 1 }; // decrease total
+            });
 
             onBack(); // optional: go back to list
 
@@ -618,13 +630,16 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
             const updatedPost: Post = await res.json();
 
+            // Push change to parent
+            onPostUpdate?.(updatedPost);
+
             // ✅ Optimistically update SWR cache
-            globalMutate(
-                `${apiUrl}/posts/`,
-                (posts: Post[] = []) =>
-                    posts.map(p => (p.id === updatedPost.id ? updatedPost : p)),
-                false
-            );
+            globalMutate(`${apiUrl}/posts/`, (cachedData: { posts: Post[]; total: number } | undefined) => {
+                if (!cachedData) return { posts: [], total: 0 };
+
+                const newPosts = cachedData.posts.map(p => (p.id === updatedPost.id ? updatedPost : p));
+                return { ...cachedData, posts: newPosts };
+            }, false);
 
             // ✅ Update local activePost so UI reflects changes immediately
             setActivePost(updatedPost);
@@ -646,6 +661,15 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         setEditTitle(post.title);
         setEditMessage(post.message);
     };
+
+
+
+
+
+
+
+
+
 
 
 
