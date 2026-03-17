@@ -35,6 +35,10 @@ type Props = {
 };
 
 export default function ActivePost({ post, comments, userId, onBack, totalComments }: Props) {
+    if (!userId) {
+        signOut({ redirect: true });
+        return null;
+    }
     const [commentMessage, setCommentMessage] = useState("");
     const [editingPostId, setEditingPostId] = useState<string | null>(null);
     const [editMessage, setEditMessage] = useState("");
@@ -297,7 +301,6 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 body: JSON.stringify({ message: sanitizedMessage }),
             });
             setCommentMessage("");
-            showStatusBanner("Comment sent!", "success");
 
             // Handle null / network failure
             if (!res) {

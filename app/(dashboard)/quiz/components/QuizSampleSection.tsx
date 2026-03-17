@@ -84,7 +84,7 @@ export default function QuizSampleSection({
 
 
 
-
+// --- Controls when a loading screen and spinner appears and disappears --- //
 
     useEffect(() => {
         if (!loadingDone) {
@@ -100,13 +100,18 @@ export default function QuizSampleSection({
 
 
 
+// --- Scroll to options when user selects an answer --- //
 
-
-    // Scroll to options when an option is selected
     useEffect(() => {
         if (!selectedOption) return;
         optionsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, [selectedOption]);
+
+
+
+
+
+// --- Reset question state when loading starts --- //
 
     useEffect(() => {
         if (!loadingDone) {
@@ -115,6 +120,12 @@ export default function QuizSampleSection({
             setAnswerResult(null);
         }
     }, [loadingDone]);
+
+
+
+
+
+// --- Fetch the first question from backend --- //
 
     useEffect(() => {
         if (!loadingDone || !apiUrl) return;
@@ -155,7 +166,11 @@ export default function QuizSampleSection({
     }, [loadingDone, apiUrl, isLoggedIn, userId, subjectId]);
 
 
-    // Handle when sidebar clicks "Next"
+
+
+
+// --- Requests the next quiz question from backend when the user clicks Next --- //
+
     async function fetchNextQuestion() {
         if (!apiUrl) return null;
 
@@ -180,6 +195,11 @@ export default function QuizSampleSection({
         }
     }
 
+
+
+
+
+// --- Main controller for moving to the next quiz question --- //
 
     const handleNextQuestion = async () => {
         setFade(false);
@@ -220,7 +240,10 @@ export default function QuizSampleSection({
 
 
 
-// 3️⃣ Handle answer click
+
+
+// --- Runs when a user clicks one of the answer options in your quiz --- //
+
     const handleAnswerClick = async (option: string) => {
         if (!selectedOption && questionData) {
             setSelectedOption(option);
@@ -269,6 +292,7 @@ export default function QuizSampleSection({
             setAnswerResult({ correct, answer, explanation });
         }
     };
+
 
 
 

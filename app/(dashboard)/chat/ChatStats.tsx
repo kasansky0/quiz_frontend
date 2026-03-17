@@ -439,166 +439,166 @@ export default function ChatStats() {
 
 
 
-                    <div className="w-full max-w-4xl mx-auto flex flex-col">
+                <div className="w-full max-w-4xl mx-auto flex flex-col">
 
 
 
 
-                        {creatingPost && (
-                            <CreatePost
-                                onSubmit={handleCreatePost} // now correctly expects {title, message}
-                                onCancel={() => setCreatingPost(false)}
-                                isBlocked={!!serverError}                     // show blocked banner if serverError exists
-                                blockMessage={serverError || undefined}       // message to display
-                            />
-                        )}
+                    {creatingPost && (
+                        <CreatePost
+                            onSubmit={handleCreatePost} // now correctly expects {title, message}
+                            onCancel={() => setCreatingPost(false)}
+                            isBlocked={!!serverError}                     // show blocked banner if serverError exists
+                            blockMessage={serverError || undefined}       // message to display
+                        />
+                    )}
 
 
 
 
 
 
-                        {!creatingPost && !activePost && (
-                            <>
+                    {!creatingPost && !activePost && (
+                        <>
 
 
 
 
-                                <div className="flex items-center justify-start">
+                            <div className="flex items-center justify-start">
 
-                                        {/* Create Post Button */}
-                                        <button
-                                            onClick={() => setCreatingPost(true)}
+                                {/* Create Post Button */}
+                                <button
+                                    onClick={() => setCreatingPost(true)}
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={1.5}
+                                        stroke="currentColor"
+                                        className="w-8 h-8"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                        />
+                                    </svg>
+                                </button>
+
+                                {/* Future Ads / Message */}
+                                <div className="w-full text-center text-sm py-2">
+                                    Promoted: CBS Electrical Contractors <br/> Hiring NETA 2 Techs 📍Raleigh NC
+                                </div>
+
+                            </div>
+
+
+
+
+
+
+
+
+
+
+
+                            <div className={`mx-auto max-w-4xl transition-opacity duration-500 ease-in-out ${listFade ? "opacity-100" : "opacity-0"}`}>
+
+                                <div className="space-y-4">
+                                    {filteredPosts.map(post => (
+                                        <div
+                                            key={post.id}
+                                            onClick={() => handleActivatePost(post)}
+                                            className="relative px-1 sm:px-2 py-2 cursor-pointer rounded-xl bg-transparent hover:bg-dark-800 transition-colors duration-100"
                                         >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                strokeWidth={1.5}
-                                                stroke="currentColor"
-                                                className="w-8 h-8"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                                                />
-                                            </svg>
-                                        </button>
-
-                                        {/* Future Ads / Message */}
-                                    <div className="w-full text-center text-sm py-2">
-                                            Promoted: CBS Electrical Contractors <br/> Hiring NETA 2 Techs 📍Raleigh NC
-                                        </div>
-
-                                    </div>
 
 
 
 
 
 
-
-
-
-
-
-                                <div className={`mx-auto max-w-4xl transition-opacity duration-500 ease-in-out ${listFade ? "opacity-100" : "opacity-0"}`}>
-
-                                    <div className="space-y-4">
-                                        {filteredPosts.map(post => (
-                                            <div
-                                                key={post.id}
-                                                onClick={() => handleActivatePost(post)}
-                                                className="relative px-1 sm:px-2 py-2 cursor-pointer rounded-xl bg-transparent hover:bg-dark-800 transition-colors duration-100"
-                                            >
-
-
-
-
-
-
-                                                <div className="flex items-center mb-1 w-full">
-                                                    {/* Left side: nickname + comments */}
-                                                    <div className="flex items-center gap-2 truncate">
+                                            <div className="flex items-center mb-1 w-full">
+                                                {/* Left side: nickname + comments */}
+                                                <div className="flex items-center gap-2 truncate">
                                                         <span className="text-sm sm:text-sm md:text-base font-semibold truncate text-blue-400">
                                                             {post.nickname}
                                                         </span>
 
-                                                        {/* Comments bubble + pinned */}
-                                                        <div className="flex items-center justify-center bg-black/70 backdrop-blur-xl
+                                                    {/* Comments bubble + pinned */}
+                                                    <div className="flex items-center justify-center bg-black/70 backdrop-blur-xl
                                                             border border-white/10 rounded-full shadow-lg
                                                             px-3 h-6 min-w-[40px] truncate">
-                                                            <svg
-                                                                aria-hidden="true"
-                                                                className="w-3 h-3 mr-1 text-white-400"
-                                                                fill="currentColor"
-                                                                viewBox="0 0 20 20"
-                                                            >
-                                                                <path d="M10 1a9 9 0 00-9 9c0 1.947.79 3.58 1.935 4.957L.231 17.661A.784.784 0 00.785 19H10a9 9 0 009-9 9 9 0 00-9-9zm0 16.2H6.162c-.994.004-1.907.053-3.045.144l-.076-.188a36.981 36.981 0 002.328-2.087l-1.05-1.263C3.297 12.576 2.8 11.331 2.8 10c0-3.97 3.23-7.2 7.2-7.2s7.2 3.23 7.2 7.2-3.23 7.2-7.2 7.2z" />
-                                                            </svg>
+                                                        <svg
+                                                            aria-hidden="true"
+                                                            className="w-3 h-3 mr-1 text-white-400"
+                                                            fill="currentColor"
+                                                            viewBox="0 0 20 20"
+                                                        >
+                                                            <path d="M10 1a9 9 0 00-9 9c0 1.947.79 3.58 1.935 4.957L.231 17.661A.784.784 0 00.785 19H10a9 9 0 009-9 9 9 0 00-9-9zm0 16.2H6.162c-.994.004-1.907.053-3.045.144l-.076-.188a36.981 36.981 0 002.328-2.087l-1.05-1.263C3.297 12.576 2.8 11.331 2.8 10c0-3.97 3.23-7.2 7.2-7.2s7.2 3.23 7.2 7.2-3.23 7.2-7.2 7.2z" />
+                                                        </svg>
 
-                                                            <span className="text-white-400 text-sm sm:text-sm md:text-base font-medium">
+                                                        <span className="text-white-400 text-sm sm:text-sm md:text-base font-medium">
                                                                 {post.commentCount ?? 0}
                                                             </span>
 
-                                                            {post.pinned && (
-                                                                <span className="text-yellow-400 text-sm sm:text-sm md:text-base font-bold ml-1 truncate">
+                                                        {post.pinned && (
+                                                            <span className="text-yellow-400 text-sm sm:text-sm md:text-base font-bold ml-1 truncate">
                                                                     📌
                                                                 </span>
-                                                            )}
-                                                        </div>
+                                                        )}
                                                     </div>
-
-                                                    {/* Timestamp right-aligned */}
-                                                    <span className="text-white-500/60 text-sm sm:text-sm md:text-base ml-auto whitespace-nowrap">
-                                                        {formatLocalDate(post.timestamp, post.edited)}
-                                                    </span>
                                                 </div>
 
-                                                <h3 className="text-white-800 font-bold mb-1 text-sm sm:text-base md:text-lg line-clamp-2">
-                                                    {post.title}
-                                                </h3>
+                                                {/* Timestamp right-aligned */}
+                                                <span className="text-white-500/60 text-sm sm:text-sm md:text-base ml-auto whitespace-nowrap">
+                                                        {formatLocalDate(post.timestamp, post.edited)}
+                                                    </span>
                                             </div>
 
+                                            <h3 className="text-white-800 font-bold mb-1 text-sm sm:text-base md:text-lg line-clamp-2">
+                                                {post.title}
+                                            </h3>
+                                        </div>
 
 
 
 
 
 
-                                        ))}
-                                    </div>
+
+                                    ))}
                                 </div>
+                            </div>
 
 
+                        </>
+                    )}
+
+
+
+
+
+
+
+                    <div className={`transition-opacity duration-500 ease-in-out ${listFade ? "opacity-100" : "opacity-0"} w-full flex-1`}>
+                        {activePost && (
+                            <>
+                                <ActivePost
+                                    post={activePost as Post} // tell TS it's not null
+                                    comments={{
+                                        comments: activePostComments,
+                                        total: Number(activePost.commentCount ?? 0),
+                                    }}
+                                    userId={userId}
+                                    onBack={handleBackToList}
+                                    totalComments={Number(activePost.commentCount ?? 0)}
+                                />
                             </>
                         )}
-
-
-
-
-
-
-
-                        <div className={`transition-opacity duration-500 ease-in-out ${listFade ? "opacity-100" : "opacity-0"} w-full flex-1`}>
-                            {activePost && (
-                                <>
-                                    <ActivePost
-                                        post={activePost as Post} // tell TS it's not null
-                                        comments={{
-                                            comments: activePostComments,
-                                            total: Number(activePost.commentCount ?? 0),
-                                        }}
-                                        userId={userId}
-                                        onBack={handleBackToList}
-                                        totalComments={Number(activePost.commentCount ?? 0)}
-                                    />
-                                </>
-                            )}
                     </div>
 
-            </div>
+                </div>
             )}
         </div>
     );

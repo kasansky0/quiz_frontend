@@ -17,17 +17,27 @@ const InfoAndFormulas = () => {
     return (
         <div className="text-black min-h-screen flex flex-col justify-start items-center p-5">
 
-            {/* Hiring Banner */}
+            {/* Hiring Banner
             <div className="w-full bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 text-gray-900 font-semibold text-center py-4 px-6 rounded-xl shadow-md border border-yellow-500 mb-8 flex flex-col sm:flex-row items-center justify-center gap-2">
                 <span className="text-lg sm:text-xl">🧲 Welcome!</span>
                 <span className="text-md sm:text-lg hover:underline">
-        Check out the study guide and targeted questions for the topic
-    </span>
+                    Check out the study guide and targeted questions for the topic
+                </span>
             </div>
+            */}
+
+            {/* Authentication Notice */}
+            <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-white-400 mb-6 text-left">
+                🔐 Authentication
+            </h1>
+            <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-8 leading-relaxed mx-auto">
+                This platform uses Google authentication tokens. Tokens expire automatically after approximately <strong>1 hour</strong>.
+                When a token expires, your session will end and you will need to log in again.
+            </p>
 
             {/* Page Title & Introduction */}
             <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-white-400 mb-6 text-left">
-                Community Guidelines & Messaging Policy
+                💬 Messaging
             </h1>
             <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-8 mx-auto leading-relaxed">
                 NetaPrep is committed to maintaining a professional, respectful, and focused learning environment.
@@ -36,8 +46,8 @@ const InfoAndFormulas = () => {
             </p>
 
             {/* 1. Community Guidelines */}
-            <h2 className="text-xl sm:text-2xl font-bold text-white-400 mb-4 text-left max-w-md sm:max-w-2xl md:max-w-3xl mx-auto">
-                What Is Allowed
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white-400 mb-4 text-left max-w-md sm:max-w-2xl md:max-w-3xl mx-auto">
+                👍 Allowed
             </h2>
             <div className="max-w-md sm:max-w-2xl md:max-w-3xl mx-auto">
                 <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base md:text-lg text-white/80 leading-relaxed">
@@ -50,8 +60,8 @@ const InfoAndFormulas = () => {
             </div>
             <br/>
 
-            <h2 className="text-xl sm:text-2xl font-bold text-white-400 mb-4 text-left max-w-md sm:max-w-2xl md:max-w-3xl mx-auto">
-                What Is Not Allowed
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white-400 mb-4 text-left max-w-md sm:max-w-2xl md:max-w-3xl mx-auto">
+                🚫 Not Allowed
             </h2>
             <div className="max-w-md sm:max-w-2xl md:max-w-3xl mx-auto">
                 <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base md:text-lg text-white/80 leading-relaxed">
@@ -67,8 +77,8 @@ const InfoAndFormulas = () => {
             <br/>
 
             {/* 2. Automated Moderation & Enforcement */}
-            <h2 className="text-xl sm:text-2xl font-bold text-white-400 mb-4 text-left max-w-md sm:max-w-2xl md:max-w-3xl mx-auto">
-                Automated Moderation & Enforcement
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white-400 mb-4 text-left max-w-md sm:max-w-2xl md:max-w-3xl mx-auto">
+                ⚖ Automated Moderation
             </h2>
             <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-6 mx-auto leading-relaxed">
                 All content is automatically scanned for prohibited language, spam patterns,
@@ -89,16 +99,15 @@ const InfoAndFormulas = () => {
             </p>
 
             {/* 3. Writing Recommendations */}
-            <h2 className="text-xl sm:text-2xl font-bold text-white-400 mb-4 text-left max-w-md sm:max-w-2xl md:max-w-3xl mx-auto">
-                Writing Recommendations
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white-400 mb-4 text-left max-w-md sm:max-w-2xl md:max-w-3xl mx-auto">
+                📝 Writing Recommendations
             </h2>
             <div className="max-w-md sm:max-w-2xl md:max-w-3xl mx-auto">
                 <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base md:text-lg text-white/80 leading-relaxed">
                     <li>Keep messages under 500 characters</li>
                     <li>Avoid excessive capitalization or punctuation</li>
-                    <li>Limit formatting to simple emphasis (bold/italic)</li>
-                    <li>Stay focused on technical and exam-related topics</li>
-                    <li>Be respectful — assume good intent from others</li>
+                    <li>Stay focused on exam-related topics</li>
+                    <li>Be respectful, assume good intent from others</li>
                 </ul>
             </div>
             <br/>
@@ -108,9 +117,9 @@ const InfoAndFormulas = () => {
             </p>
 
             {/* 4. Quiz Progress & Performance */}
-            <h2 className="text-xl sm:text-2xl font-bold text-white-400 mb-4 text-left max-w-md sm:max-w-2xl md:max-w-3xl mx-auto">
-                Quiz Progress & Performance
-            </h2>
+            <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-white-400 mb-6 text-left">
+                📊 Quiz Progress
+            </h1>
             <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-4 mx-auto leading-relaxed">
                 Your quiz progress is tracked using a progress bar that reflects your performance.
                 The percentage is calculated as:

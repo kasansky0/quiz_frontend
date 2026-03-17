@@ -45,6 +45,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
+    useEffect(() => {
+        if (status === "unauthenticated") {
+            router.replace("/");
+        }
+    }, [status, router]);
+
+
+
+
+
+
+
+
 
 
 
@@ -427,13 +440,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
 
     if (!session) {
-        router.push("/"); // immediate redirect
         return (
             <div className="flex items-center justify-center h-screen text-white">
                 Redirecting to login...
             </div>
         );
     }
+
+
+
 
 
 
