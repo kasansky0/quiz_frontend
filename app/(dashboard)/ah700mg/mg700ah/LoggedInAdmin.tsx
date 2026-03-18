@@ -8,6 +8,34 @@ import { fetchWithToken, handleSessionExpired } from "@/app/hooks/refreshToken";
 
 
 
+
+interface ApiCall {
+    timestamp: string;
+    endpoint: string;
+    user?: string;
+    count_in_last_10_min?: number; // <-- add this
+}
+
+interface BlockedIp {
+    ip: string;
+    reason?: string;
+    createdAt?: string; // <-- Add this
+}
+
+interface BlockedUser {
+    email: string;
+    reason: string;
+}
+
+interface AdminSummary {
+    total_requests: number;
+    apicall_history: ApiCall[];
+    blocked_ips: BlockedIp[];
+    blocked_users: BlockedUser[];
+}
+
+
+
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 
@@ -75,6 +103,7 @@ export default function LoggedInAdmin() {
     const [blockUserId, setBlockUserId] = useState<string>("");
     const fetchedRef = useRef(0);
     const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
+    const [summary, setSummary] = useState<AdminSummary | null>(null);
 
 
 
@@ -119,6 +148,11 @@ export default function LoggedInAdmin() {
 
                 setUsers(data.users);
 
+                // ✅ Set summary from backend
+                if (data.summary) {
+                    setSummary(data.summary);
+                }
+
             } catch (err) {
                 console.error("Fetch error:", err);
                 showError("Network error fetching users");
@@ -154,6 +188,19 @@ export default function LoggedInAdmin() {
             year: "numeric",
         });
 
+    // Add this inside LoggedInAdmin, above your JSX
+    const formatLocalDate = (dateString?: string) => {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        return date.toLocaleString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+    };
+
     const formatTime = (dateString: string) =>
         new Date(dateString).toLocaleTimeString("en-US", {
             hour: "2-digit",
@@ -178,6 +225,77 @@ export default function LoggedInAdmin() {
                 <h1 className="text-2xl sm:text-3xl font-bold text-white-400">
                     Admin Dashboard
                 </h1>
+
+
+
+
+
+
+
+
+                {summary && (() => {
+                    const apicalls = summary.apicall_history?.filter(c => Object.keys(c).length > 0) || [];
+                    const blockedIps = summary.blocked_ips?.filter(ip => Object.keys(ip).length > 0) || [];
+                    const blockedUsers = summary.blocked_users?.filter(u => Object.keys(u).length > 0) || [];
+
+                    return (
+                        <div className="mb-6 text-sm sm:text-base text-white space-y-2">
+
+                            {/* Total Requests */}
+                            <div className="inline-block bg-blue-600 text-white px-3 py-1 rounded-full">
+                                Total API Requests: {summary.total_requests ?? 0}
+                            </div>
+
+                            {/* Blocked IPs */}
+                            <div className="inline-block bg-blue-600 text-white px-3 py-1 rounded-full">
+                                Blocked IPs:{" "}
+                                {blockedIps.length > 0
+                                    ? blockedIps.map((ip, i) => (
+                                        <span key={i}>
+                            {ip.ip} {ip.reason ? `(${ip.reason})` : ""} {ip.createdAt ? `[${formatLocalDate(ip.createdAt)}]` : ""}
+                                            {i < blockedIps.length - 1 ? ", " : ""}
+                        </span>
+                                    ))
+                                    : "None"}
+                            </div>
+
+                            {/* Blocked Users */}
+                            <div className="inline-block bg-blue-600 text-white px-3 py-1 rounded-full">
+                                Blocked Users:{" "}
+                                {blockedUsers.length > 0
+                                    ? blockedUsers.map((u, i) => (
+                                        <span key={i}>
+                            {u.email}
+                                            {i < blockedUsers.length - 1 ? ", " : ""}
+                        </span>
+                                    ))
+                                    : "None"}
+                            </div>
+
+                            {/* Last API Calls */}
+                            <div className="inline-block bg-blue-600 text-white px-3 py-1 rounded-full">
+                                Last API Calls:{" "}
+                                {apicalls.length > 0
+                                    ? apicalls.map((call, i) => {
+                                        const date = new Date(call.timestamp);
+                                        const formattedTime = `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+                                        return (
+                                            <span key={i}>
+                                {formattedTime} ({call.count_in_last_10_min ?? "—"})
+                                                {i < apicalls.length - 1 ? "; " : ""}
+                            </span>
+                                        );
+                                    })
+                                    : "No API calls"}
+                            </div>
+
+                        </div>
+                    );
+                })()}
+
+
+
+
 
 
 

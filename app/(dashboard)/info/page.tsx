@@ -1,19 +1,9 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useEffect, useState, useCallback } from "react";
-import LoggedInAdmin from "./LoggedInAdmin";
-import { useRouter } from "next/navigation";
-import { useError } from "@/app/ErrorProvider";
-
-
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 // Info & Formulas Component
 const InfoAndFormulas = () => {
-    const router = useRouter(); // initialize router for back button
-
-
     return (
         <div className="text-black min-h-screen flex flex-col justify-start items-center p-5">
 
@@ -135,48 +125,11 @@ const InfoAndFormulas = () => {
     );
 };
 
-export default function AdminPage() {
+export default function InfoPage() {
     const { data: session, status } = useSession();
-    const [isAdmin, setIsAdmin] = useState<boolean>(false);
-    const [loadingAdmin, setLoadingAdmin] = useState<boolean>(false);
-    const [minLoading, setMinLoading] = useState<boolean>(true);
 
-    const { showError } = useError() as { showError: (msg: string | object) => void };
+    // Optional: you can show a loading spinner if session is still loading
+    if (status === "loading") return <p>Loading...</p>;
 
-    // Fetch admin status
-    const fetchAdminStatus = useCallback(async () => {
-        if (!session) return;
-
-        setLoadingAdmin(true);
-
-        try {
-            const res = await fetch(`${apiUrl}/admin/check`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${session.idToken}`, // send same token as comment
-                },
-            });
-            setIsAdmin(res.status === 200);
-        } catch (err: any) {
-            setIsAdmin(false);
-        } finally {
-            setLoadingAdmin(false);
-        }
-    }, [session, showError]);
-
-    useEffect(() => {
-        if (session) fetchAdminStatus();
-        else setIsAdmin(false);
-
-        // Minimum loading timer (3 seconds)
-        const timer = setTimeout(() => setMinLoading(false), 800);
-        return () => clearTimeout(timer);
-    }, [session, fetchAdminStatus]);
-
-    // Admin → dashboard
-    if (isAdmin) return <LoggedInAdmin />;
-
-    // Everyone else → info + formulas
     return <InfoAndFormulas />;
 }

@@ -38,15 +38,31 @@ export default function ChatStats() {
 
     // Fetch posts from API with skip & limit
     const fetchPosts = async (skip: number, limit: number) => {
-        const res = await fetch(`${apiUrl}/posts/?skip=${skip}&limit=${limit}`, { credentials: "include" });
+        const res = await fetch(`${apiUrl}/posts/?skip=${skip}&limit=${limit}`, {
+            credentials: "include"
+        });
+
         const data = await res.json();
-        return data as { posts: Post[]; total: number };
+
+        if (!res.ok) {
+            // Show error in UI instead of console
+            const msg = data?.detail || "Failed to fetch posts. Your IP may be blocked.";
+            showError(msg); // <-- display in UI
+            return { posts: [], total: 0, error: msg }; // safely return empty data
+        }
+
+        return { posts: data.posts || [], total: data.total || 0 } as { posts: Post[]; total: number; error?: string };
     };
 
     const loadInitialPosts = async () => {
         setShowLoading(true);
         try {
             const data = await fetchPosts(0, postLimit);
+            // ✅ ADD THIS
+            if (!data || !Array.isArray(data.posts)) {
+                // Already showed error in fetchPosts
+                return;
+            }
             setAllPosts(data.posts);
             setTotalPosts(data.total);
             setPostSkip(data.posts.length);
@@ -67,6 +83,12 @@ export default function ChatStats() {
         setLoadingMore(true);
         try {
             const data = await fetchPosts(postSkip, postLimit);
+
+            if (!data || !Array.isArray(data.posts)) {
+                showError("Invalid server response");
+                return;
+            }
+
             setAllPosts(prev => {
                 const existingIds = new Set(prev.map(p => p.id));
                 const newPosts = data.posts.filter(p => !existingIds.has(p.id)); // skip duplicates
@@ -94,7 +116,16 @@ export default function ChatStats() {
     }, []);
 
     // --- COMMENTS POLLING ---
-    const commentsFetcher = (url: string) => fetch(url, { credentials: "include" }).then(res => res.json());
+    const commentsFetcher = async (url: string) => {
+        const res = await fetch(url, { credentials: "include" });
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new Error(data?.detail || "Failed to fetch comments");
+        }
+
+        return data;
+    };
     const { data: polledComments } = useSWR<Comment[]>(
         activePost ? `${apiUrl}/posts/${activePost.id}/comments?skip=0&limit=10` : null,
         commentsFetcher,
@@ -166,6 +197,13 @@ export default function ChatStats() {
 
             try {
                 const data = await fetchPosts(0, postLimit);
+
+                // ✅ ADD THIS
+                if (!data || !Array.isArray(data.posts)) {
+                    console.error("Invalid posts response:", data);
+                    interval = setTimeout(poll, delay); // ✅ keep polling alive
+                    return;
+                }
 
                 setAllPosts(prev => {
                     const map = new Map<string, Post>();

@@ -76,7 +76,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
     const showStatusBanner = (message: string, type: "loading" | "success" | "error" = "loading") => {
         setStatusBanner({ message, type });
-        setTimeout(() => setStatusBanner(null), 1000); // hide after 3 seconds
+        setTimeout(() => setStatusBanner(null), 5000); // hide after 3 seconds
     };
 
 
@@ -96,7 +96,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const { data: polledData, error } = useSWR(
         commentsKey(post.id, 0), // always fetch from skip=0 to get latest
         fetcher,
-        { refreshInterval: 1000 } // fetch every 5 seconds
+        { refreshInterval: 5000 } // fetch every 5 seconds
     );
 
 
@@ -210,7 +210,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 }
                 return prev - 1;
             });
-        }, 1000);
+        }, 5000);
 
         return () => clearInterval(timer);
     }, [isBlocked, blockSeconds, hideError]);
@@ -1218,7 +1218,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                         setTimeout(() => {
                                             setIsButtonLoading(false); // stop loading after 1s (or any delay)
                                             handleLoadMore(); // still call your real handler
-                                        }, 1000); // 1 second delay
+                                        }, 5000); // 1 second delay
                                     }}
                                     style={{ touchAction: "manipulation" }}
                                     className="w-full flex justify-center items-center py-3 bg-blue-50 hover:bg-blue-100 rounded-xl mt-2 transition"
