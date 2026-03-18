@@ -310,79 +310,81 @@ export default function LoggedInAdmin() {
 
 
                 {/* --- Block User by Email --- */}
-                <div className="my-6 flex items-center max-w-md">
-                    {/* Input with very thin white rounded-full border */}
-                    <input
-                        type="text"
-                        placeholder="Admin Block User (24h)"
-                        value={blockUserId}
-                        onChange={(e) => setBlockUserId(e.target.value)}
-                        className="px-4 h-12 w-[270px] border border-white/20 rounded-full text-white placeholder-white bg-transparent focus:outline-none focus:border-white/40"
-                    />
+                <div className="my-6 flex items-center">
+                    {/* Wrapper for input + button */}
+                    <div className="flex items-center bg-transparent">
+                        <input
+                            type="text"
+                            placeholder="Block User"
+                            value={blockUserId}
+                            onChange={(e) => setBlockUserId(e.target.value)}
+                            className="text-white placeholder-white bg-transparent focus:outline-none"
+                            style={{
+                                width: blockUserId.length > 0 ? `${blockUserId.length + 1}ch` : '90px', // dynamic width
+                                minWidth: '90px',
+                                display: 'inline-block', // ensures input only takes needed width
+                            }}
+                        />
 
-                    {/* SVG Button floating next to input, matching height */}
-                    <button
-                        onClick={async () => {
-                            if (!blockUserId) return alert("Enter a user ID");
-
-                            try {
-                                const res = await fetchWithToken(`${apiUrl}/posts/admin/block-user`, {
-                                    method: "POST",
-                                    headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify({
-                                        user_id: blockUserId,
-                                        admin_key: "YOUR_SECRET_ADMIN_KEY",
-                                    }),
-                                });
-
-                                // ✅ Handle null first
-                                if (!res) {
-                                    showError("⚠️ Network error. Please try again.");
-                                    return;
-                                }
-
-                                // ✅ Now res is guaranteed not null
-                                if (!res.ok) {
-                                    const err = await res.json().catch(() => null);
-                                    if (res.status === 401 || res.status === 403) {
-                                        await handleSessionExpired();
+                        {/* Button immediately next to text, no margin */}
+                        <button
+                            onClick={async () => {
+                                if (!blockUserId) return alert("Enter a user ID");
+                                try {
+                                    const res = await fetchWithToken(`${apiUrl}/posts/admin/block-user`, {
+                                        method: "POST",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify({
+                                            user_id: blockUserId,
+                                            admin_key: "YOUR_SECRET_ADMIN_KEY",
+                                        }),
+                                    });
+                                    if (!res) {
+                                        showError("⚠️ Network error. Please try again.");
                                         return;
                                     }
-                                    showError(`Failed: ${err?.detail || "Unknown error"}`);
-                                    return;
+                                    if (!res.ok) {
+                                        const err = await res.json().catch(() => null);
+                                        if (res.status === 401 || res.status === 403) {
+                                            await handleSessionExpired();
+                                            return;
+                                        }
+                                        showError(`Failed: ${err?.detail || "Unknown error"}`);
+                                        return;
+                                    }
+                                    const result = await res.json();
+                                    alert(`✅ User blocked until ${new Date(result.blocked_until).toLocaleString()}`);
+                                    setBlockUserId("");
+                                } catch (err) {
+                                    console.error(err);
+                                    alert("Error occurred while blocking user.");
                                 }
-
-                                const result = await res.json();
-                                alert(`✅ User blocked until ${new Date(result.blocked_until).toLocaleString()}`);
-                                setBlockUserId("");
-                            } catch (err) {
-                                console.error(err);
-                                alert("Error occurred while blocking user.");
-                            }
-                        }}
-                        className="flex items-center justify-center h-12 w-12 text-white hover:text-green-400"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                            className="w-6 h-6"
+                            }}
+                            className="text-white hover:text-green-400 flex items-center justify-center ml-1" // small spacing
+                            style={{ display: 'inline-flex' }}
                         >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636"
-                            />
-                        </svg>
-                    </button>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="w-6 h-6"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636"
+                                />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
 
 
                 {/* Archive Deleted SVG */}
-                <div className="mb-2">
+                <div className="mb-6">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"

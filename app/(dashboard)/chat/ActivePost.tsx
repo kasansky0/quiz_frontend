@@ -17,7 +17,7 @@ import StatusBanner from "@/app/positiveBanner";
 
 
 
-
+const COMMENTS_CACHE_KEY = "post_comments";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
 const COMMENTS_PAGE_SIZE = 10;
 const commentsKey = (postId: string, skip: number) => `${apiUrl}/posts/${postId}/comments?skip=${skip}&limit=${COMMENTS_PAGE_SIZE}`;
@@ -63,11 +63,49 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const commentsArray = comments?.comments ?? [];
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMoreComments, setHasMoreComments] = useState(totalComments > COMMENTS_PAGE_SIZE);
-    const [displayedComments, setDisplayedComments] = useState<Comment[]>([]);
     const { data: session } = useSession(); // ✅ get session here
     const [statusBanner, setStatusBanner] = useState<{ message: string; type?: "loading" | "success" | "error" } | null>(null);
     const [isButtonLoading, setIsButtonLoading] = useState(false);
     const [loadError, setLoadError] = useState<string | null>(null);
+
+
+
+
+// --- Local storage --- //
+
+    const [displayedComments, setDisplayedComments] = useState<Comment[]>(() =>
+        loadCommentsFromLocal(post.id)
+    );
+
+    function saveCommentsToLocal(postId: string, newComments: Comment[]) {
+        if (!postId) return;
+
+        const currentCache = JSON.parse(localStorage.getItem(COMMENTS_CACHE_KEY) || "{}");
+        const existingComments: Comment[] = currentCache[postId] || [];
+
+        // Merge old + new, deduplicate by _id
+        const dedupedMap = new Map<string, Comment>();
+        [...existingComments, ...newComments].forEach(c => dedupedMap.set(c._id, c));
+
+        currentCache[postId] = Array.from(dedupedMap.values()).sort(
+            (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        );
+
+        localStorage.setItem(COMMENTS_CACHE_KEY, JSON.stringify(currentCache));
+    }
+
+    function loadCommentsFromLocal(postId: string): Comment[] {
+        const currentCache = JSON.parse(localStorage.getItem(COMMENTS_CACHE_KEY) || "{}");
+        return currentCache[postId] || [];
+    }
+
+    useEffect(() => {
+        if (displayedComments.length >= 0) {
+            saveCommentsToLocal(post.id, displayedComments);
+        }
+    }, [displayedComments, post.id]);
+
+// --- Local Storage --- //
 
 
 
@@ -168,15 +206,19 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             }
 
             setDisplayedComments(prev => {
-                const sortedNew = [...data.comments].sort(
+                const merged = [...prev, ...data.comments];
+
+                // Deduplicate by _id
+                const dedupedMap = new Map<string, Comment>();
+                merged.forEach(c => dedupedMap.set(c._id, c));
+
+                // Sort newest first (descending timestamp)
+                const sorted = Array.from(dedupedMap.values()).sort(
                     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
                 );
 
-                const updated = [...prev, ...sortedNew];
-
-                setHasMoreComments(updated.length < totalComments);
-
-                return updated;
+                setHasMoreComments(sorted.length < totalComments);
+                return sorted;
             });
 
             setCommentsSkip(prev => prev + data.comments.length);
@@ -340,6 +382,12 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             // COMMENT ADD
             onCommentCountChange?.(activePost.id, (totalComments || 0) + 1);
 
+            // UPDATE STATE & LOCALSTORAGE
+            setDisplayedComments(prev => {
+                const updated = [newComment, ...prev];
+                saveCommentsToLocal(activePost.id, updated);
+                return updated;
+            });
 
             setCurrentPage(1);
             setCommentsSkip(prev => prev + 1);
@@ -370,8 +418,11 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         const previousComments = [...displayedComments];
 
         // Optimistically mark as deleted locally (filter out)
-        setDisplayedComments(prev => prev.filter(c => c._id !== comment._id));
-        onCommentCountChange?.(activePost.id, (totalComments || 1) - 1);
+        setDisplayedComments(prev => {
+            const updated = [...prev, ...data.comments];
+            saveCommentsToLocal(activePost.id, data.comments); // append new
+            return updated;
+        });
 
         // Update SWR cache optimistically
         globalMutate(`${apiUrl}/posts/`, (cachedData: { posts: Post[]; total: number } | undefined) => {
