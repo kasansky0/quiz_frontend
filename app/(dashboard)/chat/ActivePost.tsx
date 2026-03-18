@@ -419,8 +419,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
         // Optimistically mark as deleted locally (filter out)
         setDisplayedComments(prev => {
-            const updated = [...prev, ...data.comments];
-            saveCommentsToLocal(activePost.id, data.comments); // append new
+            const updated = prev.filter(c => c._id !== comment._id);
+            saveCommentsToLocal(activePost.id, updated);
             return updated;
         });
 
