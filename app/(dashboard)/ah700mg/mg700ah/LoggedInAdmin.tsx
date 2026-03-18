@@ -222,7 +222,7 @@ export default function LoggedInAdmin() {
         <div ref={topRef} className="min-h-screen bg-black text-white relative">
             <div className="mx-auto max-w-2xl p-4 sm:p-10">
                 {/* Header */}
-                <h1 className="text-2xl sm:text-3xl font-bold text-white-400">
+                <h1 className="text-2xl sm:text-3xl mb-2 font-bold text-white-400">
                     Admin Dashboard
                 </h1>
 
@@ -242,38 +242,45 @@ export default function LoggedInAdmin() {
                         <div className="mb-6 text-sm sm:text-base text-white space-y-2">
 
                             {/* Total Requests */}
-                            <div className="inline-block bg-blue-600 text-white px-3 py-1 rounded-full">
-                                Total API Requests: {summary.total_requests ?? 0}
+                            <div className="inline-block text-white py-1 rounded-full">
+                                Total API Requests: <span className="text-yellow-500 font-bold">{summary.total_requests ?? 0}</span>
                             </div>
 
+                            <br/>
+
                             {/* Blocked IPs */}
-                            <div className="inline-block bg-blue-600 text-white px-3 py-1 rounded-full">
+                            <div className="inline-block text-white py-1 rounded-full">
                                 Blocked IPs:{" "}
                                 {blockedIps.length > 0
                                     ? blockedIps.map((ip, i) => (
                                         <span key={i}>
-                            {ip.ip} {ip.reason ? `(${ip.reason})` : ""} {ip.createdAt ? `[${formatLocalDate(ip.createdAt)}]` : ""}
+                                    <span className="text-yellow-500 font-bold">{ip.ip}</span> {ip.reason ? `(${ip.reason})` : ""} {ip.createdAt ? `[${formatLocalDate(ip.createdAt)}]` : ""}
                                             {i < blockedIps.length - 1 ? ", " : ""}
-                        </span>
+                                    </span>
                                     ))
-                                    : "None"}
+                                    : <span className="text-yellow-500 font-bold">None</span>}
                             </div>
 
+                            <br/>
+
+
                             {/* Blocked Users */}
-                            <div className="inline-block bg-blue-600 text-white px-3 py-1 rounded-full">
+                            <div className="inline-block text-white py-1 rounded-full">
                                 Blocked Users:{" "}
                                 {blockedUsers.length > 0
                                     ? blockedUsers.map((u, i) => (
                                         <span key={i}>
-                            {u.email}
+                                 <span className="text-yellow-500 font-bold">{u.email}</span>
                                             {i < blockedUsers.length - 1 ? ", " : ""}
-                        </span>
+                                </span>
                                     ))
-                                    : "None"}
+                                    : <span className="text-yellow-500 font-bold">None</span>}
                             </div>
 
+                            <br/>
+
                             {/* Last API Calls */}
-                            <div className="inline-block bg-blue-600 text-white px-3 py-1 rounded-full">
+                            <div className="inline-block text-white py-1 rounded-full">
                                 Last API Calls:{" "}
                                 {apicalls.length > 0
                                     ? apicalls.map((call, i) => {
@@ -281,12 +288,15 @@ export default function LoggedInAdmin() {
                                         const formattedTime = `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
                                         return (
                                             <span key={i}>
-                                {formattedTime} ({call.count_in_last_10_min ?? "—"})
-                                                {i < apicalls.length - 1 ? "; " : ""}
+                                {formattedTime} (
+                                <span className="text-yellow-500 font-bold">
+                                    {call.count_in_last_10_min ?? "—"}
+                                </span>
+                                ){i < apicalls.length - 1 ? "; " : ""}
                             </span>
                                         );
                                     })
-                                    : "No API calls"}
+                                    : <span className="text-yellow-500 font-bold">No API calls</span>}
                             </div>
 
                         </div>
@@ -430,28 +440,25 @@ export default function LoggedInAdmin() {
                     <>
                         {/* Total Users */}
                         <p className="text-white-300 text-sm sm:text-base mb-2">
-                            Total Users: <strong>{users.length}</strong>
+                            Total Users: <strong className="text-yellow-500">{users.length}</strong>
                         </p>
 
                         {/* Total Created Per Month */}
-                        <div className="text-white-300 text-sm sm:text-base mb-2 space-y-1">
+                        <div className="text-white-300 text-sm sm:text-base mb-2 flex flex-wrap gap-3">
                             {(() => {
-                                // Get all months
                                 const monthNames = [
                                     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
                                     "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"
                                 ];
 
-                                // Group users by month/year
                                 const usersByMonth: Record<string, number> = {};
 
                                 users.forEach(u => {
                                     const d = new Date(u.created_at);
-                                    const key = `${monthNames[d.getMonth()]} ${d.getFullYear()}`; // e.g., "December 2025"
+                                    const key = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
                                     usersByMonth[key] = (usersByMonth[key] || 0) + 1;
                                 });
 
-                                // Sort keys by date
                                 const sortedKeys = Object.keys(usersByMonth).sort((a, b) => {
                                     const [monthA, yearA] = a.split(" ");
                                     const [monthB, yearB] = b.split(" ");
@@ -461,9 +468,9 @@ export default function LoggedInAdmin() {
                                 });
 
                                 return sortedKeys.map(key => (
-                                    <p key={key}>
-                                        {key}: <strong>{usersByMonth[key]}</strong>
-                                    </p>
+                                    <span key={key} className="inline-block">
+                        {key}: <strong className="text-yellow-500">{usersByMonth[key]}</strong>
+                    </span>
                                 ));
                             })()}
                         </div>
