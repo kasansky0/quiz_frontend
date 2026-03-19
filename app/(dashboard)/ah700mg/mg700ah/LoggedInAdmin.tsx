@@ -9,6 +9,16 @@ import { fetchWithToken, handleSessionExpired } from "@/app/hooks/refreshToken";
 
 
 
+interface AdminLoggedIn {
+    timestamp: string;
+    userId?: string;
+    email: string;
+    nickname: string;
+    ip: string;
+    success: boolean;
+    reason?: string;
+}
+
 interface ApiCall {
     timestamp: string;
     endpoint: string;
@@ -32,6 +42,7 @@ interface AdminSummary {
     apicall_history: ApiCall[];
     blocked_ips: BlockedIp[];
     blocked_users: BlockedUser[];
+    admin_logged_in: AdminLoggedIn[];
 }
 
 
@@ -229,6 +240,29 @@ export default function LoggedInAdmin() {
 
 
 
+
+
+
+                {/* Recent Admin Logins */}
+                {summary?.admin_logged_in && summary.admin_logged_in.length > 0 && (
+                    <div className="mb-6 text-sm sm:text-base text-white space-y-1">
+                        <h3 className="font-bold text-white-400 mb-1">Recent Admin Logins:</h3>
+                        {summary.admin_logged_in.map((login, i) => (
+                            <div key={i} className="mb-2">
+                                <div className="text-yellow-500 font-bold">{login.nickname}</div>
+                                <div className="text-gray-400 text-xs">
+                                    ({login.email}) <br /> IP: {login.ip} | {login.success ? "✅ Success" : "❌ Failed"}
+                                </div>
+                                <div className="text-gray-400 text-xs">
+                                    [{formatLocalDate(login.timestamp)}]
+                                </div>
+                                {login.reason && (
+                                    <div className="text-red-400 text-xs">Reason: {login.reason}</div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                )}
 
 
 
