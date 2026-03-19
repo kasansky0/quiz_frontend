@@ -13,7 +13,7 @@ import StatusBanner from "@/app/positiveBanner";
 
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
-const COMMENTS_PAGE_SIZE = 10;
+const COMMENTS_PAGE_SIZE = 25;
 const commentsKey = (postId: string, skip: number) => `${apiUrl}/posts/${postId}/comments?skip=${skip}&limit=${COMMENTS_PAGE_SIZE}`;
 const fetcher = (url: string) =>
     fetch(url, { credentials: "include" }).then(res => res.json());
