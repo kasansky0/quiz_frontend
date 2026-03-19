@@ -12,19 +12,11 @@ import StatusBanner from "@/app/positiveBanner";
 
 
 
-
-
-
-
-
-const COMMENTS_CACHE_KEY = "post_comments";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
 const COMMENTS_PAGE_SIZE = 10;
 const commentsKey = (postId: string, skip: number) => `${apiUrl}/posts/${postId}/comments?skip=${skip}&limit=${COMMENTS_PAGE_SIZE}`;
-
 const fetcher = (url: string) =>
     fetch(url, { credentials: "include" }).then(res => res.json());
-
 
 type Props = {
     post: Post;
@@ -63,73 +55,15 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const commentsArray = comments?.comments ?? [];
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMoreComments, setHasMoreComments] = useState(totalComments > COMMENTS_PAGE_SIZE);
+    const [displayedComments, setDisplayedComments] = useState<Comment[]>([]);
     const { data: session } = useSession(); // ✅ get session here
     const [statusBanner, setStatusBanner] = useState<{ message: string; type?: "loading" | "success" | "error" } | null>(null);
     const [isButtonLoading, setIsButtonLoading] = useState(false);
     const [loadError, setLoadError] = useState<string | null>(null);
-
-
-
-
-// --- Local storage --- //
-
-    const [displayedComments, setDisplayedComments] = useState<Comment[]>(() =>
-        loadCommentsFromLocal(post.id)
-    );
-
-    function saveCommentsToLocal(postId: string, newComments: Comment[]) {
-        if (!postId) return;
-
-        const currentCache = JSON.parse(localStorage.getItem(COMMENTS_CACHE_KEY) || "{}");
-        const existingComments: Comment[] = currentCache[postId] || [];
-
-        // Merge old + new, deduplicate by _id
-        const dedupedMap = new Map<string, Comment>();
-        [...existingComments, ...newComments].forEach(c => dedupedMap.set(c._id, c));
-
-        currentCache[postId] = Array.from(dedupedMap.values()).sort(
-            (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-        );
-
-        localStorage.setItem(COMMENTS_CACHE_KEY, JSON.stringify(currentCache));
-    }
-
-    function loadCommentsFromLocal(postId: string): Comment[] {
-        const currentCache = JSON.parse(localStorage.getItem(COMMENTS_CACHE_KEY) || "{}");
-        return currentCache[postId] || [];
-    }
-
-    useEffect(() => {
-        if (displayedComments.length >= 0) {
-            saveCommentsToLocal(post.id, displayedComments);
-        }
-    }, [displayedComments, post.id]);
-
-// --- Local Storage --- //
-
-
-
-
-
-
     const showStatusBanner = (message: string, type: "loading" | "success" | "error" = "loading") => {
         setStatusBanner({ message, type });
         setTimeout(() => setStatusBanner(null), 5000); // hide after 3 seconds
     };
-
-
-
-
-
-
-
-// ENSURE LOAIDNG INDICATOR SHOWS FOR AT LEAST 1.5 SECONDS BEFORE HIDING //
-    useEffect(() => {
-        const timer = setTimeout(() => setShowLoading(false), 1500); // 3 seconds minimum
-        return () => clearTimeout(timer);
-    }, []);
-
-
 // POLL LATEST COMMENTS FOR THE POST EVERY 1 SECOND AND TRACK ERRORS //
     const { data: polledData, error } = useSWR(
         commentsKey(post.id, 0), // always fetch from skip=0 to get latest
@@ -137,63 +71,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         { refreshInterval: 5000 } // fetch every 5 seconds
     );
 
-
-// TOGGLE LOADING STATE INDICATOR BASED ON WHETHER COMMENTS HAVE BEEN RECEIVED OR POLLED //
-    useEffect(() => {
-        if (commentsArray?.length || polledData?.comments?.length) {
-            setShowLoading(false);
-        } else {
-            setShowLoading(true);
-        }
-    }, [commentsArray, polledData]);
-
-
-// MERGE NEWLY POLLED COMMENTS WITH DISPLAYED COMMENTS, REMOVE DUPS, SORT BY TIME, UPDATE PAGINATION //
-
-    useEffect(() => {
-        if (!polledData?.comments?.length) return;
-
-        setDisplayedComments(prev => {
-            // Merge old + new comments
-            const merged = [...prev, ...polledData.comments];
-
-            // Deduplicate by _id
-            const dedupedMap = new Map<string, Comment>();
-            merged.forEach(c => dedupedMap.set(c._id, c));
-
-            // Sort by timestamp ascending (old → new)
-            const sorted = Array.from(dedupedMap.values()).sort(
-                (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-            );
-
-            // Reverse the sequence if you want newest at the bottom visually
-            const reversed = sorted.reverse();
-
-            setCommentsSkip(reversed.length);
-            return reversed;
-        });
-    }, [polledData]);
-
-
-// SYNC AND SORT DISPLAY COMMENTS ON NEW DATA //
-
-    useEffect(() => {
-        if (!commentsArray.length) return;
-
-        setDisplayedComments([...commentsArray].sort(
-            (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-        ));
-
-        // Increment skip by the number of comments we just received
-        setCommentsSkip(commentsArray.length);
-
-        setCurrentPage(1);
-        setHasMoreComments(totalComments > COMMENTS_PAGE_SIZE);
-    }, [commentsArray, totalComments]);
-
-
 //LOAD NEXT PAGE OF COMMENTS FOR THE ACTIVE POST //
-
     const handleLoadMore = async () => {
         if (!activePost) return;
 
@@ -206,19 +84,15 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             }
 
             setDisplayedComments(prev => {
-                const merged = [...prev, ...data.comments];
-
-                // Deduplicate by _id
-                const dedupedMap = new Map<string, Comment>();
-                merged.forEach(c => dedupedMap.set(c._id, c));
-
-                // Sort newest first (descending timestamp)
-                const sorted = Array.from(dedupedMap.values()).sort(
+                const sortedNew = [...data.comments].sort(
                     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
                 );
 
-                setHasMoreComments(sorted.length < totalComments);
-                return sorted;
+                const updated = [...prev, ...sortedNew];
+
+                setHasMoreComments(updated.length < totalComments);
+
+                return updated;
             });
 
             setCommentsSkip(prev => prev + data.comments.length);
@@ -229,46 +103,14 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         }
     };
 
-
-// TRIGGER FADE IN ANIMATION ON MOUNT //
-
-    useEffect(() => {
-        const timer = setTimeout(() => setFade(true), 50);
-        return () => clearTimeout(timer);
-    }, []);
-
-
-// BLOCKED USER COUNTDOWN //
-
-    useEffect(() => {
-        if (!isBlocked || blockSeconds === null) return;
-
-        const timer = setInterval(() => {
-            setBlockSeconds(prev => {
-                if (prev === null || prev <= 1) {
-                    setIsBlocked(false);
-                    hideError();
-                    return null;
-                }
-                return prev - 1;
-            });
-        }, 5000);
-
-        return () => clearInterval(timer);
-    }, [isBlocked, blockSeconds, hideError]);
-
-
 // HELPER SESSION EXPIRE HANDLER //
-
     const handleSessionExpired = async () => {
         await signOut({ redirect: false }); // clear session
         setCooldownSeconds(null);
         hideError();
     };
 
-
 // FORMAT DATE AS X TIME AGO AND INDICATE IF EDITED //
-
     const formatLocalDate = (dateString?: string, editedString?: string) => {
         if (!dateString) return "";
 
@@ -311,8 +153,89 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         );
     };
 
-    // Add comment to active activePost
+// Add comment to active activePost
     const cooldownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+// ENSURE LOAIDNG INDICATOR SHOWS FOR AT LEAST 1.5 SECONDS BEFORE HIDING //
+    useEffect(() => {
+        const timer = setTimeout(() => setShowLoading(false), 1500); // 3 seconds minimum
+        return () => clearTimeout(timer);
+    }, []);
+
+// TOGGLE LOADING STATE INDICATOR BASED ON WHETHER COMMENTS HAVE BEEN RECEIVED OR POLLED //
+    useEffect(() => {
+        if (commentsArray?.length || polledData?.comments?.length) {
+            setShowLoading(false);
+        } else {
+            setShowLoading(true);
+        }
+    }, [commentsArray, polledData]);
+
+// MERGE NEWLY POLLED COMMENTS WITH DISPLAYED COMMENTS, REMOVE DUPS, SORT BY TIME, UPDATE PAGINATION //
+
+    useEffect(() => {
+        if (!polledData?.comments?.length) return;
+
+        setDisplayedComments(prev => {
+            // Merge old + new comments
+            const merged = [...prev, ...polledData.comments];
+
+            // Deduplicate by _id
+            const dedupedMap = new Map<string, Comment>();
+            merged.forEach(c => dedupedMap.set(c._id, c));
+
+            // Sort by timestamp ascending (old → new)
+            const sorted = Array.from(dedupedMap.values()).sort(
+                (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+            );
+
+            // Reverse the sequence if you want newest at the bottom visually
+            const reversed = sorted.reverse();
+
+            setCommentsSkip(reversed.length);
+            return reversed;
+        });
+    }, [polledData]);
+
+// SYNC AND SORT DISPLAY COMMENTS ON NEW DATA //
+    useEffect(() => {
+        if (!commentsArray.length) return;
+
+        setDisplayedComments([...commentsArray].sort(
+            (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        ));
+
+        // Increment skip by the number of comments we just received
+        setCommentsSkip(commentsArray.length);
+
+        setCurrentPage(1);
+        setHasMoreComments(totalComments > COMMENTS_PAGE_SIZE);
+    }, [commentsArray, totalComments]);
+
+// TRIGGER FADE IN ANIMATION ON MOUNT //
+    useEffect(() => {
+        const timer = setTimeout(() => setFade(true), 50);
+        return () => clearTimeout(timer);
+    }, []);
+
+// BLOCKED USER COUNTDOWN //
+    useEffect(() => {
+        if (!isBlocked || blockSeconds === null) return;
+
+        const timer = setInterval(() => {
+            setBlockSeconds(prev => {
+                if (prev === null || prev <= 1) {
+                    setIsBlocked(false);
+                    hideError();
+                    return null;
+                }
+                return prev - 1;
+            });
+        }, 5000);
+
+        return () => clearInterval(timer);
+    }, [isBlocked, blockSeconds, hideError]);
+
 
 
 
@@ -331,7 +254,6 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
 
 // COMMENT ADD //
-
     const handleAddComment = async (message: string) => {
         if (!activePost || !message.trim() || !userId || isSending || isBlocked) return;
         setIsSending(true);
@@ -382,12 +304,6 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             // COMMENT ADD
             onCommentCountChange?.(activePost.id, (totalComments || 0) + 1);
 
-            // UPDATE STATE & LOCALSTORAGE
-            setDisplayedComments(prev => {
-                const updated = [newComment, ...prev];
-                saveCommentsToLocal(activePost.id, updated);
-                return updated;
-            });
 
             setCurrentPage(1);
             setCommentsSkip(prev => prev + 1);
@@ -418,11 +334,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         const previousComments = [...displayedComments];
 
         // Optimistically mark as deleted locally (filter out)
-        setDisplayedComments(prev => {
-            const updated = prev.filter(c => c._id !== comment._id);
-            saveCommentsToLocal(activePost.id, updated);
-            return updated;
-        });
+        setDisplayedComments(prev => prev.filter(c => c._id !== comment._id));
+        onCommentCountChange?.(activePost.id, (totalComments || 1) - 1);
 
         // Update SWR cache optimistically
         globalMutate(`${apiUrl}/posts/`, (cachedData: { posts: Post[]; total: number } | undefined) => {
