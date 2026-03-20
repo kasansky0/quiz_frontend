@@ -255,22 +255,27 @@ export default function LoggedInAdmin() {
                 {summary?.limiter_hits && summary.limiter_hits.length > 0 && (
                     <div className="mb-6 text-sm sm:text-base text-white space-y-2">
                         <h3 className="font-bold text-white-400 mb-2">Recent Limiter Hits:</h3>
-                        {summary.limiter_hits.map((hit, i) => (
-                            <div
-                                key={i}
-                                className="bg-black/90 p-4 sm:p-6 rounded-xl mb-2 border border-white/20 text-sm sm:text-base shadow-sm"
-                            >
-                                <div className="text-yellow-500 font-bold">
-                                    {hit.nickname ?? hit.email ?? hit.user_id ?? "Unknown User"}
+
+                        <div className="max-h-80 overflow-y-auto pr-2 space-y-2">
+                            {summary.limiter_hits.map((hit, i) => (
+                                <div
+                                    key={i}
+                                    className="bg-black/90 p-4 sm:p-6 rounded-xl border border-white/20 text-sm sm:text-base shadow-sm"
+                                >
+                                    <div className="text-yellow-500 font-bold">
+                                        {hit.nickname ?? hit.email ?? hit.user_id ?? "Unknown User"}
+                                    </div>
+
+                                    <div className="text-gray-400 text-xs">
+                                        IP: {hit.ip} <br /> Endpoint: {hit.endpoint}
+                                    </div>
+
+                                    <div className="text-gray-400 text-xs">
+                                        [{formatLocalDate(hit.createdAt)}]
+                                    </div>
                                 </div>
-                                <div className="text-gray-400 text-xs">
-                                    IP: {hit.ip} <br /> Endpoint: {hit.endpoint}
-                                </div>
-                                <div className="text-gray-400 text-xs">
-                                    [{formatLocalDate(hit.createdAt)}]
-                                </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 )}
 
@@ -350,23 +355,56 @@ export default function LoggedInAdmin() {
                             <br/>
 
                             {/* Last API Calls */}
-                            <div className="inline-block text-white py-1 rounded-full">
-                                Last API Calls:{" "}
-                                {apicalls.length > 0
-                                    ? apicalls.map((call, i) => {
-                                        const date = new Date(call.timestamp);
-                                        const formattedTime = `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
-                                        return (
-                                            <span key={i}>
-                                {formattedTime} (
-                                <span className="text-yellow-500 font-bold">
-                                    {call.count_in_last_10_min ?? "—"}
-                                </span>
-                                ){i < apicalls.length - 1 ? "; " : ""}
-                            </span>
-                                        );
-                                    })
-                                    : <span className="text-yellow-500 font-bold">No API calls</span>}
+                            <div className="text-white">
+                                <h3 className="mb-2">Last API Calls:</h3>
+
+                                <div className="max-h-60 overflow-y-auto space-y-2 pr-2">
+                                    {apicalls.length > 0 ? (
+                                        [...apicalls]
+                                            .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+                                            .map((call, i) => {
+                                                const date = new Date(call.timestamp);
+                                                const formattedTime = `${date
+                                                    .getHours()
+                                                    .toString()
+                                                    .padStart(2, "0")}:${date
+                                                    .getMinutes()
+                                                    .toString()
+                                                    .padStart(2, "0")}`;
+
+                                                const count = call.count_in_last_10_min ?? 0;
+
+                                                // 🔥 Determine color based on digits
+                                                let colorClass = "text-yellow-500"; // default (1–2 digits)
+
+                                                if (count >= 100 && count < 1000) {
+                                                    colorClass = "text-yellow-500";
+                                                } else if (count >= 1000) {
+                                                    colorClass = "text-red-500";
+                                                }
+
+                                                return (
+                                                    <div
+                                                        key={i}
+                                                        className="bg-black/80 border border-white/20 rounded-lg p-3 text-sm shadow-sm"
+                                                    >
+                                                        <div className="text-gray-300">
+                                                            Time: {formattedTime}
+                                                        </div>
+
+                                                        <div>
+                                                            Calls:{" "}
+                                                            <span className={`${colorClass} font-bold`}>
+                                                                {count || "—"}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })
+                                    ) : (
+                                        <div className="text-yellow-500 font-bold">No API calls</div>
+                                    )}
+                                </div>
                             </div>
 
                         </div>
