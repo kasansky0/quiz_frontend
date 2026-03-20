@@ -357,6 +357,11 @@ export default function QuizSampleSection({
                                     {/* Question */}
                                     <Question question={questionData.question} />
 
+                                    {/* Future Ads / Message */}
+                                    <div className="w-full text-center text-sm py-2">
+                                        Promoted: CBS Electrical Contractors <br/> Hiring NETA 2 Techs 📍Raleigh NC
+                                    </div>
+
                                     {/* Options */}
                                     <div ref={optionsRef} className="flex flex-col gap-3">
                                         {questionData.options.map((option) => (

@@ -8,6 +8,15 @@ import { fetchWithToken, handleSessionExpired } from "@/app/hooks/refreshToken";
 
 
 
+interface LimiterHit {
+    user_id?: string;
+    nickname?: string;
+    email?: string;
+    ip?: string;
+    endpoint?: string;
+    limit?: number;
+    createdAt?: string;
+}
 
 interface AdminLoggedIn {
     timestamp: string;
@@ -43,6 +52,7 @@ interface AdminSummary {
     blocked_ips: BlockedIp[];
     blocked_users: BlockedUser[];
     admin_logged_in: AdminLoggedIn[];
+    limiter_hits: LimiterHit[];
 }
 
 
@@ -234,9 +244,35 @@ export default function LoggedInAdmin() {
             <div className="mx-auto max-w-2xl p-4 sm:p-10">
                 {/* Header */}
                 <h1 className="text-2xl sm:text-3xl mb-2 font-bold text-white-400">
-                    Admin Dashboard
+                    Logs
                 </h1>
 
+
+
+
+
+                {/* Recent Limiter Hits */}
+                {summary?.limiter_hits && summary.limiter_hits.length > 0 && (
+                    <div className="mb-6 text-sm sm:text-base text-white space-y-2">
+                        <h3 className="font-bold text-white-400 mb-2">Recent Limiter Hits:</h3>
+                        {summary.limiter_hits.map((hit, i) => (
+                            <div
+                                key={i}
+                                className="bg-black/90 p-4 sm:p-6 rounded-xl mb-2 border border-white/20 text-sm sm:text-base shadow-sm"
+                            >
+                                <div className="text-yellow-500 font-bold">
+                                    {hit.nickname ?? hit.email ?? hit.user_id ?? "Unknown User"}
+                                </div>
+                                <div className="text-gray-400 text-xs">
+                                    IP: {hit.ip} <br /> Endpoint: {hit.endpoint}
+                                </div>
+                                <div className="text-gray-400 text-xs">
+                                    [{formatLocalDate(hit.createdAt)}]
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
 
 
 

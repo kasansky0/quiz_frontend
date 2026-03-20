@@ -16,6 +16,13 @@ const InfoAndFormulas = () => {
             </div>
             */}
 
+            {/* Future Ads / Message */}
+            <div className="w-full text-center text-sm py-2">
+                Promoted: CBS Electrical Contractors <br/> Hiring NETA 2 Techs 📍Raleigh NC
+            </div>
+
+            <br/>
+
             {/* Authentication Notice */}
             <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-white-400 mb-6 text-left">
                 🔐 Authentication

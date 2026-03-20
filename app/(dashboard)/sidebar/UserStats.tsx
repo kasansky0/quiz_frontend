@@ -424,7 +424,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                 </svg>
 
                 <span className="text-white font-medium">
-                    Group chat
+                    Messenger
                 </span>
             </div>
 
