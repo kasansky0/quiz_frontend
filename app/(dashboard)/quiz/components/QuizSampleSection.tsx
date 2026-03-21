@@ -143,26 +143,47 @@ export default function QuizSampleSection({
                     }),
                 });
 
-                // if (!res.ok) showError("Failed to fetch question"); // 🔴 show banner
+                // Check HTTP status
+                if (!res.ok) {
+                    const text = await res.text().catch(() => "");
+                    console.error("Failed to fetch question:", text);
+                    if (isMounted) setFetchError(true);
+                    return;
+                }
 
-                const data: QuestionType = await res.json();
+                // Parse JSON safely
+                let data: QuestionType | null = null;
+                try {
+                    data = await res.json();
+                } catch (jsonErr) {
+                    console.error("Failed to parse question JSON:", jsonErr);
+                    if (isMounted) setFetchError(true);
+                    return;
+                }
 
-                if (!data?.options?.length) return;
+                // Ensure we have options
+                if (!data?.options?.length) {
+                    console.warn("No options found for question:", data);
+                    if (isMounted) setFetchError(true);
+                    return;
+                }
 
+                // Update state safely
                 if (isMounted) {
                     setQuestionData(data);
                     setTimeout(() => setFade(true), 100);
+                    setFetchError(false); // reset fetch error if successful
                 }
 
             } catch (err) {
-                // showError("Unable to load question. Please try again later."); //
-                setQuestionData(null);
+                console.error("Unable to load question:", err);
+                if (isMounted) setFetchError(true);
             }
         }
 
         fetchFirstQuestion();
 
-        return () => { isMounted = false };
+        return () => { isMounted = false; };
     }, [loadingDone, apiUrl, isLoggedIn, userId, subjectId]);
 
 
@@ -184,13 +205,37 @@ export default function QuizSampleSection({
                 }),
             });
 
-            // if (!res.ok) showError("Failed to fetch question"); // 🔴 show banner
+            // ✅ Check HTTP status
+            if (!res.ok) {
+                const text = await res.text().catch(() => "");
+                console.error("Failed to fetch next question:", text);
+                setFetchError(true);
+                return null;
+            }
 
-            const data: QuestionType = await res.json();
+            // ✅ Parse JSON safely
+            let data: QuestionType | null = null;
+            try {
+                data = await res.json();
+            } catch (jsonErr) {
+                console.error("Failed to parse next question JSON:", jsonErr);
+                setFetchError(true);
+                return null;
+            }
+
+            // ✅ Ensure options exist
+            if (!data?.options?.length) {
+                console.warn("No options in next question:", data);
+                setFetchError(true);
+                return null;
+            }
+
+            setFetchError(false); // reset error if successful
             return data;
 
         } catch (err) {
-            // showError("Unable to load question. Please check your connection or try again later.");
+            console.error("Unable to fetch next question:", err);
+            setFetchError(true);
             return null;
         }
     }
@@ -264,22 +309,38 @@ export default function QuizSampleSection({
                         }),
                     });
 
-                    // if (!res.ok) showError("API failed"); // 🔴 show banner
+                    // ✅ Check HTTP status
+                    if (!res.ok) {
+                        const text = await res.text().catch(() => "");
+                        console.error("Answer check failed:", text);
+                        showError?.("Failed to check answer. Please try again.");
+                        return;
+                    }
 
-                    const result = await res.json();
-                    correct = result.correct;
-                    answer = result.answer;
-                    explanation = result.explanation || questionData.explanation;
+                    // ✅ Parse JSON safely
+                    const result = await res.json().catch(err => {
+                        console.error("Failed to parse answer JSON:", err);
+                        showError?.("Failed to check answer. Please try again.");
+                        return null;
+                    });
+
+                    if (result) {
+                        correct = result.correct;
+                        answer = result.answer;
+                        explanation = result.explanation || questionData.explanation;
+                    }
+
                 } catch (err) {
-                    // Show user-friendly error only
-                    // showError("Failed to check answer. Please check your connection or try again.");
-                    return; // stop further processing
+                    console.error("Error checking answer:", err);
+                    showError?.("Failed to check answer. Please check your connection.");
+                    return;
                 }
             } else {
+                // fallback local check
                 correct = option === questionData.answer;
             }
 
-            // ✅ Add to the back of the queue if wrong
+            // ✅ Add wrong answers to the review queue
             if (!correct && setWrongQueue && questionData) {
                 setWrongQueue(prev => {
                     if (prev.some(q => q.id === questionData.id)) return prev;

@@ -121,7 +121,9 @@ export default function ChatStats() {
         const data = await res.json();
 
         if (!res.ok) {
-            throw new Error(data?.detail || "Failed to fetch comments");
+            // Instead of throwing, show error in UI
+            showError(data?.detail || "Failed to fetch comments");
+            return []; // return empty array to prevent crashes
         }
 
         return data;
