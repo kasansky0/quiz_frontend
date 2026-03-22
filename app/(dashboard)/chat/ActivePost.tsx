@@ -267,7 +267,6 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message: sanitizedMessage }),
             });
-            setCommentMessage("");
 
             // Handle null / network failure
             if (!res) {
@@ -301,22 +300,25 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
             const newComment: Comment = await res.json();
 
-            // COMMENT ADD
+            // COMMENT ADD TO UI IMMEDIATELY
+            setDisplayedComments(prev => [newComment, ...prev]);
+
+            // Update counts AFTER comment is visible
             onCommentCountChange?.(activePost.id, (totalComments || 0) + 1);
-
-
             setCurrentPage(1);
             setCommentsSkip(prev => prev + 1);
+
             setCommentMessage("");
             if (commentInputRef.current) commentInputRef.current.style.height = "auto";
             hideError();
+            showStatusBanner("Comment added!", "success"); // optional success feedback
 
         } catch (err: any) {
             console.error("Failed to post comment:", err);
             showError("We couldn't send your comment. Please try again."); // 🔴 friendly
             showStatusBanner("Failed to send comment", "error");
         } finally {
-            setIsSending(false);
+            setIsSending(false); // ✅ only now we unblock input
         }
     };
 
@@ -914,52 +916,59 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
                                 <form
                                     className="flex items-center gap-2"
-                                    onSubmit={(e) => {
+                                    onSubmit={async (e) => {
                                         e.preventDefault();
-                                        if (!commentMessage.trim() || isBlocked) return;
-                                        handleAddComment(commentMessage.trim());
+                                        if (!commentMessage.trim() || isBlocked || isSending) return;
+
+                                        setIsSending(true); // 🚀 block input immediately
+
+                                        try {
+                                            await handleAddComment(commentMessage.trim());
+                                            setCommentMessage(""); // only clear input after success
+                                        } catch (err) {
+                                            console.error(err);
+                                            setStatusBanner({ type: "error", message: "Failed to send comment" });
+                                        } finally {
+                                            setIsSending(false);
+                                        }
                                     }}
                                 >
-                                                    <textarea
-                                                        ref={commentInputRef}
-                                                        style={{ WebkitOverflowScrolling: "touch" }}
-                                                        onInput={(e) => {
-                                                            const el = e.currentTarget;
-                                                            el.style.height = "auto";
-                                                            el.style.height = el.scrollHeight + "px";
-                                                        }}
-                                                        placeholder={
-                                                            isBlocked
-                                                                ? `Blocked for ${blockSeconds}s...`
-                                                                : "Add a comment..."
-                                                        }
-                                                        className="
-                                                            flex-1
-                                                            rounded-xl
-                                                            bg-transparent
-                                                            px-3
-                                                            py-2
-                                                            text-sm sm:text-sm md:text-base
-                                                            text-white
-                                                            placeholder:text-[10px] sm:placeholder:text-xs md:placeholder:text-sm
-                                                            placeholder-white/80
-                                                            border
-                                                            border-white
-                                                            focus:outline-none
-                                                            focus:ring-2
-                                                            focus:ring-white/20
-                                                            resize-none
-                                                            overflow-hidden
-                                                          "
-                                                        rows={1}
-                                                        value={commentMessage}
-                                                        onChange={(e) => {
-                                                            const value = e.target.value;
-                                                            if (value.length <= 500) setCommentMessage(value);
-                                                            else setCommentMessage(value.slice(0, 500));
-                                                        }}
-                                                        disabled={isBlocked}
-                                                    />
+    <textarea
+        ref={commentInputRef}
+        style={{ WebkitOverflowScrolling: "touch" }}
+        onInput={(e) => {
+            const el = e.currentTarget;
+            el.style.height = "auto";
+            el.style.height = el.scrollHeight + "px";
+        }}
+        placeholder="Add a comment..." // keep placeholder stable
+        className="
+        flex-1
+        rounded-xl
+        bg-transparent
+        px-3
+        py-2
+        text-sm sm:text-sm md:text-base
+        text-white
+        placeholder:text-[10px] sm:placeholder:text-xs md:placeholder:text-sm
+        placeholder-white/80
+        border
+        border-white
+        focus:outline-none
+        focus:ring-2
+        focus:ring-white/20
+        resize-none
+        overflow-hidden
+      "
+        rows={1}
+        value={commentMessage}
+        onChange={(e) => {
+            const value = e.target.value;
+            if (value.length <= 500) setCommentMessage(value);
+            else setCommentMessage(value.slice(0, 500));
+        }}
+        disabled={isBlocked || isSending} // block input while sending
+    />
 
                                     <button
                                         type="submit"
@@ -980,8 +989,6 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                             />
                                         </svg>
                                     </button>
-
-
                                 </form>
                             </div>
 
