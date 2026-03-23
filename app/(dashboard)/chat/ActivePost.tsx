@@ -12,6 +12,7 @@ import StatusBanner from "@/app/positiveBanner";
 
 
 
+
 const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
 const COMMENTS_PAGE_SIZE = 25;
 const commentsKey = (postId: string, skip: number) => `${apiUrl}/posts/${postId}/comments?skip=${skip}&limit=${COMMENTS_PAGE_SIZE}`;
@@ -32,8 +33,16 @@ type Props = {
 };
 
 export default function ActivePost({ post, comments, userId, onBack, totalComments, onPostDelete, onPostUpdate, onCommentCountChange }: Props) {
-    if (!userId) {
-        signOut({ redirect: true });
+    const { data: session, status } = useSession();
+
+    // 1️⃣ While session is loading, just show a placeholder
+    if (status === "loading") {
+        return <div>Loading post...</div>;
+    }
+
+    // 2️⃣ If session is unauthenticated but userId prop exists,
+    // you can still render UI and let buttons work
+    if (status === "unauthenticated" && !userId) {
         return null;
     }
     const [commentMessage, setCommentMessage] = useState("");
@@ -57,7 +66,6 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMoreComments, setHasMoreComments] = useState(totalComments > COMMENTS_PAGE_SIZE);
     const [displayedComments, setDisplayedComments] = useState<Comment[]>([]);
-    const { data: session } = useSession(); // ✅ get session here
     const [statusBanner, setStatusBanner] = useState<{ message: string; type?: "loading" | "success" | "error" } | null>(null);
     const [isButtonLoading, setIsButtonLoading] = useState(false);
     const [loadError, setLoadError] = useState<string | null>(null);
@@ -423,7 +431,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 setActivePost(prev =>
                     prev ? { ...prev, comments: previousComments } : prev
                 );
-                showError("Oops! You need to log in again to continue.");
+                showError("Comment has been deleted. Refresh the page.");
             }
         } catch (err) {
             setDeletedCommentIds(prev => {
@@ -683,6 +691,25 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         setEditTitle(post.title);
         setEditMessage(post.message);
     };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1058,7 +1085,6 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                 >
                                     {displayedComments.map((comment) => {
 
-                                        console.log("Rendering comment:", comment);
 
                                             const isOwner = userId && comment.userId === userId;
                                             const isEditing = editingCommentId === comment._id;
