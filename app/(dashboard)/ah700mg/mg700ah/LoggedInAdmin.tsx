@@ -125,6 +125,15 @@ export default function LoggedInAdmin() {
     const fetchedRef = useRef(0);
     const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
     const [summary, setSummary] = useState<AdminSummary | null>(null);
+    const [spanWidth, setSpanWidth] = useState(90);
+    const spanRef = useRef<HTMLSpanElement>(null);
+
+    useEffect(() => {
+        if (spanRef.current) {
+            const width = spanRef.current.offsetWidth + 5; // small buffer
+            setSpanWidth(width);
+        }
+    }, [blockUserId]);
 
 
 
@@ -250,28 +259,174 @@ export default function LoggedInAdmin() {
 
 
 
+                <div className="my-2 flex items-center gap-4">
+                    {/* --- Block User by Email --- */}
+                    <div className="flex items-center">
+                        {/* Wrapper for input + button */}
+                        <div className="flex items-center bg-transparent">
+                            {/* Hidden span for measuring text width */}
+                            <span
+                                ref={spanRef}
+                                className="invisible absolute whitespace-pre text-white"
+                            >
+                              {blockUserId || "Block User"}
+                            </span>
+
+                            {/* Input */}
+                            <input
+                                type="text"
+                                placeholder="Block User"
+                                value={blockUserId}
+                                onChange={(e) => setBlockUserId(e.target.value)}
+                                className="text-white placeholder-white bg-transparent focus:outline-none"
+                                style={{
+                                    width: `${spanWidth}px`,
+                                    minWidth: "90px",
+                                }}
+                            />
+
+                            {/* Button immediately next to text, no margin */}
+                            <button
+                                onClick={async () => {
+                                    if (!blockUserId) return alert("Enter a user ID");
+                                    try {
+                                        const res = await fetchWithToken(`${apiUrl}/posts/admin/block-user`, {
+                                            method: "POST",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({
+                                                user_id: blockUserId,
+                                                admin_key: "YOUR_SECRET_ADMIN_KEY",
+                                            }),
+                                        });
+                                        if (!res) {
+                                            showError("⚠️ Network error. Please try again.");
+                                            return;
+                                        }
+                                        if (!res.ok) {
+                                            const err = await res.json().catch(() => null);
+                                            if (res.status === 401 || res.status === 403) {
+                                                await handleSessionExpired();
+                                                return;
+                                            }
+                                            showError(`Failed: ${err?.detail || "Unknown error"}`);
+                                            return;
+                                        }
+                                        const result = await res.json();
+                                        alert(`✅ User blocked until ${new Date(result.blocked_until).toLocaleString()}`);
+                                        setBlockUserId("");
+                                    } catch (err) {
+                                        console.error(err);
+                                        alert("Error occurred while blocking user.");
+                                    }
+                                }}
+                                className="text-white hover:text-green-400 flex items-center justify-center ml-1" // small spacing
+                                style={{ display: 'inline-flex' }}
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth={1.5}
+                                    stroke="currentColor"
+                                    className="w-6 h-6"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+
+
+
+
+                    {/* Archive Deleted SVG */}
+                    <div >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="white"
+                            className="w-6 h-6 cursor-pointer text-blue-600 hover:text-blue-700"
+                            onClick={async () => {
+                                if (!confirm("Are you sure you want to archive all deleted posts and comments?")) return;
+
+                                try {
+                                    const res = await fetchWithToken(`${apiUrl}/posts/admin/archive-deleted`, {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                        },
+                                    });
+
+                                    // ✅ TypeScript-safe null check
+                                    if (!res) {
+                                        showError("⚠️ Network error. Please try again.");
+                                        return;
+                                    }
+
+                                    // Now TypeScript knows res is not null
+                                    if (!res.ok) {
+                                        const err = await res.json().catch(() => null);
+                                        if (res.status === 401 || res.status === 403) {
+                                            await handleSessionExpired();
+                                            return;
+                                        }
+                                        showError(`Failed: ${err?.detail || "Unknown error"}`);
+                                        return;
+                                    }
+
+                                    const result = await res.json();
+                                    alert(`Archived ${result.posts_archived} posts and ${result.comments_archived} comments.`);
+                                } catch (err) {
+                                    console.error(err);
+                                    alert("Error occurred while archiving.");
+                                }
+                            }}
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0-3-3m3 3 3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"
+                            />
+                        </svg>
+                    </div>
+                </div>
+
+
+
 
                 {/* Recent Limiter Hits */}
                 {summary?.limiter_hits && summary.limiter_hits.length > 0 && (
-                    <div className="mb-6 text-sm sm:text-base text-white space-y-2">
-                        <h3 className="font-bold text-white-400 mb-2">Recent Limiter Hits:</h3>
+                    <div className="bg-black/90 p-4 sm:p-6 rounded-xl mb-2 border border-white text-sm sm:text-base">
+                        <h3 className="font-bold text-white">
+                            Recent Limiter Hits: ({summary.limiter_hits.length} unique IP{summary.limiter_hits.length > 1 ? "s" : ""})
+                        </h3>
 
                         <div className="max-h-80 overflow-y-auto pr-2 space-y-2">
                             {summary.limiter_hits.map((hit, i) => (
                                 <div
                                     key={i}
-                                    className="bg-black/90 p-4 sm:p-6 rounded-xl border border-white/20 text-sm sm:text-base shadow-sm"
+                                    className="bg-black/90 rounded-xl text-sm sm:text-base"
                                 >
-                                    <div className="text-yellow-500 font-bold">
-                                        {hit.nickname ?? hit.email ?? hit.user_id ?? "Unknown User"}
-                                    </div>
-
-                                    <div className="text-gray-400 text-xs">
-                                        IP: {hit.ip} <br /> Endpoint: {hit.endpoint}
-                                    </div>
-
-                                    <div className="text-gray-400 text-xs">
-                                        [{formatLocalDate(hit.createdAt)}]
+                                    <div className="flex items-center mb-3 sm:mb-4">
+                                        <div>
+                                            <div>
+                                                <p className="font-bold text-yellow-500">
+                                                    {hit.nickname ?? hit.email ?? hit.user_id ?? "Unknown User"}
+                                                </p>
+                                            </div>
+                                            <p className="text-blue-400 text-xs sm:text-sm">IP: {hit.ip}</p>
+                                            <p className="text-gray-400 text-xs sm:text-sm">Endpoint: {hit.endpoint}</p>
+                                            <p className="text-red-500 text-xs sm:text-sm">
+                                                [{formatLocalDate(hit.createdAt)}]
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -284,9 +439,11 @@ export default function LoggedInAdmin() {
 
 
 
+
+
                 {/* Recent Admin Logins */}
                 {summary?.admin_logged_in && summary.admin_logged_in.length > 0 && (
-                    <div className="mb-6 text-sm sm:text-base text-white space-y-1">
+                    <div className="bg-black/90 p-4 sm:p-6 rounded-xl mb-2 border border-white text-sm sm:text-base">
                         <h3 className="font-bold text-white-400 mb-1">Recent Admin Logins:</h3>
                         {summary.admin_logged_in.map((login, i) => (
                             <div key={i} className="mb-2">
@@ -308,23 +465,25 @@ export default function LoggedInAdmin() {
 
 
 
+
+
+
+
                 {summary && (() => {
                     const apicalls = summary.apicall_history?.filter(c => Object.keys(c).length > 0) || [];
                     const blockedIps = summary.blocked_ips?.filter(ip => Object.keys(ip).length > 0) || [];
                     const blockedUsers = summary.blocked_users?.filter(u => Object.keys(u).length > 0) || [];
 
                     return (
-                        <div className="mb-6 text-sm sm:text-base text-white space-y-2">
+                        <div className="text-sm sm:text-base text-white space-y-2">
 
                             {/* Total Requests */}
-                            <div className="inline-block text-white py-1 rounded-full">
+                            <div className="bg-black/90 p-4 sm:p-6 rounded-xl border border-white text-sm sm:text-base">
                                 Total API Requests: <span className="text-yellow-500 font-bold">{summary.total_requests ?? 0}</span>
                             </div>
 
-                            <br/>
-
                             {/* Blocked IPs */}
-                            <div className="inline-block text-white py-1 rounded-full">
+                            <div className="bg-black/90 p-4 sm:p-6 rounded-xl mb-6 border border-white text-sm sm:text-base">
                                 Blocked IPs:{" "}
                                 {blockedIps.length > 0
                                     ? blockedIps.map((ip, i) => (
@@ -336,11 +495,9 @@ export default function LoggedInAdmin() {
                                     : <span className="text-yellow-500 font-bold">None</span>}
                             </div>
 
-                            <br/>
-
 
                             {/* Blocked Users */}
-                            <div className="inline-block text-white py-1 rounded-full">
+                            <div className="bg-black/90 p-4 sm:p-6 rounded-xl mb-6 border border-white text-sm sm:text-base">
                                 Blocked Users:{" "}
                                 {blockedUsers.length > 0
                                     ? blockedUsers.map((u, i) => (
@@ -352,10 +509,8 @@ export default function LoggedInAdmin() {
                                     : <span className="text-yellow-500 font-bold">None</span>}
                             </div>
 
-                            <br/>
-
                             {/* Last API Calls */}
-                            <div className="text-white">
+                            <div className="bg-black/90 p-4 sm:p-6 rounded-xl mb-6 border border-white text-sm sm:text-base">
                                 <h3 className="mb-2">Last API Calls:</h3>
 
                                 <div className="max-h-60 overflow-y-auto space-y-2 pr-2">
@@ -386,17 +541,14 @@ export default function LoggedInAdmin() {
                                                 return (
                                                     <div
                                                         key={i}
-                                                        className="bg-black/80 border border-white/20 rounded-lg p-3 text-sm shadow-sm"
+                                                        className="bg-black/80 rounded-lg text-sm shadow-sm flex items-center gap-4"
                                                     >
                                                         <div className="text-gray-300">
                                                             Time: {formattedTime}
                                                         </div>
 
                                                         <div>
-                                                            Calls:{" "}
-                                                            <span className={`${colorClass} font-bold`}>
-                                                                {count || "—"}
-                                                            </span>
+                                                            Calls: <span className={`${colorClass} font-bold`}>{count || "—"}</span>
                                                         </div>
                                                     </div>
                                                 );
@@ -417,144 +569,21 @@ export default function LoggedInAdmin() {
 
 
 
-                {/* --- Block User by Email --- */}
-                <div className="my-6 flex items-center">
-                    {/* Wrapper for input + button */}
-                    <div className="flex items-center bg-transparent">
-                        <input
-                            type="text"
-                            placeholder="Block User"
-                            value={blockUserId}
-                            onChange={(e) => setBlockUserId(e.target.value)}
-                            className="text-white placeholder-white bg-transparent focus:outline-none"
-                            style={{
-                                width: blockUserId.length > 0 ? `${blockUserId.length + 1}ch` : '90px', // dynamic width
-                                minWidth: '90px',
-                                display: 'inline-block', // ensures input only takes needed width
-                            }}
-                        />
-
-                        {/* Button immediately next to text, no margin */}
-                        <button
-                            onClick={async () => {
-                                if (!blockUserId) return alert("Enter a user ID");
-                                try {
-                                    const res = await fetchWithToken(`${apiUrl}/posts/admin/block-user`, {
-                                        method: "POST",
-                                        headers: { "Content-Type": "application/json" },
-                                        body: JSON.stringify({
-                                            user_id: blockUserId,
-                                            admin_key: "YOUR_SECRET_ADMIN_KEY",
-                                        }),
-                                    });
-                                    if (!res) {
-                                        showError("⚠️ Network error. Please try again.");
-                                        return;
-                                    }
-                                    if (!res.ok) {
-                                        const err = await res.json().catch(() => null);
-                                        if (res.status === 401 || res.status === 403) {
-                                            await handleSessionExpired();
-                                            return;
-                                        }
-                                        showError(`Failed: ${err?.detail || "Unknown error"}`);
-                                        return;
-                                    }
-                                    const result = await res.json();
-                                    alert(`✅ User blocked until ${new Date(result.blocked_until).toLocaleString()}`);
-                                    setBlockUserId("");
-                                } catch (err) {
-                                    console.error(err);
-                                    alert("Error occurred while blocking user.");
-                                }
-                            }}
-                            className="text-white hover:text-green-400 flex items-center justify-center ml-1" // small spacing
-                            style={{ display: 'inline-flex' }}
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth={1.5}
-                                stroke="currentColor"
-                                className="w-6 h-6"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636"
-                                />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
 
 
 
-                {/* Archive Deleted SVG */}
-                <div className="mb-6">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="white"
-                        className="w-6 h-6 cursor-pointer text-blue-600 hover:text-blue-700"
-                        onClick={async () => {
-                            if (!confirm("Are you sure you want to archive all deleted posts and comments?")) return;
-
-                            try {
-                                const res = await fetchWithToken(`${apiUrl}/posts/admin/archive-deleted`, {
-                                    method: "POST",
-                                    headers: {
-                                        "Content-Type": "application/json",
-                                    },
-                                });
-
-                                // ✅ TypeScript-safe null check
-                                if (!res) {
-                                    showError("⚠️ Network error. Please try again.");
-                                    return;
-                                }
-
-                                // Now TypeScript knows res is not null
-                                if (!res.ok) {
-                                    const err = await res.json().catch(() => null);
-                                    if (res.status === 401 || res.status === 403) {
-                                        await handleSessionExpired();
-                                        return;
-                                    }
-                                    showError(`Failed: ${err?.detail || "Unknown error"}`);
-                                    return;
-                                }
-
-                                const result = await res.json();
-                                alert(`Archived ${result.posts_archived} posts and ${result.comments_archived} comments.`);
-                            } catch (err) {
-                                console.error(err);
-                                alert("Error occurred while archiving.");
-                            }
-                        }}
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0-3-3m3 3 3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"
-                        />
-                    </svg>
-                </div>
 
 
 
                 {!usersLoading && users.length > 0 && (
-                    <>
+                    <div className="bg-black/90 p-4 sm:p-6 my-2 rounded-xl border border-white text-sm sm:text-base">
                         {/* Total Users */}
                         <p className="text-white-300 text-sm sm:text-base mb-2">
                             Total Users: <strong className="text-yellow-500">{users.length}</strong>
                         </p>
 
                         {/* Total Created Per Month */}
-                        <div className="text-white-300 text-sm sm:text-base mb-2 flex flex-wrap gap-3">
+                        <div className="text-white-300 text-sm sm:text-base mb-2 flex flex-col gap-3">
                             {(() => {
                                 const monthNames = [
                                     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -579,12 +608,12 @@ export default function LoggedInAdmin() {
 
                                 return sortedKeys.map(key => (
                                     <span key={key} className="inline-block">
-                        {key}: <strong className="text-yellow-500">{usersByMonth[key]}</strong>
-                    </span>
+                                        {key}: <strong className="text-yellow-500">{usersByMonth[key]}</strong>
+                                    </span>
                                 ));
                             })()}
                         </div>
-                    </>
+                    </div>
                 )}
 
 
