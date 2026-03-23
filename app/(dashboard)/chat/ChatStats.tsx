@@ -28,6 +28,7 @@ export default function ChatStats() {
     const [serverError, setServerError] = useState<string | null>(null);
     const [showLoading, setShowLoading] = useState(true);
     const { data: session } = useSession();
+    const [deletedCommentIds, setDeletedCommentIds] = useState<Set<string>>(new Set());
 
     // --- POSTS PAGINATION ---
     const [postSkip, setPostSkip] = useState(0);
@@ -129,21 +130,20 @@ export default function ChatStats() {
         return data;
     };
     const { data: polledComments } = useSWR<Comment[]>(
-        activePost ? `${apiUrl}/posts/${activePost.id}/comments?skip=0&limit=10` : null,
+        activePost ? `${apiUrl}/posts/${activePost.id}/comments?skip=0&limit=25` : null,
         commentsFetcher,
-        { refreshInterval: 3000, revalidateOnFocus: true, dedupingInterval: 1000 }
+        { refreshInterval: 15000, revalidateOnFocus: true, dedupingInterval: 1000 }
     );
 
     useEffect(() => {
-        if (!polledComments?.length) return;
-        setActivePostComments(prev => {
-            const existingIds = new Set(prev.map(c => c.id));
-            const newComments = polledComments.filter(c => !existingIds.has(c.id));
-            if (newComments.length === 0) return prev;
-            return [...prev, ...newComments].sort(
-                (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-            );
-        });
+        if (!polledComments || !Array.isArray(polledComments)) return;
+
+        // Replace entire comment state instead of appending
+        const sorted = [...polledComments].sort(
+            (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+        );
+
+        setActivePostComments(sorted);
     }, [polledComments]);
 
     const handleActivatePost = (post: Post) => {
@@ -466,6 +466,8 @@ export default function ChatStats() {
                     <div className={`transition-opacity duration-500 ease-in-out ${listFade ? "opacity-100" : "opacity-0"} w-full flex-1`}>
                         {activePost && (
                             <ActivePost
+                                deletedCommentIds={deletedCommentIds}       // ✅ pass set
+                                setDeletedCommentIds={setDeletedCommentIds} // ✅ pass setter
                                 post={activePost}
                                 comments={{ comments: activePostComments, total: Number(activePost.commentCount ?? 0) }}
                                 userId={userId}

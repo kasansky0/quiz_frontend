@@ -20,6 +20,8 @@ const fetcher = (url: string) =>
 
 type Props = {
     post: Post;
+    deletedCommentIds: Set<string>;
+    setDeletedCommentIds: React.Dispatch<React.SetStateAction<Set<string>>>;
     comments: { comments: Comment[]; total: number };
     userId?: string | null;
     onBack: () => void;
@@ -50,7 +52,6 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const [fade, setFade] = useState(false);
     const [blockMessage, setBlockMessage] = useState<string | null>(null);
     const [showLoading, setShowLoading] = useState(true);
-    const { fetchPostComments } = chatApis({ apiUrl });
     const [commentsSkip, setCommentsSkip] = useState(0); // number of comments already loaded
     const commentsArray = comments?.comments ?? [];
     const [currentPage, setCurrentPage] = useState(1);
@@ -60,15 +61,22 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const [statusBanner, setStatusBanner] = useState<{ message: string; type?: "loading" | "success" | "error" } | null>(null);
     const [isButtonLoading, setIsButtonLoading] = useState(false);
     const [loadError, setLoadError] = useState<string | null>(null);
+    const [deletedCommentIds, setDeletedCommentIds] = useState<Set<string>>(new Set());
+    const { fetchPostComments } = chatApis({ apiUrl });
     const showStatusBanner = (message: string, type: "loading" | "success" | "error" = "loading") => {
         setStatusBanner({ message, type });
-        setTimeout(() => setStatusBanner(null), 5000); // hide after 3 seconds
+        setIsSending(true); // 🔒 lock
+
+        setTimeout(() => {
+            setStatusBanner(null);
+            setIsSending(false); // 🔓 unlock AFTER banner
+        }, 10000);
     };
 // POLL LATEST COMMENTS FOR THE POST EVERY 1 SECOND AND TRACK ERRORS //
     const { data: polledData, error } = useSWR(
         commentsKey(post.id, 0), // always fetch from skip=0 to get latest
         fetcher,
-        { refreshInterval: 5000 } // fetch every 5 seconds
+        { refreshInterval: 15000 } // fetch every 5 seconds
     );
 
 //LOAD NEXT PAGE OF COMMENTS FOR THE ACTIVE POST //
@@ -99,7 +107,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             setCurrentPage(prev => prev + 1);
 
         } catch (err) {
-            showError("Failed to load more comments. Please try again.");
+            showError("Oops! You need to log in again to continue.");
         }
     };
 
@@ -176,41 +184,50 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     useEffect(() => {
         if (!polledData?.comments?.length) return;
 
-        setDisplayedComments(prev => {
-            // Merge old + new comments
-            const merged = [...prev, ...polledData.comments];
+        const polledComments = polledData.comments as Comment[]; // ✅ cast to Comment[]
 
-            // Deduplicate by _id
+        setDisplayedComments(prev => {
+            // 0️⃣ Filter out deleted comments so they don't reappear
+            const filteredPolled = polledComments.filter(c => !deletedCommentIds.has(c._id));
+
+            // 1️⃣ Merge old + new comments
+            const merged = [...prev, ...filteredPolled];
+
+            // 2️⃣ Deduplicate by _id
             const dedupedMap = new Map<string, Comment>();
             merged.forEach(c => dedupedMap.set(c._id, c));
 
-            // Sort by timestamp ascending (old → new)
+            // 3️⃣ Sort by timestamp ascending (old → new)
             const sorted = Array.from(dedupedMap.values()).sort(
                 (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
             );
 
-            // Reverse the sequence if you want newest at the bottom visually
+            // 4️⃣ Reverse so newest is at bottom
             const reversed = sorted.reverse();
 
+            // 5️⃣ Update commentsSkip
             setCommentsSkip(reversed.length);
+
             return reversed;
         });
-    }, [polledData]);
+    }, [polledData, deletedCommentIds]);
 
 // SYNC AND SORT DISPLAY COMMENTS ON NEW DATA //
     useEffect(() => {
         if (!commentsArray.length) return;
 
-        setDisplayedComments([...commentsArray].sort(
+        const filteredComments = commentsArray.filter(
+            c => !deletedCommentIds.has(c._id)
+        );
+
+        setDisplayedComments(filteredComments.sort(
             (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
         ));
 
-        // Increment skip by the number of comments we just received
-        setCommentsSkip(commentsArray.length);
-
+        setCommentsSkip(filteredComments.length);
         setCurrentPage(1);
         setHasMoreComments(totalComments > COMMENTS_PAGE_SIZE);
-    }, [commentsArray, totalComments]);
+    }, [commentsArray, deletedCommentIds, totalComments]);
 
 // TRIGGER FADE IN ANIMATION ON MOUNT //
     useEffect(() => {
@@ -256,17 +273,17 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 // COMMENT ADD //
     const handleAddComment = async (message: string) => {
         if (!activePost || !message.trim() || !userId || isSending || isBlocked) return;
-        setIsSending(true);
 
         const sanitizedMessage = DOMPurify.sanitize(message.trim());
 
         try {
-            showStatusBanner("Sending comment...", "loading");
+            showStatusBanner("Sending comment... Please wait", "loading");
             const res = await fetchWithToken(`${apiUrl}/posts/${activePost.id}/comments`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message: sanitizedMessage }),
             });
+            setCommentMessage("");
 
             // Handle null / network failure
             if (!res) {
@@ -300,25 +317,20 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
             const newComment: Comment = await res.json();
 
-            // COMMENT ADD TO UI IMMEDIATELY
-            setDisplayedComments(prev => [newComment, ...prev]);
-
-            // Update counts AFTER comment is visible
+            // COMMENT ADD
             onCommentCountChange?.(activePost.id, (totalComments || 0) + 1);
+
+
             setCurrentPage(1);
             setCommentsSkip(prev => prev + 1);
-
             setCommentMessage("");
             if (commentInputRef.current) commentInputRef.current.style.height = "auto";
             hideError();
-            showStatusBanner("Comment added!", "success"); // optional success feedback
 
         } catch (err: any) {
             console.error("Failed to post comment:", err);
             showError("We couldn't send your comment. Please try again."); // 🔴 friendly
             showStatusBanner("Failed to send comment", "error");
-        } finally {
-            setIsSending(false); // ✅ only now we unblock input
         }
     };
 
@@ -332,54 +344,98 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         const confirmed = window.confirm("Are you sure you want to delete this comment?");
         if (!confirmed) return;
 
-        // Store previous state for rollback
-        const previousComments = [...displayedComments];
+        const previousComments = [...displayedComments]; // backup for rollback
 
-        // Optimistically mark as deleted locally (filter out)
-        setDisplayedComments(prev => prev.filter(c => c._id !== comment._id));
-        onCommentCountChange?.(activePost.id, (totalComments || 1) - 1);
+        // ✅ Track deleted comment
+        setDeletedCommentIds(prev => new Set(prev).add(comment._id));
 
-        // Update SWR cache optimistically
-        globalMutate(`${apiUrl}/posts/`, (cachedData: { posts: Post[]; total: number } | undefined) => {
-            if (!cachedData) return cachedData;
-            const updatedPosts = cachedData.posts.map(p =>
-                p.id === activePost.id
-                    ? { ...p, comments: p.comments?.filter(c => c._id !== comment._id) }
-                    : p
-            );
-            return { ...cachedData, posts: updatedPosts };
-        }, false);
-
-        globalMutate(`${apiUrl}/posts/${activePost.id}`, (cachedPost: Post | undefined) => {
-            if (!cachedPost) return cachedPost;
-            return { ...cachedPost, comments: cachedPost.comments?.filter(c => c._id !== comment._id) };
-        }, false);
-
-        // Call backend
         try {
+            // add to deleted set in parent
+            setDeletedCommentIds(prev => new Set(prev).add(comment._id));
+
+            // 1️⃣ Optimistically remove comment from UI
+            setDisplayedComments(prev =>
+                prev.filter(c => c._id !== comment._id)
+            );
+
+            // Update activePost locally
+            setActivePost(prev =>
+                prev
+                    ? { ...prev, comments: prev.comments?.filter(c => c._id !== comment._id) }
+                    : prev
+            );
+
+            // 2️⃣ Mutate the SWR keys exactly like edit does
+            globalMutate(
+                `${apiUrl}/posts/`,
+                (cachedData: { posts: Post[]; total: number } | undefined) => {
+                    if (!cachedData) return cachedData;
+                    const updatedPosts = cachedData.posts.map(p =>
+                        p.id === activePost.id
+                            ? { ...p, comments: p.comments?.filter(c => c._id !== comment._id) }
+                            : p
+                    );
+                    return { ...cachedData, posts: updatedPosts };
+                },
+                false
+            );
+
+            globalMutate(
+                `${apiUrl}/posts/${activePost.id}`,
+                (cachedPost: Post | undefined) => {
+                    if (!cachedPost) return cachedPost;
+                    return {
+                        ...cachedPost,
+                        comments: cachedPost.comments?.filter(c => c._id !== comment._id)
+                    };
+                },
+                false
+            );
+
+            globalMutate(
+                commentsKey(activePost.id, 0),
+                (cachedComments: { comments: Comment[]; total: number } | undefined) => {
+                    if (!cachedComments) return cachedComments;
+                    return {
+                        ...cachedComments,
+                        comments: cachedComments.comments.filter(c => c._id !== comment._id),
+                        total: cachedComments.total - 1
+                    };
+                },
+                false
+            );
+
+            // 3️⃣ Call backend
             const res = await fetchWithToken(
                 `${apiUrl}/posts/${activePost.id}/comments/${comment._id}`,
                 { method: "DELETE" }
             );
 
             if (!res || !res.ok) {
-                // Rollback UI & counts
+                // rollback on failure
+                setDeletedCommentIds(prev => {
+                    const newSet = new Set(prev);
+                    newSet.delete(comment._id);
+                    return newSet;
+                });
+
                 setDisplayedComments(previousComments);
-                onCommentCountChange?.(activePost.id, totalComments || 0);
-
-                if (res?.status === 403) {
-                    showError("You are not allowed to delete this comment.");
-                } else if (res?.status === 401) {
-                    await handleSessionExpired();
-                } else {
-                    showError("Failed to delete comment. It will reappear on next refresh.");
-                }
+                setActivePost(prev =>
+                    prev ? { ...prev, comments: previousComments } : prev
+                );
+                showError("Oops! You need to log in again to continue.");
             }
-
         } catch (err) {
-            // Rollback UI & counts
+            setDeletedCommentIds(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(comment._id);
+                return newSet;
+            });
+
             setDisplayedComments(previousComments);
-            onCommentCountChange?.(activePost.id, totalComments || 0);
+            setActivePost(prev =>
+                prev ? { ...prev, comments: previousComments } : prev
+            );
             console.error("Delete comment error:", err);
             showError("Network error. Comment will reappear on next refresh.");
         }
@@ -916,59 +972,54 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
                                 <form
                                     className="flex items-center gap-2"
-                                    onSubmit={async (e) => {
+                                    onSubmit={(e) => {
                                         e.preventDefault();
-                                        if (!commentMessage.trim() || isBlocked || isSending) return;
-
-                                        setIsSending(true); // 🚀 block input immediately
-
-                                        try {
-                                            await handleAddComment(commentMessage.trim());
-                                            setCommentMessage(""); // only clear input after success
-                                        } catch (err) {
-                                            console.error(err);
-                                            setStatusBanner({ type: "error", message: "Failed to send comment" });
-                                        } finally {
-                                            setIsSending(false);
-                                        }
+                                        if (!commentMessage.trim() || isBlocked) return;
+                                        handleAddComment(commentMessage.trim());
                                     }}
                                 >
-    <textarea
-        ref={commentInputRef}
-        style={{ WebkitOverflowScrolling: "touch" }}
-        onInput={(e) => {
-            const el = e.currentTarget;
-            el.style.height = "auto";
-            el.style.height = el.scrollHeight + "px";
-        }}
-        placeholder="Add a comment..." // keep placeholder stable
-        className="
-        flex-1
-        rounded-xl
-        bg-transparent
-        px-3
-        py-2
-        text-sm sm:text-sm md:text-base
-        text-white
-        placeholder:text-[10px] sm:placeholder:text-xs md:placeholder:text-sm
-        placeholder-white/80
-        border
-        border-white
-        focus:outline-none
-        focus:ring-2
-        focus:ring-white/20
-        resize-none
-        overflow-hidden
-      "
-        rows={1}
-        value={commentMessage}
-        onChange={(e) => {
-            const value = e.target.value;
-            if (value.length <= 500) setCommentMessage(value);
-            else setCommentMessage(value.slice(0, 500));
-        }}
-        disabled={isBlocked || isSending} // block input while sending
-    />
+                                                    <textarea
+                                                        ref={commentInputRef}
+                                                        style={{ WebkitOverflowScrolling: "touch" }}
+                                                        onInput={(e) => {
+                                                            const el = e.currentTarget;
+                                                            el.style.height = "auto";
+                                                            el.style.height = el.scrollHeight + "px";
+                                                        }}
+                                                        placeholder={
+                                                            isBlocked
+                                                                ? `Blocked for ${blockSeconds}s...`
+                                                                : "Add a comment..."
+                                                        }
+                                                        className={`
+                                                          flex-1
+                                                          rounded-xl
+                                                          bg-transparent
+                                                          px-3
+                                                          py-2
+                                                          text-sm sm:text-sm md:text-base
+                                                          text-white
+                                                          placeholder:text-[10px] sm:placeholder:text-xs md:placeholder:text-sm
+                                                          placeholder-white/80
+                                                          border
+                                                          border-white
+                                                          focus:outline-none
+                                                          focus:ring-2
+                                                          focus:ring-white/20
+                                                          resize-none
+                                                          overflow-hidden
+                                                          ${isSending ? "opacity-50 cursor-not-allowed" : ""}
+                                                        `}
+                                                        rows={1}
+                                                        value={commentMessage}
+                                                        onChange={(e) => {
+                                                            if (isSending) return; // 🔒 HARD BLOCK
+                                                            const value = e.target.value;
+                                                            if (value.length <= 500) setCommentMessage(value);
+                                                            else setCommentMessage(value.slice(0, 500));
+                                                        }}
+                                                        disabled={isBlocked || isSending}
+                                                    />
 
                                     <button
                                         type="submit"
@@ -989,6 +1040,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                             />
                                         </svg>
                                     </button>
+
+
                                 </form>
                             </div>
 
@@ -1189,7 +1242,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                         setTimeout(() => {
                                             setIsButtonLoading(false); // stop loading after 1s (or any delay)
                                             handleLoadMore(); // still call your real handler
-                                        }, 5000); // 1 second delay
+                                        }, 5000); // 5 second delay
                                     }}
                                     style={{ touchAction: "manipulation" }}
                                     className="w-full flex justify-center items-center py-3 bg-blue-50 hover:bg-blue-100 rounded-xl mt-2 transition"
