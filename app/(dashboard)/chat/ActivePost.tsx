@@ -78,13 +78,24 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         setTimeout(() => {
             setStatusBanner(null);
             setIsSending(false); // 🔓 unlock AFTER banner
-        }, 10000);
+        }, 2000);
     };
+
 // POLL LATEST COMMENTS FOR THE POST EVERY 1 SECOND AND TRACK ERRORS //
+//    const { data: polledData, error } = useSWR(
+//        commentsKey(post.id, 0), // always fetch from skip=0 to get latest
+//        fetcher,
+//        { refreshInterval: 300000 } // fetch every 1 minute
+//    );
+
     const { data: polledData, error } = useSWR(
-        commentsKey(post.id, 0), // always fetch from skip=0 to get latest
+        commentsKey(post.id, 0),
         fetcher,
-        { refreshInterval: 15000 } // fetch every 5 seconds
+        {
+            refreshInterval: 300000,
+            fallbackData: comments, // use the comments prop you already have
+            revalidateOnMount: false // prevents SWR from fetching immediately on mount
+        }
     );
 
 //LOAD NEXT PAGE OF COMMENTS FOR THE ACTIVE POST //
@@ -285,7 +296,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         const sanitizedMessage = DOMPurify.sanitize(message.trim());
 
         try {
-            showStatusBanner("Sending comment... Please wait", "loading");
+            showStatusBanner("Sending comment...", "loading");
             const res = await fetchWithToken(`${apiUrl}/posts/${activePost.id}/comments`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -324,6 +335,11 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             }
 
             const newComment: Comment = await res.json();
+
+            // 🔹 Extra SWR fetch trigger 2 seconds after comment is added
+            setTimeout(() => {
+                globalMutate(commentsKey(activePost.id, 0)); // trigger re-fetch for this post's comments
+            }, 1000);
 
             // COMMENT ADD
             onCommentCountChange?.(activePost.id, (totalComments || 0) + 1);
@@ -400,6 +416,11 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 false
             );
 
+            // 2️⃣b Trigger re-fetch for server validation
+            setTimeout(() => {
+                globalMutate(commentsKey(activePost.id, 0)); // fetch latest from server
+            }, 1000);
+
             globalMutate(
                 commentsKey(activePost.id, 0),
                 (cachedComments: { comments: Comment[]; total: number } | undefined) => {
@@ -431,7 +452,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 setActivePost(prev =>
                     prev ? { ...prev, comments: previousComments } : prev
                 );
-                showError("Comment has been deleted. Refresh the page.");
+                showError("Refresh the page.");
             }
         } catch (err) {
             setDeletedCommentIds(prev => {

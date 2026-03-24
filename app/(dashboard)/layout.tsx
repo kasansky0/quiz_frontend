@@ -250,46 +250,55 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         tokenSentRef.current = true; // ✅ lock immediately
 
+        // Helper function to wrap fetch safely
+        const safeFetch = async (url: string, options: RequestInit) => {
+            try {
+                return await fetch(url, options);
+            } catch (err) {
+                console.warn("Network fetch failed (suppressed):", err);
+                return null;
+            }
+        };
+
         const sendToken = async () => {
             try {
                 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
                 if (!apiUrl) {
-                    console.error("NEXT_PUBLIC_API_URL is missing");
+                    console.warn("NEXT_PUBLIC_API_URL is missing"); // ⚠️ use warn instead of error
                     return;
                 }
 
-                const res = await fetch(`${apiUrl}/auth/google`, {
+                const res = await safeFetch(`${apiUrl}/auth/google`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ token: extendedSession.idToken }),
                     credentials: "include",
                 });
 
+                if (!res) {
+                    // Backend unreachable → user-friendly message
+                    showError("❌ Authentication failed: server unreachable.");
+                    return;
+                }
+
                 if (!res.ok) {
                     const text = await res.text().catch(() => "");
-                    console.warn("Google token auth failed:", res.status, text);
-                    // do NOT call showError here
+                    console.warn("Google token auth failed:", res.status, text); // ⚠️ use warn
                     return;
                 }
 
                 // Wait for token verification before fetching user data
                 await fetchData();
             } catch (err: unknown) {
+                // Any unexpected error → suppressed red console error
                 const message = err instanceof Error ? err.message : String(err);
-                console.error("❌ Failed to send Google token:", message);
+                console.warn("Failed to send Google token (suppressed):", message);
                 showError("❌ Authentication failed. Please refresh.");
-                // Optional: log to Sentry or any error tracking service
-                // Sentry.captureException(err);
             }
         };
 
         sendToken();
     }, [session?.idToken, fetchData, showError]);
-
-
-    useEffect(() => {
-        tokenSentRef.current = false; // reset on session change
-    }, [session?.user?.email]);
 
 
 

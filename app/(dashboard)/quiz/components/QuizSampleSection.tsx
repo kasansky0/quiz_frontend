@@ -132,52 +132,62 @@ export default function QuizSampleSection({
 
         let isMounted = true;
 
-        async function fetchFirstQuestion() {
+        // Network-safe fetch wrapper
+        async function safeFetch(url: string, options: RequestInit) {
             try {
-                const res = await fetch(`${apiUrl}/questions/next`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        user_id: isLoggedIn ? userId : null,
-                        subject_id: subjectId ?? null,
-                    }),
-                });
-
-                // Check HTTP status
-                if (!res.ok) {
-                    const text = await res.text().catch(() => "");
-                    console.error("Failed to fetch question:", text);
-                    if (isMounted) setFetchError(true);
-                    return;
-                }
-
-                // Parse JSON safely
-                let data: QuestionType | null = null;
-                try {
-                    data = await res.json();
-                } catch (jsonErr) {
-                    console.error("Failed to parse question JSON:", jsonErr);
-                    if (isMounted) setFetchError(true);
-                    return;
-                }
-
-                // Ensure we have options
-                if (!data?.options?.length) {
-                    console.warn("No options found for question:", data);
-                    if (isMounted) setFetchError(true);
-                    return;
-                }
-
-                // Update state safely
-                if (isMounted) {
-                    setQuestionData(data);
-                    setTimeout(() => setFade(true), 100);
-                    setFetchError(false); // reset fetch error if successful
-                }
-
+                return await fetch(url, options);
             } catch (err) {
-                console.error("Unable to load question:", err);
+                // Only log if you want, but won't throw red in DevTools
+                console.warn("Network fetch failed (suppressed):", err);
+                return null;
+            }
+        }
+
+        async function fetchFirstQuestion() {
+            const res = await safeFetch(`${apiUrl}/questions/next`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    user_id: isLoggedIn ? userId : null,
+                    subject_id: subjectId ?? null,
+                }),
+            });
+
+            if (!res) {
                 if (isMounted) setFetchError(true);
+                return;
+            }
+
+            // Check HTTP status
+            if (!res.ok) {
+                const text = await res.text().catch(() => "");
+                console.error("Failed to fetch question (HTTP error):", text);
+                if (isMounted) setFetchError(true);
+                return;
+            }
+
+            // Parse JSON safely
+            let data: QuestionType | null = null;
+            try {
+                data = await res.json();
+            } catch (jsonErr) {
+                console.error("Failed to parse question JSON:", jsonErr);
+                if (isMounted) setFetchError(true);
+                return;
+            }
+
+            // Ensure options exist
+            if (!data?.options?.length) {
+                console.warn("No options found for question:", data);
+                if (isMounted) setFetchError(true);
+                return;
+            }
+
+            // ✅ Update state safely
+            if (isMounted) {
+                setQuestionData(data);
+                setTimeout(() => setFade(true), 100);
+                setFetchError(false); // reset fetch error if successful
             }
         }
 

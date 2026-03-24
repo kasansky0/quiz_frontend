@@ -11,9 +11,8 @@ export async function refreshToken() {
     const session = await getSession();
 
     if (!session?.idToken) {
-        await handleSessionExpired();
-        console.error("No session after refresh");
-        return null; // indicate failure without throwing
+        console.warn("No session after refresh");
+        return null;
     }
 
     return session.idToken;
@@ -24,9 +23,8 @@ export async function fetchWithToken(url: string, options: RequestInit = {}, ret
     let idToken = currentSession?.idToken;
 
     if (!idToken) {
-        await handleSessionExpired();
-        console.error("No session token");
-        return null; // fail gracefully instead of throwing
+        console.warn("Session not ready yet");
+        return null; // ⛔ just stop, DO NOT log out
     }
 
     options.headers = {
