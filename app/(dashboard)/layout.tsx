@@ -639,7 +639,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     ref={sidebarRef}
                     className={`
                       hidden md:block
-                      w-64 bg-dark-400 backdrop-blur-md shadow-lg
+                      w-64 bg-black-200 backdrop-blur-md shadow-lg
                       overflow-y-auto hide-scrollbar
                       border-r-[0.5px] border-green-500
                     `}

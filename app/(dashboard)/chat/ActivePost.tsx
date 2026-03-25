@@ -296,7 +296,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         const sanitizedMessage = DOMPurify.sanitize(message.trim());
 
         try {
-            showStatusBanner("Sending comment...", "loading");
+            showStatusBanner("Sending...", "loading");
             const res = await fetchWithToken(`${apiUrl}/posts/${activePost.id}/comments`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -452,7 +452,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 setActivePost(prev =>
                     prev ? { ...prev, comments: previousComments } : prev
                 );
-                showError("Refresh the page.");
+                showError("Refresh the page or log in again.");
             }
         } catch (err) {
             setDeletedCommentIds(prev => {
@@ -1008,15 +1008,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                     </div>
                                 )}
 
-                                {/* --- Inline Status Banner --- */}
-                                {statusBanner && (
-                                    <StatusBanner
-                                        message={statusBanner.message}
-                                        type={statusBanner.type}
-                                        onClose={() => setStatusBanner(null)}
-                                        inline={true} // show above textarea
-                                    />
-                                )}
+
 
                                 <form
                                     className="flex items-center gap-2"
@@ -1040,6 +1032,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                                 : "Add a comment..."
                                                         }
                                                         className={`
+                                                          my-1
                                                           flex-1
                                                           rounded-xl
                                                           bg-transparent
@@ -1091,6 +1084,15 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
 
                                 </form>
+                                {/* --- Inline Status Banner --- */}
+                                {statusBanner && (
+                                    <StatusBanner
+                                        message={statusBanner.message}
+                                        type={statusBanner.type}
+                                        onClose={() => setStatusBanner(null)}
+                                        inline={true} // show above textarea
+                                    />
+                                )}
                             </div>
 
 

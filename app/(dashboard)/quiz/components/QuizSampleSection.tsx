@@ -401,7 +401,7 @@ export default function QuizSampleSection({
                                     </p>
                                     <button
                                         onClick={() => window.location.reload()}
-                                        className="px-5 py-2 bg-green-500 text-black font-medium rounded-full hover:bg-green-400 transition"
+                                        className="px-5 py-2 bg-green-400 text-black font-medium rounded-full hover:bg-green-400 transition"
                                     >
                                         Reload
                                     </button>
