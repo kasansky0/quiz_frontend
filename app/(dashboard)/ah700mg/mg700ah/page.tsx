@@ -49,7 +49,7 @@ export default function AdminPage() {
 
     // Show loading state while checking admin status
     if (status === "loading" || loadingAdmin || minLoading) {
-        return <p className="text-white text-center mt-20">Loading admin dashboard...</p>;
+        return <p className="text-white text-center mt-20">Loading ...</p>;
     }
 
     // If user is not authenticated, return 404
