@@ -47,8 +47,6 @@ export function useSubjectById(apiUrl: string, subjectId: string) {
                 return res.json();
             })
             .then(data => {
-                // ✅ Log the data here
-                console.log("📦 Raw data received:", data);
                 if (Array.isArray(data)) {
                     console.log("📊 Data length:", data.length);
                     console.log("🔎 First item:", data[0]);

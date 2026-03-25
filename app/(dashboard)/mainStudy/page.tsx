@@ -70,25 +70,27 @@ export default function MainStudyPage() {
                 {error && <div className="p-6 text-red-400">{error}</div>}
                 {!error && mainTopics.length === 0 && <div className="p-6 text-white">No main topics found.</div>}
 
-                <h1 className="text-2xl font-bold mb-6">Main Study Topics</h1>
-                <div className="flex flex-col space-y-4">
+                <h1 className="text-2xl font-bold mb-6 text-center">Main Study Topics</h1>
+
+                {/* Grid container with 2 columns */}
+                <div className="grid grid-cols-2 gap-4">
                     {mainTopics.map((mainTopic) => (
                         <Link
                             key={mainTopic}
                             href={`/mainStudy/${mainTopic}`}
                             className="
                                 block
+                                w-full             /* fill the grid column */
                                 rounded-lg
                                 bg-dark-300/60
                                 hover:bg-dark-300
                                 transition
                                 p-4
                                 cursor-pointer
-                            "
+                                text-center        /* center the text nicely */
+                              "
                         >
-                            <h2 className="font-semibold text-blue-500">
-                                {mainTopic}
-                            </h2>
+                            <h2 className="font-semibold text-blue-500">{mainTopic}</h2>
                         </Link>
                     ))}
                 </div>

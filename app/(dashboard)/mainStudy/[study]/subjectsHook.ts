@@ -31,10 +31,6 @@ export function useSubjects(apiUrl: string, mainTopic: string) {
 
             const data = await res.json();
 
-            console.log("📦 Raw data received:", data);
-            console.log("📊 Data length:", data.length);
-            console.log("🔎 First item:", data[0]);
-
             // Filter only id, title, description from backend (in case backend sends extra fields)
             const filtered: Subject[] = data?.map((s: any) => ({
                 id: s.id,
