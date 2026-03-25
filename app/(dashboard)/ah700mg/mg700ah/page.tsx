@@ -47,11 +47,6 @@ export default function AdminPage() {
         return () => clearTimeout(timer);
     }, [session, fetchAdminStatus]);
 
-    // Show loading state while checking admin status
-    if (status === "loading" || loadingAdmin || minLoading) {
-        return <p className="text-white text-center mt-20">Loading ...</p>;
-    }
-
     // If user is not authenticated, return 404
     if (!session) {
         notFound(); // This triggers Next.js 404 page
