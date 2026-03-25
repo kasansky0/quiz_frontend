@@ -79,16 +79,18 @@ export default function MainStudyPage() {
                             key={mainTopic}
                             href={`/mainStudy/${mainTopic}`}
                             className="
-                                block
-                                w-full             /* fill the grid column */
-                                rounded-lg
-                                bg-dark-300/60
-                                hover:bg-dark-300
-                                transition
-                                p-4
-                                cursor-pointer
-                                text-center        /* center the text nicely */
-                              "
+                            border
+                            border-green-500
+                            block
+                            w-full
+                            rounded-full        /* makes it fully rounded */
+                            bg-dark-300/60
+                            hover:bg-dark-300
+                            transition
+                            p-4
+                            cursor-pointer
+                            text-center
+                            "
                         >
                             <h2 className="font-semibold text-blue-500">{mainTopic}</h2>
                         </Link>
