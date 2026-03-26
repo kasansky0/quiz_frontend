@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import Link from "next/link"
 
 // Info & Formulas Component
 const InfoAndFormulas = () => {
@@ -17,9 +18,11 @@ const InfoAndFormulas = () => {
             */}
 
             {/* Future Ads / Message */}
-            <div className="w-full text-center text-sm py-2">
-                Promoted: CBS Electrical Contractors <br/> Hiring NETA 2 Techs 📍Raleigh NC
-            </div>
+            <Link href={"/apply"}>
+                <div className="w-full text-center text-sm py-2">
+                    Promoted: Hiring NETA 2 Techs <br/> Click to apply
+                </div>
+            </Link>
 
             <br/>
 

@@ -18,6 +18,16 @@ export default function MainStudyPage() {
 
 
 
+    // 👇 Add this here
+    useEffect(() => {
+        if (!loading && !error) {
+            console.log("Raw subjects data:", mainTopics);
+        }
+    }, [mainTopics, loading, error]);
+
+
+
+
 
 
     useEffect(() => {
@@ -79,13 +89,11 @@ export default function MainStudyPage() {
                             key={mainTopic}
                             href={`/mainStudy/${mainTopic}`}
                             className="
-                            border
-                            border-green-500
                             block
                             w-full
                             rounded-full        /* makes it fully rounded */
-                            bg-dark-300/60
-                            hover:bg-dark-300
+                            bg-dark-400
+                            hover:bg-dark-600
                             transition
                             p-4
                             cursor-pointer
