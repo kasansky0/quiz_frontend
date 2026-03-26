@@ -301,8 +301,7 @@ export default function ChatStats() {
 
     const handleCreatePost = async ({ title, message }: { title: string; message: string }) => {
         if (!session?.idToken) {
-            console.error("No session token available");
-            await handleSessionExpired();
+            showError("Oops! You need to log in again to continue.");
             return;
         }
         const idToken = session.idToken;
