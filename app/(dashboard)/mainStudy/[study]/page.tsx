@@ -80,7 +80,7 @@ export default function StudyPage() {
                     </button>
 
                     <div className="text-sm sm:text-base">
-                        Promoted: Hiring NETA Level 2 Techs
+                        Promoted: CBS Electrical Contractors <br /> Hiring NETA 2 Techs 📍Raleigh NC
                     </div>
                 </div>
 

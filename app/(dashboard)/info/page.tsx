@@ -20,7 +20,7 @@ const InfoAndFormulas = () => {
             {/* Future Ads / Message */}
             <Link href={"/apply"}>
                 <div className="w-full text-center text-sm py-2">
-                    Promoted: Hiring NETA 2 Techs <br/> Click to apply
+                    Promoted: Hiring NETA Level 2 Techs <br/> Click to apply
                 </div>
             </Link>
 

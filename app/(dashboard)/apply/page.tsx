@@ -2,48 +2,55 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { submitApplication, ApplyFormPayload } from "@/app/(dashboard)/apply/submitApplication";
+import { useError } from "@/app/ErrorProvider";
+
+
 
 export default function ApplyPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
     const [agreed, setAgreed] = useState(false);
-    const [anyLocation, setAnyLocation] = useState(false);
     const [submitted, setSubmitted] = useState(false); // NEW: submission state
     const [loading, setLoading] = useState(false);
+    const { showError } = useError();
 
 
 
     interface ApplyForm {
-        location: string;
-        background: string;
-        experience: string;
-        position: string;
-        message: string;
-        availability: string;
-        certifications: string[];
-        travel: string;
-        overtime: string;
-        readyToMove: string;
+        name: string;              // session.user.name
+        email: string;             // session.user.email
+        background: boolean;        // Veteran? checkbox
+        location: string;          // Preferred Location
+        availability: string;      // Earliest Start Date
+        certifications: string;  // Certifications selected
+        travel: string;            // Willing to Travel? (yes/no)
+        overtime: string;          // Willing to Work Overtime? (yes/no)
+        readyToMove: string;       // Ready to Relocate? (yes/no)
+        experience: string;        // Years of Electrical Experience
+        position: string;          // Position Applying For
+        message: string;           // Additional Information
     }
 
     const [form, setForm] = useState<ApplyForm>({
+        name: "",                  // filled automatically from session
+        email: "",                 // filled automatically from session
+        background: false,            // empty or "veteran"
         location: "",
-        background: "",
+        availability: "",
+        certifications: "",
+        travel: "",
+        overtime: "",
+        readyToMove: "",
         experience: "",
         position: "",
         message: "",
-        availability: "",
-        certifications: [],
-        travel: "",
-        overtime: "",
-        readyToMove: ""
     });
 
-    const [errors, setErrors] = useState<{[key:string]: boolean}>({});
+    const [errors, setErrors] = useState<{[key:string]: string}>({});
 
-    const requiredFields = ["location", "background", "experience", "position", "message", "availability", "travel", "overtime", "readyToMove"];
+    const requiredFields = ["location", "experience", "position", "message", "availability", "travel", "overtime", "readyToMove"];
     const isFormComplete = requiredFields.every(field => {
-        if (field === "location" && anyLocation) return true;
         const value = form[field as keyof typeof form];
         if (Array.isArray(value)) return value.length > 0;
         return value && value.toString().trim() !== "";
@@ -51,77 +58,154 @@ export default function ApplyPage() {
 
     const handleChange = (e: any) => {
         setForm({ ...form, [e.target.name]: e.target.value });
-        setErrors({ ...errors, [e.target.name]: false });
+        setErrors({ ...errors, [e.target.name]: "" }); // clear string error
     }
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
 
-        try {
-            // validation logic...
-            // fetch logic...
-        } finally {
-            setLoading(false);
-        }
+        const newErrors: { [key: string]: string } = {};
 
-        // --- validation ---
-        const newErrors: { [key: string]: boolean } = {};
+        // --- required fields ---
         requiredFields.forEach(field => {
-            if (field === "location" && anyLocation) return;
-            if (!form[field as keyof typeof form] || form[field as keyof typeof form].toString().trim() === "") {
-                newErrors[field] = true;
+            const value = form[field as keyof ApplyForm];
+            if (typeof value === "string" && value.trim() === "") {
+                newErrors[field] = "This field is required.";
+            }
+            if (typeof value === "boolean" && !value) {
+                // only for checkboxes like background if required
+                newErrors[field] = "This field is required.";
             }
         });
 
+        // --- Yes/No fields ---
+        const yesNoFields = ["travel", "overtime", "readyToMove"];
+        yesNoFields.forEach(field => {
+            const rawValue = form[field as keyof typeof form];
+            const value = rawValue ? String(rawValue).toLowerCase() : "";
+            if (value && !["yes","no","y","n"].includes(value)) {
+                newErrors[field] = "Must be 'Yes', 'No', 'Y' or 'N'.";
+            }
+        });
+
+        // --- Experience: 0-20, optionally 'years' ---
+        if (form.experience) {
+            const exp = form.experience.trim().toLowerCase();
+            const match = exp.match(/^(\d+)(\s*years)?$/);
+            if (!match) {
+                newErrors.experience = "Must be a number 0–20, optionally followed by 'years'.";
+            } else {
+                const num = parseInt(match[1], 10);
+                if (num < 0 || num > 20) {
+                    newErrors.experience = "Experience must be between 0 and 20 years.";
+                }
+            }
+        }
+
+        // --- Date validation ---
+        if (form.availability && isNaN(Date.parse(form.availability))) {
+            newErrors.availability = "Must be a valid date.";
+        }
+
+        // --- Certifications max 30 chars ---
+        if (form.certifications && form.certifications.length > 30) {
+            newErrors.certifications = "Certifications must be 30 characters or less.";
+        }
+
+        // --- Other fields max 30 chars ---
+        const shortFields = ["location", "position", "travel", "overtime", "readyToMove"];
+        shortFields.forEach(field => {
+            const value = form[field as keyof typeof form];
+            if (value && value.toString().length > 30) {
+                newErrors[field] = "Maximum 30 characters allowed.";
+            }
+        });
+
+        // --- Message max 100 chars ---
+        if (form.message && form.message.length > 100) {
+            newErrors.message = "Message cannot exceed 100 characters.";
+        }
+
+        // --- Consent ---
         if (!agreed) {
-            alert("You must agree to the terms before submitting.");
+            showError("You must agree to the terms before submitting.");
             return;
         }
 
+        // --- Stop if errors ---
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
             return;
         }
 
+        // Not logged in
         if (!session?.user?.email || !session?.user?.name) {
-            alert("You must be logged in to submit an application.");
+            showError("You must be logged in to submit an application.");
             return;
         }
 
         setLoading(true);
 
-        // --- MOCK submit (simulate network delay) ---
-//        setTimeout(() => {
-//            setLoading(false);
-//            setSubmitted(true); // simulate successful submission
-//        }, 2000); // 2-second delay for testing spinner
+        const payload: ApplyFormPayload = {
+            name: session.user.name,
+            email: session.user.email,
+            location: form.location,
+            availability: form.availability,
+            certifications: form.certifications,
+            travel: form.travel,
+            overtime: form.overtime,
+            readyToMove: form.readyToMove,
+            background: form.background,
+            experience: form.experience,
+            position: form.position,
+            message: form.message,
+            consent: agreed,
+        };
 
-        // --- send form ---
-        const payload = { ...form, email: session.user.email, name: session.user.name, anyLocation };
-        try {
-            const res = await fetch("/api/apply", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
-
-            if (res.ok) {
-                // show professional submission screen
-                setSubmitted(true);
-            } else {
-                const error = await res.json();
-                alert(error.message || "Submission failed");
-            }
-        } catch (err) {
-            alert("Submission failed, please try again.");
+        // API submission error
+        // Not logged in
+        if (!session?.user?.email || !session?.user?.name) {
+            showError("You must be logged in to submit an application.");
+            return;
         }
-    }
+
+        // API submission error
+        try {
+            const result = await submitApplication(payload);
+
+            if (result.error) {
+                // Handle known API errors
+                if (result.error.toLowerCase().includes("already submitted") || result.error === "Bad Request") {
+                    // Show friendly message for duplicates
+                    showError("It looks like you've already submitted an application. Please check your email, our team will get back to you soon!");
+                } else {
+                    showError(result.error);
+                }
+                return; // stop here, do NOT set submitted
+            }
+
+            // Success
+            setSubmitted(true);
+
+        } catch (err: any) {
+            // If backend throws an HTTP 400 for duplicate, also catch here
+            if (err?.message?.includes("Bad Request")) {
+                showError("You have already submitted an application with this email.");
+            } else {
+                showError(err?.message || "Submission failed, please try again.");
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
 
     if (status === "loading") return <p>Loading...</p>;
     if (!session) return <p>Please log in with Google to submit an application.</p>;
 
     const inputClass = (field:string) =>
-        `w-full p-2 rounded border ${errors[field] ? "border-red-500 bg-gray-900" : "border-gray-700 bg-gray-900"}`;
+        `w-full p-2 rounded-xl border text-sm
+   ${errors[field] ? "border-red-500 bg-gray-900" : "border-gray-700 bg-gray-900"}
+   placeholder:text-xs placeholder:text-gray-500`;
 
     // --- SUBMISSION SUCCESS SCREEN ---
     if (submitted) {
@@ -138,7 +222,7 @@ export default function ApplyPage() {
                     </p>
                     <button
                         onClick={() => router.push("/info")} // go back to home or dashboard
-                        className="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded border border-gray-700"
+                        className="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 - border border-gray-700"
                     >
                         Go Back
                     </button>
@@ -149,6 +233,8 @@ export default function ApplyPage() {
 
     return (
         <div className="p-4 md:p-4 text-white relative min-h-screen">
+
+
 
             <style jsx>{`
               /* Make the native calendar icon white */
@@ -187,9 +273,9 @@ export default function ApplyPage() {
 
             <form
                 onSubmit={handleSubmit}
-                className="bg-black text-white p-2 rounded-2xl space-y-4 max-w-md mx-auto"
+                className="bg-black text-white p-2 pb-16 rounded-2xl space-y-4 max-w-md mx-auto"
             >
-                <div className="bg-gray-900 rounded p-2 border border-gray-700">
+                <div className="bg-gray-900 rounded-xl p-2 border border-gray-700">
                     <p><strong>Name:</strong> {session.user.name}</p>
                     <p><strong>Email:</strong> {session.user.email}</p>
                 </div>
@@ -199,20 +285,36 @@ export default function ApplyPage() {
 
 
 
+                <div className="flex items-center space-x-2 mb-4">
+                    <input
+                        type="checkbox"
+                        id="veteran"
+                        checked={form.background}
+                        onChange={(e) =>
+                            setForm({ ...form, background: e.target.checked })
+                        }
+                        className="w-5 h-5 text-blue-800 bg-gray-900 border-gray-700 rounded-xl focus:ring-yellow-400"
+                    />
+                    <label htmlFor="veteran" className="text-blue-400 text-sm select-none">
+                        Veteran
+                    </label>
+                </div>
+
+
+
+
 
 
                 <div className="flex flex-col">
-                    <label htmlFor="location" className="text-gray-400 text-sm mb-1">
+                    <label htmlFor="location" className="text-blue-400 text-lg font-semibold mb-1">
                         Preferred Location
                     </label>
                     <input
                         id="location"
                         name="location"
                         placeholder="Dallas TX, Any location"
-                        value={anyLocation ? "Open to any location" : form.location}
                         onChange={handleChange}
                         className={inputClass("location")}
-                        disabled={anyLocation}
                     />
                 </div>
 
@@ -225,7 +327,7 @@ export default function ApplyPage() {
 
 
                 <div className="flex flex-col">
-                    <label htmlFor="availability" className="text-gray-400 text-sm mb-1">
+                    <label htmlFor="availability" className="text-blue-400 text-lg font-semibold mb-1">
                         Earliest Start Date
                     </label>
                     <input
@@ -248,31 +350,18 @@ export default function ApplyPage() {
 
 
                 <div className="flex flex-col">
-                    <label className="text-gray-400 text-sm mb-1">
+                    <label htmlFor="certifications" className="text-blue-400 text-lg font-semibold mb-1">
                         Certifications
                     </label>
-                    <div className="flex flex-wrap gap-2">
-                        {["NETA 1","NETA 2","NETA 3","NETA 4","NICET 1","NICET 2","NICET 3","NICET 4"].map(cert => (
-                            <label key={cert} className="flex items-center space-x-1">
-                                <input
-                                    type="checkbox"
-                                    name="certifications"
-                                    value={cert}
-                                    checked={form.certifications?.includes(cert) || false}
-                                    onChange={(e) => {
-                                        const selected = form.certifications || [];
-                                        if (e.target.checked) {
-                                            setForm({ ...form, certifications: [...selected, cert] });
-                                        } else {
-                                            setForm({ ...form, certifications: selected.filter(c => c !== cert) });
-                                        }
-                                    }}
-                                    className="mt-1"
-                                />
-                                <span className="text-gray-300 text-sm">{cert}</span>
-                            </label>
-                        ))}
-                    </div>
+                    <input
+                        type="text"
+                        id="certifications"
+                        name="certifications"
+                        placeholder="NETA 2"
+                        value={form.certifications as unknown as string} // treat as string for input
+                        onChange={(e) => setForm({ ...form, certifications: e.target.value as unknown as string })} // just save string
+                        className={inputClass("certifications")}
+                    />
                 </div>
 
 
@@ -286,20 +375,18 @@ export default function ApplyPage() {
 
 
                 <div className="flex flex-col">
-                    <label htmlFor="travel" className="text-gray-400 text-sm mb-1">
+                    <label htmlFor="travel" className="text-blue-400 text-lg font-semibold mb-1">
                         Willing to Travel?
                     </label>
-                    <select
+                    <input
+                        type="text"
                         id="travel"
                         name="travel"
-                        value={form.travel || ""}
-                        onChange={handleChange}
+                        placeholder="Yes or No"
+                        value={form.travel}
+                        onChange={(e) => setForm({ ...form, travel: e.target.value })}
                         className={inputClass("travel")}
-                    >
-                        <option value="">-- Choose an option --</option>
-                        <option value="yes">Yes</option>
-                        <option value="no">No</option>
-                    </select>
+                    />
                 </div>
 
 
@@ -311,20 +398,18 @@ export default function ApplyPage() {
 
 
                 <div className="flex flex-col">
-                    <label htmlFor="overtime" className="text-gray-400 text-sm mb-1">
+                    <label htmlFor="overtime" className="text-blue-400 text-lg font-semibold mb-1">
                         Willing to Work Overtime?
                     </label>
-                    <select
+                    <input
+                        type="text"
                         id="overtime"
                         name="overtime"
-                        value={form.overtime || ""}
-                        onChange={handleChange}
+                        placeholder="Yes or No"
+                        value={form.overtime}
+                        onChange={(e) => setForm({ ...form, overtime: e.target.value })}
                         className={inputClass("overtime")}
-                    >
-                        <option value="">-- Choose an option --</option>
-                        <option value="yes">Yes</option>
-                        <option value="no">No</option>
-                    </select>
+                    />
                 </div>
 
 
@@ -336,20 +421,18 @@ export default function ApplyPage() {
 
 
                 <div className="flex flex-col">
-                    <label htmlFor="readyToMove" className="text-gray-400 text-sm mb-1">
+                    <label htmlFor="readyToMove" className="text-blue-400 text-lg font-semibold mb-1">
                         Are you ready to relocate?
                     </label>
-                    <select
+                    <input
+                        type="text"
                         id="readyToMove"
-                        name="readyToMove" // changed from "background"
-                        onChange={handleChange}
-                        className={inputClass("readyToMove")} // use the new field for styling errors if needed
-                        value={form.readyToMove || ""} // make sure the value is controlled
-                    >
-                        <option value="">-- Choose an option --</option>
-                        <option value="yes">Yes</option>
-                        <option value="no">No</option>
-                    </select>
+                        name="readyToMove"
+                        placeholder="Yes or No"
+                        value={form.readyToMove}
+                        onChange={(e) => setForm({ ...form, readyToMove: e.target.value })}
+                        className={inputClass("readyToMove")}
+                    />
                 </div>
 
 
@@ -358,30 +441,13 @@ export default function ApplyPage() {
 
 
 
-                <div className="flex flex-col">
-                    <label htmlFor="background" className="text-gray-400 text-sm mb-1">
-                        Select your background
-                    </label>
-                    <select
-                        id="background"
-                        name="background"
-                        onChange={handleChange}
-                        className={inputClass("background")}
-                    >
-                        <option value="">-- Choose an option --</option>
-                        <option value="veteran">Veteran</option>
-                        <option value="nonveteran">Non-Veteran</option>
-                        <option value="preferNotToSay">Prefer not to say</option>
-                    </select>
-                </div>
-
 
 
 
 
 
                 <div className="flex flex-col">
-                    <label htmlFor="experience" className="text-gray-400 text-sm mb-1">
+                    <label htmlFor="experience" className="text-blue-400 text-lg font-semibold mb-1">
                         Years of Electrical Experience
                     </label>
                     <input
@@ -399,7 +465,7 @@ export default function ApplyPage() {
 
 
                 <div className="flex flex-col">
-                    <label htmlFor="position" className="text-gray-400 text-sm mb-1">
+                    <label htmlFor="position" className="text-blue-400 text-lg font-semibold mb-1">
                         Position Applying For
                     </label>
                     <input
@@ -418,7 +484,7 @@ export default function ApplyPage() {
 
 
                 <div className="flex flex-col">
-                    <label htmlFor="message" className="text-gray-400 text-sm mb-1">
+                    <label htmlFor="message" className="text-blue-400 text-lg font-semibold mb-1">
                         Additional Information
                     </label>
                     <textarea
@@ -447,7 +513,7 @@ export default function ApplyPage() {
                         disabled={!isFormComplete}
                         className={`mt-1 ${!isFormComplete ? "cursor-not-allowed opacity-50" : ""}`}
                     />
-                    <label htmlFor="agree" className="text-xs text-gray-400">
+                    <label htmlFor="agree" className="text-xs text-blue-400">
                         By submitting this application, I confirm that the information provided is accurate.
                         I consent to being contacted regarding this application and related job opportunities,
                         and I agree that my information, including my resume, may be shared with potential employers.
@@ -457,7 +523,11 @@ export default function ApplyPage() {
 
 
 
-                <button type="submit" disabled={loading}  className="w-full bg-gray-900 text-white p-2 rounded font-semibold hover:bg-gray-800 border border-gray-700">
+                <button
+                    type="submit"
+                    disabled={loading || !agreed}
+                    className="w-full bg-gray-900 text-white p-2 rounded-xl font-semibold hover:bg-gray-800 border border-gray-700 disabled:opacity-50"
+                >
                     {loading ? "Submitting..." : "Apply"}
                 </button>
 
