@@ -57,9 +57,73 @@ export default function ApplyPage() {
     });
 
     const handleChange = (e: any) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-        setErrors({ ...errors, [e.target.name]: "" }); // clear string error
-    }
+        const { name, value } = e.target;
+
+        setForm(prev => ({
+            ...prev,
+            [name]: value
+        }));
+
+        let error = "";
+
+        // --- REQUIRED fields
+        if (
+            requiredFields.includes(name) &&
+            !["travel", "overtime", "readyToMove"].includes(name)
+        ) {
+            if (!value || value.trim() === "") {
+                error = "This field is required.";
+            }
+        }
+
+        // --- YES/NO fields
+        if (["travel", "overtime", "readyToMove"].includes(name)) {
+            const v = value.trim().toLowerCase(); // ✅ FIX
+
+            if (v === "") {
+                error = "This field is required.";
+            } else if (!["yes", "no", "y", "n"].includes(v)) {
+                error = "Must be Yes / No / Y / N";
+            }
+        }
+
+        // --- EXPERIENCE
+        if (name === "experience") {
+            const match = value.trim().toLowerCase().match(/^(\d+)(\s*years)?$/);
+            if (value && !match) {
+                error = "Must be number (0–20)";
+            } else if (match) {
+                const num = parseInt(match[1], 10);
+                if (num < 0 || num > 20) {
+                    error = "0–20 only";
+                }
+            }
+        }
+
+        // --- DATE
+        if (name === "availability") {
+            if (value && isNaN(Date.parse(value))) {
+                error = "Invalid date";
+            }
+        }
+
+        // --- MAX LENGTH
+        if (["location", "position", "travel", "overtime", "readyToMove"].includes(name)) {
+            if (value.length > 30) {
+                error = "Max 30 chars";
+            }
+        }
+
+        // --- MESSAGE
+        if (name === "message" && value.length > 100) {
+            error = "Max 100 chars";
+        }
+
+        setErrors(prev => ({
+            ...prev,
+            [name]: error
+        }));
+    };
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
@@ -169,6 +233,23 @@ export default function ApplyPage() {
             if (result.error) {
                 if (result.error.toLowerCase().includes("already submitted")) {
                     showError("It looks like you've already submitted an application. Please check your email, our team will get back to you soon!");
+
+                    // --- CLEAR ALL TEXT INPUTS AND TEXTAREAS ---
+                    setForm({
+                        ...form,
+                        background: false,
+                        location: "",
+                        availability: "",
+                        certifications: "",
+                        travel: "",
+                        overtime: "",
+                        readyToMove: "",
+                        experience: "",
+                        position: "",
+                        message: "",
+                    });
+                    setAgreed(false); // uncheck agreement if checked
+                    setErrors({});
                 } else {
                     showError(result.error);
                 }
@@ -186,6 +267,23 @@ export default function ApplyPage() {
             // If backend throws an HTTP 400 for duplicate, also catch here
             if (err?.message?.includes("Bad Request")) {
                 showError("You have already submitted an application with this email.");
+
+                // --- CLEAR ALL TEXT INPUTS AND TEXTAREAS ---
+                setForm({
+                    ...form,
+                    background: false,
+                    location: "",
+                    availability: "",
+                    certifications: "",
+                    travel: "",
+                    overtime: "",
+                    readyToMove: "",
+                    experience: "",
+                    position: "",
+                    message: "",
+                });
+                setAgreed(false);
+                setErrors({});
             } else {
                 showError(err?.message || "Submission failed, please try again.");
             }
@@ -232,20 +330,27 @@ export default function ApplyPage() {
 
 
             <style jsx>{`
-              /* Fix date input width + vertical alignment (iPhone) */
               input[type="date"] {
+                text-align: left;
+                padding-left: 0.5rem;
+            
                 display: block;
                 width: 100%;
                 min-width: 0;
                 -webkit-appearance: none;
             
-                height: 2.5rem;       /* matches Tailwind h-10 */
-                line-height: 2.5rem;  /* centers text vertically */
+                height: 2.5rem;
+                line-height: 2.5rem;
                 padding-top: 0;
                 padding-bottom: 0;
               }
             
-              /* Make the calendar icon white */
+              /* iOS inner text fix */
+              input[type="date"]::-webkit-date-and-time-value {
+                text-align: left;
+              }
+            
+              /* Make calendar icon white */
               input[type="date"]::-webkit-calendar-picker-indicator {
                 filter: invert(1);
                 cursor: pointer;
@@ -321,6 +426,7 @@ export default function ApplyPage() {
                         id="location"
                         name="location"
                         placeholder="Dallas TX, Any location"
+                        value={form.location}
                         onChange={handleChange}
                         className={inputClass("location")}
                     />
