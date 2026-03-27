@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/Textarea";
 import { useError } from "@/app/ErrorProvider";
 import StatusBanner from "@/app/positiveBanner"
-import Link from "next/link";
 
 
 interface CreatePostProps {
@@ -148,16 +147,9 @@ export default function CreatePost({
                         </button>
 
                         {/* Future Ads / Message */}
-                        <Link href="/apply">
-                            <div className="w-full max-w-md mx-auto text-center p-4 bg-gray-900 border border-gray-700 rounded-xl hover:bg-gray-800 cursor-pointer transition">
-                                <span className="text-sm font-semibold text-white block">
-                                  Promoted: Hiring NETA Level 2 Techs
-                                </span>
-                                <span className="text-xs text-gray-400 block mt-1">
-                                  Click to apply
-                                </span>
-                            </div>
-                        </Link>
+                        <div className="w-full text-center text-sm py-2">
+                            Promoted: CBS Electrical Contractors <br/> Hiring NETA 2 Techs 📍Raleigh NC
+                        </div>
 
                     </div>
 
