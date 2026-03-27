@@ -267,7 +267,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 }
                 return prev - 1;
             });
-        }, 5000);
+        }, 1000);
 
         return () => clearInterval(timer);
     }, [isBlocked, blockSeconds, hideError]);
@@ -323,7 +323,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                         return;
                     }
 
-                    const seconds = errDetail?.remaining || 10;
+                    const seconds = errDetail?.remaining || 60;
                     setIsBlocked(true);
                     setBlockSeconds(seconds);
                     showError(`Slow down. Wait ${seconds} second${seconds > 1 ? "s" : ""}.`);

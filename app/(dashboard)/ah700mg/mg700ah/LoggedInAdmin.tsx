@@ -7,6 +7,25 @@ import { useError } from "@/app/ErrorProvider";
 import { fetchWithToken, handleSessionExpired } from "@/app/hooks/refreshToken";
 
 
+interface Application {
+    _id: string;
+    userId: string;
+    name: string;
+    email: string;
+    location: string;
+    availability: string;
+    certifications: string;
+    travel: string; // 'y' / 'n'
+    overtime: string; // 'y' / 'n'
+    readyToMove: string; // 'y' / 'n'
+    background: boolean;
+    experience: string; // number as string
+    position: string;
+    message: string;
+    consent: boolean;
+    submitted_at: string;
+}
+
 
 interface LimiterHit {
     user_id?: string;
@@ -53,6 +72,7 @@ interface AdminSummary {
     blocked_users: BlockedUser[];
     admin_logged_in: AdminLoggedIn[];
     limiter_hits: LimiterHit[];
+    applications?: Application[];
 }
 
 
@@ -170,6 +190,10 @@ export default function LoggedInAdmin() {
                 }
 
                 const data = await res.json();
+
+                // 🔥 CONSOLE LOG EVERYTHING RECEIVED
+                console.log("🚀 Backend response:", data);
+
                 if (!Array.isArray(data?.users)) {
                     showError("No users returned from backend");
                     setUsers([]);
@@ -615,6 +639,70 @@ export default function LoggedInAdmin() {
                         </div>
                     </div>
                 )}
+
+
+
+
+                {/* Applications */}
+                {summary?.applications && summary.applications.length > 0 && (
+                    <div className="bg-black/90 p-4 sm:p-6 rounded-xl mb-6 border border-white text-sm sm:text-base">
+                        <h3 className="font-bold text-white-400 mb-2">
+                            Applications: ({summary.applications.length})
+                        </h3>
+
+                        <div className="max-h-80 overflow-y-auto space-y-4 pr-2">
+                            {summary.applications.map((app, i) => (
+                                <div key={i} className="bg-black/80 p-3 rounded-lg border border-gray-700">
+                                    <p>
+                                        <span className="font-bold text-yellow-500">Name:</span> {app.name}
+                                    </p>
+                                    <p>
+                                        <span className="font-bold text-yellow-500">Email:</span> {app.email}
+                                    </p>
+                                    <p>
+                                        <span className="font-bold text-yellow-500">Location:</span> {app.location}
+                                    </p>
+                                    <p>
+                                        <span className="font-bold text-yellow-500">Availability:</span> {app.availability}
+                                    </p>
+                                    <p>
+                                        <span className="font-bold text-yellow-500">Position:</span> {app.position}
+                                    </p>
+                                    <p>
+                                        <span className="font-bold text-yellow-500">Experience:</span> {app.experience} years
+                                    </p>
+                                    <p>
+                                        <span className="font-bold text-yellow-500">Travel:</span> {app.travel === "y" ? "Yes" : "No"}
+                                    </p>
+                                    <p>
+                                        <span className="font-bold text-yellow-500">Overtime:</span> {app.overtime === "y" ? "Yes" : "No"}
+                                    </p>
+                                    <p>
+                                        <span className="font-bold text-yellow-500">Ready to Move:</span> {app.readyToMove === "y" ? "Yes" : "No"}
+                                    </p>
+                                    <p>
+                                        <span className="font-bold text-yellow-500">Background Check:</span> {app.background ? "Passed" : "No"}
+                                    </p>
+                                    <p>
+                                        <span className="font-bold text-yellow-500">Consent:</span> {app.consent ? "Yes" : "No"}
+                                    </p>
+                                    <p>
+                                        <span className="font-bold text-yellow-500">Message:</span> {app.message || "-"}
+                                    </p>
+                                    <p className="text-gray-400 text-xs mt-1">
+                                        Submitted at: {formatLocalDate(app.submitted_at)}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+
+
+
+
+
 
 
                 {/* Users */}

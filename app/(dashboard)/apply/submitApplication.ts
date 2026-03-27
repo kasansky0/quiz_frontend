@@ -39,11 +39,25 @@ export async function submitApplication(payload: ApplyFormPayload) {
 
         if (!res.ok) {
             const errorData = await res.json().catch(() => null);
-            return { error: errorData?.message || res.statusText };
+            return { error: errorData?.detail || "Request failed" };
         }
 
         return { data: await res.json() };
     } catch (err: any) {
         return { error: err?.message || "Unknown error occurred" };
+    }
+}
+
+
+
+// Check if email has already submitted an application
+export async function checkApplicationEmail(email: string) {
+    try {
+        const res = await fetch(`${apiUrl}/apply/check-email?email=${encodeURIComponent(email)}`);
+        if (!res.ok) throw new Error("Failed to check email");
+        return await res.json(); // { exists: true/false }
+    } catch (err: any) {
+        console.error(err);
+        return { exists: false }; // default to false on error
     }
 }

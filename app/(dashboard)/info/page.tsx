@@ -7,20 +7,10 @@ import Link from "next/link"
 const InfoAndFormulas = () => {
     return (
         <div className="text-black min-h-screen flex flex-col justify-start items-center p-5">
-
-            {/* Hiring Banner
-            <div className="w-full bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 text-gray-900 font-semibold text-center py-4 px-6 rounded-xl shadow-md border border-yellow-500 mb-8 flex flex-col sm:flex-row items-center justify-center gap-2">
-                <span className="text-lg sm:text-xl">🧲 Welcome!</span>
-                <span className="text-md sm:text-lg hover:underline">
-                    Check out the study guide and targeted questions for the topic
-                </span>
-            </div>
-            */}
-
             {/* Future Ads / Message */}
             <Link href={"/apply"}>
                 <div className="w-full text-center text-sm py-2">
-                    Promoted: Hiring NETA Level 2 Techs <br/> Click to apply
+                    Promoted: CBS Electrical Contractors <br/> Hiring NETA 2 Techs 📍Raleigh NC <br/> Click to apply
                 </div>
             </Link>
 

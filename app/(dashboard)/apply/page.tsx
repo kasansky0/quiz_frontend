@@ -163,29 +163,24 @@ export default function ApplyPage() {
         };
 
         // API submission error
-        // Not logged in
-        if (!session?.user?.email || !session?.user?.name) {
-            showError("You must be logged in to submit an application.");
-            return;
-        }
-
-        // API submission error
         try {
             const result = await submitApplication(payload);
 
             if (result.error) {
-                // Handle known API errors
-                if (result.error.toLowerCase().includes("already submitted") || result.error === "Bad Request") {
-                    // Show friendly message for duplicates
+                if (result.error.toLowerCase().includes("already submitted")) {
                     showError("It looks like you've already submitted an application. Please check your email, our team will get back to you soon!");
                 } else {
                     showError(result.error);
                 }
-                return; // stop here, do NOT set submitted
+                return;
             }
 
-            // Success
-            setSubmitted(true);
+            // ✅ ONLY mark success if data exists
+            if (result.data?.success) {
+                setSubmitted(true);
+            } else {
+                showError("Something went wrong. Please try again.");
+            }
 
         } catch (err: any) {
             // If backend throws an HTTP 400 for duplicate, also catch here
@@ -538,10 +533,10 @@ export default function ApplyPage() {
 
                 <button
                     type="submit"
-                    disabled={loading || !agreed}
+                    disabled={loading || !agreed || submitted} // disable if loading, not agreed, or already submitted
                     className="w-full bg-gray-900 text-white p-2 rounded-xl font-semibold hover:bg-gray-800 border border-gray-700 disabled:opacity-50"
                 >
-                    {loading ? "Submitting..." : "Apply"}
+                    {loading ? "Submitting..." : submitted ? "Already Submitted" : "Apply"}
                 </button>
 
 
