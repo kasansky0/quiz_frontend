@@ -237,12 +237,17 @@ export default function ApplyPage() {
 
 
             <style jsx>{`
-              /* Fix date input width on iPhone */
+              /* Fix date input width + vertical alignment (iPhone) */
               input[type="date"] {
-                  display: block;
-                  width: 100%;
-                  min-width: 0;
-                  -webkit-appearance: none;
+                display: block;
+                width: 100%;
+                min-width: 0;
+                -webkit-appearance: none;
+            
+                height: 2.5rem;       /* matches Tailwind h-10 */
+                line-height: 2.5rem;  /* centers text vertically */
+                padding-top: 0;
+                padding-bottom: 0;
               }
             
               /* Make the calendar icon white */
