@@ -203,9 +203,9 @@ export default function ApplyPage() {
     if (!session) return <p>Please log in with Google to submit an application.</p>;
 
     const inputClass = (field:string) =>
-        `w-full p-2 rounded-xl border text-sm
-   ${errors[field] ? "border-red-500 bg-gray-900" : "border-gray-700 bg-gray-900"}
-   placeholder:text-xs placeholder:text-gray-500`;
+        `w-full h-10 px-2 rounded-xl border text-sm appearance-none
+     ${errors[field] ? "border-red-500 bg-gray-900" : "border-gray-700 bg-gray-900"}
+     placeholder:text-xs placeholder:text-gray-500`;
 
     // --- SUBMISSION SUCCESS SCREEN ---
     if (submitted) {
@@ -237,10 +237,18 @@ export default function ApplyPage() {
 
 
             <style jsx>{`
-              /* Make the native calendar icon white */
+              /* Fix date input width on iPhone */
+              input[type="date"] {
+                  display: block;
+                  width: 100%;
+                  min-width: 0;
+                  -webkit-appearance: none;
+              }
+            
+              /* Make the calendar icon white */
               input[type="date"]::-webkit-calendar-picker-indicator {
-                filter: invert(1); /* invert color to white */
-                cursor: pointer;   /* optional: makes it clickable */
+                filter: invert(1);
+                cursor: pointer;
               }
             `}</style>
 
