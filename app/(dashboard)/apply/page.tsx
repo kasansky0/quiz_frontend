@@ -295,7 +295,7 @@ export default function ApplyPage() {
                         }
                         className="w-5 h-5 text-blue-800 bg-gray-900 border-gray-700 rounded-xl focus:ring-yellow-400"
                     />
-                    <label htmlFor="veteran" className="text-blue-400 text-sm select-none">
+                    <label htmlFor="veteran" className="text-white text-sm select-none">
                         Veteran
                     </label>
                 </div>
@@ -306,7 +306,7 @@ export default function ApplyPage() {
 
 
                 <div className="flex flex-col">
-                    <label htmlFor="location" className="text-blue-400 text-lg font-semibold mb-1">
+                    <label htmlFor="location" className="text-white text-lg font-semibold mb-1">
                         Preferred Location
                     </label>
                     <input
@@ -327,7 +327,7 @@ export default function ApplyPage() {
 
 
                 <div className="flex flex-col">
-                    <label htmlFor="availability" className="text-blue-400 text-lg font-semibold mb-1">
+                    <label htmlFor="availability" className="text-white text-lg font-semibold mb-1">
                         Earliest Start Date
                     </label>
                     <input
@@ -350,7 +350,7 @@ export default function ApplyPage() {
 
 
                 <div className="flex flex-col">
-                    <label htmlFor="certifications" className="text-blue-400 text-lg font-semibold mb-1">
+                    <label htmlFor="certifications" className="text-white text-lg font-semibold mb-1">
                         Certifications
                     </label>
                     <input
@@ -375,7 +375,7 @@ export default function ApplyPage() {
 
 
                 <div className="flex flex-col">
-                    <label htmlFor="travel" className="text-blue-400 text-lg font-semibold mb-1">
+                    <label htmlFor="travel" className="text-white text-lg font-semibold mb-1">
                         Willing to Travel?
                     </label>
                     <input
@@ -398,7 +398,7 @@ export default function ApplyPage() {
 
 
                 <div className="flex flex-col">
-                    <label htmlFor="overtime" className="text-blue-400 text-lg font-semibold mb-1">
+                    <label htmlFor="overtime" className="text-white text-lg font-semibold mb-1">
                         Willing to Work Overtime?
                     </label>
                     <input
@@ -421,7 +421,7 @@ export default function ApplyPage() {
 
 
                 <div className="flex flex-col">
-                    <label htmlFor="readyToMove" className="text-blue-400 text-lg font-semibold mb-1">
+                    <label htmlFor="readyToMove" className="text-white text-lg font-semibold mb-1">
                         Are you ready to relocate?
                     </label>
                     <input
@@ -447,7 +447,7 @@ export default function ApplyPage() {
 
 
                 <div className="flex flex-col">
-                    <label htmlFor="experience" className="text-blue-400 text-lg font-semibold mb-1">
+                    <label htmlFor="experience" className="text-white text-lg font-semibold mb-1">
                         Years of Electrical Experience
                     </label>
                     <input
@@ -465,7 +465,7 @@ export default function ApplyPage() {
 
 
                 <div className="flex flex-col">
-                    <label htmlFor="position" className="text-blue-400 text-lg font-semibold mb-1">
+                    <label htmlFor="position" className="text-white text-lg font-semibold mb-1">
                         Position Applying For
                     </label>
                     <input
@@ -484,7 +484,7 @@ export default function ApplyPage() {
 
 
                 <div className="flex flex-col">
-                    <label htmlFor="message" className="text-blue-400 text-lg font-semibold mb-1">
+                    <label htmlFor="message" className="text-white text-lg font-semibold mb-1">
                         Additional Information
                     </label>
                     <textarea
@@ -513,7 +513,7 @@ export default function ApplyPage() {
                         disabled={!isFormComplete}
                         className={`mt-1 ${!isFormComplete ? "cursor-not-allowed opacity-50" : ""}`}
                     />
-                    <label htmlFor="agree" className="text-xs text-blue-400">
+                    <label htmlFor="agree" className="text-xs text-white">
                         By submitting this application, I confirm that the information provided is accurate.
                         I consent to being contacted regarding this application and related job opportunities,
                         and I agree that my information, including my resume, may be shared with potential employers.
