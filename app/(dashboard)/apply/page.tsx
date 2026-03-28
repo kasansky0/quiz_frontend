@@ -14,7 +14,15 @@ export default function ApplyPage() {
     const [submitted, setSubmitted] = useState(false); // NEW: submission state
     const [loading, setLoading] = useState(false);
     const { showError } = useError();
+    const shortFields = ["location", "position", "travel", "overtime", "readyToMove"];
 
+
+
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1); // move to next day
+    const localTomorrow = new Date(tomorrow.getTime() - tomorrow.getTimezoneOffset() * 60000)
+        .toISOString()
+        .split("T")[0];
 
 
     interface ApplyForm {
@@ -76,27 +84,21 @@ export default function ApplyPage() {
             }
         }
 
-        // --- YES/NO fields
+        // --- SHORT TEXT fields
         if (["travel", "overtime", "readyToMove"].includes(name)) {
-            const v = value.trim().toLowerCase(); // ✅ FIX
-
-            if (v === "") {
+            if (!value || value.trim() === "") {
                 error = "This field is required.";
-            } else if (!["yes", "no", "y", "n"].includes(v)) {
-                error = "Must be Yes / No / Y / N";
+            } else if (value.length > 30) {
+                error = "Max 30 characters";
             }
         }
 
         // --- EXPERIENCE
         if (name === "experience") {
-            const match = value.trim().toLowerCase().match(/^(\d+)(\s*years)?$/);
-            if (value && !match) {
-                error = "Must be number (0–20)";
-            } else if (match) {
-                const num = parseInt(match[1], 10);
-                if (num < 0 || num > 20) {
-                    error = "0–20 only";
-                }
+            if (!value || value.trim() === "") {
+                error = "This field is required.";
+            } else if (value.length > 30) {
+                error = "Maximum 30 characters allowed.";
             }
         }
 
@@ -104,6 +106,14 @@ export default function ApplyPage() {
         if (name === "availability") {
             if (value && isNaN(Date.parse(value))) {
                 error = "Invalid date";
+            } else if (value) {
+                const selected = new Date(value);
+                const today = new Date();
+                today.setHours(0,0,0,0);
+
+                if (selected < today) {
+                    error = "Date cannot be in the past";
+                }
             }
         }
 
@@ -142,33 +152,31 @@ export default function ApplyPage() {
             }
         });
 
-        // --- Yes/No fields ---
-        const yesNoFields = ["travel", "overtime", "readyToMove"];
-        yesNoFields.forEach(field => {
-            const rawValue = form[field as keyof typeof form];
-            const value = rawValue ? String(rawValue).toLowerCase() : "";
-            if (value && !["yes","no","y","n"].includes(value)) {
-                newErrors[field] = "Must be 'Yes', 'No', 'Y' or 'N'.";
+        shortFields.forEach(field => {
+            const value = form[field as keyof typeof form];
+            if (!value || value.toString().trim() === "") {
+                newErrors[field] = "This field is required.";
+            } else if (value.toString().length > 30) {
+                newErrors[field] = "Maximum 30 characters allowed.";
             }
         });
 
         // --- Experience: 0-20, optionally 'years' ---
-        if (form.experience) {
-            const exp = form.experience.trim().toLowerCase();
-            const match = exp.match(/^(\d+)(\s*years)?$/);
-            if (!match) {
-                newErrors.experience = "Must be a number 0–20, optionally followed by 'years'.";
-            } else {
-                const num = parseInt(match[1], 10);
-                if (num < 0 || num > 20) {
-                    newErrors.experience = "Experience must be between 0 and 20 years.";
-                }
-            }
+        if (!form.experience || form.experience.trim() === "") {
+            newErrors.experience = "This field is required.";
+        } else if (form.experience.length > 30) {
+            newErrors.experience = "Maximum 30 characters allowed.";
         }
 
         // --- Date validation ---
-        if (form.availability && isNaN(Date.parse(form.availability))) {
-            newErrors.availability = "Must be a valid date.";
+        if (form.availability) {
+            const selected = new Date(form.availability);
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            if (selected < today) {
+                newErrors.availability = "Date cannot be in the past.";
+            }
         }
 
         // --- Certifications max 30 chars ---
@@ -177,7 +185,6 @@ export default function ApplyPage() {
         }
 
         // --- Other fields max 30 chars ---
-        const shortFields = ["location", "position", "travel", "overtime", "readyToMove"];
         shortFields.forEach(field => {
             const value = form[field as keyof typeof form];
             if (value && value.toString().length > 30) {
@@ -228,49 +235,32 @@ export default function ApplyPage() {
 
         // API submission error
         try {
+            setLoading(true);
             const result = await submitApplication(payload);
 
             if (result.error) {
-                if (result.error.toLowerCase().includes("already submitted")) {
-                    showError("It looks like you've already submitted an application. Please check your email, our team will get back to you soon!");
+                let friendlyMsg = "Something went wrong. Please try again.";
 
-                    // --- CLEAR ALL TEXT INPUTS AND TEXTAREAS ---
-                    setForm({
-                        ...form,
-                        background: false,
-                        location: "",
-                        availability: "",
-                        certifications: "",
-                        travel: "",
-                        overtime: "",
-                        readyToMove: "",
-                        experience: "",
-                        position: "",
-                        message: "",
-                    });
-                    setAgreed(false); // uncheck agreement if checked
-                    setErrors({});
-                } else {
-                    showError(result.error);
+                if (typeof result.error === "string") {
+                    // if backend returned a string with prohibited content
+                    if (result.error.includes("Prohibited content detected") || result.error.includes("<script")) {
+                        friendlyMsg = "Check your content and try again.";
+                    } else if (result.error.includes("already submitted")) {
+                        friendlyMsg = "You’ve already submitted an application!";
+                    } else {
+                        friendlyMsg = result.error;
+                    }
+                } else if (typeof result.error === "object") {
+                    // field-level errors or unknown object
+                    friendlyMsg = "Check your content and try again.";
                 }
-                return;
-            }
 
-            // ✅ ONLY mark success if data exists
-            if (result.data?.success) {
-                setSubmitted(true);
-            } else {
-                showError("Something went wrong. Please try again.");
-            }
+                showError(friendlyMsg);
 
-        } catch (err: any) {
-            // If backend throws an HTTP 400 for duplicate, also catch here
-            if (err?.message?.includes("Bad Request")) {
-                showError("You have already submitted an application with this email.");
-
-                // --- CLEAR ALL TEXT INPUTS AND TEXTAREAS ---
+                // clear form
                 setForm({
-                    ...form,
+                    name: "",
+                    email: "",
                     background: false,
                     location: "",
                     availability: "",
@@ -284,9 +274,53 @@ export default function ApplyPage() {
                 });
                 setAgreed(false);
                 setErrors({});
-            } else {
-                showError(err?.message || "Submission failed, please try again.");
+                return;
             }
+
+            if (result.data?.success) {
+                setSubmitted(true);
+            } else {
+                showError("Something went wrong. Please try again.");
+
+                // --- CLEAR ALL TEXT INPUTS AND TEXTAREAS ---
+                setForm({
+                    name: "",
+                    email: "",
+                    background: false,
+                    location: "",
+                    availability: "",
+                    certifications: "",
+                    travel: "",
+                    overtime: "",
+                    readyToMove: "",
+                    experience: "",
+                    position: "",
+                    message: "",
+                });
+                setAgreed(false);
+                setErrors({});
+            }
+
+        } catch (err: any) {
+            showError(err?.message || "Submission failed, please try again.");
+
+            // --- CLEAR ALL TEXT INPUTS AND TEXTAREAS ---
+            setForm({
+                name: "",
+                email: "",
+                background: false,
+                location: "",
+                availability: "",
+                certifications: "",
+                travel: "",
+                overtime: "",
+                readyToMove: "",
+                experience: "",
+                position: "",
+                message: "",
+            });
+            setAgreed(false);
+            setErrors({});
         } finally {
             setLoading(false);
         }
@@ -450,6 +484,7 @@ export default function ApplyPage() {
                         name="availability"
                         value={form.availability || ""}
                         onChange={handleChange}
+                        min={localTomorrow}
                         className={inputClass("availability")}
                     />
                 </div>

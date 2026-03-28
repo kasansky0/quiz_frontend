@@ -672,13 +672,13 @@ export default function LoggedInAdmin() {
                                         <span className="font-bold text-yellow-500">Experience:</span> {app.experience} years
                                     </p>
                                     <p>
-                                        <span className="font-bold text-yellow-500">Travel:</span> {app.travel === "y" ? "Yes" : "No"}
+                                        <span className="font-bold text-yellow-500">Travel:</span> {app.travel}
                                     </p>
                                     <p>
-                                        <span className="font-bold text-yellow-500">Overtime:</span> {app.overtime === "y" ? "Yes" : "No"}
+                                        <span className="font-bold text-yellow-500">Overtime:</span> {app.overtime}
                                     </p>
                                     <p>
-                                        <span className="font-bold text-yellow-500">Ready to Move:</span> {app.readyToMove === "y" ? "Yes" : "No"}
+                                        <span className="font-bold text-yellow-500">Ready to Move:</span> {app.readyToMove}
                                     </p>
                                     <p>
                                         <span className="font-bold text-yellow-500">Background Check:</span> {app.background ? "Passed" : "No"}
