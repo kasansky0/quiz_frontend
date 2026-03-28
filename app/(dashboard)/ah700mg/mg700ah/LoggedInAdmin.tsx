@@ -157,6 +157,15 @@ export default function LoggedInAdmin() {
 
 
 
+    // Helper function
+    const isTrue = (value: any) => {
+        if (typeof value === "boolean") return value;
+        if (typeof value === "string") return value.toLowerCase() === "true";
+        return false;
+    };
+
+
+
     useEffect(() => {
         if (status !== "authenticated") return; // wait for NextAuth to finish
         if (fetchedRef.current >= 2) return;
@@ -660,16 +669,17 @@ export default function LoggedInAdmin() {
                                         <span className="font-bold text-yellow-500">Email:</span> {app.email}
                                     </p>
                                     <p>
+                                        <span className="font-bold text-yellow-500">Background Check:</span>{" "}
+                                        {isTrue(app.background) ? "✅" : "❌"}
+                                    </p>
+                                    <p>
                                         <span className="font-bold text-yellow-500">Location:</span> {app.location}
                                     </p>
                                     <p>
                                         <span className="font-bold text-yellow-500">Availability:</span> {app.availability}
                                     </p>
                                     <p>
-                                        <span className="font-bold text-yellow-500">Position:</span> {app.position}
-                                    </p>
-                                    <p>
-                                        <span className="font-bold text-yellow-500">Experience:</span> {app.experience} years
+                                        <span className="font-bold text-yellow-500">Certifications:</span> {app.certifications}
                                     </p>
                                     <p>
                                         <span className="font-bold text-yellow-500">Travel:</span> {app.travel}
@@ -681,13 +691,16 @@ export default function LoggedInAdmin() {
                                         <span className="font-bold text-yellow-500">Ready to Move:</span> {app.readyToMove}
                                     </p>
                                     <p>
-                                        <span className="font-bold text-yellow-500">Background Check:</span> {app.background ? "Passed" : "No"}
+                                        <span className="font-bold text-yellow-500">Experience:</span> {app.experience} years
                                     </p>
                                     <p>
-                                        <span className="font-bold text-yellow-500">Consent:</span> {app.consent ? "Yes" : "No"}
+                                        <span className="font-bold text-yellow-500">Position:</span> {app.position}
                                     </p>
                                     <p>
                                         <span className="font-bold text-yellow-500">Message:</span> {app.message || "-"}
+                                    </p>
+                                    <p>
+                                        <span className="font-bold text-yellow-500">Consent:</span> {app.consent ? "Yes" : "No"}
                                     </p>
                                     <p className="text-gray-400 text-xs mt-1">
                                         Submitted at: {formatLocalDate(app.submitted_at)}

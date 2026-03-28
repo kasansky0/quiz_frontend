@@ -14,7 +14,7 @@ export default function ApplyPage() {
     const [submitted, setSubmitted] = useState(false); // NEW: submission state
     const [loading, setLoading] = useState(false);
     const { showError } = useError();
-    const shortFields = ["location", "position", "travel", "overtime", "readyToMove"];
+    const shortFields = ["travel", "overtime", "readyToMove"]; // only the text-limited fields
 
 
 
@@ -57,7 +57,7 @@ export default function ApplyPage() {
 
     const [errors, setErrors] = useState<{[key:string]: string}>({});
 
-    const requiredFields = ["location", "experience", "position", "message", "availability", "travel", "overtime", "readyToMove"];
+    const requiredFields = ["location", "background", "experience", "position", "message", "availability", "travel", "overtime", "readyToMove"];
     const isFormComplete = requiredFields.every(field => {
         const value = form[field as keyof typeof form];
         if (Array.isArray(value)) return value.length > 0;
@@ -88,17 +88,22 @@ export default function ApplyPage() {
         if (["travel", "overtime", "readyToMove"].includes(name)) {
             if (!value || value.trim() === "") {
                 error = "This field is required.";
-            } else if (value.length > 30) {
-                error = "Max 30 characters";
+            } else if (value.length > 100) {
+                error = "Max 100 characters";
             }
+        }
+
+        // --- CERTIFICATION
+        if (name === "certifications" && value.length > 100) {
+            error = "Max 100 characters";
         }
 
         // --- EXPERIENCE
         if (name === "experience") {
             if (!value || value.trim() === "") {
                 error = "This field is required.";
-            } else if (value.length > 30) {
-                error = "Maximum 30 characters allowed.";
+            } else if (value.length > 100) {
+                error = "Maximum 100 characters allowed.";
             }
         }
 
@@ -119,14 +124,14 @@ export default function ApplyPage() {
 
         // --- MAX LENGTH
         if (["location", "position", "travel", "overtime", "readyToMove"].includes(name)) {
-            if (value.length > 30) {
-                error = "Max 30 chars";
+            if (value.length > 100) {
+                error = "Max 100 chars";
             }
         }
 
         // --- MESSAGE
-        if (name === "message" && value.length > 100) {
-            error = "Max 100 chars";
+        if (name === "message" && value.length > 200) {
+            error = "Max 200 chars";
         }
 
         setErrors(prev => ({
@@ -156,16 +161,16 @@ export default function ApplyPage() {
             const value = form[field as keyof typeof form];
             if (!value || value.toString().trim() === "") {
                 newErrors[field] = "This field is required.";
-            } else if (value.toString().length > 30) {
-                newErrors[field] = "Maximum 30 characters allowed.";
+            } else if (value.toString().length > 100) {
+                newErrors[field] = "Maximum 100 characters allowed.";
             }
         });
 
         // --- Experience: 0-20, optionally 'years' ---
         if (!form.experience || form.experience.trim() === "") {
             newErrors.experience = "This field is required.";
-        } else if (form.experience.length > 30) {
-            newErrors.experience = "Maximum 30 characters allowed.";
+        } else if (form.experience.length > 100) {
+            newErrors.experience = "Maximum 100 characters allowed.";
         }
 
         // --- Date validation ---
@@ -179,22 +184,22 @@ export default function ApplyPage() {
             }
         }
 
-        // --- Certifications max 30 chars ---
-        if (form.certifications && form.certifications.length > 30) {
-            newErrors.certifications = "Certifications must be 30 characters or less.";
+        // --- Certifications max 100 chars ---
+        if (form.certifications && form.certifications.length > 100) {
+            newErrors.certifications = "Certifications must be 100 characters or less.";
         }
 
-        // --- Other fields max 30 chars ---
+        // --- Other fields max 100 chars ---
         shortFields.forEach(field => {
             const value = form[field as keyof typeof form];
-            if (value && value.toString().length > 30) {
-                newErrors[field] = "Maximum 30 characters allowed.";
+            if (value && value.toString().length > 100) {
+                newErrors[field] = "Maximum 100 characters allowed.";
             }
         });
 
         // --- Message max 100 chars ---
-        if (form.message && form.message.length > 100) {
-            newErrors.message = "Message cannot exceed 100 characters.";
+        if (form.message && form.message.length > 200) {
+            newErrors.message = "Message cannot exceed 200 characters.";
         }
 
         // --- Consent ---
@@ -259,8 +264,7 @@ export default function ApplyPage() {
 
                 // clear form
                 setForm({
-                    name: "",
-                    email: "",
+                    ...form,
                     background: false,
                     location: "",
                     availability: "",
@@ -284,8 +288,7 @@ export default function ApplyPage() {
 
                 // --- CLEAR ALL TEXT INPUTS AND TEXTAREAS ---
                 setForm({
-                    name: "",
-                    email: "",
+                    ...form,
                     background: false,
                     location: "",
                     availability: "",
@@ -306,8 +309,7 @@ export default function ApplyPage() {
 
             // --- CLEAR ALL TEXT INPUTS AND TEXTAREAS ---
             setForm({
-                name: "",
-                email: "",
+                ...form,
                 background: false,
                 location: "",
                 availability: "",
@@ -508,7 +510,7 @@ export default function ApplyPage() {
                         name="certifications"
                         placeholder="NETA 2"
                         value={form.certifications as unknown as string} // treat as string for input
-                        onChange={(e) => setForm({ ...form, certifications: e.target.value as unknown as string })} // just save string
+                        onChange={handleChange}
                         className={inputClass("certifications")}
                     />
                 </div>
@@ -533,7 +535,7 @@ export default function ApplyPage() {
                         name="travel"
                         placeholder="Yes or No"
                         value={form.travel}
-                        onChange={(e) => setForm({ ...form, travel: e.target.value })}
+                        onChange={handleChange}
                         className={inputClass("travel")}
                     />
                 </div>
@@ -556,7 +558,7 @@ export default function ApplyPage() {
                         name="overtime"
                         placeholder="Yes or No"
                         value={form.overtime}
-                        onChange={(e) => setForm({ ...form, overtime: e.target.value })}
+                        onChange={handleChange}
                         className={inputClass("overtime")}
                     />
                 </div>
@@ -579,7 +581,7 @@ export default function ApplyPage() {
                         name="readyToMove"
                         placeholder="Yes or No"
                         value={form.readyToMove}
-                        onChange={(e) => setForm({ ...form, readyToMove: e.target.value })}
+                        onChange={handleChange}
                         className={inputClass("readyToMove")}
                     />
                 </div>
@@ -674,7 +676,7 @@ export default function ApplyPage() {
 
                 <button
                     type="submit"
-                    disabled={loading || !agreed || submitted} // disable if loading, not agreed, or already submitted
+                    disabled={loading || !agreed || submitted || !isFormComplete}
                     className="w-full bg-gray-900 text-white p-2 rounded-xl font-semibold hover:bg-gray-800 border border-gray-700 disabled:opacity-50"
                 >
                     {loading ? "Submitting..." : submitted ? "Already Submitted" : "Apply"}
