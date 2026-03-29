@@ -4,6 +4,7 @@ import { useSubjects } from "@/app/(dashboard)/mainStudy/[study]/subjectsHook";
 import {useParams, useRouter} from "next/navigation"; // get dynamic route
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 
 
 export default function StudyPage() {
@@ -11,8 +12,19 @@ export default function StudyPage() {
     const params = useParams();
     const mainTopic = params.study as string;
     const router = useRouter(); // <-- add router
+    const { data: session } = useSession();
+    const token = session?.idToken; // or accessToken depending on your setup
 
-    const { subjects, loadingSubjects, errorSubjects } = useSubjects(apiUrl, mainTopic);
+    const { subjects, loadingSubjects, errorSubjects, subscriptionRequired } =
+        useSubjects(apiUrl, mainTopic, token);
+
+
+    // Redirect if subscription is required
+    useEffect(() => {
+        if (subscriptionRequired) {
+            router.push("/mainStudy"); // redirect to mainStudy page
+        }
+    }, [subscriptionRequired, router]);
 
 
     // Delayed loading

@@ -28,39 +28,55 @@ export interface Subject {
     isQuiz?: boolean; // <-- add this line
 }
 
-export function useSubjectById(apiUrl: string, subjectId: string) {
+export function useSubjectById(apiUrl: string, subjectId: string, token?: string) {
     const [subject, setSubject] = useState<Subject | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const { showError } = useError();
+    const [subscriptionRequired, setSubscriptionRequired] = useState(false);
 
+    const { showError } = useError();
 
     useEffect(() => {
         if (!apiUrl || !subjectId) return;
 
+        if (!token) {
+            setLoading(false);
+            setError("Oops! You need to log in again to continue.");
+            showError(
+                "Oops! You need to log in again to continue.",
+                true
+            );
+            return;
+        }
+
         setLoading(true);
         setError(null);
 
-        fetch(`${apiUrl}/subjects/${subjectId}`)
+        fetch(`${apiUrl}/subjects/${subjectId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        })
             .then(res => {
-                if (!res.ok) showError("Failed to fetch subject"); // 🔴 show banner
+                if (res.status === 403) {
+                    setSubscriptionRequired(true);   // ✅ set flag
+                    showError("Subscription required");
+                    return;
+                }
+                if (!res.ok) {
+                    setSubscriptionRequired(true);   // ✅ set flag
+                    showError(
+                        "Oops! You need to log in again to continue.",
+                        true
+                    );
+                }
                 return res.json();
             })
-            .then(data => {
-                if (Array.isArray(data)) {
-                    console.log("📊 Data length:", data.length);
-                    console.log("🔎 First item:", data[0]);
-                }
-
-                setSubject(data);
-            })
-            .catch(err => {
-                const message = err.message || "Unknown error fetching subject";
-                setError(message);
-                showError(`❌ ${message}`); // 🔴 show banner
-            })
+            .then(data => setSubject(data))
+            .catch(err => setError(err.message))
             .finally(() => setLoading(false));
-    }, [apiUrl, subjectId]);
+    }, [apiUrl, subjectId, token]);
 
-    return { subject, loading, error };
+    return { subject, loading, error, subscriptionRequired };
 }

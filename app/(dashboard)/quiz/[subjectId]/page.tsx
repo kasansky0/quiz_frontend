@@ -12,6 +12,7 @@
         const [answerCount, setAnswerCount] = useState(0);
         const apiUrl = process.env.NEXT_PUBLIC_API_URL;
         const userId = session?.user?.id;
+        const token = session?.idToken;
 
 
         const { subjectId: param } = useParams();
@@ -26,6 +27,8 @@
                 apiUrl={apiUrl}
                 userId={userId}
                 loadingDone={true}
+                mode="smart"
+                token={token}
                 subjectId={subjectId} // pass dynamic param here
                 onAnswer={async (isCorrect, questionId) => {
                     setAnswerCount(prev => prev + 1);

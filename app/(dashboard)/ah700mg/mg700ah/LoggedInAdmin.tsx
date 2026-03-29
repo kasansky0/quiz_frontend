@@ -669,7 +669,7 @@ export default function LoggedInAdmin() {
                                         <span className="font-bold text-yellow-500">Email:</span> {app.email}
                                     </p>
                                     <p>
-                                        <span className="font-bold text-yellow-500">Background Check:</span>{" "}
+                                        <span className="font-bold text-yellow-500">Veteran?:</span>{" "}
                                         {isTrue(app.background) ? "✅" : "❌"}
                                     </p>
                                     <p>

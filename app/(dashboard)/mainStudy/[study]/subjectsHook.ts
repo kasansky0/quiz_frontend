@@ -10,33 +10,55 @@ export interface Subject {
     isQuiz?: boolean; // <-- add this
 }
 
-export function useSubjects(apiUrl: string, mainTopic: string) {
+export function useSubjects(apiUrl: string, mainTopic: string, token?: string) {
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [loadingSubjects, setLoadingSubjects] = useState(true);
     const [errorSubjects, setErrorSubjects] = useState<string | null>(null);
+    const [subscriptionRequired, setSubscriptionRequired] = useState(false);
     const { showError } = useError();
 
     const fetchSubjects = useCallback(async () => {
         if (!apiUrl || !mainTopic) return;
 
+        if (!token) {
+            setLoadingSubjects(false);       // ✅ stop infinite loading
+            setErrorSubjects("Not authenticated"); // ✅ show error
+            return;
+        }
+
         setLoadingSubjects(true);
         setErrorSubjects(null);
 
         try {
-            const res = await fetch(`${apiUrl}/subjects/?main_topic=${encodeURIComponent(mainTopic)}`);
+            const res = await fetch(`${apiUrl}/subjects/?main_topic=${encodeURIComponent(mainTopic)}`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (res.status === 403) {
+                setSubscriptionRequired(true);   // ✅ set flag
+                showError("Subscription required");
+                return;
+            }
+
             if (!res.ok) {
-                showError("Failed to fetch subjects");
-                return null;
+                setSubscriptionRequired(true);   // ✅ set flag
+                showError(
+                    "Oops! You need to log in again to continue.",
+                    true
+                );
+                return;
             }
 
             const data = await res.json();
 
-            // Filter only id, title, description from backend (in case backend sends extra fields)
             const filtered: Subject[] = data?.map((s: any) => ({
                 id: s.id,
                 title: s.title,
                 description: s.description,
-                isQuiz: s.isQuiz ?? false, // <-- include isQuiz, default false
+                isQuiz: s.isQuiz ?? false,
             })) ?? [];
 
             setSubjects(filtered);
@@ -47,11 +69,11 @@ export function useSubjects(apiUrl: string, mainTopic: string) {
         } finally {
             setLoadingSubjects(false);
         }
-    }, [apiUrl, mainTopic, showError]);
+    }, [apiUrl, mainTopic, token]);
 
     useEffect(() => {
         fetchSubjects();
     }, [fetchSubjects]);
 
-    return { subjects, loadingSubjects, errorSubjects, refetchSubjects: fetchSubjects };
+    return { subjects, loadingSubjects, errorSubjects, subscriptionRequired, refetchSubjects: fetchSubjects };
 }

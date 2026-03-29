@@ -4,15 +4,20 @@ import { useSubjectById } from "@/app/(dashboard)/mainStudy/[study]/[subjectId]/
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+
 
 export default function SubjectPage() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
     const { subjectId } = useParams();
     const router = useRouter(); // <-- add router
+    const { data: session } = useSession();
+    const token = session?.idToken;
 
-    const { subject, loading, error } = useSubjectById(
+    const { subject, loading, error, subscriptionRequired } = useSubjectById(
         apiUrl,
-        Array.isArray(subjectId) ? subjectId[0] : subjectId ?? ""
+        Array.isArray(subjectId) ? subjectId[0] : subjectId ?? "",
+        token
     );
 
     // Delayed loading
@@ -32,6 +37,13 @@ export default function SubjectPage() {
 
         return () => clearTimeout(timer);
     }, [loading]);
+
+
+    useEffect(() => {
+        if (subscriptionRequired) {
+            router.push("/mainStudy"); // redirect if user is not subscribed
+        }
+    }, [subscriptionRequired, router]);
 
     // Trigger fade after subject is ready
     useEffect(() => {
@@ -183,7 +195,7 @@ export default function SubjectPage() {
                                 />
                             </svg>
                             <span className="ml-2 text-blue-600 font-medium text-sm sm:text-base">
-                                {`Practice "${subject.title}" Quiz`}
+                                Practice targeted questions
                             </span>
                         </button>
                     </div>

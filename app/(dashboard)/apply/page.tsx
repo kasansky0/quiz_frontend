@@ -57,7 +57,7 @@ export default function ApplyPage() {
 
     const [errors, setErrors] = useState<{[key:string]: string}>({});
 
-    const requiredFields = ["location", "background", "experience", "position", "message", "availability", "travel", "overtime", "readyToMove"];
+    const requiredFields = ["location", "experience", "position", "message", "availability", "travel", "overtime", "readyToMove"];
     const isFormComplete = requiredFields.every(field => {
         const value = form[field as keyof typeof form];
         if (Array.isArray(value)) return value.length > 0;

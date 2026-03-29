@@ -9,6 +9,7 @@ import useSWR, { mutate as globalMutate } from "swr";
 import { useSession, signOut, getSession } from "next-auth/react"; // ✅ add useSession
 import { fetchWithToken, handleSessionExpired } from "@/app/hooks/refreshToken";
 import StatusBanner from "@/app/positiveBanner";
+import { useRouter } from "next/navigation";
 
 
 
@@ -70,6 +71,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const [isButtonLoading, setIsButtonLoading] = useState(false);
     const [loadError, setLoadError] = useState<string | null>(null);
     const [deletedCommentIds, setDeletedCommentIds] = useState<Set<string>>(new Set());
+    const router = useRouter();
     const { fetchPostComments } = chatApis({ apiUrl });
     const showStatusBanner = (message: string, type: "loading" | "success" | "error" = "loading") => {
         setStatusBanner({ message, type });
@@ -126,7 +128,11 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             setCurrentPage(prev => prev + 1);
 
         } catch (err) {
-            showError("Oops! You need to log in again to continue.");
+            showError(
+                "Oops! You need to log in again to continue.",
+                true
+            );
+            router.push("/info");
         }
     };
 

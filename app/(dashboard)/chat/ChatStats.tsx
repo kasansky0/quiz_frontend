@@ -301,7 +301,10 @@ export default function ChatStats() {
 
     const handleCreatePost = async ({ title, message }: { title: string; message: string }) => {
         if (!session?.idToken) {
-            showError("Oops! You need to log in again to continue.");
+            showError(
+                "Oops! You need to log in again to continue.",
+                true
+            );
             return;
         }
         const idToken = session.idToken;
@@ -311,10 +314,10 @@ export default function ChatStats() {
         try {
             const res = await fetch(`${apiUrl}/posts/`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${idToken}`,
-                },
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${idToken}`,
+                    },
                 body: JSON.stringify({ title: sanitizedTitle, message: sanitizedMessage }),
             });
             if (!res.ok) {

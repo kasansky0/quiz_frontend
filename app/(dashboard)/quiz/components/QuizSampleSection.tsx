@@ -8,6 +8,7 @@ import { HeroCard } from "./HeroCard";
 import { ScrollHint } from "./ScrollHint";
 import { Button } from "@/components/ui/Button";
 import { useError } from "@/app/ErrorProvider";
+import { useRouter } from "next/navigation";
 
 
 export interface QuestionType {
@@ -53,6 +54,8 @@ interface QuizSampleSectionProps {
     scrollContainerRef?: React.RefObject<HTMLElement | null>;
     onAnswer?: (isCorrect: boolean, questionId: number) => void;
     subjectId?: string; // <-- add this
+    mode?: "random" | "smart"; // ✅ ADD THIS
+    token?: string;
 }
 
 
@@ -67,6 +70,8 @@ export default function QuizSampleSection({
                                               loadingDone,
                                               scrollContainerRef,
                                               subjectId,
+                                              token,
+                                              mode = "smart", // ✅ default behavior stays same
                                               onAnswer = () => {}, // default no-op
                                           }: QuizSampleSectionProps) {
     const [questionData, setQuestionData] = useState<QuestionType | null>(null);
@@ -80,6 +85,60 @@ export default function QuizSampleSection({
     const QUESTIONS_BEFORE_REVIEW = 2;
     const { showError } = useError();
     const [showLoading, setShowLoading] = useState(true);
+    const [subscriptionRequired, setSubscriptionRequired] = useState(false);
+    const router = useRouter();
+
+    const isMountedRef = useRef(true);
+
+    useEffect(() => {
+        // when component mounts
+        isMountedRef.current = true;
+        return () => {
+            // when component unmounts
+            isMountedRef.current = false;
+        };
+    }, []);
+
+
+
+
+
+    function buildQuestionUrl() {
+        if (!apiUrl) return "";
+
+        let base = "";
+
+        if (mode === "random") {
+            base = `${apiUrl}/questions/random`;
+        } else {
+            base = `${apiUrl}/questions/random-topic`;
+        }
+
+        if (subjectId) {
+            base += `?subject_id=${subjectId}`;
+        }
+
+        return base;
+    }
+
+
+
+
+    // Network-safe fetch wrapper
+    async function safeFetch(url: string, options: RequestInit) {
+        try {
+            if (token) {
+                options.headers = {
+                    ...(options.headers || {}),
+                    Authorization: `Bearer ${token}`,
+                };
+            }
+            return await fetch(url, options);
+        } catch (err) {
+            console.warn("Network fetch failed (suppressed):", err);
+            return null;
+        }
+    }
 
 
 
@@ -128,41 +187,42 @@ export default function QuizSampleSection({
 // --- Fetch the first question from backend --- //
 
     useEffect(() => {
-        if (!loadingDone || !apiUrl) return;
+        if (!loadingDone || !apiUrl || !token) return;
 
         let isMounted = true;
 
-        // Network-safe fetch wrapper
-        async function safeFetch(url: string, options: RequestInit) {
-            try {
-                return await fetch(url, options);
-            } catch (err) {
-                // Only log if you want, but won't throw red in DevTools
-                console.warn("Network fetch failed (suppressed):", err);
-                return null;
-            }
-        }
-
         async function fetchFirstQuestion() {
-            const res = await safeFetch(`${apiUrl}/questions/next`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    user_id: isLoggedIn ? userId : null,
-                    subject_id: subjectId ?? null,
-                }),
+            const url = buildQuestionUrl();
+
+            const res = await safeFetch(url, {
+                method: "GET",
             });
 
             if (!res) {
-                if (isMounted) setFetchError(true);
+                if (isMounted) {
+                    showError("Failed to load question. Please try again.");
+                    setFetchError(true);
+                }
                 return;
             }
 
             // Check HTTP status
             if (!res.ok) {
-                const text = await res.text().catch(() => "");
-                console.error("Failed to fetch question (HTTP error):", text);
-                if (isMounted) setFetchError(true);
+                let msg = "Failed to load question. Please try again.";
+                try {
+                    const json = await res.json().catch(() => null);
+                    if (json?.detail) {
+                        msg = json.detail; // backend sends 'Subscription required for this subject'
+                    }
+                } catch {}
+
+                if (isMountedRef.current) {
+                    showError(msg, true);              // already showing the message
+                    if (msg.includes("Subscription required")) {
+                        router.push("/mainStudy"); // just redirect
+                    }
+                    setFetchError(true);
+                }
                 return;
             }
 
@@ -172,14 +232,20 @@ export default function QuizSampleSection({
                 data = await res.json();
             } catch (jsonErr) {
                 console.error("Failed to parse question JSON:", jsonErr);
-                if (isMounted) setFetchError(true);
+                if (isMounted) {
+                    showError("Failed to parse question data.");
+                    setFetchError(true);
+                }
                 return;
             }
 
             // Ensure options exist
             if (!data?.options?.length) {
                 console.warn("No options found for question:", data);
-                if (isMounted) setFetchError(true);
+                if (isMounted) {
+                    showError("No options available for this question.");
+                    setFetchError(true);
+                }
                 return;
             }
 
@@ -194,7 +260,7 @@ export default function QuizSampleSection({
         fetchFirstQuestion();
 
         return () => { isMounted = false; };
-    }, [loadingDone, apiUrl, isLoggedIn, userId, subjectId]);
+    }, [loadingDone, apiUrl, isLoggedIn, userId, token, subjectId, mode]);
 
 
 
@@ -203,22 +269,33 @@ export default function QuizSampleSection({
 // --- Requests the next quiz question from backend when the user clicks Next --- //
 
     async function fetchNextQuestion() {
-        if (!apiUrl) return null;
+        if (!apiUrl || !token) return null;
 
         try {
-            const res = await fetch(`${apiUrl}/questions/next`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    user_id: isLoggedIn ? userId : null,
-                    subject_id: subjectId ?? null,
-                }),
+            const url = buildQuestionUrl();
+
+            const res = await safeFetch(url, {
+                method: "GET",
             });
+
+            if (!res) {
+                if (isMountedRef.current) showError("Failed to load next question. Please try again.");
+                setFetchError(true);
+                return null;
+            }
 
             // ✅ Check HTTP status
             if (!res.ok) {
-                const text = await res.text().catch(() => "");
-                console.error("Failed to fetch next question:", text);
+                let msg = "Failed to fetch next question. Please try again.";
+                try {
+                    const json = await res.json().catch(() => null);
+                    if (json?.detail) {
+                        msg = json.detail; // backend subscription message
+                    }
+                } catch {}
+
+                console.error("Failed to fetch next question:", msg);
+                if (isMountedRef.current) showError(msg, true);
                 setFetchError(true);
                 return null;
             }
@@ -229,6 +306,7 @@ export default function QuizSampleSection({
                 data = await res.json();
             } catch (jsonErr) {
                 console.error("Failed to parse next question JSON:", jsonErr);
+                if (isMountedRef.current) showError("Failed to parse next question data.");
                 setFetchError(true);
                 return null;
             }
@@ -236,6 +314,7 @@ export default function QuizSampleSection({
             // ✅ Ensure options exist
             if (!data?.options?.length) {
                 console.warn("No options in next question:", data);
+                if (isMountedRef.current) showError("No options available for the next question.");
                 setFetchError(true);
                 return null;
             }
@@ -245,6 +324,7 @@ export default function QuizSampleSection({
 
         } catch (err) {
             console.error("Unable to fetch next question:", err);
+            if (isMountedRef.current) showError("Unable to fetch next question. Please check your connection.");
             setFetchError(true);
             return null;
         }
@@ -309,15 +389,22 @@ export default function QuizSampleSection({
 
             if (isLoggedIn && apiUrl) {
                 try {
-                    const res = await fetch(`${apiUrl}/answer/check`, {
+                    const res = await safeFetch(`${apiUrl}/answer/check`, {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
                         body: JSON.stringify({
                             question_id: questionData.id,
                             selected_option: option,
                             user_id: String(userId),
                         }),
                     });
+
+                    if (!res) {
+                        showError?.("Failed to check answer. Please try again.");
+                        return;
+                    }
 
                     // ✅ Check HTTP status
                     if (!res.ok) {

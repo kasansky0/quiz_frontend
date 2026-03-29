@@ -1,44 +1,56 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useError } from "@/app/ErrorProvider";
 
+// --- We no longer need MainTopic interface per item, just array + boolean ---
+interface MainTopicsResponse {
+    main_topics: string[];
+    is_paid: boolean;
+}
 
-export function useMainTopics(apiUrl: string) {
-    const [mainTopics, setMainTopics] = useState<string[]>([]);
+export function useMainTopics(apiUrl: string, token?: string) {
+    const [mainTopics, setMainTopics] = useState<string[]>([]); // array of strings now
+    const [isPaid, setIsPaid] = useState(false);                // backend boolean
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { showError } = useError();
 
+    const fetchMainTopics = useCallback(async () => {
+        if (!apiUrl) return;
+
+        setLoading(true);
+        setError(null);
+
+        try {
+            const res = await fetch(`${apiUrl}/subjects/main-topics`, {
+                headers: token
+                    ? { "Authorization": `Bearer ${token}` }
+                    : undefined,
+            });
+
+            if (!res.ok) {
+                const msg = `Failed to fetch main topics (status ${res.status})`;
+                setError(msg);
+                showError(msg);
+                return;
+            }
+
+            const data: MainTopicsResponse = await res.json(); // parse as object
+            console.log("API response:", data);
+            setMainTopics(data.main_topics); // array of strings
+            setIsPaid(data.is_paid);         // boolean
+        } catch (err: any) {
+            const msg = "❌ Failed to fetch main topics: " + (err?.message || err);
+            setError(msg);
+            showError(msg);
+        } finally {
+            setLoading(false);
+        }
+    }, [apiUrl, token, showError]);
 
     useEffect(() => {
-        const fetchMainTopics = async () => {
-            try {
-                const res = await fetch(`${apiUrl}/subjects/`);
-                if (!res.ok) {
-                    showError("Failed to fetch subjects");
-                    return null;
-                }
-
-                const data = await res.json();
-
-                // extract unique main_topic values from subjects array
-                const topics = Array.from(
-                    new Set(
-                        data
-                            .map((s: any) => s.main_topic)
-                            .filter((t: unknown): t is string => typeof t === "string" && t.length > 0) // ✅ fixed type
-                    )
-                ) as string[];
-                setMainTopics(topics);
-            } catch (err: any) {
-                const msg = "❌ Failed to fetch main topics: " + (err?.message || err);
-                setError(msg);        // now MainStudyPage sees error
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchMainTopics();
-    }, [apiUrl]);
+    }, [fetchMainTopics]);
 
-    return { mainTopics, loading, error };
+    return { mainTopics, isPaid, loading, error, refetchMainTopics: fetchMainTopics };
 }

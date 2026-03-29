@@ -11,6 +11,7 @@ export default function QuizNoSubjectPage() {
     const [answerCount, setAnswerCount] = useState(0);
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     const userId = session?.user?.id;
+    const token = session?.idToken;
 
     return (
         <QuizSampleSection
@@ -19,6 +20,8 @@ export default function QuizNoSubjectPage() {
             setWrongQueue={setWrongQueue}
             apiUrl={apiUrl}
             userId={userId}
+            mode="random"
+            token={token}
             loadingDone={true}
             onAnswer={async (isCorrect, questionId) => {
                 setAnswerCount(prev => prev + 1);
