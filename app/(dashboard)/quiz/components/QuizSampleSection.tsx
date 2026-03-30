@@ -399,8 +399,8 @@ export default function QuizSampleSection({
                             question_id: questionData.id,
                             selected_option: option,
                             user_id: String(userId),
-                        }, showError),
-                    });
+                        }),
+                    }, showError);
 
                     if (!res) {
                         showError?.("Failed to check answer. Please try again.");
