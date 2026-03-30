@@ -349,8 +349,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 return;
             }
 
-            if (!res.ok) {
-                const err = await res.json().catch(() => null);
+            if (!res.success) {
+                const err = await res.data.catch(() => null);
 
                 // 🔹 Check if backend tells the user to log in again
                 const loginRequired = err?.detail === "Oops! You need to log in again to continue.";
@@ -376,7 +376,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 return; // exit early
             }
 
-            const newComment: Comment = await res.json();
+            const newComment: Comment = await res.data;
 
             // 🔹 Extra SWR fetch trigger 2 seconds after comment is added
             setTimeout(() => {
@@ -482,7 +482,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 { method: "DELETE" }
             );
 
-            if (!res || !res.ok) {
+            if (!res || !res.success) {
                 // rollback on failure
                 setDeletedCommentIds(prev => {
                     const newSet = new Set(prev);
@@ -541,7 +541,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 return;
             }
 
-            if (!res.ok) {
+            if (!res.success) {
                 if (res.status === 401) {
                     await handleSessionExpired();
                     return;
@@ -569,7 +569,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             return;
         }
 
-        if (!res.ok) {
+        if (!res.success) {
             if (res.status === 401) {
                 await handleSessionExpired();
                 return;
@@ -578,7 +578,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             return;
         }
 
-        const updatedComment: Comment = await res.json();
+        const updatedComment: Comment = await res.data;
 
 
         // update visible comments
@@ -658,7 +658,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 return;
             }
 
-            if (!res.ok) {
+            if (!res.success) {
                 if (res.status === 401) {
                     await handleSessionExpired();
                     return;
@@ -712,7 +712,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 return;
             }
 
-            if (!res.ok) {
+            if (!res.success) {
                 if (res.status === 401) {
                     await handleSessionExpired();
                     return;
@@ -721,7 +721,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 return;
             }
 
-            const updatedPost: Post = await res.json();
+            const updatedPost: Post = await res.data;
 
             // Push change to parent
             onPostUpdate?.(updatedPost);
