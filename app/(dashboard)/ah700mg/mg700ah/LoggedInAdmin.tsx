@@ -187,8 +187,8 @@ export default function LoggedInAdmin() {
                     return;
                 }
 
-                if (!res.ok) {
-                    const err = await res.json().catch(() => null);
+                if (!res.success) {
+                    const err = await res.data.catch(() => null);
                     if (res.status === 401 || res.status === 403) {
                         await handleSessionExpired(); // uses the same logic as in add comment
                         return;
@@ -198,7 +198,7 @@ export default function LoggedInAdmin() {
                     return;
                 }
 
-                const data = await res.json();
+                const data = await res.data;
 
                 // 🔥 CONSOLE LOG EVERYTHING RECEIVED
                 console.log("🚀 Backend response:", data);
@@ -335,8 +335,8 @@ export default function LoggedInAdmin() {
                                             showError("⚠️ Network error. Please try again.");
                                             return;
                                         }
-                                        if (!res.ok) {
-                                            const err = await res.json().catch(() => null);
+                                        if (!res.success) {
+                                            const err = await res.data.catch(() => null);
                                             if (res.status === 401 || res.status === 403) {
                                                 await handleSessionExpired();
                                                 return;
@@ -344,7 +344,7 @@ export default function LoggedInAdmin() {
                                             showError(`Failed: ${err?.detail || "Unknown error"}`);
                                             return;
                                         }
-                                        const result = await res.json();
+                                        const result = await res.data;
                                         alert(`✅ User blocked until ${new Date(result.blocked_until).toLocaleString()}`);
                                         setBlockUserId("");
                                     } catch (err) {
@@ -404,8 +404,8 @@ export default function LoggedInAdmin() {
                                     }
 
                                     // Now TypeScript knows res is not null
-                                    if (!res.ok) {
-                                        const err = await res.json().catch(() => null);
+                                    if (!res.success) {
+                                        const err = await res.data.catch(() => null);
                                         if (res.status === 401 || res.status === 403) {
                                             await handleSessionExpired();
                                             return;
@@ -414,7 +414,7 @@ export default function LoggedInAdmin() {
                                         return;
                                     }
 
-                                    const result = await res.json();
+                                    const result = await res.data;
                                     alert(`Archived ${result.posts_archived} posts and ${result.comments_archived} comments.`);
                                 } catch (err) {
                                     console.error(err);
