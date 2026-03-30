@@ -131,29 +131,24 @@ export default function ChatStats() {
         return () => clearTimeout(timer);
     }, []);
 
+    // Minimum loading screen
+//    useEffect(() => {
+//        const timer = setTimeout(() => setShowLoading(false), 1500);
+//        return () => clearTimeout(timer);
+//    }, []);
+
     // --- COMMENTS POLLING ---
     const commentsFetcher = async (url: string) => {
-        try {
-            const res = await fetch(url, { credentials: "include" });
-            const data = await res.json().catch(() => null);
+        const res = await fetch(url, { credentials: "include" });
+        const data = await res.json();
 
-            if (!res.ok) {
-                showError(data?.detail || "Failed to fetch comments");
-                return [];
-            }
-
-            return data || [];
-        } catch (err: any) {
-            console.error("Comments fetch failed:", err);
-
-            if (!navigator.onLine) {
-                showError("⚠️ No internet connection. Please check your WiFi.", false);
-            } else {
-                showError("⚠️ Unable to fetch comments. Please try again.", false);
-            }
-
-            return [];
+        if (!res.ok) {
+            // Instead of throwing, show error in UI
+            showError(data?.detail || "Failed to fetch comments");
+            return []; // return empty array to prevent crashes
         }
+
+        return data;
     };
     const { data: polledComments } = useSWR<Comment[]>(
         activePost ? `${apiUrl}/posts/${activePost.id}/comments?skip=0&limit=25` : null,
@@ -364,11 +359,7 @@ export default function ChatStats() {
             setCreatingPost(false);
         } catch (err: any) {
             console.error("Create post error:", err);
-            if (err.name === "TypeError") {
-                showError("⚠️ Network error while creating post. Check your connection.");
-            } else {
-                showError("⚠️ Something went wrong. Please try again.");
-            }
+            showError("Network error while creating post");
         }
     };
 
