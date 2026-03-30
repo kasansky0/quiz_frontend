@@ -40,7 +40,7 @@ export function useMainTopics(apiUrl: string, token?: string) {
             setMainTopics(data.main_topics); // array of strings
             setIsPaid(data.is_paid);         // boolean
         } catch (err: any) {
-            const msg = "❌ Failed to fetch main topics: " + (err?.message || err);
+            const msg = "⚠️ Network error. Please try again."; // user-friendly
             setError(msg);
             showError(msg);
         } finally {

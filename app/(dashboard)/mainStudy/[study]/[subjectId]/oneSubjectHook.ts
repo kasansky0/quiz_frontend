@@ -42,40 +42,44 @@ export function useSubjectById(apiUrl: string, subjectId: string, token?: string
         if (!token) {
             setLoading(false);
             setError("Oops! You need to log in again to continue.");
-            showError(
-                "Oops! You need to log in again to continue.",
-                true
-            );
+            showError("Oops! You need to log in again to continue.", true);
             return;
         }
 
-        setLoading(true);
-        setError(null);
+        const fetchSubject = async () => {
+            setLoading(true);
+            setError(null);
 
-        fetch(`${apiUrl}/subjects/${subjectId}`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-            },
-        })
-            .then(res => {
+            try {
+                const res = await fetch(`${apiUrl}/subjects/${subjectId}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                });
+
                 if (res.status === 403) {
-                    setSubscriptionRequired(true);   // ✅ set flag
+                    setSubscriptionRequired(true);
                     showError("Subscription required");
                     return;
                 }
+
                 if (!res.ok) {
-                    setSubscriptionRequired(true);   // ✅ set flag
-                    showError(
-                        "Oops! You need to log in again to continue.",
-                        true
-                    );
+                    throw new Error("Failed to fetch subject. Please log in again.");
                 }
-                return res.json();
-            })
-            .then(data => setSubject(data))
-            .catch(err => setError(err.message))
-            .finally(() => setLoading(false));
+
+                const data: Subject = await res.json();
+                setSubject(data);
+            } catch (err: unknown) {
+                const message = err instanceof Error ? err.message : String(err);
+                setError(message);
+                console.warn("Fetch error:", message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchSubject();
     }, [apiUrl, subjectId, token]);
 
     return { subject, loading, error, subscriptionRequired };

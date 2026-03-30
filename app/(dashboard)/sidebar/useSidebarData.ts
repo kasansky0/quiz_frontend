@@ -2,9 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { UserStatsType } from "@/types/userStats";
-import type { QuestionType } from "@/app/(dashboard)/quiz/components/QuizSampleSection";
 import { useUser } from "@/app/UserContext";
-import {signIn, signOut} from "next-auth/react";
+import { signOut} from "next-auth/react";
 import { useError } from "@/app/ErrorProvider";
 
 
@@ -39,7 +38,7 @@ export function useUserSidebarData({
     const {setUserId} = useUser();
     const [errorState, setErrorState] = useState<string | null>(null);
     const [isLoggedOut, setIsLoggedOut] = useState(false);
-    const { showError } = useError() as { showError: (msg: string | object) => void };
+    const { showError } = useError();
 
 
 
@@ -56,7 +55,7 @@ export function useUserSidebarData({
         try {
             const res = await fetch(`${apiUrl}/user/`, {
                 method: "POST",
-                headers: {"Content-Type": "application/json"},
+                headers: { "Content-Type": "application/json" },
                 credentials: "include",
                 body: JSON.stringify({
                     name: session.user.name,
@@ -66,15 +65,15 @@ export function useUserSidebarData({
                 }),
             });
 
-            // Auth/session expired
             if (res.status === 401) {
                 handleSessionExpired();
                 return;
             }
 
-            // Other backend errors → do NOT log out
             if (!res.ok) {
-                setErrorState("Unable to load sidebar data.");
+                const text = await res.text().catch(() => "");
+                console.error("Backend error:", text);
+                showError("Unable to load sidebar data. Please try again.", true);
                 return;
             }
 
@@ -83,8 +82,7 @@ export function useUserSidebarData({
 
         } catch (err) {
             console.error("Network error:", err);
-            setErrorState("Network error");
-            // do NOT log out user here unless you really want
+            showError("Network error. Please check your connection.", true);
         } finally {
             setLoading(false);
         }
@@ -131,17 +129,22 @@ export function useUserSidebarData({
             try {
                 const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/google`, {
                     method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({token: session.idToken}),
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ token: session.idToken }),
                     credentials: "include",
                 });
 
-                const data = await res.json();
-                showError("✅ Google auth response: " + JSON.stringify(data));
+                if (!res.ok) {
+                    const text = await res.text().catch(() => "");
+                    showError("Failed to authenticate Google token. " + text, true);
+                    return;
+                }
 
                 fetchData(); // safe to call after auth
+                // Optionally: show friendly success toast
+                // showSuccess("Logged in successfully!");
             } catch (err: any) {
-                showError("Failed to send Google token: " + (err?.message || err));
+                showError("Network error: Failed to send Google token. " + (err?.message || err), true);
             }
         }
 
@@ -226,22 +229,34 @@ export function useUserSidebarData({
     useEffect(() => {
         if (!userStats?.user_id || answerCount === 0 || answeredState === null) return;
 
-        // Every 5 answers, push to backend
-        fetch(`${apiUrl}/userPercentage/update`, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                userId: userStats.user_id,
-                userPercentage: userPercentage,
-                totalOnlineTime: onlineTime  // 👈 SEND UPDATED TIME
-            }),
-        })
+        const updatePercentage = async () => {
+            try {
+                const res = await fetch(`${apiUrl}/userPercentage/update`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        userId: userStats.user_id,
+                        userPercentage: userPercentage,
+                        totalOnlineTime: onlineTime,
+                    }),
+                });
 
-            .then(res => res.json())
-            .then(data => showError("User percentage updated: " + JSON.stringify(data)))
-            .catch(err => showError("Failed to update sidebar percentage: " + (err?.message || err)));
-        // }
-    }, [answerCount, userPercentage, userStats, showError]);
+                if (!res.ok) {
+                    const text = await res.text().catch(() => "");
+                    showError("Failed to update user percentage: " + text);
+                    return;
+                }
+
+                const data = await res.json();
+                showError("User percentage updated: " + JSON.stringify(data));
+
+            } catch (err: any) {
+                showError("Failed to update sidebar percentage: " + (err?.message || err));
+            }
+        };
+
+        updatePercentage();
+    }, [answerCount, userPercentage, userStats, onlineTime, apiUrl, answeredState, showError]);
 
 
     // 1️⃣ Add another useEffect to initialize userPercentage from DB

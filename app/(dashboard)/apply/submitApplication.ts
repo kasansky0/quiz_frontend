@@ -24,8 +24,8 @@ export async function submitApplication(payload: ApplyFormPayload) {
         const token = session?.idToken;
 
         if (!token) {
-            // let caller handle this
-            return { error: "User not authenticated" };
+            // Let client know user needs to log in
+            return { error: "Oops! You need to log in again.", loginRequired: true };
         }
 
         const res = await fetch(`${apiUrl}/apply/`, {
@@ -39,12 +39,20 @@ export async function submitApplication(payload: ApplyFormPayload) {
 
         if (!res.ok) {
             const errorData = await res.json().catch(() => null);
-            return { error: errorData?.detail || "Request failed" };
+
+            // Friendly messages for known cases
+            if (res.status === 401) {
+                return { error: "Oops! You need to log in again.", loginRequired: true };
+            }
+
+            return { error: errorData?.detail || "Request failed. Please try again." };
         }
 
-        return { data: await res.json() };
-    } catch (err: any) {
-        return { error: err?.message || "Unknown error occurred" };
+        const data = await res.json();
+        return { data };
+    } catch (err) {
+        // Always return a simple, user-friendly message
+        return { error: "Network error. Please try again." };
     }
 }
 
@@ -53,11 +61,23 @@ export async function submitApplication(payload: ApplyFormPayload) {
 // Check if email has already submitted an application
 export async function checkApplicationEmail(email: string) {
     try {
-        const res = await fetch(`${apiUrl}/apply/check-email?email=${encodeURIComponent(email)}`);
-        if (!res.ok) throw new Error("Failed to check email");
-        return await res.json(); // { exists: true/false }
-    } catch (err: any) {
-        console.error(err);
-        return { exists: false }; // default to false on error
+        const res = await fetch(
+            `${apiUrl}/apply/check-email?email=${encodeURIComponent(email)}`
+        );
+
+        if (!res.ok) {
+            // Handle known cases
+            if (res.status === 401) {
+                return { error: "Oops! You need to log in again.", loginRequired: true };
+            }
+
+            return { error: "Failed to check email. Please try again." };
+        }
+
+        const data = await res.json(); // { exists: true/false }
+        return { data };
+    } catch (err) {
+        // Friendly network error message
+        return { error: "Network error. Please try again." };
     }
 }

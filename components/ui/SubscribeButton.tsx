@@ -2,13 +2,21 @@
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
+import { useError } from "@/app/ErrorProvider"; // adjust path if needed
 
 export default function SubscribeButton() {
     const [loading, setLoading] = useState(false);
     const { data: session } = useSession();
     const token = session?.idToken;
+    const { showError } = useError();
 
     const handleSubscribe = async () => {
+
+        if (!token) {
+            showError("You need to log in to subscribe.", true);
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -23,21 +31,27 @@ export default function SubscribeButton() {
             const data = await res.json();
 
             if (!res.ok) {
-                console.error("Backend error:", data);
-                throw new Error(data.detail || "Request failed");
+                if (process.env.NODE_ENV === "development") {
+                    console.log("Backend error:", data);
+                }
+
+                // 🔥 KEY PART: detect auth issue
+                if (res.status === 401 || res.status === 403 || !token) {
+                    showError("Oops! You need to log in again to continue.", true);
+                    return;
+                }
+
+                showError(data.detail || "Request failed");
+                return;
             }
 
-            if (!data.checkoutUrl) {
-                console.error("Missing checkoutUrl, response was:", data);
-                throw new Error("No checkout URL returned");
-            }
-
-            // redirect the user
             window.location.href = data.checkoutUrl;
 
         } catch (err) {
-            console.error(err);
-            alert("Something went wrong. Please try again.");
+            if (process.env.NODE_ENV === "development") {
+                console.log("Network error:", err);
+            }
+            showError("Network error. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -47,9 +61,9 @@ export default function SubscribeButton() {
         <button
             onClick={handleSubscribe}
             disabled={loading}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl transition"
+            className="w-full bg-blue-400 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl transition"
         >
-            {loading ? "Redirecting..." : "Subscribe to Unlock Full Access"}
+            {loading ? "Redirecting..." : "Subscribe for just 9.99$"}
         </button>
     );
 }

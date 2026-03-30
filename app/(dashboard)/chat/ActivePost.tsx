@@ -17,8 +17,28 @@ import { useRouter } from "next/navigation";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
 const COMMENTS_PAGE_SIZE = 25;
 const commentsKey = (postId: string, skip: number) => `${apiUrl}/posts/${postId}/comments?skip=${skip}&limit=${COMMENTS_PAGE_SIZE}`;
-const fetcher = (url: string) =>
-    fetch(url, { credentials: "include" }).then(res => res.json());
+const fetcher = async (url: string) => {
+    try {
+        const res = await fetch(url, { credentials: "include" });
+
+        let data;
+        try {
+            data = await res.json();
+        } catch {
+            data = null;
+        }
+
+        if (!res.ok) {
+            // Default friendly message
+            throw new Error(data?.error || "Failed to load data. Please try again.");
+        }
+
+        return data;
+    } catch (err: any) {
+        // Network error fallback
+        throw new Error(err?.message || "Network error. Please check your connection.");
+    }
+};
 
 type Props = {
     post: Post;
@@ -83,12 +103,6 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         }, 2000);
     };
 
-// POLL LATEST COMMENTS FOR THE POST EVERY 1 SECOND AND TRACK ERRORS //
-//    const { data: polledData, error } = useSWR(
-//        commentsKey(post.id, 0), // always fetch from skip=0 to get latest
-//        fetcher,
-//        { refreshInterval: 300000 } // fetch every 1 minute
-//    );
 
     const { data: polledData, error } = useSWR(
         commentsKey(post.id, 0),
@@ -99,6 +113,14 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             revalidateOnMount: false // prevents SWR from fetching immediately on mount
         }
     );
+
+    useEffect(() => {
+        if (error) {
+            showError(error.message || "Failed to load comments.");
+            const timer = setTimeout(() => hideError(), 15000); // hide after 5s
+            return () => clearTimeout(timer);
+        }
+    }, [error, showError, hideError]);
 
 //LOAD NEXT PAGE OF COMMENTS FOR THE ACTIVE POST //
     const handleLoadMore = async () => {
@@ -129,7 +151,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
         } catch (err) {
             showError(
-                "Oops! You need to log in again to continue.",
+                "Oops! Log in again to continue.",
                 true
             );
             router.push("/info");
@@ -297,6 +319,16 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
 // COMMENT ADD //
     const handleAddComment = async (message: string) => {
+
+        // ✅ Check if user is logged in
+        if (!userId || !session?.idToken) {
+            showError(
+                "Oops! Log in again to continue.",
+                true
+            );
+            return;
+        }
+
         if (!activePost || !message.trim() || !userId || isSending || isBlocked) return;
 
         const sanitizedMessage = DOMPurify.sanitize(message.trim());
@@ -320,6 +352,9 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             if (!res.ok) {
                 const err = await res.json().catch(() => null);
 
+                // 🔹 Check if backend tells the user to log in again
+                const loginRequired = err?.detail === "Oops! You need to log in again to continue.";
+
                 if (res.status === 429) {
                     const errDetail = err?.detail;
                     if (errDetail?.blocked) {
@@ -336,8 +371,9 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                     return;
                 }
 
-                showError(err?.detail || err?.error || "Failed to post comment.");
-                return;
+                // 🔹 Show error, include login button if login is required
+                showError(err?.detail || err?.error || "Failed to post comment.", loginRequired);
+                return; // exit early
             }
 
             const newComment: Comment = await res.json();

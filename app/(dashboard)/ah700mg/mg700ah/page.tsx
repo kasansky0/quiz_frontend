@@ -14,7 +14,7 @@ export default function AdminPage() {
     const [loadingAdmin, setLoadingAdmin] = useState<boolean>(false);
     const [minLoading, setMinLoading] = useState<boolean>(true);
 
-    const { showError } = useError() as { showError: (msg: string | object) => void };
+    const { showError } = useError();
 
     // Fetch admin status
     const fetchAdminStatus = useCallback(async () => {
@@ -30,10 +30,21 @@ export default function AdminPage() {
                     "Authorization": `Bearer ${session.idToken}`,
                 },
             });
+
             setIsAdmin(res.status === 200);
-        } catch (err: any) {
+
+            if (!res.ok) {
+                const data = await res.json().catch(() => null);
+                if (res.status === 401) {
+                    showError("Oops! You need to log in again.", true);
+                } else {
+                    showError(data?.detail || data?.error || "Failed to check admin status");
+                }
+                return;
+            }
+        } catch {
             setIsAdmin(false);
-            showError(err);
+            showError("Network error. Please try again.");
         } finally {
             setLoadingAdmin(false);
         }

@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useState } from "react";
 import QuizSampleSection from "@/app/(dashboard)/quiz/components/QuizSampleSection";
 import type { QuestionType } from "@/app/(dashboard)/quiz/components/QuizSampleSection";
+import { useError } from "@/app/ErrorProvider";
 
 export default function QuizNoSubjectPage() {
     const { data: session } = useSession();
@@ -12,6 +13,7 @@ export default function QuizNoSubjectPage() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     const userId = session?.user?.id;
     const token = session?.idToken;
+    const { showError } = useError();
 
     return (
         <QuizSampleSection
@@ -28,15 +30,29 @@ export default function QuizNoSubjectPage() {
 
                 if (!apiUrl || !userId) return;
 
-                await fetch(`${apiUrl}/answer/record`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        user_id: userId,
-                        question_id: questionId,
-                        correct: isCorrect,
-                    }),
-                });
+                try {
+                    const res = await fetch(`${apiUrl}/answer/record`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`, // if backend requires it
+                        },
+                        body: JSON.stringify({
+                            user_id: userId,
+                            question_id: questionId,
+                            correct: isCorrect,
+                        }),
+                    });
+
+                    if (!res.ok) {
+                        const text = await res.text().catch(() => "");
+                        console.error("Failed to record answer:", text);
+                        showError("Failed to record your answer. Please try again.", true);
+                    }
+                } catch (err) {
+                    console.error("Network error recording answer:", err);
+                    showError("Network error. Please check your connection and try again.", true);
+                }
             }}
         />
     );

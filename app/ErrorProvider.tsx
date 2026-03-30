@@ -23,10 +23,18 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
         if (typeof msg === "string") {
             finalMsg = msg;
         } else if (typeof msg === "object" && msg !== null) {
-            finalMsg = (msg as any).msg || JSON.stringify(msg);
+            // Try known fields first, fallback to generic
+            finalMsg =
+                (msg as any).msg ||
+                (msg as any).detail ||
+                (msg as any).error ||
+                "Something went wrong";
+        } else {
+            finalMsg = "Something went wrong";
         }
 
-        if (finalMsg.length > 15000) finalMsg = finalMsg.slice(0, 15000) + "...";
+        // Limit long messages
+        if (finalMsg.length > 200) finalMsg = finalMsg.slice(0, 200) + "...";
 
         setMessage(finalMsg);
         setShowLoginButton(showLoginBtn);
@@ -50,17 +58,19 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
             {children}
 
             {message && (
-                <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 max-w-xl w-full px-6 py-3 rounded-xl bg-red-500 bg-opacity-90 text-white shadow-md flex items-center gap-4 animate-slide-down whitespace-nowrap overflow-hidden">
-                    <span className="text-sm md:text-base truncate">{message}</span>
+                <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 max-w-xl w-full px-6 py-3 rounded-xl bg-red-500 bg-opacity-90 text-white shadow-md flex items-center justify-between animate-slide-down">
+                    <div className="flex items-center gap-4 truncate">
+                        <span className="text-sm md:text-base truncate">{message}</span>
 
-                    {showLoginButton && (
-                        <button
-                            onClick={() => signIn("google")}
-                            className="px-3 py-1 bg-black/70 border border-green-400/20 rounded-full shadow hover:bg-black/60 font-medium whitespace-nowrap"
-                        >
-                            Log In
-                        </button>
-                    )}
+                        {showLoginButton && (
+                            <button
+                                onClick={() => signIn("google")}
+                                className="px-3 py-1 bg-white text-gray-900 rounded-full shadow-sm hover:bg-gray-100 font-medium whitespace-nowrap transition"
+                            >
+                                Log In
+                            </button>
+                        )}
+                    </div>
 
                     <button
                         onClick={hideError}

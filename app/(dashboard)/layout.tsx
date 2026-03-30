@@ -64,6 +64,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
+    useEffect(() => {
+        const handleOnline = () => {
+            showError("✅ Back online!", false);
+        };
+
+        const handleOffline = () => {
+            showError("⚠️ You are offline", false);
+        };
+
+        window.addEventListener("online", handleOnline);
+        window.addEventListener("offline", handleOffline);
+
+        return () => {
+            window.removeEventListener("online", handleOnline);
+            window.removeEventListener("offline", handleOffline);
+        };
+    }, [showError]);
+
 
 
 
@@ -102,15 +120,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         try {
             const res = await fetch("/api/questionStats");
-            const data = await res.json();
 
-            // Update userStats with the new question stats
+            if (!res.ok) {
+                const errData = await res.json().catch(() => null);
+                const msg = errData?.error || errData?.detail || `Failed to refresh stats (status ${res.status})`;
+                showError(msg);
+                return;
+            }
+
+            const data = await res.json();
             setUserStats(prev => prev ? { ...prev, ...data } : data);
         } catch (err: any) {
-            showError("Failed to refresh stats: " + (err?.message || err));
+            // Network or unexpected error
+            if (err.name === "TypeError") {
+                showError("⚠️ Network error: check your connection");
+            } else {
+                showError("⚠️ Failed to refresh stats: " + (err?.message || err));
+            }
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     }, [showError]);
 
 
@@ -203,13 +232,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             }
 
             // Backend returned error → show message
-            if (!res.ok) {
+            if (!res.success) {
                 setErrorState("Unable to load sidebar data.");
                 showError("❌ Failed to fetch user data from server.");
                 return;
             }
 
-            const data = await res.json();
+            const data = await res.data;
             setUserStats(data);
             setErrorState(null); // clear previous error
         } catch (err: any) {
@@ -251,11 +280,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         tokenSentRef.current = true; // ✅ lock immediately
 
         // Helper function to wrap fetch safely
-        const safeFetch = async (url: string, options: RequestInit) => {
+        const safeFetch = async (url: string, options: RequestInit, showError?: (msg: string) => void) => {
             try {
                 return await fetch(url, options);
-            } catch (err) {
-                console.warn("Network fetch failed (suppressed):", err);
+            } catch (err: any) {
+                console.warn("Network fetch failed:", err);
+                if (showError) showError("⚠️ Network error: please check your connection.");
                 return null;
             }
         };
@@ -404,12 +434,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     return;
                 }
 
-                if (!res.ok) {
+                if (!res.success) {
                     showError("❌ Failed to update user percentage. Server returned an error.");
                     return;
                 }
 
-                const data = await res.json();
+                const data = await res.data;
                 showError("✅ User percentage updated");
             } catch (err: any) {
                 showError("❌ Failed to update sidebar percentage: " + (err?.message || err));

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from "react";
 import CreatePost from "./CreatePost";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { Post, Comment } from "../../hooks/usePosts";
 import { useUser } from "../../UserContext";
 import { useRouter } from "next/navigation";
@@ -10,7 +10,6 @@ import useSWR, { mutate as globalMutate } from "swr";
 import { useError } from "@/app/ErrorProvider";
 import DOMPurify from 'dompurify';
 import ActivePost from "./ActivePost";
-import { chatApis } from '@/app/hooks/chatApis';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
 
@@ -39,9 +38,15 @@ export default function ChatStats() {
 
     // Fetch posts from API with skip & limit
     const fetchPosts = async (skip: number, limit: number) => {
+
+        if (!navigator.onLine) {
+            showError("⚠️ No internet connection. Please check your WiFi.", false);
+            return { posts: [], total: 0, error: "offline" };
+        }
+
         const apiUrl = process.env.NEXT_PUBLIC_API_URL;
         if (!apiUrl) {
-            showError("Network is down.");
+            showError("App configuration error. Please try again later.");
             return { posts: [], total: 0, error: "API URL missing" };
         }
         try {
@@ -60,8 +65,14 @@ export default function ChatStats() {
             return { posts: data.posts || [], total: data.total || 0 };
         } catch (err: any) {
             console.error("Fetch failed:", err);
-            showError("Network error while fetching posts");
-            return { posts: [], total: 0, error: "Network error" };
+
+            if (!navigator.onLine) {
+                showError("⚠️ No internet connection. Please check your WiFi.", false);
+                return { posts: [], total: 0, error: "offline" };
+            }
+
+            showError("⚠️ Unable to connect to server. Please try again.", false);
+            return { posts: [], total: 0, error: "network_error" };
         }
     };
 
@@ -120,24 +131,29 @@ export default function ChatStats() {
         return () => clearTimeout(timer);
     }, []);
 
-    // Minimum loading screen
-//    useEffect(() => {
-//        const timer = setTimeout(() => setShowLoading(false), 1500);
-//        return () => clearTimeout(timer);
-//    }, []);
-
     // --- COMMENTS POLLING ---
     const commentsFetcher = async (url: string) => {
-        const res = await fetch(url, { credentials: "include" });
-        const data = await res.json();
+        try {
+            const res = await fetch(url, { credentials: "include" });
+            const data = await res.json().catch(() => null);
 
-        if (!res.ok) {
-            // Instead of throwing, show error in UI
-            showError(data?.detail || "Failed to fetch comments");
-            return []; // return empty array to prevent crashes
+            if (!res.ok) {
+                showError(data?.detail || "Failed to fetch comments");
+                return [];
+            }
+
+            return data || [];
+        } catch (err: any) {
+            console.error("Comments fetch failed:", err);
+
+            if (!navigator.onLine) {
+                showError("⚠️ No internet connection. Please check your WiFi.", false);
+            } else {
+                showError("⚠️ Unable to fetch comments. Please try again.", false);
+            }
+
+            return [];
         }
-
-        return data;
     };
     const { data: polledComments } = useSWR<Comment[]>(
         activePost ? `${apiUrl}/posts/${activePost.id}/comments?skip=0&limit=25` : null,
@@ -162,9 +178,10 @@ export default function ChatStats() {
     };
 
     const handleSessionExpired = async () => {
-        await signOut({ redirect: false });
-        setLoggedOut(true);
-        hideError();
+        showError(
+            "Oops! You need to log in again to continue.",
+            true
+        );
     };
 
     function LoggedOut() {
@@ -347,7 +364,11 @@ export default function ChatStats() {
             setCreatingPost(false);
         } catch (err: any) {
             console.error("Create post error:", err);
-            showError("Network error while creating post");
+            if (err.name === "TypeError") {
+                showError("⚠️ Network error while creating post. Check your connection.");
+            } else {
+                showError("⚠️ Something went wrong. Please try again.");
+            }
         }
     };
 

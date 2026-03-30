@@ -72,17 +72,37 @@ export default function MainStudyPage() {
                     {/* Optional: show if user is paid */}
                     <div className="text-center mb-4">
                         {isPaid ? (
-                            <span className="text-green-400 font-semibold">
-            Premium Access
-        </span>
+                            <span className="flex items-center justify-center gap-2 text-green-400 font-semibold">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="w-5 h-5"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                            </svg>
+                            Premium Access
+                          </span>
                         ) : (
-                            <div className="flex flex-col items-center gap-4">
-            <span className="text-yellow-400 font-semibold">
-                Subscribe to unlock all topics
-            </span>
+                            <div className="flex flex-col items-center gap-2">
+                                <div className="flex flex-col items-center gap-3 text-center px-4">
+                                    <p className="text-yellow-400 font-semibold text-lg">
+                                        Subscribe to unlock all study topics
+                                    </p>
+                                    <p className="text-white/70 text-sm md:text-base">
+                                        Most importantly, access <span className="font-bold text-green-400">topic-targeted muscle memory quizzes</span> that focus on one topic at a time.
+                                        <br />
+                                        Unlike the free version where questions come randomly from all 800+ questions, this ensures faster mastery and retention.
+                                    </p>
+                                </div>
 
                                 <div className="w-full max-w-xs">
                                     <SubscribeButton />
+                                </div>
+                                <div className="mt-2 text-center text-xs text-white/60 space-y-1">
+                                    <p>🔒 Secure payment via Stripe.</p>
                                 </div>
                             </div>
                         )}
@@ -98,11 +118,11 @@ export default function MainStudyPage() {
                                     key={mainTopic}
                                     href={locked ? "#" : `/mainStudy/${mainTopic}`}
                                     className={`
-                block w-full rounded-full p-4 text-center transition
-                ${locked
+                                        block w-full rounded-full p-4 text-center transition
+                                        ${locked
                                         ? "bg-gray-700 opacity-50 cursor-not-allowed"
                                         : "bg-dark-400 hover:bg-dark-600"}
-            `}
+                                    `}
                                 >
                                     <h2 className="font-semibold text-blue-500">
                                         {mainTopic} {locked && "🔒"}

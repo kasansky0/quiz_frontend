@@ -1,7 +1,7 @@
 "use client";
 
 import {useCallback, useEffect, useState} from "react";
-import {signIn, signOut} from "next-auth/react";
+import { signOut} from "next-auth/react";
 import {usePosts} from "@/app/hooks/usePosts";
 import { useError } from "@/app/ErrorProvider";
 
@@ -51,8 +51,14 @@ export function chatApis({ apiUrl, mainView }: UseChatPostsProps) {
                 );
 
                 if (!res.ok) {
-                    if (res.status === 401) handleSessionExpired();
-                    return null;
+                    if (res.status === 401) {
+                        handleSessionExpired();
+                        return null;
+                    } else {
+                        const text = await res.text().catch(() => "");
+                        showError(`Failed to load comments. ${text}`, true);
+                        return null;
+                    }
                 }
 
                 const data = await res.json(); // { comments: [], total: number }
@@ -63,8 +69,7 @@ export function chatApis({ apiUrl, mainView }: UseChatPostsProps) {
                             const existingComments = p.comments || [];
                             return {
                                 ...p,
-                                comments:
-                                    skip === 0 ? data.comments : [...existingComments, ...data.comments],
+                                comments: skip === 0 ? data.comments : [...existingComments, ...data.comments],
                                 commentCount: data.total,
                             };
                         }
@@ -72,14 +77,13 @@ export function chatApis({ apiUrl, mainView }: UseChatPostsProps) {
                     })
                 );
 
-                // Update skip for next fetch only if skipOverride was not used
                 if (skipOverride === undefined) {
                     setCommentSkips(prev => ({ ...prev, [postId]: skip + data.comments.length }));
                 }
 
                 return data;
-            } catch (err) {
-                // Network error happened, but we won’t log it to console
+            } catch (err: any) {
+                showError("Network error while loading comments. Please check your connection.", true);
                 return null;
             }
         },

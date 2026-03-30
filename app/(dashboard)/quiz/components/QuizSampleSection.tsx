@@ -124,8 +124,8 @@ export default function QuizSampleSection({
 
 
 
-    // Network-safe fetch wrapper
-    async function safeFetch(url: string, options: RequestInit) {
+    // Network-safe fetch wrapper with user-friendly error
+    async function safeFetch(url: string, options: RequestInit, showError?: (msg: string, isPersistent?: boolean) => void) {
         try {
             if (token) {
                 options.headers = {
@@ -134,8 +134,9 @@ export default function QuizSampleSection({
                 };
             }
             return await fetch(url, options);
-        } catch (err) {
-            console.warn("Network fetch failed (suppressed):", err);
+        } catch (err: any) {
+            console.warn("Network fetch failed:", err);
+            if (showError) showError("Network request failed. Please check your connection.");
             return null;
         }
     }
@@ -196,7 +197,7 @@ export default function QuizSampleSection({
 
             const res = await safeFetch(url, {
                 method: "GET",
-            });
+            }, showError);
 
             if (!res) {
                 if (isMounted) {
@@ -276,7 +277,7 @@ export default function QuizSampleSection({
 
             const res = await safeFetch(url, {
                 method: "GET",
-            });
+            }, showError);
 
             if (!res) {
                 if (isMountedRef.current) showError("Failed to load next question. Please try again.");
@@ -398,7 +399,7 @@ export default function QuizSampleSection({
                             question_id: questionData.id,
                             selected_option: option,
                             user_id: String(userId),
-                        }),
+                        }, showError),
                     });
 
                     if (!res) {
@@ -462,7 +463,7 @@ export default function QuizSampleSection({
         >
 
             {showLoading ? (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
                     <p className="text-xl flex items-center">
                         Loading
                         <span className="ml-2 flex space-x-1">
@@ -478,7 +479,7 @@ export default function QuizSampleSection({
                 <>
                         {/* Reload overlay if fetch failed */}
                         {fetchError && (
-                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-dark-300/90 backdrop-blur-sm p-4">
+                            <div className="absolute inset-0 flex items-center justify-center bg-black text-white z-40">
                                 <div className="bg-dark-400/80 border border-green-400/40 shadow-lg rounded-2xl max-w-md w-full p-6 text-center backdrop-blur-md">
                                     <h2 className="text-green-400 text-lg font-semibold mb-2 drop-shadow-[0_0_12px_rgba(36,174,124,0.8)]">
                                         Error

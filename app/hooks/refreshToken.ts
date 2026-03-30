@@ -24,7 +24,7 @@ export async function fetchWithToken(url: string, options: RequestInit = {}, ret
 
     if (!idToken) {
         console.warn("Session not ready yet");
-        return null; // ⛔ just stop, DO NOT log out
+        return { success: false, status: 0, message: "Session not ready" };
     }
 
     options.headers = {
@@ -35,19 +35,16 @@ export async function fetchWithToken(url: string, options: RequestInit = {}, ret
     try {
         let res = await fetch(url, options);
 
-        // Retry once on 401
-        // Retry once on 401
         if (res.status === 401 && retries > 0) {
             const newToken = await refreshToken();
 
             if (!newToken) {
-                console.error("Failed to refresh token");
-                return null; // exit early if refresh fails
+                return { success: false, status: 401, message: "Session expired. Please log in again." };
             }
 
-            idToken = newToken; // now safe to assign
+            idToken = newToken;
 
-            await new Promise(r => setTimeout(r, 200));
+            await new Promise(r => setTimeout(r, 200)); // keep delay
 
             options.headers = {
                 ...(options.headers as Record<string, string> || {}),
@@ -57,9 +54,15 @@ export async function fetchWithToken(url: string, options: RequestInit = {}, ret
             return fetchWithToken(url, options, retries - 1);
         }
 
-        return res;
-    } catch (err) {
+        if (!res.ok) {
+            const text = await res.text().catch(() => "");
+            return { success: false, status: res.status, message: `Server error: ${text}` };
+        }
+
+        const data = await res.json();
+        return { success: true, data };
+    } catch (err: any) {
         console.error("Fetch failed:", err);
-        return null;
+        return { success: false, status: 0, message: "Network error, please check your connection." };
     }
 }
