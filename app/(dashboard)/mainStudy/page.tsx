@@ -5,12 +5,15 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import SubscribeButton from "@/components/ui/SubscribeButton"; // adjust path if needed
+import { useError } from "@/app/ErrorProvider"; // make sure you import showError
+
 
 export default function MainStudyPage() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
     const { data: session, status } = useSession();
     const token = session?.idToken; // or accessToken depending on your setup
-    const { mainTopics, isPaid, loading, error } = useMainTopics(apiUrl, token);
+    const { mainTopics, isPaid, loading, error, tokenExpired } = useMainTopics(apiUrl, token);
+    const { showError } = useError();
 
 
     // Delayed loading
@@ -20,18 +23,28 @@ export default function MainStudyPage() {
     // Check token validity
     const [tokenValid, setTokenValid] = useState(false);
 
+    // Show error if token expired
     useEffect(() => {
-        if (status === "loading") {
-            // Session still loading, keep showing loader
-            setTokenValid(false);
-        } else if (!token) {
-            // No token or invalid token, keep showing loader
-            setTokenValid(false);
+        if (tokenExpired) {
+            // Only show once
+            if (!localStorage.getItem("tokenExpiredShown")) {
+                showError?.("Oops! You need to log in again.", true);
+                localStorage.setItem("tokenExpiredShown", "true");
+            }
+            setShowLoading(true);
         } else {
-            // Token exists, consider it valid
-            setTokenValid(true);
+            localStorage.removeItem("tokenExpiredShown"); // reset when token becomes valid
         }
-    }, [status, token]);
+    }, [tokenExpired, showError]);
+
+    // Update validToken to true when valid
+    useEffect(() => {
+        if (token && !tokenExpired) {
+            setTokenValid(true);
+        } else {
+            setTokenValid(false);
+        }
+    }, [token, tokenExpired]);
 
     // Handle delayed loading spinner
     useEffect(() => {
@@ -52,16 +65,17 @@ export default function MainStudyPage() {
     }, [loading, mainTopics, showLoading]);
 
     // Render loading screen if token is invalid or data is loading
-    if (!tokenValid || showLoading) {
+    // Render loading screen if token is invalid, loading, or tokenExpired
+    if (!tokenValid || showLoading || tokenExpired) {
         return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
-                      <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
-                      <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                      <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
-                    </span>
+                  <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
+                  <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                  <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                </span>
                 </p>
             </div>
         );

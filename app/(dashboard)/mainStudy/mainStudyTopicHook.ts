@@ -14,6 +14,7 @@ export function useMainTopics(apiUrl: string, token?: string) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { showError } = useError();
+    const [tokenExpired, setTokenExpired] = useState(false);
 
     const fetchMainTopics = useCallback(async () => {
         if (!apiUrl) return;
@@ -28,14 +29,13 @@ export function useMainTopics(apiUrl: string, token?: string) {
                     : undefined,
             });
 
-            if (!res.ok) {
-                const msg = `Failed to fetch main topics (status ${res.status})`;
-                setError(msg);
-                showError(msg);
+            if (res.status === 401) {          // <-- Unauthorized
+                setTokenExpired(true);
                 return;
             }
 
             const data: MainTopicsResponse = await res.json(); // parse as object
+
             setMainTopics(data.main_topics); // array of strings
             setIsPaid(data.is_paid);         // boolean
         } catch (err: any) {
@@ -51,5 +51,5 @@ export function useMainTopics(apiUrl: string, token?: string) {
         fetchMainTopics();
     }, [fetchMainTopics]);
 
-    return { mainTopics, isPaid, loading, error, refetchMainTopics: fetchMainTopics };
+    return { mainTopics, isPaid, loading, error, tokenExpired, refetchMainTopics: fetchMainTopics };
 }
