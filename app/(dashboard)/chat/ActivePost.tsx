@@ -299,9 +299,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const handleAddComment = async (message: string) => {
 
         if (!userId || !session?.idToken) {
-            setStatusBanner({
-                message: "Oops! You need to log in to comment.",
-            });
+            showError("Oops! You need to log in again.", true)
             // optionally include a login button in banner
             return;
         }
