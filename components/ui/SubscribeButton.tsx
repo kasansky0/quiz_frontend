@@ -31,13 +31,9 @@ export default function SubscribeButton() {
             const data = await res.json();
 
             if (!res.ok) {
-                if (process.env.NODE_ENV === "development") {
-                    console.log("Backend error:", data);
-                }
-
                 // 🔥 KEY PART: detect auth issue
                 if (res.status === 401 || res.status === 403 || !token) {
-                    showError("Oops! You need to log in again to continue.", true);
+                    showError("Oops! You need to log in again.", true);
                     return;
                 }
 
@@ -48,9 +44,6 @@ export default function SubscribeButton() {
             window.location.href = data.checkoutUrl;
 
         } catch (err) {
-            if (process.env.NODE_ENV === "development") {
-                console.log("Network error:", err);
-            }
             showError("Network error. Please try again.");
         } finally {
             setLoading(false);

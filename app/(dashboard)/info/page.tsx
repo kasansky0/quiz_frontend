@@ -126,7 +126,15 @@ const InfoAndFormulas = () => {
 
             {/* 5. Contact Info Section */}
             <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-6 mx-auto leading-relaxed font-semibold">
-                <strong>Contact: info@netaprep.com</strong>
+                <strong>
+                    Contact:{" "}
+                    <a
+                        href="mailto:info@netaprep.com"
+                        className="underline hover:text-white transition-colors"
+                    >
+                        info@netaprep.com
+                    </a>
+                </strong>
             </p>
         </div>
     );

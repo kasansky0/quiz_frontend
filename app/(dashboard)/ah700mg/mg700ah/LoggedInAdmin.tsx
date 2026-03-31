@@ -127,6 +127,7 @@ interface UserData {
     userPercentage: number;
     user_id: string;
     last_updated: string;
+    is_paid: boolean;
 }
 
 export default function LoggedInAdmin() {
@@ -147,6 +148,7 @@ export default function LoggedInAdmin() {
     const [summary, setSummary] = useState<AdminSummary | null>(null);
     const [spanWidth, setSpanWidth] = useState(90);
     const spanRef = useRef<HTMLSpanElement>(null);
+    const paidUsersCount = users.filter(user => user.is_paid).length;
 
     useEffect(() => {
         if (spanRef.current) {
@@ -199,9 +201,6 @@ export default function LoggedInAdmin() {
                 }
 
                 const data = await res.data;
-
-                // 🔥 CONSOLE LOG EVERYTHING RECEIVED
-                console.log("🚀 Backend response:", data);
 
                 if (!Array.isArray(data?.users)) {
                     showError("No users returned from backend");
@@ -652,6 +651,34 @@ export default function LoggedInAdmin() {
 
 
 
+
+
+
+                {/* Paid Users */}
+                {users.length > 0 && (
+                    <div className="bg-black/90 p-4 sm:p-6 my-2 rounded-xl border border-white text-sm sm:text-base">
+                        <p className="text-white-300 text-sm sm:text-base mb-2">
+                            Paid Users: <strong className="text-green-400">{paidUsersCount}</strong>
+                        </p>
+                        <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+                            {users
+                                .filter(user => user.is_paid)
+                                .map(user => (
+                                    <span
+                                        key={user.user_id}
+                                        className="text-xs sm:text-sm"
+                                    >
+                                        <span className="text-green-400">{user.email}</span>{" "}
+                                        <span className="text-gray-400">({user.nickname})</span>
+                                    </span>
+                                ))}
+                        </div>
+                    </div>
+                )}
+
+
+
+
                 {/* Applications */}
                 {summary?.applications && summary.applications.length > 0 && (
                     <div className="bg-black/90 p-4 sm:p-6 rounded-xl mb-6 border border-white text-sm sm:text-base">
@@ -806,6 +833,14 @@ export default function LoggedInAdmin() {
                                 {Math.floor((user.totalOnlineTime % 3600) / 60)}m
                             </p>
                             <p><strong>User Percentage:</strong> {user.userPercentage}</p>
+                            <p>
+                                <strong>Paid User:</strong>{" "}
+                                {user.is_paid ? (
+                                    <span className="text-green-400 font-bold">Yes</span>
+                                ) : (
+                                    <span className="text-red-400 font-bold">No</span>
+                                )}
+                            </p>
                             <p><strong>IP Address:</strong> {user.ip_address}</p>
 
                         </div>

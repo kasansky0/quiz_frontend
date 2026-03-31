@@ -18,15 +18,6 @@ export default function MainStudyPage() {
     // Fade in effect
     const [fade, setFade] = useState(false);
 
-    // Debug log to see data from backend
-    useEffect(() => {
-        if (!loading && !error) {
-            console.log("Token:", token);
-            console.log("Raw main topics:", mainTopics);
-            console.log("User is paid:", isPaid);
-        }
-    }, [mainTopics, isPaid, loading, error, token]);
-
     // Handle delayed loading spinner
     useEffect(() => {
         if (loading || error) {
@@ -50,7 +41,7 @@ export default function MainStudyPage() {
 
             {/* Loading screen */}
             {showLoading ? (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
                     <p className="text-xl flex items-center">
                         Loading
                         <span className="ml-2 flex space-x-1">

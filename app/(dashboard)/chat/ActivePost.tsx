@@ -129,7 +129,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
         } catch (err) {
             showError(
-                "Oops! You need to log in again to continue.",
+                "Oops! You need to log in again.",
                 true
             );
             router.push("/info");
@@ -321,7 +321,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
             // Handle null / network failure
             if (!res) {
-                showError("Oops! You need to log in again to continue.", true);
+                showError("Oops! You need to log in again.", true);
                 showStatusBanner("Failed to send comment", "error");
                 return;
             }
@@ -345,7 +345,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                     return;
                 }
 
-                showError("Failed to Oops! You need to log in again to continue.", true);
+                showError("Oops! You need to log in again.", true);
                 return;
             }
 
@@ -368,7 +368,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
         } catch (err: any) {
             console.error("Failed to post comment:", err);
-            showError("Oops! You need to log in again to continue.", true); // 🔴 friendly
+            showError("Oops! You need to log in again.", true); // 🔴 friendly
         }
     };
 

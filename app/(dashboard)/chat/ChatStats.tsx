@@ -174,7 +174,7 @@ export default function ChatStats() {
 
     const handleSessionExpired = async () => {
         showError(
-            "Oops! You need to log in again to continue.",
+            "Oops! You need to log in again.",
             true
         );
     };
@@ -314,7 +314,7 @@ export default function ChatStats() {
     const handleCreatePost = async ({ title, message }: { title: string; message: string }) => {
         if (!session?.idToken) {
             showError(
-                "Oops! You need to log in again to continue.",
+                "Oops! You need to log in again.",
                 true
             );
             return;

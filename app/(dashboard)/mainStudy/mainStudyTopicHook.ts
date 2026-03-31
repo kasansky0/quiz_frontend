@@ -36,7 +36,6 @@ export function useMainTopics(apiUrl: string, token?: string) {
             }
 
             const data: MainTopicsResponse = await res.json(); // parse as object
-            console.log("API response:", data);
             setMainTopics(data.main_topics); // array of strings
             setIsPaid(data.is_paid);         // boolean
         } catch (err: any) {

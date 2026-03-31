@@ -42,7 +42,7 @@ export function useSubjectById(apiUrl: string, subjectId: string, token?: string
         if (!token) {
             setLoading(false);
             setError("Oops! You need to log in again to continue.");
-            showError("Oops! You need to log in again to continue.", true);
+            showError("Oops! You need to log in again.", true);
             return;
         }
 

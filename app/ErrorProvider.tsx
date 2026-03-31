@@ -1,7 +1,8 @@
 "use client";
 
-import { createContext, useContext, useState, useRef, ReactNode } from "react";
+import { useEffect, createContext, useContext, useState, useRef, ReactNode } from "react";
 import { signIn } from "next-auth/react";
+import { usePathname } from "next/navigation";
 
 interface ErrorContextType {
     showError: (msg: string | object, showLoginButton?: boolean) => void;
@@ -16,6 +17,11 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
     const [message, setMessage] = useState<string | null>(null);
     const [showLoginButton, setShowLoginButton] = useState(false);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const pathname = usePathname();
+
+    useEffect(() => {
+        hideError(); // clear banner on route change
+    }, [pathname]);
 
     const showError = (msg: string | object, showLoginBtn: boolean = false) => {
         let finalMsg = "";
