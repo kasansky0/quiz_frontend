@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect, useCallback } from "react";
 import { useError } from "@/app/ErrorProvider";
 
@@ -11,44 +10,36 @@ interface MainTopicsResponse {
 
 export function useMainTopics(apiUrl: string, token?: string) {
     const [mainTopics, setMainTopics] = useState<string[]>([]); // array of strings now
-    const [isPaid, setIsPaid] = useState<boolean | null>(null);
+    const [isPaid, setIsPaid] = useState(false);                // backend boolean
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [tokenExpired, setTokenExpired] = useState(false);
     const { showError } = useError();
 
     const fetchMainTopics = useCallback(async () => {
-        if (!apiUrl || !token) return;
+        if (!apiUrl) return;
 
         setLoading(true);
         setError(null);
-        setTokenExpired(false);
 
         try {
             const res = await fetch(`${apiUrl}/subjects/main-topics`, {
-                headers: { "Authorization": `Bearer ${token}` },
+                headers: token
+                    ? { "Authorization": `Bearer ${token}` }
+                    : undefined,
             });
 
             if (!res.ok) {
-                if (res.status === 401) {
-                    // Token expired, preserve previous isPaid value
-                    setTokenExpired(true);
-                    showError("Session expired. Please log in again.", true);
-                } else {
-                    setMainTopics([]);
-                    setIsPaid(null);
-                    const msg = `Failed to fetch main topics (status ${res.status})`;
-                    setError(msg);
-                    showError(msg);
-                }
+                const msg = `Failed to fetch main topics (status ${res.status})`;
+                setError(msg);
+                showError(msg);
                 return;
             }
 
-            const data: MainTopicsResponse = await res.json();
-            setMainTopics(data.main_topics);
-            setIsPaid(data.is_paid);
-        } catch (err) {
-            const msg = "⚠️ Network error.";
+            const data: MainTopicsResponse = await res.json(); // parse as object
+            setMainTopics(data.main_topics); // array of strings
+            setIsPaid(data.is_paid);         // boolean
+        } catch (err: any) {
+            const msg = "❌ Failed to fetch main topics: " + (err?.message || err);
             setError(msg);
             showError(msg);
         } finally {
@@ -60,5 +51,5 @@ export function useMainTopics(apiUrl: string, token?: string) {
         fetchMainTopics();
     }, [fetchMainTopics]);
 
-    return { mainTopics, isPaid, loading, error, tokenExpired, refetchMainTopics: fetchMainTopics };
+    return { mainTopics, isPaid, loading, error, refetchMainTopics: fetchMainTopics };
 }

@@ -2,100 +2,128 @@
 
 import { useMainTopics } from "@/app/(dashboard)/mainStudy/mainStudyTopicHook";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import SubscribeButton from "@/components/ui/SubscribeButton";
-import { useError } from "@/app/ErrorProvider";
+import SubscribeButton from "@/components/ui/SubscribeButton"; // adjust path if needed
 
 export default function MainStudyPage() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
-    const { data: session, status } = useSession(); // status: 'loading' | 'authenticated' | 'unauthenticated'
-    const token = session?.idToken;
-    const { mainTopics, isPaid, loading, error, tokenExpired } = useMainTopics(apiUrl, token);
-    const { showError } = useError();
+    const { data: session, status } = useSession();
+    const token = session?.idToken; // or accessToken depending on your setup
+    const { mainTopics, isPaid, loading, error } = useMainTopics(apiUrl, token);
 
+
+    // Delayed loading
+    const [showLoading, setShowLoading] = useState(true);
+    // Fade in effect
     const [fade, setFade] = useState(false);
+    // Check token validity
+    const [tokenValid, setTokenValid] = useState(false);
 
-    // Show error if token expired
     useEffect(() => {
-        if (tokenExpired) showError("Oops! You have to log in again.", true);
-    }, [tokenExpired, showError]);
+        if (status === "loading") {
+            // Session still loading, keep showing loader
+            setTokenValid(false);
+        } else if (!token) {
+            // No token or invalid token, keep showing loader
+            setTokenValid(false);
+        } else {
+            // Token exists, consider it valid
+            setTokenValid(true);
+        }
+    }, [status, token]);
+
+    // Handle delayed loading spinner
+    useEffect(() => {
+        if (loading || error) {
+            setShowLoading(true);
+        } else {
+            const timer = setTimeout(() => setShowLoading(false), 1500);
+            return () => clearTimeout(timer);
+        }
+    }, [loading, error]);
 
     // Trigger fade after topics are ready
     useEffect(() => {
-        if (!loading && isPaid !== null && mainTopics.length) {
+        if (!loading && mainTopics.length && !showLoading) {
             const timer = setTimeout(() => setFade(true), 50);
             return () => clearTimeout(timer);
         }
-    }, [loading, isPaid, mainTopics]);
+    }, [loading, mainTopics, showLoading]);
 
-    useEffect(() => {
-        setFade(false);
-    }, [loading]);
-
-    // --- SHOW LOADING UNTIL SESSION AND DATA ARE READY ---
-    console.log("MainStudyPage render debug:", {
-        status,
-        token,
-        tokenExpired,
-        loading,
-        isPaid,
-        showLoadingCondition: status === "loading" || !token || tokenExpired || loading || isPaid === null
-    });
-
-    // --- SHOW LOADING UNTIL SESSION AND DATA ARE READY ---
-    if (status === "loading" || !token || tokenExpired || loading || isPaid === null) {
+    // Render loading screen if token is invalid or data is loading
+    if (!tokenValid || showLoading) {
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
-                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
-                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                      <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
+                      <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                      <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
                     </span>
                 </p>
             </div>
         );
     }
 
-    // --- NORMAL PAGE RENDER ---
+    // Then render all your full content with headings, subscription text, grid, etc.
     return (
         <div className="p-4 md:p-4 text-white relative min-h-screen">
-            <div className={`mx-auto max-w-4xl transition-opacity duration-700 ease-in-out ${fade ? "opacity-100" : "opacity-0"}`}>
+            <div className={`mx-auto max-w-4xl transition-opacity duration-700 ease-in-out ${
+                fade ? "opacity-100" : "opacity-0"
+            }`}>
                 {error && <div className="p-6 text-red-400">{error}</div>}
                 {!error && mainTopics.length === 0 && <div className="p-6 text-white">No main topics found.</div>}
 
                 <h1 className="text-2xl font-bold mb-6 text-center">Main Study Topics</h1>
 
+                {/* Full subscription section */}
                 <div className="text-center mb-4">
-                    {isPaid === true ? (
+                    {isPaid ? (
                         <span className="flex items-center justify-center gap-2 text-green-400 font-semibold">
-                            Premium Access
-                        </span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                        </svg>
+                        Premium Access
+                    </span>
                     ) : (
                         <div className="flex flex-col items-center gap-2">
                             <div className="flex flex-col items-center gap-3 text-center px-4">
                                 <p className="text-yellow-400 font-semibold text-lg">
                                     Subscribe to unlock all study topics
                                 </p>
+                                <p className="text-white/70 text-sm md:text-base">
+                                    Most importantly, access <span className="font-bold text-green-400">topic-targeted muscle memory quizzes</span> that focus on one topic at a time.
+                                    <br />
+                                    Unlike the free version where questions come randomly from all 800+ questions, this ensures faster mastery and retention.
+                                </p>
                             </div>
 
                             <div className="w-full max-w-xs">
                                 <SubscribeButton />
                             </div>
+                            <div className="mt-2 text-center text-xs text-white/60 space-y-1">
+                                <p>🔒 Secure payment via Stripe.</p>
+                            </div>
                         </div>
                     )}
                 </div>
 
+                {/* Grid container with 2 columns */}
                 <div className="grid grid-cols-2 gap-4">
                     {mainTopics.map((mainTopic) => {
-                        const locked = isPaid !== true;
+                        const locked = !isPaid;
                         return (
                             <Link
                                 key={mainTopic}
                                 href={locked ? "#" : `/mainStudy/${mainTopic}`}
-                                className={`block w-full rounded-full p-4 text-center transition ${locked ? "bg-gray-700 opacity-50 cursor-not-allowed" : "bg-dark-400 hover:bg-dark-600"}`}
+                                className={`
+                                block w-full rounded-full p-4 text-center transition
+                                ${locked
+                                    ? "bg-gray-700 opacity-50 cursor-not-allowed"
+                                    : "bg-dark-400 hover:bg-dark-600"}
+                            `}
                             >
                                 <h2 className="font-semibold text-blue-500">
                                     {mainTopic} {locked && "🔒"}
