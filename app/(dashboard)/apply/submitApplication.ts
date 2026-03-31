@@ -52,7 +52,7 @@ export async function submitApplication(payload: ApplyFormPayload) {
         return { data };
     } catch (err) {
         // Always return a simple, user-friendly message
-        return { error: "Network error. Please try again." };
+        return { error: "⚠️ Network error." };
     }
 }
 
@@ -78,6 +78,6 @@ export async function checkApplicationEmail(email: string) {
         return { data };
     } catch (err) {
         // Friendly network error message
-        return { error: "Network error. Please try again." };
+        return { error: "⚠️ Network error." };
     }
 }

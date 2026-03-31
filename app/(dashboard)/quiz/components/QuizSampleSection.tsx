@@ -87,8 +87,10 @@ export default function QuizSampleSection({
     const [showLoading, setShowLoading] = useState(true);
     const [subscriptionRequired, setSubscriptionRequired] = useState(false);
     const router = useRouter();
-
     const isMountedRef = useRef(true);
+
+    const [isFetchingNext, setIsFetchingNext] = useState(false);
+
 
     useEffect(() => {
         // when component mounts
@@ -336,8 +338,15 @@ export default function QuizSampleSection({
 // --- Main controller for moving to the next quiz question --- //
 
     const handleNextQuestion = async () => {
-        setFade(false);
+
+        if (isFetchingNext) return;
+        setIsFetchingNext(true);
+
+        // your existing logic
         await new Promise(res => setTimeout(res, 500));
+
+        setFade(false);
+        await new Promise(res => setTimeout(res, 200));
 
         setSelectedOption(null);
         setAnswerResult(null);
@@ -370,6 +379,8 @@ export default function QuizSampleSection({
 
         scrollContainerRef?.current?.scrollTo({ top: 0, behavior: "auto" });
         window.scrollTo({ top: 0, behavior: "auto" });
+
+        setIsFetchingNext(false);
     };
 
 
@@ -538,9 +549,37 @@ export default function QuizSampleSection({
                                         <div className="flex flex-col items-center gap-2 w-full">
                                             <Button
                                                 onClick={handleNextQuestion}
-                                                className="px-4 py-2 text-sm sm:px-6 sm:py-2.5 sm:text-base"
+                                                disabled={isFetchingNext}
+                                                className={`flex items-center justify-center gap-2 px-6 py-3 text-sm sm:text-base font-medium rounded-full shadow-md transition-all duration-200
+    ${isFetchingNext
+                                                    ? "bg-blue-400 cursor-not-allowed opacity-70 shadow-none"
+                                                    : "bg-blue-600 hover:bg-blue-700 active:scale-95 hover:shadow-lg"}
+  `}
                                             >
-                                                Next
+                                                {isFetchingNext ? (
+                                                    <span className="flex items-center gap-2">
+                                                      Loading
+                                                      <span className="ml-2 flex space-x-1">
+                                                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
+                                                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                                                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                                                      </span>
+                                                    </span>
+                                                ) : (
+                                                    <>
+                                                        Next
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            strokeWidth={2}
+                                                            stroke="currentColor"
+                                                            className="w-4 h-4 transition-transform group-hover:translate-x-1"
+                                                        >
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 12H6.75m10.5 0-4.5-4.5m4.5 4.5-4.5 4.5" />
+                                                        </svg>
+                                                    </>
+                                                )}
                                             </Button>
                                             <div className="flex flex-col items-center text-center">
                                                 <ScrollHint />

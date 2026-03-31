@@ -39,7 +39,7 @@ export function useMainTopics(apiUrl: string, token?: string) {
             setMainTopics(data.main_topics); // array of strings
             setIsPaid(data.is_paid);         // boolean
         } catch (err: any) {
-            const msg = "⚠️ Network error. Please try again."; // user-friendly
+            const msg = "⚠️ Network error."; // user-friendly
             setError(msg);
             showError(msg);
         } finally {

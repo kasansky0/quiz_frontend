@@ -51,7 +51,7 @@ export default function QuizNoSubjectPage() {
                     }
                 } catch (err) {
                     console.error("Network error recording answer:", err);
-                    showError("Network error. Please check your connection and try again.", true);
+                    showError("⚠️ Network error.", true);
                 }
             }}
         />

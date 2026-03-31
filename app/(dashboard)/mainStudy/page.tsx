@@ -17,39 +17,27 @@ export default function MainStudyPage() {
 
 
 
-
-    if (!token) {
-        showError("Oops! You need to log in again", true);
-        return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
-                <p className="text-xl flex items-center">
-                    Loading
-                    <span className="ml-2 flex space-x-1">
-                      <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
-                      <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                      <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
-                    </span>
-                </p>
-            </div>
-        );
-    }
-
-
-
     // Delayed loading
     const [showLoading, setShowLoading] = useState(true);
     // Fade in effect
     const [fade, setFade] = useState(false);
 
+
+    useEffect(() => {
+        if (!token) {
+            showError("Oops! You need to log in again", true);
+        }
+    }, [token, showError]);
+
     // Handle delayed loading spinner
     useEffect(() => {
-        if (loading || error || isPaid === null) {
+        if (loading || isPaid === null) {
             setShowLoading(true);
         } else {
-            const timer = setTimeout(() => setShowLoading(false), 1500);
+            const timer = setTimeout(() => setShowLoading(false), 300);
             return () => clearTimeout(timer);
         }
-    }, [loading, error]);
+    }, [loading, error, isPaid]);
 
     // Trigger fade after topics are ready
     useEffect(() => {
@@ -63,25 +51,52 @@ export default function MainStudyPage() {
         setFade(false);
     }, [loading]);
 
+
+
+
+    // 2️⃣ Show error / login UI if no token
+    if (!token) {
+        return (
+            <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black text-white gap-4">
+                <p className="text-xl font-semibold">Oops! You need to log in again</p>
+                <button
+                    onClick={() => showError("Oops! You need to log in again", true)}
+                    className="px-6 py-3 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-black font-semibold transition"
+                >
+                    Log In
+                </button>
+            </div>
+        );
+    }
+
+
+    if (showLoading) {
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
+                <p className="text-xl flex items-center">
+                    Loading
+                    <span className="ml-2 flex space-x-1">
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                </span>
+                </p>
+            </div>
+        );
+    }
+
+
+
+
+
+
     return (
         <div className="p-4 md:p-4 text-white relative min-h-screen">
 
-            {/* Loading screen */}
-            {showLoading || isPaid === null ? (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
-                    <p className="text-xl flex items-center">
-                        Loading
-                        <span className="ml-2 flex space-x-1">
-                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
-                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
-                        </span>
-                    </p>
-                </div>
-            ) : (
+
                 <div className={`mx-auto max-w-4xl transition-opacity duration-700 ease-in-out ${
-                    fade ? "opacity-100" : "opacity-0"
-                }`}>
+                    fade ? "opacity-100" : "opacity-0"}`}>
+
                     {error && <div className="p-6 text-red-400">{error}</div>}
                     {!error && mainTopics.length === 0 && <div className="p-6 text-white">No main topics found.</div>}
 
@@ -159,7 +174,6 @@ export default function MainStudyPage() {
                         })}
                     </div>
                 </div>
-            )}
         </div>
     );
 }

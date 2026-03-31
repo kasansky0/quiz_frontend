@@ -44,7 +44,7 @@ export default function SubscribeButton() {
             window.location.href = data.checkoutUrl;
 
         } catch (err) {
-            showError("Network error. Please try again.");
+            showError("⚠️ Network error.");
         } finally {
             setLoading(false);
         }

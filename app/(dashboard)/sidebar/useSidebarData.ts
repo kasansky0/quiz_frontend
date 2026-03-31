@@ -82,7 +82,7 @@ export function useUserSidebarData({
 
         } catch (err) {
             console.error("Network error:", err);
-            showError("Network error. Please check your connection.", true);
+            showError("⚠️ Network error.", true);
         } finally {
             setLoading(false);
         }

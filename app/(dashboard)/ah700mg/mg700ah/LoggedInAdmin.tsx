@@ -331,7 +331,7 @@ export default function LoggedInAdmin() {
                                             }),
                                         });
                                         if (!res) {
-                                            showError("⚠️ Network error. Please try again.");
+                                            showError("⚠️ Network error.");
                                             return;
                                         }
                                         if (!res.success) {
@@ -398,7 +398,7 @@ export default function LoggedInAdmin() {
 
                                     // ✅ TypeScript-safe null check
                                     if (!res) {
-                                        showError("⚠️ Network error. Please try again.");
+                                        showError("⚠️ Network error.");
                                         return;
                                     }
 

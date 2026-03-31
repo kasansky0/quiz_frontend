@@ -59,7 +59,7 @@
                     } catch (err: unknown) {
                         const message = err instanceof Error ? err.message : String(err);
                         console.warn("Error recording answer:", message);
-                        showError("⚠️ Network error. Please check your connection.");
+                        showError("⚠️ Network error.");
                     }
                 }}
             />

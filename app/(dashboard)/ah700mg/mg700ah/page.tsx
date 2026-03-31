@@ -44,7 +44,7 @@ export default function AdminPage() {
             }
         } catch {
             setIsAdmin(false);
-            showError("Network error. Please try again.");
+            showError("⚠️ Network error.");
         } finally {
             setLoadingAdmin(false);
         }

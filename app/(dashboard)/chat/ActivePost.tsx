@@ -128,10 +128,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             setCurrentPage(prev => prev + 1);
 
         } catch (err) {
-            showError(
-                "Oops! You need to log in again.",
-                true
-            );
+            showError("Oops! You need to log in again.", true);
             router.push("/info");
         }
     };
@@ -478,7 +475,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 prev ? { ...prev, comments: previousComments } : prev
             );
             console.error("Delete comment error:", err);
-            showError("Network error. Comment will reappear on next refresh.");
+            showError("⚠️ Network error.");
         }
     };
 

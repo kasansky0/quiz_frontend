@@ -181,10 +181,7 @@ export default function ChatStats() {
     };
 
     const handleSessionExpired = async () => {
-        showError(
-            "Oops! You need to log in again.",
-            true
-        );
+        showError("Oops! You need to log in again.", true);
     };
 
     function LoggedOut() {
@@ -322,10 +319,7 @@ export default function ChatStats() {
 
     const handleCreatePost = async ({title, message}: { title: string; message: string }) => {
         if (!session?.idToken) {
-            showError(
-                "Oops! You need to log in again.",
-                true
-            );
+            showError("Oops! You need to log in again.", true);
             return;
         }
         const idToken = session.idToken;
