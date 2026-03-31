@@ -5,12 +5,35 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import SubscribeButton from "@/components/ui/SubscribeButton"; // adjust path if needed
+import { useError } from "@/app/ErrorProvider";
+
 
 export default function MainStudyPage() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
     const { data: session } = useSession();
     const token = session?.idToken; // or accessToken depending on your setup
     const { mainTopics, isPaid, loading, error } = useMainTopics(apiUrl, token);
+    const { showError } = useError();
+
+
+
+
+    if (!token) {
+        showError("Oops! You need to log in again", true);
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
+                <p className="text-xl flex items-center">
+                    Loading
+                    <span className="ml-2 flex space-x-1">
+                      <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
+                      <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                      <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                    </span>
+                </p>
+            </div>
+        );
+    }
+
 
 
     // Delayed loading
@@ -94,7 +117,16 @@ export default function MainStudyPage() {
                                 </div>
 
                                 <div className="w-full max-w-xs">
-                                    <SubscribeButton />
+                                    {token ? (
+                                        <SubscribeButton />
+                                    ) : (
+                                        <button
+                                            onClick={() => showError("Oops! You need to log in again", true)}
+                                            className="w-full px-4 py-3 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-black font-semibold transition"
+                                        >
+                                            Log in to Subscribe
+                                        </button>
+                                    )}
                                 </div>
                                 <div className="mt-2 text-center text-xs text-white/60 space-y-1">
                                     <p>🔒 Secure payment via Stripe.</p>
