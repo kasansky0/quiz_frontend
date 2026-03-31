@@ -29,7 +29,12 @@ export function useMainTopics(apiUrl: string, token?: string) {
             });
 
             if (!res.ok) {
-                const msg = `Failed to fetch main topics (status ${res.status})`;
+                setMainTopics([]);
+                setIsPaid(null);  // explicitly reset
+                const msg =
+                    res.status === 401
+                        ? "Session expired. Please log in again."
+                        : `Failed to fetch main topics (status ${res.status})`;
                 setError(msg);
                 showError(msg);
                 return;
