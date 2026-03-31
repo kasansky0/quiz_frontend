@@ -10,7 +10,7 @@ interface MainTopicsResponse {
 
 export function useMainTopics(apiUrl: string, token?: string) {
     const [mainTopics, setMainTopics] = useState<string[]>([]); // array of strings now
-    const [isPaid, setIsPaid] = useState(false);                // backend boolean
+    const [isPaid, setIsPaid] = useState<boolean | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { showError } = useError();

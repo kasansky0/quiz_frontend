@@ -20,7 +20,7 @@ export default function MainStudyPage() {
 
     // Handle delayed loading spinner
     useEffect(() => {
-        if (loading || error) {
+        if (loading || error || isPaid === null) {
             setShowLoading(true);
         } else {
             const timer = setTimeout(() => setShowLoading(false), 1500);
@@ -30,17 +30,21 @@ export default function MainStudyPage() {
 
     // Trigger fade after topics are ready
     useEffect(() => {
-        if (!loading && mainTopics.length && !showLoading) {
+        if (!loading && isPaid !== null && mainTopics.length && !showLoading) {
             const timer = setTimeout(() => setFade(true), 50);
             return () => clearTimeout(timer);
         }
-    }, [loading, mainTopics, showLoading]);
+    }, [loading, isPaid, mainTopics, showLoading]);
+
+    useEffect(() => {
+        setFade(false);
+    }, [loading]);
 
     return (
         <div className="p-4 md:p-4 text-white relative min-h-screen">
 
             {/* Loading screen */}
-            {showLoading ? (
+            {showLoading || isPaid === null ? (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
                     <p className="text-xl flex items-center">
                         Loading
@@ -62,7 +66,7 @@ export default function MainStudyPage() {
 
                     {/* Optional: show if user is paid */}
                     <div className="text-center mb-4">
-                        {isPaid ? (
+                        {isPaid === true ? (
                             <span className="flex items-center justify-center gap-2 text-green-400 font-semibold">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -102,7 +106,7 @@ export default function MainStudyPage() {
                     {/* Grid container with 2 columns */}
                     <div className="grid grid-cols-2 gap-4">
                         {mainTopics.map((mainTopic) => {
-                            const locked = !isPaid;
+                            const locked = isPaid !== true;
 
                             return (
                                 <Link

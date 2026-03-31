@@ -136,7 +136,6 @@ export default function QuizSampleSection({
             return await fetch(url, options);
         } catch (err: any) {
             console.warn("Network fetch failed:", err);
-            if (showError) showError("Network request failed. Please check your connection.");
             return null;
         }
     }
@@ -201,7 +200,6 @@ export default function QuizSampleSection({
 
             if (!res) {
                 if (isMounted) {
-                    showError("Failed to load question. Please try again.");
                     setFetchError(true);
                 }
                 return;

@@ -21,10 +21,10 @@ export default function StudyPage() {
 
     // Redirect if subscription is required
     useEffect(() => {
-        if (subscriptionRequired) {
-            router.push("/mainStudy"); // redirect to mainStudy page
+        if (!loadingSubjects && subscriptionRequired) {
+            router.push("/mainStudy");
         }
-    }, [subscriptionRequired, router]);
+    }, [loadingSubjects, subscriptionRequired, router]);
 
 
     // Delayed loading
@@ -47,21 +47,32 @@ export default function StudyPage() {
 
     // Trigger fade after subjects are ready
     useEffect(() => {
-        if (!loadingSubjects && subjects.length) {
+        if (!loadingSubjects && subscriptionRequired === false && subjects.length && !showLoading) {
             const timer = setTimeout(() => setFade(true), 50);
             return () => clearTimeout(timer);
         }
-    }, [loadingSubjects, subjects]);
+    }, [loadingSubjects, subscriptionRequired, subjects, showLoading]);
+
+    useEffect(() => {
+        setFade(false);
+    }, [loadingSubjects]);
 
     return (
         <div className="p-4 md:p-4 text-white relative min-h-screen">
 
             {/* Loading screen */}
-            {loadingSubjects && showLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black text-white transition-opacity duration-700 ease-in-out">
-                    <p className="text-xl">Loading subjects...</p>
+            {showLoading || subscriptionRequired === null ? (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
+                    <p className="text-xl flex items-center">
+                        Loading
+                        <span className="ml-2 flex space-x-1">
+                            <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
+                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                        </span>
+                    </p>
                 </div>
-            )}
+            ) : (
 
             <div className={`mx-auto max-w-4xl transition-opacity duration-700 ease-in-out ${
                 fade ? "opacity-100" : "opacity-0"
@@ -110,6 +121,7 @@ export default function StudyPage() {
                     ))}
                 </div>
             </div>
+            )}
         </div>
     );
 }

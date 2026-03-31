@@ -14,7 +14,7 @@ export function useSubjects(apiUrl: string, mainTopic: string, token?: string) {
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [loadingSubjects, setLoadingSubjects] = useState(true);
     const [errorSubjects, setErrorSubjects] = useState<string | null>(null);
-    const [subscriptionRequired, setSubscriptionRequired] = useState(false);
+    const [subscriptionRequired, setSubscriptionRequired] = useState<boolean | null>(null);
     const { showError } = useError();
 
     const fetchSubjects = useCallback(async () => {
@@ -51,6 +51,9 @@ export function useSubjects(apiUrl: string, mainTopic: string, token?: string) {
                 );
                 return;
             }
+
+            // ✅ SUCCESS CASE
+            setSubscriptionRequired(false);
 
             const data = await res.json();
 

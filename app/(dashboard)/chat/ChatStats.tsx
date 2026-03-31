@@ -17,16 +17,16 @@ export default function ChatStats() {
     const [activePost, setActivePost] = useState<Post | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [creatingPost, setCreatingPost] = useState(false);
-    const { userId } = useUser();
+    const {userId} = useUser();
     const router = useRouter();
     const [loggedOut, setLoggedOut] = useState(false);
-    const { showError, hideError } = useError();
+    const {showError, hideError} = useError();
     const handleBackToList = () => setActivePost(null);
     const [listFade, setListFade] = useState(false);
     const [activePostComments, setActivePostComments] = useState<Comment[]>([]);
     const [serverError, setServerError] = useState<string | null>(null);
     const [showLoading, setShowLoading] = useState(true);
-    const { data: session } = useSession();
+    const {data: session} = useSession();
     const [deletedCommentIds, setDeletedCommentIds] = useState<Set<string>>(new Set());
 
     // --- POSTS PAGINATION ---
@@ -36,65 +36,79 @@ export default function ChatStats() {
     const [totalPosts, setTotalPosts] = useState(0);
     const [loadingMore, setLoadingMore] = useState(false);
 
-    // Fetch posts from API with skip & limit
-    const fetchPosts = async (skip: number, limit: number) => {
+    const showOverlay = showLoading || !!serverError;
 
+    const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+// Network event listeners
+    useEffect(() => {
+        const handleOnline = () => setIsOnline(true);
+        const handleOffline = () => setIsOnline(false);
+
+        window.addEventListener("online", handleOnline);
+        window.addEventListener("offline", handleOffline);
+
+        return () => {
+            window.removeEventListener("online", handleOnline);
+            window.removeEventListener("offline", handleOffline);
+        };
+    }, []);
+
+    // --- Modify fetchPosts ---
+    const fetchPosts = async (skip: number, limit: number) => {
         if (!navigator.onLine) {
-            showError("⚠️ No internet connection. Please check your WiFi.", false);
+            // Keep loading forever until network is back
+            setServerError("⚠️ No internet connection. Please check your WiFi.");
+            setShowLoading(true);
             return { posts: [], total: 0, error: "offline" };
         }
 
         const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-        if (!apiUrl) {
-            showError("App configuration error. Please try again later.");
-            return { posts: [], total: 0, error: "API URL missing" };
-        }
+        if (!apiUrl) return { posts: [], total: 0, error: "API URL missing" };
+
         try {
             const res = await fetch(`${apiUrl}/posts/?skip=${skip}&limit=${limit}`, {
                 credentials: "include",
             });
+            const data = await res.json().catch(() => null);
 
-            const data = await res.json().catch(() => null); // fallback if json parsing fails
-
-            if (!res.ok) {
-                const msg = data?.detail || "Failed to fetch posts. Your IP may be blocked.";
-                showError(msg);
-                return { posts: [], total: 0, error: msg };
-            }
+            if (!res.ok) return { posts: [], total: 0, error: data?.detail || "Fetch failed" };
 
             return { posts: data.posts || [], total: data.total || 0 };
-        } catch (err: any) {
-            console.error("Fetch failed:", err);
-
-            if (!navigator.onLine) {
-                showError("⚠️ No internet connection. Please check your WiFi.", false);
-                return { posts: [], total: 0, error: "offline" };
-            }
-
-            showError("⚠️ Unable to connect to server. Please try again.", false);
+        } catch (err) {
+            setServerError("Network error");
+            setShowLoading(true);
             return { posts: [], total: 0, error: "network_error" };
         }
     };
 
+// --- Modify loadInitialPosts ---
     const loadInitialPosts = async () => {
+        setServerError(null);
         setShowLoading(true);
-        try {
-            const data = await fetchPosts(0, postLimit);
-            // ✅ ADD THIS
-            if (!data || !Array.isArray(data.posts)) {
-                // Already showed error in fetchPosts
-                return;
-            }
-            setAllPosts(data.posts);
-            setTotalPosts(data.total);
-            setPostSkip(data.posts.length);
-        } catch (err) {
-            console.error("Failed to fetch posts", err);
-            showError("Failed to load posts");
-        } finally {
-            setShowLoading(false);
+
+        const data = await fetchPosts(0, postLimit);
+
+        if (!data || data.error) {
+            // Keep loading if offline
+            if (data.error === "offline") return;
+            setServerError(data.error);
+            setShowLoading(true);
+            return;
         }
+
+        setAllPosts(data.posts);
+        setTotalPosts(data.total);
+        setPostSkip(data.posts.length);
+        setShowLoading(false); // hide only if network OK
     };
+
+// --- Optional: auto retry when back online ---
+    useEffect(() => {
+        if (isOnline && showLoading) {
+            loadInitialPosts(); // retry fetching posts
+        }
+    }, [isOnline]);
 
     useEffect(() => {
         loadInitialPosts();
@@ -131,15 +145,9 @@ export default function ChatStats() {
         return () => clearTimeout(timer);
     }, []);
 
-    // Minimum loading screen
-//    useEffect(() => {
-//        const timer = setTimeout(() => setShowLoading(false), 1500);
-//        return () => clearTimeout(timer);
-//    }, []);
-
     // --- COMMENTS POLLING ---
     const commentsFetcher = async (url: string) => {
-        const res = await fetch(url, { credentials: "include" });
+        const res = await fetch(url, {credentials: "include"});
         const data = await res.json();
 
         if (!res.ok) {
@@ -150,10 +158,10 @@ export default function ChatStats() {
 
         return data;
     };
-    const { data: polledComments } = useSWR<Comment[]>(
+    const {data: polledComments} = useSWR<Comment[]>(
         activePost ? `${apiUrl}/posts/${activePost.id}/comments?skip=0&limit=25` : null,
         commentsFetcher,
-        { refreshInterval: 300000, revalidateOnFocus: true, dedupingInterval: 1000 }
+        {refreshInterval: 300000, revalidateOnFocus: true, dedupingInterval: 1000}
     );
 
     useEffect(() => {
@@ -183,7 +191,8 @@ export default function ChatStats() {
         const router = useRouter();
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
-                <div className="bg-black/70 border border-white/10 shadow-lg rounded-2xl max-w-md w-full p-6 text-center backdrop-blur-md">
+                <div
+                    className="bg-black/70 border border-white/10 shadow-lg rounded-2xl max-w-md w-full p-6 text-center backdrop-blur-md">
                     <h2 className="text-white-400 text-lg font-semibold mb-2 drop-shadow-[0_0_12px_rgba(36,174,124,0.8)]">
                         Session Expired
                     </h2>
@@ -311,7 +320,7 @@ export default function ChatStats() {
         );
     };
 
-    const handleCreatePost = async ({ title, message }: { title: string; message: string }) => {
+    const handleCreatePost = async ({title, message}: { title: string; message: string }) => {
         if (!session?.idToken) {
             showError(
                 "Oops! You need to log in again.",
@@ -326,14 +335,17 @@ export default function ChatStats() {
         try {
             const res = await fetch(`${apiUrl}/posts/`, {
                 method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${idToken}`,
-                    },
-                body: JSON.stringify({ title: sanitizedTitle, message: sanitizedMessage }),
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${idToken}`,
+                },
+                body: JSON.stringify({title: sanitizedTitle, message: sanitizedMessage}),
             });
             if (!res.ok) {
-                if (res.status === 401) { await handleSessionExpired(); return; }
+                if (res.status === 401) {
+                    await handleSessionExpired();
+                    return;
+                }
                 const err = await res.json().catch(() => null);
                 let msg = "Failed to create post";
                 if (err?.detail) msg = typeof err.detail === "string" ? err.detail : err.detail.error ?? msg;
@@ -347,7 +359,7 @@ export default function ChatStats() {
                 (cachedData: { posts: Post[]; total: number } | undefined) => {
                     const existingPosts = cachedData?.posts ?? [];
                     const total = cachedData?.total ?? 0;
-                    return { posts: [newPost, ...existingPosts], total: total + 1 };
+                    return {posts: [newPost, ...existingPosts], total: total + 1};
                 },
                 false
             );
@@ -379,132 +391,133 @@ export default function ChatStats() {
             });
     }, [allPosts, searchQuery]);
 
-    if (loggedOut) return <LoggedOut />;
+    if (loggedOut) return <LoggedOut/>;
+
 
     return (
-        <div className="w-full max-w-4xl mx-auto">
-            {(showLoading) ? (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white">
-                    <p className="text-xl flex items-center">
-                        Loading
-                        <span className="ml-2 flex space-x-1">
-                            <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
-                            <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                            <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
-                        </span>
-                    </p>
+        <div className="w-full max-w-4xl mx-auto relative">
+            {/* Loading / Error Banner */}
+            {(showLoading || serverError) && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
+                    {showLoading && (
+                        <p className="text-xl flex items-center">
+                            Loading
+                            <span className="ml-2 flex space-x-1">
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                </span>
+                        </p>
+                    )}
+                    {!showLoading && serverError && (
+                        <p className="text-center px-4 text-white text-lg">{serverError}</p>
+                    )}
                 </div>
-            ) : (
+            )}
+
+            {/* Main Content */}
+            {!showLoading && allPosts.length > 0 && (
                 <div className="w-full max-w-4xl mx-auto flex flex-col pb-16">
                     {creatingPost && (
                         <CreatePost
                             onSubmit={handleCreatePost}
                             onCancel={() => setCreatingPost(false)}
-                            isBlocked={!!serverError}
-                            blockMessage={serverError || undefined}
+                            isBlocked={false} // no block while loading already done
                         />
                     )}
 
                     {!creatingPost && !activePost && (
                         <>
-                            {showLoading ? (
-                                <div className="min-h-[200px] flex items-center justify-center text-white/70">
-                                    Loading...
+                            {/* Posts list */}
+                            <div className="flex items-center justify-start relative">
+                                <button onClick={() => setCreatingPost(true)}>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={1.5}
+                                        stroke="currentColor"
+                                        className="w-8 h-8"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                        />
+                                    </svg>
+                                </button>
+                                <div className="w-full text-center text-sm py-2">
+                                    Promoted: CBS Electrical Contractors <br /> Hiring NETA 2 Techs 📍Raleigh NC
                                 </div>
-                            ) : filteredPosts.length === 0 ? (
-                                <div className="min-h-[200px] flex items-center justify-center text-white/70">
-                                    No posts yet
-                                </div>
-                            ) : (
+                            </div>
 
-                                    <>
-                                        <div className="flex items-center justify-start">
-                                            <button onClick={() => setCreatingPost(true)}>
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                                </svg>
-                                            </button>
-                                            <div className="w-full text-center text-sm py-2">
-                                                Promoted: CBS Electrical Contractors <br /> Hiring NETA 2 Techs 📍Raleigh NC
-                                            </div>
-                                        </div>
-
-                                        <div className={`mx-auto max-w-4xl transition-opacity duration-500 ease-in-out ${listFade ? "opacity-100" : "opacity-0"}`}>
-                                            <div className="space-y-4">
-                                                {filteredPosts.map(post => (
-                                                    <div
-                                                        key={post.id}
-                                                        onClick={() => handleActivatePost(post)}
-                                                        className="relative px-1 sm:px-2 py-2 cursor-pointer rounded-xl bg-transparent hover:bg-dark-800 transition-colors duration-100"
-                                                    >
-                                                        <div className="flex items-center mb-1 w-full">
-                                                            <div className="flex items-center gap-2 truncate">
-                                                                <span className="text-sm sm:text-sm md:text-base font-semibold truncate text-blue-400">
-                                                                    {post.nickname}
-                                                                </span>
-                                                                <div className="flex items-center justify-center bg-black/70 backdrop-blur-xl border border-white/10 rounded-full shadow-lg px-3 h-6 min-w-[40px] truncate">
-                                                                    <svg aria-hidden="true" className="w-3 h-3 mr-1 text-white-400" fill="currentColor" viewBox="0 0 20 20">
-                                                                        <path d="M10 1a9 9 0 00-9 9c0 1.947.79 3.58 1.935 4.957L.231 17.661A.784.784 0 00.785 19H10a9 9 0 009-9 9 9 0 00-9-9zm0 16.2H6.162c-.994.004-1.907.053-3.045.144l-.076-.188a36.981 36.981 0 002.328-2.087l-1.05-1.263C3.297 12.576 2.8 11.331 2.8 10c0-3.97 3.23-7.2 7.2-7.2s7.2 3.23 7.2 7.2-3.23 7.2-7.2 7.2z" />
-                                                                    </svg>
-                                                                    <span className="text-white-400 text-sm sm:text-sm md:text-base font-medium">{post.commentCount ?? 0}</span>
-                                                                    {post.pinned && <span className="text-yellow-400 text-sm sm:text-sm md:text-base font-bold ml-1 truncate">📌</span>}
-                                                                </div>
-                                                            </div>
-                                                            <span className="text-white-500/60 text-sm sm:text-sm md:text-base ml-auto whitespace-nowrap">{formatLocalDate(post.timestamp, post.edited)}</span>
-                                                        </div>
-                                                        <h3 className="text-white-800 font-bold mb-1 text-sm sm:text-base md:text-lg line-clamp-2">{post.title}</h3>
+                            <div className={`mx-auto max-w-4xl transition-opacity duration-500 ease-in-out ${listFade ? "opacity-100" : "opacity-0"}`}>
+                                <div className="space-y-4">
+                                    {filteredPosts.map(post => (
+                                        <div
+                                            key={post.id}
+                                            onClick={() => handleActivatePost(post)}
+                                            className="relative px-1 sm:px-2 py-2 cursor-pointer rounded-xl bg-transparent hover:bg-dark-800 transition-colors duration-100"
+                                        >
+                                            <div className="flex items-center mb-1 w-full">
+                                                <div className="flex items-center gap-2 truncate">
+                                                <span className="text-sm sm:text-sm md:text-base font-semibold truncate text-blue-400">
+                                                    {post.nickname}
+                                                </span>
+                                                    <div className="flex items-center justify-center bg-black/70 backdrop-blur-xl border border-white/10 rounded-full shadow-lg px-3 h-6 min-w-[40px] truncate">
+                                                        <svg aria-hidden="true" className="w-3 h-3 mr-1 text-white-400" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path d="M10 1a9 9 0 00-9 9c0 1.947.79 3.58 1.935 4.957L.231 17.661A.784.784 0 00.785 19H10a9 9 0 009-9 9 9 0 00-9-9zm0 16.2H6.162c-.994.004-1.907.053-3.045.144l-.076-.188a36.981 36.981 0 002.328-2.087l-1.05-1.263C3.297 12.576 2.8 11.331 2.8 10c0-3.97 3.23-7.2 7.2-7.2s7.2 3.23 7.2 7.2-3.23 7.2-7.2 7.2z" />
+                                                        </svg>
+                                                        <span className="text-white-400 text-sm sm:text-sm md:text-base font-medium">{post.commentCount ?? 0}</span>
+                                                        {post.pinned && (
+                                                            <span className="text-yellow-400 text-sm sm:text-sm md:text-base font-bold ml-1 truncate">📌</span>
+                                                        )}
                                                     </div>
-                                                ))}
+                                                </div>
+                                                <span className="text-white-500/60 text-sm sm:text-sm md:text-base ml-auto whitespace-nowrap">{formatLocalDate(post.timestamp, post.edited)}</span>
                                             </div>
+                                            <h3 className="text-white-800 font-bold mb-1 text-sm sm:text-base md:text-lg line-clamp-2">{post.title}</h3>
                                         </div>
+                                    ))}
+                                </div>
+                            </div>
 
-                                        {/* LOAD MORE POSTS BUTTON */}
-                                        {allPosts.length < totalPosts && (
-                                            <div className="flex justify-center my-4 w-full">
-                                                <button
-                                                    onClick={() => {
-                                                        setLoadingMore(true); // start visual loading
-                                                        setTimeout(async () => {
-                                                            await loadMorePosts(); // call real fetch handler
-                                                            setLoadingMore(false); // stop loading after posts loaded
-                                                        }, 300); // slight delay for animation, adjust as needed
-                                                    }}
-                                                    style={{ touchAction: "manipulation" }}
-                                                    className="w-full flex justify-center items-center py-3 bg-blue-50 hover:bg-blue-100 rounded-xl transition"
-                                                    disabled={loadingMore}
-                                                >
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        fill="none"
-                                                        viewBox="0 0 24 24"
-                                                        strokeWidth={1.5}
-                                                        stroke="currentColor"
-                                                        className={`w-6 h-6 text-blue-600 transition-transform ${
-                                                            loadingMore ? "animate-spin" : ""
-                                                        }`}
-                                                    >
-                                                        <path
-                                                            strokeLinecap="round"
-                                                            strokeLinejoin="round"
-                                                            d="m9 12.75 3 3m0 0 3-3m-3 3v-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                                                        />
-                                                    </svg>
-                                                    <span className="ml-2 text-blue-600 font-medium text-sm sm:text-base">
-                                                        {loadingMore ? "Loading..." : "Load More Posts"}
-                                                    </span>
-                                                </button>
-                                            </div>
-                                        )}
-                                    </>
-                                )}
+                            {/* LOAD MORE POSTS BUTTON */}
+                            {allPosts.length < totalPosts && (
+                                <div className="flex justify-center my-4 w-full">
+                                    <button
+                                        onClick={async () => {
+                                            setLoadingMore(true);
+                                            await loadMorePosts();
+                                            setLoadingMore(false);
+                                        }}
+                                        style={{ touchAction: "manipulation" }}
+                                        className="w-full flex justify-center items-center py-3 bg-blue-50 hover:bg-blue-100 rounded-xl transition"
+                                        disabled={loadingMore}
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            strokeWidth={1.5}
+                                            stroke="currentColor"
+                                            className={`w-6 h-6 text-blue-600 transition-transform ${loadingMore ? "animate-spin" : ""}`}
+                                        >
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="m9 12.75 3 3m0 0 3-3m-3 3v-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                        </svg>
+                                        <span className="ml-2 text-blue-600 font-medium text-sm sm:text-base">{loadingMore ? "Loading..." : "Load More Posts"}</span>
+                                    </button>
+                                </div>
+                            )}
                         </>
                     )}
 
+                    {/* Active Post */}
                     <div className={`transition-opacity duration-500 ease-in-out ${listFade ? "opacity-100" : "opacity-0"} w-full flex-1`}>
                         {activePost && (
                             <ActivePost
-                                deletedCommentIds={deletedCommentIds}       // ✅ pass set
-                                setDeletedCommentIds={setDeletedCommentIds} // ✅ pass setter
+                                deletedCommentIds={deletedCommentIds}
+                                setDeletedCommentIds={setDeletedCommentIds}
                                 post={activePost}
                                 comments={{ comments: activePostComments, total: Number(activePost.commentCount ?? 0) }}
                                 userId={userId}
@@ -518,12 +531,9 @@ export default function ChatStats() {
                                     setTotalPosts(prev => prev - 1);
                                 }}
                                 onCommentCountChange={(postId: string, newCount: number) => {
-                                    // Update the activePost locally
                                     if (activePost.id === postId) {
                                         setActivePost(prev => prev ? { ...prev, commentCount: newCount } : prev);
                                     }
-
-                                    // Also update the main posts list so the count stays consistent
                                     setAllPosts(prev =>
                                         prev.map(p => (p.id === postId ? { ...p, commentCount: newCount } : p))
                                     );
