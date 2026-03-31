@@ -2,27 +2,49 @@
 
 import { useMainTopics } from "@/app/(dashboard)/mainStudy/mainStudyTopicHook";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import SubscribeButton from "@/components/ui/SubscribeButton";
 import { useError } from "@/app/ErrorProvider";
 
 export default function MainStudyPage() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
-    const { data: session, status } = useSession();
+    const { data: session, status } = useSession(); // status: 'loading' | 'authenticated' | 'unauthenticated'
     const token = session?.idToken;
     const { mainTopics, isPaid, loading, error, tokenExpired } = useMainTopics(apiUrl, token);
     const { showError } = useError();
 
     const [fade, setFade] = useState(false);
 
-    // --- TOKEN MISSING OR EXPIRED: SHOW ONLY LOADING ---
-    if (!token || tokenExpired) {
-        // Show error once if token expired
-        useEffect(() => {
-            if (tokenExpired) showError("Session expired. Please log in again.", true);
-        }, [tokenExpired, showError]);
+    // Show error if token expired
+    useEffect(() => {
+        if (tokenExpired) showError("Oops! You have to log in again.", true);
+    }, [tokenExpired, showError]);
 
+    // Trigger fade after topics are ready
+    useEffect(() => {
+        if (!loading && isPaid !== null && mainTopics.length) {
+            const timer = setTimeout(() => setFade(true), 50);
+            return () => clearTimeout(timer);
+        }
+    }, [loading, isPaid, mainTopics]);
+
+    useEffect(() => {
+        setFade(false);
+    }, [loading]);
+
+    // --- SHOW LOADING UNTIL SESSION AND DATA ARE READY ---
+    console.log("MainStudyPage render debug:", {
+        status,
+        token,
+        tokenExpired,
+        loading,
+        isPaid,
+        showLoadingCondition: status === "loading" || !token || tokenExpired || loading || isPaid === null
+    });
+
+    // --- SHOW LOADING UNTIL SESSION AND DATA ARE READY ---
+    if (status === "loading" || !token || tokenExpired || loading || isPaid === null) {
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white">
                 <p className="text-xl flex items-center">
@@ -38,16 +60,6 @@ export default function MainStudyPage() {
     }
 
     // --- NORMAL PAGE RENDER ---
-    // Fade effect after topics load
-    useEffect(() => {
-        if (!loading && isPaid !== null && mainTopics.length) {
-            const timer = setTimeout(() => setFade(true), 50);
-            return () => clearTimeout(timer);
-        }
-    }, [loading, isPaid, mainTopics]);
-
-    useEffect(() => setFade(false), [loading]);
-
     return (
         <div className="p-4 md:p-4 text-white relative min-h-screen">
             <div className={`mx-auto max-w-4xl transition-opacity duration-700 ease-in-out ${fade ? "opacity-100" : "opacity-0"}`}>
@@ -67,10 +79,8 @@ export default function MainStudyPage() {
                                 <p className="text-yellow-400 font-semibold text-lg">
                                     Subscribe to unlock all study topics
                                 </p>
-                                <p className="text-white/70 text-sm md:text-base">
-                                    Access <span className="font-bold text-green-400">topic-targeted quizzes</span> for faster mastery.
-                                </p>
                             </div>
+
                             <div className="w-full max-w-xs">
                                 <SubscribeButton />
                             </div>
