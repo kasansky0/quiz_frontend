@@ -39,9 +39,9 @@ export function useMainTopics(apiUrl: string, token?: string) {
             setMainTopics(data.main_topics); // array of strings
             setIsPaid(data.is_paid);         // boolean
         } catch (err: any) {
-            const msg = "❌ Failed to fetch main topics: " + (err?.message || err);
-            setError(msg);
-            showError(msg);
+            const msg = "❌ Network error";
+            setError(msg);   // optional, if you want to keep error state
+            showError(msg);  // this will always display "Network error"
         } finally {
             setLoading(false);
         }

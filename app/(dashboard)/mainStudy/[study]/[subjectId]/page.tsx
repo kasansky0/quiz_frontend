@@ -32,9 +32,16 @@ export default function SubjectPage() {
     // Redirect if subscription is required
     useEffect(() => {
         if (subscriptionRequired) {
-            router.push("/mainStudy");
+            router.replace("/mainStudy");
         }
     }, [subscriptionRequired, router]);
+
+    useEffect(() => {
+        // If loading finished and there is no subject, redirect to mainStudy
+        if (!loading && !subject) {
+            router.replace("/mainStudy");
+        }
+    }, [loading, subject, router]);
 
     if (!subjectId)
         return <div className="p-6 text-white">Invalid subject ID</div>;
@@ -181,9 +188,7 @@ export default function SubjectPage() {
                         </div>
                     )}
                 </div>
-            ) : (
-                <div className="p-6 text-white">Subject not found</div>
-            )}
+            ) : null }
         </div>
     );
 }

@@ -17,7 +17,6 @@ export default function MainStudyPage() {
 
 
     // Delayed loading
-    const [showLoading, setShowLoading] = useState(true);
     // Fade in effect
     const [fade, setFade] = useState(false);
     // Check token validity
@@ -31,7 +30,6 @@ export default function MainStudyPage() {
                 showError?.("Oops! You need to log in again.", true);
                 localStorage.setItem("tokenExpiredShown", "true");
             }
-            setShowLoading(true);
         } else {
             localStorage.removeItem("tokenExpiredShown"); // reset when token becomes valid
         }
@@ -46,35 +44,23 @@ export default function MainStudyPage() {
         }
     }, [token, tokenExpired]);
 
-    // Handle delayed loading spinner
-    useEffect(() => {
-        if (loading || error) {
-            setShowLoading(true);
-        } else {
-            const timer = setTimeout(() => setShowLoading(false), 1500);
-            return () => clearTimeout(timer);
-        }
-    }, [loading, error]);
-
     // Trigger fade after topics are ready
     useEffect(() => {
-        if (!loading && mainTopics.length && !showLoading) {
+        if (!loading && mainTopics.length) {
             const timer = setTimeout(() => setFade(true), 50);
             return () => clearTimeout(timer);
         }
-    }, [loading, mainTopics, showLoading]);
+    }, [loading, mainTopics]);
 
-    // Render loading screen if token is invalid or data is loading
-    // Render loading screen if token is invalid, loading, or tokenExpired
-    if (!tokenValid || showLoading || tokenExpired) {
+    if (!tokenValid || loading || tokenExpired) {
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
-                  <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
-                  <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                  <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
                 </span>
                 </p>
             </div>

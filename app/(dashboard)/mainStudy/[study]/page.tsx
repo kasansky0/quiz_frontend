@@ -18,62 +18,47 @@ export default function StudyPage() {
     const { subjects, loadingSubjects, errorSubjects, subscriptionRequired } =
         useSubjects(apiUrl, mainTopic, token);
 
+    const shouldRedirect = !loadingSubjects && subscriptionRequired === true;
 
-    // Redirect if subscription is required
     useEffect(() => {
-        if (!loadingSubjects && subscriptionRequired) {
-            router.push("/mainStudy");
+        if (shouldRedirect) {
+            router.replace("/mainStudy");
         }
-    }, [loadingSubjects, subscriptionRequired, router]);
+    }, [shouldRedirect, router]);
 
-
-    // Delayed loading
-    const [showLoading, setShowLoading] = useState(false);
     // Fade-in effect
     const [fade, setFade] = useState(false);
 
-    // Handle delayed loading display
-    useEffect(() => {
-        let timer: NodeJS.Timeout;
-
-        if (loadingSubjects) {
-            timer = setTimeout(() => setShowLoading(true), 5000);
-        } else {
-            setShowLoading(false);
-        }
-
-        return () => clearTimeout(timer);
-    }, [loadingSubjects]);
-
     // Trigger fade after subjects are ready
     useEffect(() => {
-        if (!loadingSubjects && subscriptionRequired === false && subjects.length && !showLoading) {
+        if (!loadingSubjects && subscriptionRequired === false && subjects.length) {
             const timer = setTimeout(() => setFade(true), 50);
             return () => clearTimeout(timer);
         }
-    }, [loadingSubjects, subscriptionRequired, subjects, showLoading]);
+    }, [loadingSubjects, subscriptionRequired, subjects]);
 
     useEffect(() => {
         setFade(false);
     }, [loadingSubjects]);
 
+    // ✅ HARD BLOCK LOADING (PASTE HERE)
+    if (loadingSubjects || subscriptionRequired === null) {
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
+                <p className="text-xl flex items-center">
+                    Loading
+                    <span className="ml-2 flex space-x-1">
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                </span>
+                </p>
+            </div>
+        );
+    }
+
     return (
         <div className="p-4 md:p-4 text-white relative min-h-screen">
-
-            {/* Loading screen */}
-            {showLoading || subscriptionRequired === null ? (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
-                    <p className="text-xl flex items-center">
-                        Loading
-                        <span className="ml-2 flex space-x-1">
-                            <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
-                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
-                        </span>
-                    </p>
-                </div>
-            ) : (
-
             <div className={`mx-auto max-w-4xl transition-opacity duration-700 ease-in-out ${
                 fade ? "opacity-100" : "opacity-0"
             }`}>
@@ -121,7 +106,6 @@ export default function StudyPage() {
                     ))}
                 </div>
             </div>
-            )}
         </div>
     );
 }

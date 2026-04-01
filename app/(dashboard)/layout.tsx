@@ -233,8 +233,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             // Backend returned error → show message
             if (!res.success) {
-                setErrorState("Unable to load sidebar data.");
-                showError("❌ Failed to fetch user data from server.");
+                setErrorState("Network error");   // optional, just to keep error state consistent
+                showError("❌ Network error");     // always shows network error to user
                 return;
             }
 
