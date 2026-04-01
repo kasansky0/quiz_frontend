@@ -67,10 +67,18 @@ export default function MainStudyPage() {
         );
     }
 
+    const groupedTopics = mainTopics.reduce((acc: Record<string, string[]>, item) => {
+        if (!acc[item.main_topic]) {
+            acc[item.main_topic] = [];
+        }
+        acc[item.main_topic].push(item.title);
+        return acc;
+    }, {});
+
     // Then render all your full content with headings, subscription text, grid, etc.
     return (
         <div className="p-4 md:p-4 text-white relative min-h-screen">
-            <div className={`mx-auto max-w-4xl transition-opacity duration-700 ease-in-out ${
+            <div className={`mx-auto max-w-4xl pb-16 transition-opacity duration-700 ease-in-out ${
                 fade ? "opacity-100" : "opacity-0"
             }`}>
                 {error && <div className="p-6 text-red-400">{error}</div>}
@@ -111,23 +119,38 @@ export default function MainStudyPage() {
                 </div>
 
                 {/* Grid container with 2 columns */}
-                <div className="grid grid-cols-2 gap-4">
-                    {mainTopics.map((mainTopic) => {
+                <div className="grid grid-cols-1 gap-4">
+                    {Object.entries(groupedTopics).map(([mainTopic, titles]) => {
                         const locked = !isPaid;
-                        return (
-                            <Link
-                                key={mainTopic}
-                                href={locked ? "#" : `/mainStudy/${mainTopic}`}
+
+                        // Card content
+                        const cardContent = (
+                            <div
                                 className={`
-                                block w-full rounded-full p-4 text-center transition
-                                ${locked
-                                    ? "bg-gray-700 opacity-50 cursor-not-allowed"
-                                    : "bg-dark-400 hover:bg-dark-600"}
-                            `}
+          w-full rounded-2xl p-4 transition
+          ${locked ? "bg-gray-700 opacity-50 cursor-not-allowed" : "bg-dark-400 hover:bg-dark-600"}
+        `}
                             >
-                                <h2 className="font-semibold text-blue-500">
+                                {/* Main Topic */}
+                                <h2 className="font-semibold text-blue-400 mb-2">
                                     {mainTopic} {locked && "🔒"}
                                 </h2>
+
+                                {/* Titles under main topic */}
+                                <ul className="text-sm text-white/80 space-y-1 mt-2">
+                                    {titles.map((title, i) => (
+                                        <li key={i}>• {title}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        );
+
+                        // Wrap the card in a Link if unlocked
+                        return locked ? (
+                            <div key={mainTopic}>{cardContent}</div>
+                        ) : (
+                            <Link key={mainTopic} href={`/mainStudy/${mainTopic}`}>
+                                {cardContent}
                             </Link>
                         );
                     })}

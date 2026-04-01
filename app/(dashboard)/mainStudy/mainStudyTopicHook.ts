@@ -2,14 +2,19 @@
 import { useState, useEffect, useCallback } from "react";
 import { useError } from "@/app/ErrorProvider";
 
+interface MainTopicItem {
+    main_topic: string;
+    title: string;
+}
+
 // --- We no longer need MainTopic interface per item, just array + boolean ---
 interface MainTopicsResponse {
-    main_topics: string[];
+    data: MainTopicItem[];
     is_paid: boolean;
 }
 
 export function useMainTopics(apiUrl: string, token?: string) {
-    const [mainTopics, setMainTopics] = useState<string[]>([]); // array of strings now
+    const [mainTopics, setMainTopics] = useState<MainTopicItem[]>([]);
     const [isPaid, setIsPaid] = useState(false);                // backend boolean
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -36,7 +41,7 @@ export function useMainTopics(apiUrl: string, token?: string) {
 
             const data: MainTopicsResponse = await res.json(); // parse as object
 
-            setMainTopics(data.main_topics); // array of strings
+            setMainTopics(data.data);
             setIsPaid(data.is_paid);         // boolean
         } catch (err: any) {
             const msg = "❌ Network error";

@@ -59,7 +59,7 @@ export default function StudyPage() {
 
     return (
         <div className="p-4 md:p-4 text-white relative min-h-screen">
-            <div className={`mx-auto max-w-4xl transition-opacity duration-700 ease-in-out ${
+            <div className={`mx-auto max-w-4xl pb-16 transition-opacity duration-700 ease-in-out ${
                 fade ? "opacity-100" : "opacity-0"
             }`}>
                 {errorSubjects && <div className="p-6 text-red-400">{errorSubjects}</div>}
