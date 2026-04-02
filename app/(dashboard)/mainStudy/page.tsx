@@ -76,7 +76,10 @@ export default function MainStudyPage() {
 
     // Then render all your full content with headings, subscription text, grid, etc.
     return (
-        <div className={`mx-auto max-w-4xl p-4 pb-16 text-white relative h-screen transition-opacity duration-700 ease-in-out ${fade ? "opacity-100" : "opacity-0"}`}>
+        <div className="p-4 md:p-4 text-white relative min-h-screen">
+            <div className={`mx-auto max-w-4xl pb-16 transition-opacity duration-700 ease-in-out ${
+                fade ? "opacity-100" : "opacity-0"
+            }`}>
                 {error && <div className="p-6 text-red-400">{error}</div>}
                 {!error && mainTopics.length === 0 && <div className="p-6 text-white">No main topics found.</div>}
 
@@ -92,21 +95,24 @@ export default function MainStudyPage() {
                         Premium Access
                     </span>
                     ) : (
-                        <div className="flex flex-col items-center gap-4 text-center px-4">
-                            <p className="text-yellow-400 font-semibold text-lg">
-                                Subscribe to unlock all study topics
-                            </p>
-                            <p className="text-white/70 text-sm md:text-base">
-                                Most importantly, access <span className="font-bold text-green-400">topic-targeted muscle memory quizzes</span> that focus on one topic at a time.
-                                <br />
-                                Unlike the free version where questions come randomly from all 800+ questions, this ensures faster mastery and retention.
-                            </p>
+                        <div className="flex flex-col items-center gap-2">
+                            <div className="flex flex-col items-center gap-3 text-center px-4">
+                                <p className="text-yellow-400 font-semibold text-lg">
+                                    Subscribe to unlock all study topics
+                                </p>
+                                <p className="text-white/70 text-sm md:text-base">
+                                    Most importantly, access <span className="font-bold text-green-400">topic-targeted muscle memory quizzes</span> that focus on one topic at a time.
+                                    <br />
+                                    Unlike the free version where questions come randomly from all 800+ questions, this ensures faster mastery and retention.
+                                </p>
+                            </div>
 
                             <div className="w-full max-w-xs">
                                 <SubscribeButton />
                             </div>
-
-                            <p className="mt-2 text-xs text-white/60">🔒 Secure payment via Stripe.</p>
+                            <div className="mt-2 text-center text-xs text-white/60 space-y-1">
+                                <p>🔒 Secure payment via Stripe.</p>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -116,34 +122,39 @@ export default function MainStudyPage() {
                     {Object.entries(groupedTopics).map(([mainTopic, titles]) => {
                         const locked = !isPaid;
 
-                        return locked ? (
+                        // Card content
+                        const cardContent = (
                             <div
-                                key={mainTopic}
-                                className="w-full rounded-2xl p-4 bg-gray-700 opacity-50 cursor-not-allowed transition"
+                                className={`
+                                  w-full rounded-2xl p-4 transition
+                                  ${locked ? "bg-gray-700 opacity-50 cursor-not-allowed" : "bg-dark-400 hover:bg-dark-300"}
+                                `}
                             >
-                                <h2 className="font-semibold text-blue-400 mb-2">{mainTopic} 🔒</h2>
+                                {/* Main Topic */}
+                                <h2 className="font-semibold text-blue-400 mb-2">
+                                    {mainTopic} {locked && "🔒"}
+                                </h2>
+
+                                {/* Titles under main topic */}
                                 <ul className="text-sm text-white/80 space-y-1 mt-2">
                                     {titles.map((title, i) => (
                                         <li key={i}>• {title}</li>
                                     ))}
                                 </ul>
                             </div>
+                        );
+
+                        // Wrap the card in a Link if unlocked
+                        return locked ? (
+                            <div key={mainTopic}>{cardContent}</div>
                         ) : (
-                            <Link
-                                key={mainTopic}
-                                href={`/mainStudy/${mainTopic}`}
-                                className="w-full rounded-2xl p-4 bg-dark-400 hover:bg-dark-300 transition block"
-                            >
-                                <h2 className="font-semibold text-blue-400 mb-2">{mainTopic}</h2>
-                                <ul className="text-sm text-white/80 space-y-1 mt-2">
-                                    {titles.map((title, i) => (
-                                        <li key={i}>• {title}</li>
-                                    ))}
-                                </ul>
+                            <Link key={mainTopic} href={`/mainStudy/${mainTopic}`}>
+                                {cardContent}
                             </Link>
                         );
                     })}
                 </div>
+            </div>
         </div>
     );
 }

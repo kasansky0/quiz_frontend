@@ -65,12 +65,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
     useEffect(() => {
+        let timer: NodeJS.Timeout;
+
+        const showTemporary = (message: string) => {
+            showError(message, false);
+
+            // clear previous timer (important)
+            if (timer) clearTimeout(timer);
+
+            timer = setTimeout(() => {
+                showError("", false); // hide it
+            }, 5000);
+        };
+
         const handleOnline = () => {
-            showError("✅ Back online!", false);
+            showTemporary("✅ Back online!");
         };
 
         const handleOffline = () => {
-            showError("⚠️ You are offline", false);
+            showTemporary("⚠️ You are offline");
         };
 
         window.addEventListener("online", handleOnline);
@@ -79,6 +92,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         return () => {
             window.removeEventListener("online", handleOnline);
             window.removeEventListener("offline", handleOffline);
+            if (timer) clearTimeout(timer);
         };
     }, [showError]);
 

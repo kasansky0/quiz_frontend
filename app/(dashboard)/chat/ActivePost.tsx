@@ -128,7 +128,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             setCurrentPage(prev => prev + 1);
 
         } catch (err) {
-            showError("Oops! You need to log in again.", true);
+            showError("Oops! You need to log in again.😎", true);
             router.push("/info");
         }
     };
@@ -296,7 +296,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const handleAddComment = async (message: string) => {
 
         if (!userId || !session?.idToken) {
-            showError("Oops! You need to log in again.", true)
+            showError("Oops! You need to log in again.💪", true)
             // optionally include a login button in banner
             return;
         }
@@ -316,31 +316,37 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
             // Handle null / network failure
             if (!res) {
-                showError("Oops! You need to log in again.", true);
+                showError("Oops! You need to log in again.🍱", true);
                 showStatusBanner("Failed to send comment", "error");
                 return;
             }
 
             if (!res.success) {
                 const err = res.data || { error: res.message };
+                const detail = err?.detail;
 
+                // Backend blocked message (rate-limit or admin block)
+                if (detail?.blocked) {
+                    const message = detail.error || "You are temporarily blocked. Please wait.";
+                    setBlockMessage(message);
+                    if (detail.remaining) setBlockSeconds(detail.remaining);
+                    setIsBlocked(true);
+                    showError(message); // only string
+                    return;
+                }
+
+                // Rate limiting (429) without block
                 if (res.status === 429) {
-                    const errDetail = err?.detail;
-                    if (errDetail?.blocked) {
-                        setBlockMessage(errDetail.error);
-                        if (errDetail.remaining) setBlockSeconds(errDetail.remaining);
-                        setIsBlocked(true);
-                        return;
-                    }
-
-                    const seconds = errDetail?.remaining || 60;
+                    const seconds = detail?.remaining || 60;
                     setIsBlocked(true);
                     setBlockSeconds(seconds);
                     showError(`Slow down. Wait ${seconds} second${seconds > 1 ? "s" : ""}.`);
                     return;
                 }
 
-                showError("Oops! You need to log in again.", true);
+                // Fallback for session / other errors
+                const message = detail?.error || err.error || "Oops! You need to log in again.💪";
+                showError(message, true);
                 return;
             }
 
@@ -363,7 +369,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
         } catch (err: any) {
             console.error("Failed to post comment:", err);
-            showError("Oops! You need to log in again.", true); // 🔴 friendly
+            showError("Oops! You need to log in again.❌", true); // 🔴 friendly
         }
     };
 

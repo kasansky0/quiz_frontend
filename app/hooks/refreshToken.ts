@@ -2,7 +2,6 @@ import { getSession, signOut } from "next-auth/react";
 
 // --- HELPER FUNCTION TO REVALIDATE THE TOKEN BEFORE IT IS EXPIRED ---
 export async function handleSessionExpired() {
-    // Sign out the user without using React hooks
     await signOut({ redirect: false });
     console.warn("Session expired, user signed out");
 }
@@ -44,7 +43,7 @@ export async function fetchWithToken(url: string, options: RequestInit = {}, ret
 
             idToken = newToken;
 
-            await new Promise(r => setTimeout(r, 200)); // keep delay
+            await new Promise(r => setTimeout(r, 200));
 
             options.headers = {
                 ...(options.headers as Record<string, string> || {}),
@@ -54,12 +53,19 @@ export async function fetchWithToken(url: string, options: RequestInit = {}, ret
             return fetchWithToken(url, options, retries - 1);
         }
 
-        if (!res.ok) {
-            const text = await res.text().catch(() => "");
-            return { success: false, status: res.status, message: `Server error: ${text}` };
+        // Parse response safely
+        const text = await res.text().catch(() => "");
+        let data;
+        try {
+            data = text ? JSON.parse(text) : {};
+        } catch {
+            data = { error: text || "Unknown server error" };
         }
 
-        const data = await res.json();
+        if (!res.ok) {
+            return { success: false, status: res.status, data };
+        }
+
         return { success: true, data };
     } catch (err: any) {
         console.error("Fetch failed:", err);
