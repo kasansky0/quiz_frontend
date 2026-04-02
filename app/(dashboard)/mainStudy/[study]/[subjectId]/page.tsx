@@ -104,8 +104,8 @@ export default function SubjectPage() {
                         </div>
                     </div>
 
-                    <h1 className="text-3xl font-bold mb-6 text-blue-500">{subject.title}</h1>
-                    <p className="mb-8 text-gray-300">{subject.description}</p>
+                    <h1 className="text-2xl font-bold mb-4 text-blue-500">{subject.title}</h1>
+                    <p className="mb-4 text-gray-300">{subject.description}</p>
 
                     {subject.isQuiz && (
                         <div className="flex justify-center my-4 w-full">

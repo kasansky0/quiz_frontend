@@ -361,329 +361,331 @@ export default function ApplyPage() {
     }
 
     return (
-        <div className="p-4 md:p-4 text-white relative min-h-screen">
+        <div className="p-4 text-white relative min-h-screen">
+            <div className="max-w-md mx-auto">
 
 
 
-            <style jsx>{`
-              input[type="date"] {
-                text-align: left;
-                padding-left: 0.5rem;
-            
-                display: block;
-                width: 100%;
-                min-width: 0;
-                -webkit-appearance: none;
-            
-                height: 2.5rem;
-                line-height: 2.5rem;
-                padding-top: 0;
-                padding-bottom: 0;
-              }
-            
-              /* iOS inner text fix */
-              input[type="date"]::-webkit-date-and-time-value {
-                text-align: left;
-              }
-            
-              /* Make calendar icon white */
-              input[type="date"]::-webkit-calendar-picker-indicator {
-                filter: invert(1);
-                cursor: pointer;
-              }
-            `}</style>
+                <style jsx>{`
+                  input[type="date"] {
+                    text-align: left;
+                    padding-left: 0.5rem;
+                
+                    display: block;
+                    width: 100%;
+                    min-width: 0;
+                    -webkit-appearance: none;
+                
+                    height: 2.5rem;
+                    line-height: 2.5rem;
+                    padding-top: 0;
+                    padding-bottom: 0;
+                  }
+                
+                  /* iOS inner text fix */
+                  input[type="date"]::-webkit-date-and-time-value {
+                    text-align: left;
+                  }
+                
+                  /* Make calendar icon white */
+                  input[type="date"]::-webkit-calendar-picker-indicator {
+                    filter: invert(1);
+                    cursor: pointer;
+                  }
+                `}</style>
 
-            <div className="flex items-center justify-start mb-4">
-                <button
-                    onClick={() => router.back()}
-                    title="Back"
-                    className="p-0 m-0 flex items-center justify-center mr-4"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="2 2 21 21"
-                        strokeWidth={1.5}
-                        stroke="currentColor"
-                        className="w-8 h-8 block"
+                <div className="flex items-center justify-start mb-4">
+                    <button
+                        onClick={() => router.back()}
+                        title="Back"
+                        className="p-0 m-0 flex items-center justify-center mr-4"
                     >
-                        <path
-                            strokeLinecap="butt"
-                            strokeLinejoin="miter"
-                            d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                        />
-                    </svg>
-                </button>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="2 2 21 21"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-8 h-8 block"
+                        >
+                            <path
+                                strokeLinecap="butt"
+                                strokeLinejoin="miter"
+                                d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                            />
+                        </svg>
+                    </button>
 
-                <div className="text-sm sm:text-base">
-                    Promoted: CBS Electrical Contractors <br /> Hiring NETA 2 Techs 📍Raleigh NC
-                </div>
-            </div>
-
-            <form
-                onSubmit={handleSubmit}
-                className="bg-black text-white p-2 pb-16 rounded-2xl space-y-4 max-w-md mx-auto"
-            >
-                <div className="bg-gray-900 rounded-xl p-2 border border-gray-700">
-                    <p><strong>Name:</strong> {session.user.name}</p>
-                    <p><strong>Email:</strong> {session.user.email}</p>
-                </div>
-
-
-
-
-
-
-                <div className="flex items-center space-x-2 mb-4">
-                    <input
-                        type="checkbox"
-                        id="veteran"
-                        checked={form.background}
-                        onChange={(e) =>
-                            setForm({ ...form, background: e.target.checked })
-                        }
-                        className="w-5 h-5 text-blue-800 bg-gray-900 border-gray-700 rounded-xl focus:ring-yellow-400"
-                    />
-                    <label htmlFor="veteran" className="text-white text-sm select-none">
-                        Veteran
-                    </label>
+                    <div className="text-sm sm:text-base">
+                        Promoted: CBS Electrical Contractors <br /> Hiring NETA 2 Techs 📍Raleigh NC
+                    </div>
                 </div>
 
-
-
-
-
-
-                <div className="flex flex-col">
-                    <label htmlFor="location" className="text-white text-lg font-semibold mb-1">
-                        Preferred Location
-                    </label>
-                    <input
-                        id="location"
-                        name="location"
-                        placeholder="Dallas TX, Any location"
-                        value={form.location}
-                        onChange={handleChange}
-                        className={inputClass("location")}
-                    />
-                </div>
-
-
-
-
-
-
-
-
-
-                <div className="flex flex-col">
-                    <label htmlFor="availability" className="text-white text-lg font-semibold mb-1">
-                        Earliest Start Date
-                    </label>
-                    <input
-                        type="date"
-                        id="availability"
-                        name="availability"
-                        value={form.availability || ""}
-                        onChange={handleChange}
-                        min={localTomorrow}
-                        className={inputClass("availability")}
-                    />
-                </div>
-
-
-
-
-
-
-
-
-
-
-                <div className="flex flex-col">
-                    <label htmlFor="certifications" className="text-white text-lg font-semibold mb-1">
-                        Certifications
-                    </label>
-                    <input
-                        type="text"
-                        id="certifications"
-                        name="certifications"
-                        placeholder="NETA 2"
-                        value={form.certifications as unknown as string} // treat as string for input
-                        onChange={handleChange}
-                        className={inputClass("certifications")}
-                    />
-                </div>
-
-
-
-
-
-
-
-
-
-
-
-                <div className="flex flex-col">
-                    <label htmlFor="travel" className="text-white text-lg font-semibold mb-1">
-                        Willing to Travel?
-                    </label>
-                    <input
-                        type="text"
-                        id="travel"
-                        name="travel"
-                        placeholder="Yes or No"
-                        value={form.travel}
-                        onChange={handleChange}
-                        className={inputClass("travel")}
-                    />
-                </div>
-
-
-
-
-
-
-
-
-
-                <div className="flex flex-col">
-                    <label htmlFor="overtime" className="text-white text-lg font-semibold mb-1">
-                        Willing to Work Overtime?
-                    </label>
-                    <input
-                        type="text"
-                        id="overtime"
-                        name="overtime"
-                        placeholder="Yes or No"
-                        value={form.overtime}
-                        onChange={handleChange}
-                        className={inputClass("overtime")}
-                    />
-                </div>
-
-
-
-
-
-
-
-
-
-                <div className="flex flex-col">
-                    <label htmlFor="readyToMove" className="text-white text-lg font-semibold mb-1">
-                        Are you ready to relocate?
-                    </label>
-                    <input
-                        type="text"
-                        id="readyToMove"
-                        name="readyToMove"
-                        placeholder="Yes or No"
-                        value={form.readyToMove}
-                        onChange={handleChange}
-                        className={inputClass("readyToMove")}
-                    />
-                </div>
-
-
-
-
-
-
-
-
-
-
-
-
-                <div className="flex flex-col">
-                    <label htmlFor="experience" className="text-white text-lg font-semibold mb-1">
-                        Years of Electrical Experience
-                    </label>
-                    <input
-                        id="experience"
-                        name="experience"
-                        placeholder="e.g., 3"
-                        value={form.experience}
-                        onChange={handleChange}
-                        className={inputClass("experience")}
-                    />
-                </div>
-
-
-
-
-
-                <div className="flex flex-col">
-                    <label htmlFor="position" className="text-white text-lg font-semibold mb-1">
-                        Position Applying For
-                    </label>
-                    <input
-                        id="position"
-                        name="position"
-                        placeholder="e.g., NETA Level 1 Tech, Manager, Technician"
-                        value={form.position}
-                        onChange={handleChange}
-                        className={inputClass("position")}
-                    />
-                </div>
-
-
-
-
-
-
-                <div className="flex flex-col">
-                    <label htmlFor="message" className="text-white text-lg font-semibold mb-1">
-                        Additional Information
-                    </label>
-                    <textarea
-                        id="message"
-                        name="message"
-                        placeholder="Write any additional details here, e.g., skills, availability, or notes"
-                        value={form.message}
-                        onChange={handleChange}
-                        className={inputClass("message")}
-                        rows={4}
-                    />
-                </div>
-
-
-
-
-
-
-
-                <div className="flex items-start space-x-2">
-                    <input
-                        type="checkbox"
-                        id="agree"
-                        checked={agreed}
-                        onChange={(e) => setAgreed(e.target.checked)}
-                        disabled={!isFormComplete}
-                        className={`mt-1 ${!isFormComplete ? "cursor-not-allowed opacity-50" : ""}`}
-                    />
-                    <label htmlFor="agree" className="text-xs text-white">
-                        By submitting this application, I confirm that the information provided is accurate.
-                        I consent to being contacted regarding this application and related job opportunities,
-                        and I agree that my information, including my resume, may be shared with potential employers.
-                        I understand this does not create an employment contract.
-                    </label>
-                </div>
-
-
-
-                <button
-                    type="submit"
-                    disabled={loading || !agreed || submitted || !isFormComplete}
-                    className="w-full bg-gray-900 text-white p-2 rounded-xl font-semibold hover:bg-gray-800 border border-gray-700 disabled:opacity-50"
+                <form
+                    onSubmit={handleSubmit}
+                    className="bg-black text-white p-2 pb-16 rounded-2xl space-y-4 max-w-md mx-auto"
                 >
-                    {loading ? "Submitting..." : submitted ? "Already Submitted" : "Apply"}
-                </button>
+                    <div className="bg-gray-900 rounded-xl p-2 border border-gray-700">
+                        <p><strong>Name:</strong> {session.user.name}</p>
+                        <p><strong>Email:</strong> {session.user.email}</p>
+                    </div>
 
 
-            </form>
+
+
+
+
+                    <div className="flex items-center space-x-2 mb-4">
+                        <input
+                            type="checkbox"
+                            id="veteran"
+                            checked={form.background}
+                            onChange={(e) =>
+                                setForm({ ...form, background: e.target.checked })
+                            }
+                            className="w-5 h-5 text-blue-800 bg-gray-900 border-gray-700 rounded-xl focus:ring-yellow-400"
+                        />
+                        <label htmlFor="veteran" className="text-white text-sm select-none">
+                            Veteran
+                        </label>
+                    </div>
+
+
+
+
+
+
+                    <div className="flex flex-col">
+                        <label htmlFor="location" className="text-white text-lg font-semibold mb-1">
+                            Preferred Location
+                        </label>
+                        <input
+                            id="location"
+                            name="location"
+                            placeholder="Dallas TX, Any location"
+                            value={form.location}
+                            onChange={handleChange}
+                            className={inputClass("location")}
+                        />
+                    </div>
+
+
+
+
+
+
+
+
+
+                    <div className="flex flex-col">
+                        <label htmlFor="availability" className="text-white text-lg font-semibold mb-1">
+                            Earliest Start Date
+                        </label>
+                        <input
+                            type="date"
+                            id="availability"
+                            name="availability"
+                            value={form.availability || ""}
+                            onChange={handleChange}
+                            min={localTomorrow}
+                            className={inputClass("availability")}
+                        />
+                    </div>
+
+
+
+
+
+
+
+
+
+
+                    <div className="flex flex-col">
+                        <label htmlFor="certifications" className="text-white text-lg font-semibold mb-1">
+                            Certifications
+                        </label>
+                        <input
+                            type="text"
+                            id="certifications"
+                            name="certifications"
+                            placeholder="NETA 2"
+                            value={form.certifications as unknown as string} // treat as string for input
+                            onChange={handleChange}
+                            className={inputClass("certifications")}
+                        />
+                    </div>
+
+
+
+
+
+
+
+
+
+
+
+                    <div className="flex flex-col">
+                        <label htmlFor="travel" className="text-white text-lg font-semibold mb-1">
+                            Willing to Travel?
+                        </label>
+                        <input
+                            type="text"
+                            id="travel"
+                            name="travel"
+                            placeholder="Yes or No"
+                            value={form.travel}
+                            onChange={handleChange}
+                            className={inputClass("travel")}
+                        />
+                    </div>
+
+
+
+
+
+
+
+
+
+                    <div className="flex flex-col">
+                        <label htmlFor="overtime" className="text-white text-lg font-semibold mb-1">
+                            Willing to Work Overtime?
+                        </label>
+                        <input
+                            type="text"
+                            id="overtime"
+                            name="overtime"
+                            placeholder="Yes or No"
+                            value={form.overtime}
+                            onChange={handleChange}
+                            className={inputClass("overtime")}
+                        />
+                    </div>
+
+
+
+
+
+
+
+
+
+                    <div className="flex flex-col">
+                        <label htmlFor="readyToMove" className="text-white text-lg font-semibold mb-1">
+                            Are you ready to relocate?
+                        </label>
+                        <input
+                            type="text"
+                            id="readyToMove"
+                            name="readyToMove"
+                            placeholder="Yes or No"
+                            value={form.readyToMove}
+                            onChange={handleChange}
+                            className={inputClass("readyToMove")}
+                        />
+                    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+                    <div className="flex flex-col">
+                        <label htmlFor="experience" className="text-white text-lg font-semibold mb-1">
+                            Years of Electrical Experience
+                        </label>
+                        <input
+                            id="experience"
+                            name="experience"
+                            placeholder="e.g., 3"
+                            value={form.experience}
+                            onChange={handleChange}
+                            className={inputClass("experience")}
+                        />
+                    </div>
+
+
+
+
+
+                    <div className="flex flex-col">
+                        <label htmlFor="position" className="text-white text-lg font-semibold mb-1">
+                            Position Applying For
+                        </label>
+                        <input
+                            id="position"
+                            name="position"
+                            placeholder="e.g., NETA Level 1 Tech, Manager, Technician"
+                            value={form.position}
+                            onChange={handleChange}
+                            className={inputClass("position")}
+                        />
+                    </div>
+
+
+
+
+
+
+                    <div className="flex flex-col">
+                        <label htmlFor="message" className="text-white text-lg font-semibold mb-1">
+                            Additional Information
+                        </label>
+                        <textarea
+                            id="message"
+                            name="message"
+                            placeholder="Write any additional details here, e.g., skills, availability, or notes"
+                            value={form.message}
+                            onChange={handleChange}
+                            className={inputClass("message")}
+                            rows={4}
+                        />
+                    </div>
+
+
+
+
+
+
+
+                    <div className="flex items-start space-x-2">
+                        <input
+                            type="checkbox"
+                            id="agree"
+                            checked={agreed}
+                            onChange={(e) => setAgreed(e.target.checked)}
+                            disabled={!isFormComplete}
+                            className={`mt-1 ${!isFormComplete ? "cursor-not-allowed opacity-50" : ""}`}
+                        />
+                        <label htmlFor="agree" className="text-xs text-white">
+                            By submitting this application, I confirm that the information provided is accurate.
+                            I consent to being contacted regarding this application and related job opportunities,
+                            and I agree that my information, including my resume, may be shared with potential employers.
+                            I understand this does not create an employment contract.
+                        </label>
+                    </div>
+
+
+
+                    <button
+                        type="submit"
+                        disabled={loading || !agreed || submitted || !isFormComplete}
+                        className="w-full bg-gray-900 text-white p-2 rounded-xl font-semibold hover:bg-gray-800 border border-gray-700 disabled:opacity-50"
+                    >
+                        {loading ? "Submitting..." : submitted ? "Already Submitted" : "Apply"}
+                    </button>
+
+
+                </form>
+            </div>
         </div>
     )
 }

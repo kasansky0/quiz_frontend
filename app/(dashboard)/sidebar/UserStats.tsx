@@ -95,8 +95,9 @@ function PercentageBar({ correct, total, onRefreshStats }: { correct: number; to
 
     return (
         <div className="flex flex-col w-full space-y-1 mt-1">
-            <span className="text-white/50 text-sm">Progress bar</span>
-            <div className="w-full h-6 bg-white/20 rounded overflow-hidden relative">
+<span className="text-white/60 text-sm italic">
+  Aim to stay above <span className="text-green-400 font-semibold">70%</span>
+</span>            <div className="w-full h-6 bg-white/20 rounded overflow-hidden relative">
                 <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${progress}%` }}
