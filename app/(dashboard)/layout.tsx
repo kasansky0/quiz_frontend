@@ -504,7 +504,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
     return (
-        <div className="h-screen flex flex-col bg-black-200 text-white">
+        <div className="min-h-screen flex flex-col bg-black-200 text-white">
 
 
 
@@ -662,7 +662,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
             {/* ===== BODY WRAPPER ===== */}
-            <div className="flex flex-1 overflow-hidden pt-14">
+            <div className="flex flex-1 overflow-hidden pt-14 md:pt-16">
 
                 {/* ===== SIDEBAR ===== */}
                 <aside
@@ -719,7 +719,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             className="fixed bottom-0 left-0 right-0 z-50 md:hidden
                            bg-black-200 border-t border-green-500
                            rounded-t-2xl p-4 shadow-2xl
-                           max-h-[45vh] overflow-y-auto"
+                           max-h-[60vh] overflow-y-auto"
                         >
                             {/* Drag Handle */}
                             <div className="relative flex justify-center">
