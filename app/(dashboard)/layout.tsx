@@ -535,12 +535,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     <button
                         ref={buttonRef}
                         className={`
-                              transition transform duration-150 ease-out
-                              active:scale-95 active:bg-white/20
-                              focus:outline-none focus:ring-2 focus:ring-green-500
-                              hover:scale-105 hover:bg-white/10
-                              touch-manipulation
-                            `}
+                          rounded-full
+                          transition transform duration-150 ease-out
+                          active:scale-95 active:bg-white/20
+                          focus:outline-none focus:ring-2 focus:ring-green-500
+                          hover:scale-105 hover:bg-white/10
+                          touch-manipulation
+                        `}
                         onClick={() => setActiveSheet(prev => prev === "sidebar" ? null : "sidebar")}
                     >
                         <svg
@@ -573,6 +574,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                 router.push("/chat"); // then navigate
                             }}
                             className={`
+                            rounded-full
                               transition transform duration-150 ease-out
                               active:scale-95 active:bg-white/20
                               focus:outline-none focus:ring-2 focus:ring-green-500
@@ -600,6 +602,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         <button
                             onClick={() => router.push("/mainStudy")}
                             className={`
+                            rounded-full
                               transition transform duration-150 ease-out
                               active:scale-95 active:bg-white/20
                               focus:outline-none focus:ring-2 focus:ring-green-500
@@ -628,6 +631,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         <button
                             onClick={() => setActiveSheet(prev => prev === "calculator" ? null : "calculator")}
                             className={`
+                            rounded-full
                               transition transform duration-150 ease-out
                               active:scale-95 active:bg-white/20
                               focus:outline-none focus:ring-2 focus:ring-green-500
@@ -655,8 +659,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         <button
                             onClick={() => setActiveSheet(prev => prev === "formula" ? null : "formula")}
                             className={`
+                            rounded-full
                               transition transform duration-150 ease-out
-                              active:scale-95 active:bg-white/20
+                              active:scale-95 active:bg-white/20 active:p-2
                               focus:outline-none focus:ring-2 focus:ring-green-500
                               hover:scale-105 hover:bg-white/10
                               touch-manipulation

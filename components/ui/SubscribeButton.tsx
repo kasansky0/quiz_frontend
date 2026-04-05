@@ -56,7 +56,7 @@ export default function SubscribeButton() {
             disabled={loading}
             className="w-full bg-blue-400 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl transition"
         >
-            {loading ? "Redirecting..." : "Subscribe for just 9.99$"}
+            {loading ? "Redirecting..." : "Subscribe for just 24.99$"}
         </button>
     );
 }
