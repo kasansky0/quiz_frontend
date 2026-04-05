@@ -64,7 +64,7 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
             {children}
 
             {message && (
-                <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 max-w-xl w-full px-6 py-3 rounded-xl bg-red-500 bg-opacity-90 text-white shadow-md flex items-center justify-between animate-slide-down">
+                <div className="fixed top-12 left-1/2 -translate-x-1/2 z-50 max-w-xl w-full px-6 py-3 rounded-xl bg-red-500 bg-opacity-90 text-white shadow-md flex items-center justify-between animate-slide-down">
                     <div className="flex items-center gap-4 truncate">
                         <span className="text-sm md:text-base truncate">{message}</span>
 
@@ -89,8 +89,8 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
 
             <style jsx>{`
                 @keyframes slide-down {
-                  0% { transform: translate(-50%, -50%); opacity: 0; }
-                  100% { transform: translate(-50%, 0); opacity: 1; }
+                    0% { transform: translate(-50%, -20px); opacity: 0; }
+                    100% { transform: translate(-50%, 0); opacity: 1; }
                 }
                 .animate-slide-down { animation: slide-down 0.3s ease-out; }
             `}</style>

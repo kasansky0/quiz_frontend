@@ -74,7 +74,7 @@ export const metadata: Metadata = {
 
 
 export const viewport = {
-    themeColor: "#ffffff",
+    themeColor: "#22c55e" // Tailwind green-500
 };
 
 

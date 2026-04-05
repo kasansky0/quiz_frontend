@@ -7,7 +7,7 @@ import {useError} from "@/app/ErrorProvider";
 import { chatApis } from '@/app/hooks/chatApis'; // adjust path as needed
 import useSWR, { mutate as globalMutate } from "swr";
 import { useSession, signOut, getSession } from "next-auth/react"; // ✅ add useSession
-import { fetchWithToken, handleSessionExpired } from "@/app/hooks/refreshToken";
+import { fetchWithToken } from "@/app/hooks/refreshToken";
 import StatusBanner from "@/app/positiveBanner";
 import { useRouter } from "next/navigation";
 
@@ -17,8 +17,24 @@ import { useRouter } from "next/navigation";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
 const COMMENTS_PAGE_SIZE = 25;
 const commentsKey = (postId: string, skip: number) => `${apiUrl}/posts/${postId}/comments?skip=${skip}&limit=${COMMENTS_PAGE_SIZE}`;
-const fetcher = (url: string) =>
-    fetch(url, { credentials: "include" }).then(res => res.json());
+
+const fetcher = async (url: string) => {
+    const session = await getSession();
+    const idToken = session?.idToken;
+
+    if (!idToken) throw new Error("No session");
+
+    const res = await fetch(url, {
+        headers: {
+            Authorization: `Bearer ${idToken}`,
+        },
+        credentials: "include",
+    });
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    return res.json();
+};
 
 type Props = {
     post: Post;
@@ -94,7 +110,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         commentsKey(post.id, 0),
         fetcher,
         {
-            refreshInterval: 300000,
+            refreshInterval: 300,
             fallbackData: comments, // use the comments prop you already have
             revalidateOnMount: false // prevents SWR from fetching immediately on mount
         }
@@ -128,16 +144,10 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             setCurrentPage(prev => prev + 1);
 
         } catch (err) {
+            setShowLoading(true);
             showError("Oops! You need to log in again.😎", true);
             router.push("/info");
         }
-    };
-
-// HELPER SESSION EXPIRE HANDLER //
-    const handleSessionExpired = async () => {
-        await signOut({ redirect: false }); // clear session
-        setCooldownSeconds(null);
-        hideError();
     };
 
 // FORMAT DATE AS X TIME AGO AND INDICATE IF EDITED //
@@ -296,6 +306,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const handleAddComment = async (message: string) => {
 
         if (!userId || !session?.idToken) {
+            setShowLoading(true);
             showError("Oops! You need to log in again.💪", true)
             // optionally include a login button in banner
             return;
@@ -316,6 +327,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
             // Handle null / network failure
             if (!res) {
+                setShowLoading(true);
                 showError("Oops! You need to log in again.🍱", true);
                 showStatusBanner("Failed to send comment", "error");
                 return;
@@ -345,6 +357,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 }
 
                 // Fallback for session / other errors
+                setShowLoading(true);
                 const message = detail?.error || err.error || "Oops! You need to log in again.💪";
                 showError(message, true);
                 return;
@@ -369,7 +382,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
         } catch (err: any) {
             console.error("Failed to post comment:", err);
-            showError("Oops! You need to log in again.❌", true); // 🔴 friendly
+            setShowLoading(true);
+            showError("Oops! You need to log in again. ❌", true);
         }
     };
 
@@ -516,7 +530,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
             if (!res.success) {
                 if (res.status === 401) {
-                    await handleSessionExpired();
+                    setShowLoading(true);
+                    showError("Oops! You need to log in again. 👔", true);
                     return;
                 }
                 showError("We couldn't update your comment. Please try again.");
@@ -544,7 +559,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
         if (!res.success) {
             if (res.status === 401) {
-                await handleSessionExpired();
+                setShowLoading(true);
+                showError("Oops! You need to log in again. 🧲", true);
                 return;
             }
             showError("We couldn't delete your comment. Please try again.");
@@ -633,7 +649,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
             if (!res.success) {
                 if (res.status === 401) {
-                    await handleSessionExpired();
+                    setShowLoading(true);
+                    showError("Oops! You need to log in again. 🤪", true);
                     return;
                 }
                 showError("We couldn't delete the post. Please try again.");
@@ -687,7 +704,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
             if (!res.success) {
                 if (res.status === 401) {
-                    await handleSessionExpired();
+                    setShowLoading(true);
+                    showError("Oops! You need to log in again. 🥳", true);
                     return;
                 }
                 showError("We couldn't save your changes. Please try again.");

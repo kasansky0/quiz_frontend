@@ -523,7 +523,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
             {/* ===== TOP BAR ===== */}
-            <div className="fixed top-0 left-0 right-0 h-14 bg-green-500 shadow-md flex items-center px-4 justify-between z-50">
+            <div className="fixed top-0 left-0 right-0 z-50
+                pt-[env(safe-area-inset-top)]
+                h-[calc(56px+env(safe-area-inset-top))]
+                bg-green-500 shadow-md flex items-center px-4 justify-between">
 
                 {/* LEFT SIDE */}
                 <div className="flex items-center gap-3">
@@ -531,7 +534,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     {/* Mobile Toggle (clean outline version) */}
                     <button
                         ref={buttonRef}
-                        className="md:hidden p-2 text-white transition hover:scale-105 active:scale-95"
+                        className={`
+                              transition transform duration-150 ease-out
+                              active:scale-95 active:bg-white/20
+                              focus:outline-none focus:ring-2 focus:ring-green-500
+                              hover:scale-105 hover:bg-white/10
+                              touch-manipulation
+                            `}
                         onClick={() => setActiveSheet(prev => prev === "sidebar" ? null : "sidebar")}
                     >
                         <svg
@@ -563,7 +572,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             onClick={() => {
                                 router.push("/chat"); // then navigate
                             }}
-                            className="transition hover:scale-105 active:scale-95"
+                            className={`
+                              transition transform duration-150 ease-out
+                              active:scale-95 active:bg-white/20
+                              focus:outline-none focus:ring-2 focus:ring-green-500
+                              hover:scale-105 hover:bg-white/10
+                              touch-manipulation
+                            `}
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -584,7 +599,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         {/* STUDY */}
                         <button
                             onClick={() => router.push("/mainStudy")}
-                            className="transition hover:scale-105 active:scale-95"
+                            className={`
+                              transition transform duration-150 ease-out
+                              active:scale-95 active:bg-white/20
+                              focus:outline-none focus:ring-2 focus:ring-green-500
+                              hover:scale-105 hover:bg-white/10
+                              touch-manipulation
+                            `}
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -601,10 +622,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                 />
                             </svg>
                         </button>
+
+
                         {/* CALCULATOR */}
                         <button
                             onClick={() => setActiveSheet(prev => prev === "calculator" ? null : "calculator")}
-                            className="transition hover:scale-105 active:scale-95"
+                            className={`
+                              transition transform duration-150 ease-out
+                              active:scale-95 active:bg-white/20
+                              focus:outline-none focus:ring-2 focus:ring-green-500
+                              hover:scale-105 hover:bg-white/10
+                              touch-manipulation
+                            `}
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -625,7 +654,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         {/* FORMULA SHEET */}
                         <button
                             onClick={() => setActiveSheet(prev => prev === "formula" ? null : "formula")}
-                            className="transition hover:scale-105 active:scale-95"
+                            className={`
+                              transition transform duration-150 ease-out
+                              active:scale-95 active:bg-white/20
+                              focus:outline-none focus:ring-2 focus:ring-green-500
+                              hover:scale-105 hover:bg-white/10
+                              touch-manipulation
+                            `}
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -676,7 +711,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
             {/* ===== BODY WRAPPER ===== */}
-            <div className="flex flex-1 overflow-hidden pt-14">
+            <div className="flex flex-1 overflow-hidden pt-[calc(56px+env(safe-area-inset-top))]">
 
                 {/* ===== SIDEBAR ===== */}
                 <aside

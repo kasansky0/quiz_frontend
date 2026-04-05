@@ -4,6 +4,8 @@ import {useCallback, useEffect, useState} from "react";
 import { signOut} from "next-auth/react";
 import {usePosts} from "@/app/hooks/usePosts";
 import { useError } from "@/app/ErrorProvider";
+import { useSession } from "next-auth/react";
+
 
 
 interface UseChatPostsProps {
@@ -18,6 +20,8 @@ export function chatApis({ apiUrl, mainView }: UseChatPostsProps) {
     const [cooldownSeconds, setCooldownSeconds] = useState<number | null>(null);
     const [errorState, setErrorState] = useState<string | null>(null);
     const { showError, hideError } = useError();
+    const {data: session} = useSession();
+
 
 
     // Track how many comments we've fetched per post
@@ -40,6 +44,13 @@ export function chatApis({ apiUrl, mainView }: UseChatPostsProps) {
 
     const fetchPostComments = useCallback(
         async (postId: string, skipOverride?: number, limit = 10) => {
+            if (!session?.idToken) {
+                showError("Oops! You need to log in again. 👨‍⚖️", true);
+                return { posts: [], total: 0, error: "no_session" };
+            }
+
+            const idToken = session.idToken;
+
             if (!apiUrl || !postId) return null;
 
             const skip = skipOverride ?? commentSkips[postId] ?? 0;
@@ -47,7 +58,14 @@ export function chatApis({ apiUrl, mainView }: UseChatPostsProps) {
             try {
                 const res = await fetch(
                     `${apiUrl}/posts/${postId}/comments?skip=${skip}&limit=${limit}`,
-                    { method: "GET", credentials: "include" }
+                    {
+                        method: "GET",
+                        credentials: "include",
+                        headers: {
+                            Authorization: `Bearer ${idToken}`,
+                            "Content-Type": "application/json",
+                        }
+                    }
                 );
 
                 if (!res.ok) {

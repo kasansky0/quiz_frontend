@@ -11,6 +11,12 @@ import { useError } from "@/app/ErrorProvider";
 import DOMPurify from 'dompurify';
 import ActivePost from "./ActivePost";
 
+type FetchPostsResult = {
+    posts: Post[];
+    total: number;
+    error?: string;
+};
+
 const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
 
 export default function ChatStats() {
@@ -28,8 +34,6 @@ export default function ChatStats() {
     const [showLoading, setShowLoading] = useState(true);
     const {data: session} = useSession();
     const [deletedCommentIds, setDeletedCommentIds] = useState<Set<string>>(new Set());
-
-    // --- POSTS PAGINATION ---
     const [postSkip, setPostSkip] = useState(0);
     const postLimit = 10; // number of posts to fetch per batch
     const [allPosts, setAllPosts] = useState<Post[]>([]);
@@ -40,7 +44,7 @@ export default function ChatStats() {
 
     const [isOnline, setIsOnline] = useState(navigator.onLine);
 
-// Network event listeners
+    // Network event listeners
     useEffect(() => {
         const handleOnline = () => setIsOnline(true);
         const handleOffline = () => setIsOnline(false);
@@ -56,6 +60,14 @@ export default function ChatStats() {
 
     // --- Modify fetchPosts ---
     const fetchPosts = async (skip: number, limit: number) => {
+        if (!session?.idToken) {
+            setShowLoading(true);
+            showError("Oops! You need to log in again. 🦾", true);
+            return { posts: [], total: 0, error: "no_session" };
+        }
+
+        const idToken = session.idToken;
+
         if (!navigator.onLine) {
             // Keep loading forever until network is back
             setServerError("⚠️ No internet connection. Please check your WiFi.");
@@ -68,7 +80,10 @@ export default function ChatStats() {
 
         try {
             const res = await fetch(`${apiUrl}/posts/?skip=${skip}&limit=${limit}`, {
-                credentials: "include",
+                headers: {
+                    "Authorization": `Bearer ${idToken}`,
+                    "Content-Type": "application/json",
+                },
             });
             const data = await res.json().catch(() => null);
 
@@ -94,6 +109,7 @@ export default function ChatStats() {
             if (data.error === "offline") return;
             setServerError(data.error);
             setShowLoading(true);
+            showError("Oops! You need to log in again. 🍓", true);
             return;
         }
 
@@ -147,8 +163,17 @@ export default function ChatStats() {
 
     // --- COMMENTS POLLING ---
     const commentsFetcher = async (url: string) => {
-        const res = await fetch(url, {credentials: "include"});
-        const data = await res.json();
+        if (!session?.idToken) {
+            showError("Session expired. Please log in again.", true);
+            return [];
+        }
+        const res = await fetch(url, {
+            headers: {
+                "Authorization": `Bearer ${session.idToken}`,
+                "Content-Type": "application/json",
+            },
+        });
+        const data = await res.json().catch(() => null);
 
         if (!res.ok) {
             // Instead of throwing, show error in UI
@@ -181,7 +206,8 @@ export default function ChatStats() {
     };
 
     const handleSessionExpired = async () => {
-        showError("Oops! You need to log in again.", true);
+        setShowLoading(true);
+        showError("Oops! You need to log in again. 🎁", true);
     };
 
     function LoggedOut() {
@@ -319,7 +345,8 @@ export default function ChatStats() {
 
     const handleCreatePost = async ({title, message}: { title: string; message: string }) => {
         if (!session?.idToken) {
-            showError("Oops! You need to log in again.", true);
+            setShowLoading(true);
+            showError("Oops! You need to log in again. 🇪🇸", true);
             return;
         }
         const idToken = session.idToken;

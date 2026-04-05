@@ -36,7 +36,7 @@ export default function AdminPage() {
             if (!res.ok) {
                 const data = await res.json().catch(() => null);
                 if (res.status === 401) {
-                    showError("Oops! You need to log in again.", true);
+                    showError("Oops! You need to log in again. 😤", true);
                 } else {
                     showError(data?.detail || data?.error || "Failed to check admin status");
                 }
