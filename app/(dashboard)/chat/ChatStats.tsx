@@ -308,11 +308,18 @@ export default function ChatStats() {
         };
     }, [activePost, loadingMore, postLimit]);
 
-    const formatLocalDate = (dateString?: string, editedString?: string) => {
+    const formatLocalDate = (dateString?: string | Date, editedString?: string | Date) => {
         if (!dateString) return "";
-        let isoString = dateString.split(".")[0] + "Z";
-        const date = new Date(isoString);
+
+        const parseDate = (d: string | Date) => {
+            if (d instanceof Date) return d;
+            if (typeof d === "string") return new Date(d.split(".")[0] + "Z");
+            return new Date(); // fallback, shouldn't happen
+        };
+
+        const date = parseDate(dateString);
         const now = new Date();
+
         const diffMs = now.getTime() - date.getTime();
         const diffSeconds = Math.floor(diffMs / 1000);
         const diffMinutes = Math.floor(diffSeconds / 60);
@@ -334,12 +341,15 @@ export default function ChatStats() {
         }
 
         let edited = false;
-        if (editedString && editedString !== dateString) edited = true;
+        if (editedString) {
+            const editedDate = parseDate(editedString);
+            edited = editedDate.getTime() !== date.getTime();
+        }
 
         return (
             <span>
-                {relativeTime} {edited && <span className="text-white-500/60 text-[10px] ml-1">(Edited)</span>}
-            </span>
+            {relativeTime} {edited && <span className="text-white-500/60 text-[10px] ml-1">(Edited)</span>}
+        </span>
         );
     };
 
@@ -371,7 +381,8 @@ export default function ChatStats() {
                 let msg = "Failed to create post";
                 if (err?.detail) msg = typeof err.detail === "string" ? err.detail : err.detail.error ?? msg;
                 else if (err?.error) msg = err.error;
-                showError(msg);
+                setShowLoading(true);
+                showError(msg, true);
                 return;
             }
             const newPost: Post = await res.json();
@@ -512,7 +523,9 @@ export default function ChatStats() {
                                                         )}
                                                     </div>
                                                 </div>
-                                                <span className="text-white-500/60 text-sm sm:text-sm md:text-base ml-auto whitespace-nowrap">{formatLocalDate(post.timestamp, post.edited)}</span>
+                                                <span className="text-white-500/60 text-sm sm:text-sm md:text-base ml-auto whitespace-nowrap">
+                                                    {formatLocalDate(post.timestamp, post.edited)}
+                                                </span>
                                             </div>
                                             <h3 className="text-white-800 font-bold mb-1 text-sm sm:text-base md:text-lg line-clamp-2">{post.title}</h3>
                                         </div>
