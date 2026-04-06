@@ -45,7 +45,7 @@ export function chatApis({ apiUrl, mainView }: UseChatPostsProps) {
     const fetchPostComments = useCallback(
         async (postId: string, skipOverride?: number, limit = 10) => {
             if (!session?.idToken) {
-                showError("Oops! You need to log in again. 👨‍⚖️", true);
+                showError("Oops! You need to log in again. 🤩️", true);
                 return { posts: [], total: 0, error: "no_session" };
             }
 

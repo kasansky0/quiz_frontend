@@ -78,16 +78,15 @@ export default function QuizSampleSection({
     const [fade, setFade] = useState(false);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [answerResult, setAnswerResult] = useState<{ correct: boolean; answer: string; explanation: string } | null>(null);
-    const [currentIndex, setCurrentIndex] = useState(0);
     const optionsRef = useRef<HTMLDivElement>(null);
     const [cycleCount, setCycleCount] = useState(0);
     const [fetchError, setFetchError] = useState(false); // <-- track fetch failures
     const QUESTIONS_BEFORE_REVIEW = 2;
     const { showError } = useError();
     const [showLoading, setShowLoading] = useState(true);
-    const [subscriptionRequired, setSubscriptionRequired] = useState(false);
     const router = useRouter();
     const isMountedRef = useRef(true);
+
 
     const [isFetchingNext, setIsFetchingNext] = useState(false);
 
@@ -127,7 +126,11 @@ export default function QuizSampleSection({
 
 
     // Network-safe fetch wrapper with user-friendly error
-    async function safeFetch(url: string, options: RequestInit, showError?: (msg: string, isPersistent?: boolean) => void) {
+    async function safeFetch(
+        url: string, options:
+        RequestInit,
+        showError: (msg: string, isPersistent?: boolean) => void
+    ) {
         try {
             if (token) {
                 options.headers = {
@@ -135,6 +138,13 @@ export default function QuizSampleSection({
                     Authorization: `Bearer ${token}`,
                 };
             }
+
+            if (!token) {
+                setShowLoading(true);
+                showError("Oops! You need to log in again. 🫣", true);
+                return;
+            }
+
             return await fetch(url, options);
         } catch (err: any) {
             console.warn("Network fetch failed:", err);
@@ -486,25 +496,6 @@ export default function QuizSampleSection({
             ) : (
 
                 <>
-                        {/* Reload overlay if fetch failed */}
-                        {fetchError && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-black text-white z-40">
-                                <div className="bg-dark-400/80 border border-green-400/40 shadow-lg rounded-2xl max-w-md w-full p-6 text-center backdrop-blur-md">
-                                    <h2 className="text-green-400 text-lg font-semibold mb-2 drop-shadow-[0_0_12px_rgba(36,174,124,0.8)]">
-                                        Error
-                                    </h2>
-                                    <p className="text-green-200 text-sm mb-6">
-                                        Failed to load the next question. Please reload the page to continue.
-                                    </p>
-                                    <button
-                                        onClick={() => window.location.reload()}
-                                        className="px-5 py-2 bg-green-400 text-black font-medium rounded-full hover:bg-green-400 transition"
-                                    >
-                                        Reload
-                                    </button>
-                                </div>
-                            </div>
-                        )}
 
                         {/* Quiz content */}
                         {!isLoggedIn ? (

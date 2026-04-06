@@ -307,7 +307,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
         if (!userId || !session?.idToken) {
             setShowLoading(true);
-            showError("Oops! You need to log in again.💪", true)
+            showError("Oops! You need to log in again. 😨", true)
             // optionally include a login button in banner
             return;
         }
@@ -328,7 +328,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             // Handle null / network failure
             if (!res) {
                 setShowLoading(true);
-                showError("Oops! You need to log in again.🍱", true);
+                showError("Oops! You need to log in again. 😠", true);
                 showStatusBanner("Failed to send comment", "error");
                 return;
             }
@@ -358,7 +358,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
                 // Fallback for session / other errors
                 setShowLoading(true);
-                const message = detail?.error || err.error || "Oops! You need to log in again.💪";
+                const message = detail?.error || err.error || "Oops! You need to log in again. 🥲";
                 showError(message, true);
                 return;
             }
@@ -383,7 +383,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         } catch (err: any) {
             console.error("Failed to post comment:", err);
             setShowLoading(true);
-            showError("Oops! You need to log in again. ❌", true);
+            showError("Oops! You need to log in again. 😞", true);
         }
     };
 
@@ -531,7 +531,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             if (!res.success) {
                 if (res.status === 401) {
                     setShowLoading(true);
-                    showError("Oops! You need to log in again. 👔", true);
+                    showError("Oops! You need to log in again. 😀", true);
                     return;
                 }
                 showError("We couldn't update your comment. Please try again.");
@@ -560,7 +560,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         if (!res.success) {
             if (res.status === 401) {
                 setShowLoading(true);
-                showError("Oops! You need to log in again. 🧲", true);
+                showError("Oops! You need to log in again. 😖", true);
                 return;
             }
             showError("We couldn't delete your comment. Please try again.");

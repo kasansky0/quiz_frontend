@@ -142,7 +142,7 @@ export default function SubjectPage() {
                                     key={topic.id}
                                     className="bg-dark-300/40 rounded-lg p-2 shadow-sm hover:bg-dark-300 transition"
                                 >
-                                    <h2 className="text-2xl font-semibold mb-3">{topic.title}</h2>
+                                    <h2 className="text-2xl text-green-500 font-semibold mb-3">{topic.title}</h2>
 
                                     {topic.subtopics?.length ? (
                                         <div className="space-y-3">
