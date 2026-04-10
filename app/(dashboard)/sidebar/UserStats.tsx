@@ -464,7 +464,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                 </svg>
 
                 <span className="text-white font-medium">
-                    Study hard
+                    Study
                 </span>
             </div>
 

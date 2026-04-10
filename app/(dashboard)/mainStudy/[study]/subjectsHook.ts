@@ -39,7 +39,6 @@ export function useSubjects(apiUrl: string, mainTopic: string, token?: string) {
 
             if (res.status === 403) {
                 setSubscriptionRequired(true);   // ✅ set flag
-                showError("Subscription required");
                 return;
             }
 

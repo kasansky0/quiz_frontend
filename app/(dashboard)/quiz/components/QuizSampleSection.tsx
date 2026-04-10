@@ -229,7 +229,7 @@ export default function QuizSampleSection({
 
                 if (isMountedRef.current) {
                     showError(msg, true);              // already showing the message
-                    if (msg.includes("Subscription required")) {
+                    if (msg.includes("Subscription required 🚫")) {
                         router.push("/mainStudy"); // just redirect
                     }
                     setFetchError(true);

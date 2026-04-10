@@ -60,7 +60,6 @@ export function useSubjectById(apiUrl: string, subjectId: string, token?: string
 
                 if (res.status === 403) {
                     setSubscriptionRequired(true);
-                    showError("Subscription required");
                     return;
                 }
 
