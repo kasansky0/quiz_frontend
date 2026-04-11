@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 
 export default function SubjectPage() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
@@ -77,31 +78,47 @@ export default function SubjectPage() {
                 >
                     {error && <div className="p-6 text-red-400">Error: {error}</div>}
 
-                    <div className="flex items-center justify-start mb-4">
+                    <div className="relative flex items-center mb-4">
+
+                        {/* Left button */}
                         <button
                             onClick={() => router.back()}
-                            title="Back"
-                            className="p-0 m-0 flex items-center justify-center mr-4"
+                            className="absolute left-0"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
-                                viewBox="2 2 21 21"
+                                viewBox="0 0 24 24"
                                 strokeWidth={1.5}
                                 stroke="currentColor"
-                                className="w-8 h-8 block"
+                                className="w-8 h-8"
                             >
                                 <path
-                                    strokeLinecap="butt"
-                                    strokeLinejoin="miter"
-                                    d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M15.75 19.5 8.25 12l7.5-7.5"
                                 />
                             </svg>
                         </button>
 
-                        <div className="text-sm sm:text-base">
-                            Promoted: CBS Electrical Contractors <br /> Hiring NETA 2 Techs 📍Raleigh NC
-                        </div>
+                        {/* Future Ads / Message */}
+                        <Link
+                            href="/position"
+                            className="w-full text-center text-sm py-1 rounded-lg bg-white/5 hover:bg-white/10 transition block"
+                        >
+                            <div className="font-semibold">
+                                💼 Hiring NETA 2 Technicians
+                            </div>
+
+                            <div className="text-xs mt-1">
+                                📍 Multiple locations • Relocation assistance
+                            </div>
+
+                            <div className="text-blue-400 text-xs mt-2">
+                                View positions →
+                            </div>
+                        </Link>
+
                     </div>
 
                     <h1 className="text-2xl font-bold mb-4 text-blue-500">{subject.title}</h1>

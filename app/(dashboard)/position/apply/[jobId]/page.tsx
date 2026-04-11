@@ -2,12 +2,16 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { submitApplication, ApplyFormPayload } from "@/app/(dashboard)/apply/submitApplication";
+import { submitApplication, ApplyFormPayload } from "@/app/(dashboard)/position/apply/[jobId]/submitApplication";
 import { useError } from "@/app/ErrorProvider";
+import { useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 
 
 
 export default function ApplyPage() {
+    const params = useParams();
+    const selectedJobId = parseInt(params.jobId as string);
     const { data: session, status } = useSession();
     const router = useRouter();
     const [agreed, setAgreed] = useState(false);
@@ -16,13 +20,64 @@ export default function ApplyPage() {
     const { showError } = useError();
     const shortFields = ["travel", "overtime", "readyToMove"]; // only the text-limited fields
 
-
-
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1); // move to next day
     const localTomorrow = new Date(tomorrow.getTime() - tomorrow.getTimezoneOffset() * 60000)
         .toISOString()
         .split("T")[0];
+
+
+
+    const jobs = [
+        {
+            id: 1,
+            company: "ABM",
+            location: "Charlotte, Raleigh NC area, New York, Miami FL",
+            title: "NETA 3 Technician",
+            pay: "$40–$55/hr",
+            relocation: "Paid relocation",
+            perDiem: "$120/day",
+            overtime: "OT available",
+            travel: "Nationwide",
+            type: "Full-time / Travel"
+        },
+        {
+            id: 2,
+            company: "CBS",
+            location: "Raleigh NC",
+            title: "NETA 2 Technician",
+            pay: "$30–$45/hr",
+            relocation: "No relocation",
+            perDiem: "$100/day",
+            overtime: "OT available",
+            travel: "Regional",
+            type: "Local / Full-time"
+        },
+        {
+            id: 3,
+            company: "Schneider",
+            location: "Dallas TX",
+            title: "Substation Technician",
+            pay: "$45–$60/hr",
+            relocation: "Paid relocation",
+            perDiem: "$150/day",
+            overtime: "Guaranteed OT",
+            travel: "Nationwide",
+            type: "Travel / Field"
+        },
+    ];
+
+    const selectedJob = jobs.find(job => job.id === selectedJobId);
+
+    if (!selectedJob) {
+        return <p>Job not found</p>;
+    }
+
+    const company = {
+        name: selectedJob.company,
+        role: selectedJob.title,
+        location: selectedJob.location
+    };
 
 
     interface ApplyForm {
@@ -394,31 +449,37 @@ export default function ApplyPage() {
                   }
                 `}</style>
 
-                <div className="flex items-center justify-start mb-4">
+                <div className="flex items-center justify-start mb-4 gap-3">
+
                     <button
                         onClick={() => router.back()}
                         title="Back"
-                        className="p-0 m-0 flex items-center justify-center mr-4"
+                        className="p-0 m-0 flex items-center justify-center"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
-                            viewBox="2 2 21 21"
+                            viewBox="0 0 24 24"
                             strokeWidth={1.5}
                             stroke="currentColor"
-                            className="w-8 h-8 block"
+                            className="w-8 h-8"
                         >
                             <path
-                                strokeLinecap="butt"
-                                strokeLinejoin="miter"
-                                d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M15.75 19.5 8.25 12l7.5-7.5"
                             />
                         </svg>
                     </button>
 
-                    <div className="text-sm sm:text-base">
-                        Promoted: CBS Electrical Contractors <br /> Hiring NETA 2 Techs 📍Raleigh NC
-                    </div>
+                    {company && (
+                        <div className="flex-1 text-sm sm:text-base text-left bg-gray-900 border border-gray-700 rounded-xl p-3">
+                            <p><strong>Company:</strong> {company.name}</p>
+                            <p><strong>Position:</strong> {company.role}</p>
+                            <p><strong>Location:</strong> 📍{company.location}</p>
+                        </div>
+                    )}
+
                 </div>
 
                 <form
@@ -457,12 +518,12 @@ export default function ApplyPage() {
 
                     <div className="flex flex-col">
                         <label htmlFor="location" className="text-white text-lg font-semibold mb-1">
-                            Preferred Location
+                            Your current Location
                         </label>
                         <input
                             id="location"
                             name="location"
-                            placeholder="Dallas TX, Any location"
+                            placeholder="Dallas TX"
                             value={form.location}
                             onChange={handleChange}
                             className={inputClass("location")}

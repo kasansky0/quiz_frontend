@@ -9,6 +9,7 @@ import { ScrollHint } from "./ScrollHint";
 import { Button } from "@/components/ui/Button";
 import { useError } from "@/app/ErrorProvider";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 
 export interface QuestionType {
@@ -517,9 +518,22 @@ export default function QuizSampleSection({
                                     <Question question={questionData.question} />
 
                                     {/* Future Ads / Message */}
-                                    <div className="w-full text-center text-sm py-2">
-                                        Promoted: CBS Electrical Contractors <br/> Hiring NETA 2 Techs 📍Raleigh NC
-                                    </div>
+                                    <Link
+                                        href="/position"
+                                        className="w-full text-center text-sm py-1 rounded-lg bg-white/5 hover:bg-white/10 transition block"
+                                    >
+                                        <div className="font-semibold">
+                                            💼 Hiring NETA 2 Technicians
+                                        </div>
+
+                                        <div className="text-xs mt-1">
+                                            📍 Multiple locations • Relocation assistance
+                                        </div>
+
+                                        <div className="text-blue-400 text-xs mt-2">
+                                            View positions →
+                                        </div>
+                                    </Link>
 
                                     {/* Options */}
                                     <div ref={optionsRef} className="flex flex-col gap-3">

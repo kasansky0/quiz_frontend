@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/Textarea";
 import { useError } from "@/app/ErrorProvider";
 import StatusBanner from "@/app/positiveBanner"
+import Link from "next/link";
 
 
 interface CreatePostProps {
@@ -29,6 +30,23 @@ export default function CreatePost({
     const { showError } = useError();
     const TITLE_LIMIT = 100;
     const MESSAGE_LIMIT = 500;
+
+    const [keyboardOffset, setKeyboardOffset] = useState(0);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (!window.visualViewport) return;
+
+            const offset =
+                window.innerHeight - window.visualViewport.height;
+
+            setKeyboardOffset(offset);
+        };
+
+        window.visualViewport?.addEventListener("resize", handleResize);
+        return () =>
+            window.visualViewport?.removeEventListener("resize", handleResize);
+    }, []);
 
     useEffect(() => {
         const timer = setTimeout(() => setFade(true), 50);
@@ -122,34 +140,30 @@ export default function CreatePost({
                                 <path
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
-                                    d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                    d="M15.75 19.5 8.25 12l7.5-7.5"
                                 />
                             </svg>
                         </button>
 
-                        <button
-                            type="submit"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth={1.5}
-                                stroke="currentColor"
-                                className="w-8 h-8"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                                />
-                            </svg>
-                        </button>
+
 
                         {/* Future Ads / Message */}
-                        <div className="w-full text-center text-sm py-2">
-                            Promoted: CBS Electrical Contractors <br/> Hiring NETA 2 Techs 📍Raleigh NC
-                        </div>
+                        <Link
+                            href="/position"
+                            className="w-full text-center text-sm py-1 rounded-lg bg-white/5 hover:bg-white/10 transition block"
+                        >
+                            <div className="font-semibold">
+                                💼 Hiring NETA 2 Technicians
+                            </div>
+
+                            <div className="text-xs mt-1">
+                                📍 Multiple locations • Relocation assistance
+                            </div>
+
+                            <div className="text-blue-400 text-xs mt-2">
+                                View positions →
+                            </div>
+                        </Link>
 
                     </div>
 
@@ -214,6 +228,20 @@ export default function CreatePost({
                             {message.length}/{MESSAGE_LIMIT}
                         </span>
                     </div>
+
+                    <button
+                        type="submit"
+                        className="fixed right-6 p-4 rounded-full bg-gray-800 hover:bg-gray-700 shadow-lg transition flex items-center justify-center"
+                        style={{ bottom: 24 + keyboardOffset }}
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 -960 960 960"
+                            className="w-6 h-6 fill-white"
+                        >
+                            <path d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z"/>
+                        </svg>
+                    </button>
 
 
                 </form>

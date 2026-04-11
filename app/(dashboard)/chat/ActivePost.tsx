@@ -10,6 +10,7 @@ import { useSession, signOut, getSession } from "next-auth/react"; // ✅ add us
 import { fetchWithToken } from "@/app/hooks/refreshToken";
 import StatusBanner from "@/app/positiveBanner";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 
 
@@ -847,10 +848,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
                     {/* Back button like Reddit, aligned left */}
                     <div className="flex items-center justify-start">
-                        <button
-                            onClick={onBack}
-                            title="Back"
-                        >
+                        <button onClick={onBack} title="Back">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
@@ -862,15 +860,28 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                 <path
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
-                                    d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                    d="M15.75 19.5 8.25 12l7.5-7.5"
                                 />
                             </svg>
                         </button>
 
                         {/* Future Ads / Message */}
-                        <div className="w-full text-center text-sm py-2">
-                            Promoted: CBS Electrical Contractors <br/> Hiring NETA 2 Techs 📍Raleigh NC
-                        </div>
+                        <Link
+                            href="/position"
+                            className="w-full text-center text-sm py-1 rounded-lg bg-white/5 hover:bg-white/10 transition block"
+                        >
+                            <div className="font-semibold">
+                                💼 Hiring NETA 2 Technicians
+                            </div>
+
+                            <div className="text-xs mt-1">
+                                📍 Multiple locations • Relocation assistance
+                            </div>
+
+                            <div className="text-blue-400 text-xs mt-2">
+                                View positions →
+                            </div>
+                        </Link>
 
                     </div>
 

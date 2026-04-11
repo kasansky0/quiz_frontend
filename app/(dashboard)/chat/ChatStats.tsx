@@ -10,6 +10,7 @@ import useSWR, { mutate as globalMutate } from "swr";
 import { useError } from "@/app/ErrorProvider";
 import DOMPurify from 'dompurify';
 import ActivePost from "./ActivePost";
+import Link from "next/link";
 
 type FetchPostsResult = {
     posts: Post[];
@@ -465,22 +466,29 @@ export default function ChatStats() {
                                 <button onClick={() => setCreatingPost(true)}>
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        strokeWidth={1.5}
-                                        stroke="currentColor"
-                                        className="w-8 h-8"
+                                        viewBox="0 -960 960 960"
+                                        className="w-8 h-8 fill-current"
                                     >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                                        />
+                                        <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h360v80H200v560h560v-360h80v360q0 33-23.5 56.5T760-120H200Zm120-160v-80h320v80H320Zm0-120v-80h320v80H320Zm0-120v-80h320v80H320Zm360-80v-80h-80v-80h80v-80h80v80h80v80h-80v80h-80Z"/>
                                     </svg>
                                 </button>
-                                <div className="w-full text-center text-sm py-2">
-                                    Promoted: CBS Electrical Contractors <br /> Hiring NETA 2 Techs 📍Raleigh NC
-                                </div>
+                                {/* Future Ads / Message */}
+                                <Link
+                                    href="/position"
+                                    className="w-full text-center text-sm py-1 rounded-lg bg-white/5 hover:bg-white/10 transition block"
+                                >
+                                    <div className="font-semibold">
+                                        💼 Hiring NETA 2 Technicians
+                                    </div>
+
+                                    <div className="text-xs mt-1">
+                                        📍 Multiple locations • Relocation assistance
+                                    </div>
+
+                                    <div className="text-blue-400 text-xs mt-2">
+                                        View positions →
+                                    </div>
+                                </Link>
                             </div>
 
                             <div className={`mx-auto max-w-4xl transition-opacity duration-500 ease-in-out ${listFade ? "opacity-100" : "opacity-0"}`}>
