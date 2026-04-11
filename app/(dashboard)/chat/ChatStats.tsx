@@ -354,15 +354,17 @@ export default function ChatStats() {
         );
     };
 
-    const handleCreatePost = async ({title, message}: { title: string; message: string }) => {
+    const handleCreatePost = async ({ title, message }: { title: string; message: string }) => {
         if (!session?.idToken) {
-            setShowLoading(true);
             showError("Oops! You need to log in again. 🇪🤯", true);
             return;
         }
+
         const idToken = session.idToken;
         const sanitizedTitle = DOMPurify.sanitize(title.trim());
         const sanitizedMessage = DOMPurify.sanitize(message.trim());
+
+        setCreatingPost(true); // ✅ use ONE loader only
 
         try {
             const res = await fetch(`${apiUrl}/posts/`, {
@@ -371,40 +373,49 @@ export default function ChatStats() {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${idToken}`,
                 },
-                body: JSON.stringify({title: sanitizedTitle, message: sanitizedMessage}),
+                body: JSON.stringify({ title: sanitizedTitle, message: sanitizedMessage }),
             });
+
             if (!res.ok) {
                 if (res.status === 401) {
                     await handleSessionExpired();
                     return;
                 }
+
                 const err = await res.json().catch(() => null);
+
                 let msg = "Failed to create post";
                 if (err?.detail) msg = typeof err.detail === "string" ? err.detail : err.detail.error ?? msg;
                 else if (err?.error) msg = err.error;
-                setShowLoading(true);
-                showError(msg, true);
+
+                showError(msg);
                 return;
             }
+
             const newPost: Post = await res.json();
+
             globalMutate(
                 `${apiUrl}/posts/`,
                 (cachedData: { posts: Post[]; total: number } | undefined) => {
                     const existingPosts = cachedData?.posts ?? [];
                     const total = cachedData?.total ?? 0;
-                    return {posts: [newPost, ...existingPosts], total: total + 1};
+                    return { posts: [newPost, ...existingPosts], total: total + 1 };
                 },
                 false
             );
+
             setAllPosts(prev => {
                 const map = new Map<string, Post>();
-                [newPost, ...prev].forEach(p => map.set(p.id, p)); // keep last one
+                [newPost, ...prev].forEach(p => map.set(p.id, p));
                 return Array.from(map.values());
             });
-            setCreatingPost(false);
+
         } catch (err: any) {
             console.error("Create post error:", err);
             showError("Network error while creating post");
+
+        } finally {
+            setCreatingPost(false); // ✅ ALWAYS RESET (single source of truth)
         }
     };
 
@@ -478,7 +489,7 @@ export default function ChatStats() {
                                     className="w-full text-center text-sm py-1 rounded-lg bg-white/5 hover:bg-white/10 transition block"
                                 >
                                     <div className="font-semibold">
-                                        💼 Hiring NETA 2 Technicians
+                                        💼 Hiring NETA Technicians
                                     </div>
 
                                     <div className="text-xs mt-1">

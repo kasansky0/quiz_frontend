@@ -10,10 +10,10 @@ const InfoAndFormulas = () => {
             {/* Future Ads / Message */}
             <Link
                 href="/position"
-                className="w-full text-center text-sm py-1 rounded-lg bg-white/5 hover:bg-white/10 transition block"
+                className="w-full text-center text-sm py-1 rounded-lg hover:bg-white/10 transition block"
             >
                 <div className="font-semibold">
-                    💼 Hiring NETA 2 Technicians
+                    💼 Hiring NETA Technicians
                 </div>
 
                 <div className="text-xs mt-1">

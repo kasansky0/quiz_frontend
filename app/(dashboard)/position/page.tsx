@@ -45,6 +45,10 @@ const jobs = [
     },
 ];
 
+const sortedJobs = [...jobs].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+);
+
 export default function AdsPage() {
     const router = useRouter();
 
@@ -91,11 +95,11 @@ export default function AdsPage() {
 
             {/* Jobs */}
             <div className="grid grid-cols-1 gap-3 text-center">
-                {jobs.map((job) => (
+                {sortedJobs.map((job) => (
                     <Link
                         key={job.id}
                         href={`/position/apply/${job.id}`}
-                        className="cursor-pointer rounded-lg bg-white/5 hover:bg-white/10 active:scale-[0.98] transition flex flex-col items-center justify-center gap-1 mb-4"
+                        className="block w-full cursor-pointer rounded-lg hover:bg-zinc-900 active:scale-[0.98] transition flex flex-col items-center justify-center gap-1 mb-4"
                     >
                         <div className="text-sm font-semibold">
                             Company: {job.company}

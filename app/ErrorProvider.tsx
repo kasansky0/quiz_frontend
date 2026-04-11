@@ -50,7 +50,7 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
         timeoutRef.current = setTimeout(() => {
             setMessage(null);
             setShowLoginButton(false);
-        }, 15000);
+        }, 7000);
     };
 
     const hideError = () => {

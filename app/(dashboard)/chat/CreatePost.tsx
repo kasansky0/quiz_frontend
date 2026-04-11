@@ -31,23 +31,6 @@ export default function CreatePost({
     const TITLE_LIMIT = 100;
     const MESSAGE_LIMIT = 500;
 
-    const [keyboardOffset, setKeyboardOffset] = useState(0);
-
-    useEffect(() => {
-        const handleResize = () => {
-            if (!window.visualViewport) return;
-
-            const offset =
-                window.innerHeight - window.visualViewport.height;
-
-            setKeyboardOffset(offset);
-        };
-
-        window.visualViewport?.addEventListener("resize", handleResize);
-        return () =>
-            window.visualViewport?.removeEventListener("resize", handleResize);
-    }, []);
-
     useEffect(() => {
         const timer = setTimeout(() => setFade(true), 50);
         return () => clearTimeout(timer);
@@ -55,6 +38,8 @@ export default function CreatePost({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (isSending) return;
 
         const newErrors: { title?: string; message?: string } = {};
 
@@ -118,8 +103,6 @@ export default function CreatePost({
     return (
         <div className="w-full max-w-3xl min-h-screen flex flex-col space-y-4 rounded-xl bg-black">
 
-            {isSending && (<StatusBanner type="loading" message="Sending post..." />)}
-
             <div className={`w-full max-w-3xl transition-opacity duration-500 ease-in-out ${fade ? "opacity-100" : "opacity-0"}`}>
                 <form className="w-full flex flex-col space-y-4" onSubmit={handleSubmit}>
 
@@ -145,15 +128,13 @@ export default function CreatePost({
                             </svg>
                         </button>
 
-
-
                         {/* Future Ads / Message */}
                         <Link
                             href="/position"
                             className="w-full text-center text-sm py-1 rounded-lg bg-white/5 hover:bg-white/10 transition block"
                         >
                             <div className="font-semibold">
-                                💼 Hiring NETA 2 Technicians
+                                💼 Hiring NETA Technicians
                             </div>
 
                             <div className="text-xs mt-1">
@@ -164,6 +145,23 @@ export default function CreatePost({
                                 View positions →
                             </div>
                         </Link>
+
+
+                        <button
+                            type="submit"
+                            disabled={isSending}
+                            className={`transition ${
+                                isSending ? "opacity-40 cursor-not-allowed" : "hover:scale-105"
+                            }`}
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 -960 960 960"
+                                className="w-8 h-8 fill-green-500"
+                            >
+                                <path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z" />
+                            </svg>
+                        </button>
 
                     </div>
 
@@ -193,6 +191,8 @@ export default function CreatePost({
                             {title.length}/{TITLE_LIMIT}
                         </span>
                     </div>
+
+                    {isSending && (<StatusBanner type="loading" message="Sending post..." />)}
 
 
                     {/* --- Blocked Banner Between Title and Message --- */}
@@ -228,20 +228,6 @@ export default function CreatePost({
                             {message.length}/{MESSAGE_LIMIT}
                         </span>
                     </div>
-
-                    <button
-                        type="submit"
-                        className="fixed right-6 p-4 rounded-full bg-gray-800 hover:bg-gray-700 shadow-lg transition flex items-center justify-center"
-                        style={{ bottom: 24 + keyboardOffset }}
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 -960 960 960"
-                            className="w-6 h-6 fill-white"
-                        >
-                            <path d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z"/>
-                        </svg>
-                    </button>
 
 
                 </form>
