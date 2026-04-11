@@ -99,11 +99,10 @@ export default function AdsPage() {
                     <Link
                         key={job.id}
                         href={`/position/apply/${job.id}`}
-                        className="block w-full cursor-pointer rounded-lg transition flex flex-col items-center justify-center gap-1 mb-4
-                                hover:bg-zinc-900 active:scale-[0.98]
-                                active:bg-transparent focus:bg-transparent
-                                [-webkit-tap-highlight-color:transparent]
-                                select-none touch-manipulation"
+                        className="block w-full rounded-lg transition
+                            flex flex-col items-center justify-center gap-1 mb-4
+                            active:bg-transparent focus:bg-transparent
+                            [-webkit-tap-highlight-color:transparent]"
                     >
                         <div className="text-sm font-semibold">
                             Company: {job.company}
