@@ -305,7 +305,7 @@ export default function QuizSampleSection({
                     }
                 } catch {}
 
-                console.error("Failed to fetch next question:", msg);
+
                 if (isMountedRef.current) showError(msg, true);
                 setFetchError(true);
                 return null;

@@ -287,6 +287,21 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
 
 
+    useEffect(() => {
+        const el = commentInputRef.current;
+        if (!el) return;
+
+        el.style.height = "auto";
+        el.style.height = el.scrollHeight + "px";
+    }, [commentMessage]);
+
+
+
+    const placeholderText = isBlocked
+        ? `Blocked for ${blockSeconds}s...`
+        : "Add a comment...";
+
+
 
 
 
@@ -1064,24 +1079,19 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                         e.preventDefault();
                                         if (!commentMessage.trim() || isBlocked) return;
                                         handleAddComment(commentMessage.trim());
+                                        requestAnimationFrame(() => {
+                                            setCommentMessage("");
+                                        });
                                     }}
                                 >
                                                     <textarea
                                                         ref={commentInputRef}
                                                         style={{ WebkitOverflowScrolling: "touch" }}
-                                                        onInput={(e) => {
-                                                            const el = e.currentTarget;
-                                                            el.style.height = "auto";
-                                                            el.style.height = el.scrollHeight + "px";
-                                                        }}
-                                                        placeholder={
-                                                            isBlocked
-                                                                ? `Blocked for ${blockSeconds}s...`
-                                                                : "Add a comment..."
-                                                        }
+                                                        placeholder={placeholderText}
                                                         className={`
                                                           my-1
                                                           flex-1
+                                                          min-h-[40px]
                                                           rounded-xl
                                                           bg-transparent
                                                           px-3

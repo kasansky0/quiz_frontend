@@ -260,7 +260,7 @@ export default function ApplyPage() {
                     friendlyMsg = "Check your content and try again.";
                 }
 
-                showError(friendlyMsg);
+                showError(friendlyMsg, result.loginRequired);
 
                 // clear form
                 setForm({

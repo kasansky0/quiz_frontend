@@ -42,7 +42,7 @@ export async function submitApplication(payload: ApplyFormPayload) {
 
             // Friendly messages for known cases
             if (res.status === 401) {
-                return { error: "Oops! You need to log in again. 😝", loginRequired: true };
+                return { error: "Oops! You need to log in again.", loginRequired: true };
             }
 
             return { error: errorData?.detail || "Request failed. Please try again." };
