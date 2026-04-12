@@ -278,6 +278,10 @@ export default function ApplyPage() {
         setLoading(true);
 
         const payload: ApplyFormPayload = {
+            jobId: selectedJob.id,
+            company: selectedJob.company,
+            jobTitle: selectedJob.title,
+            jobLocation: selectedJob.location,
             name: session.user.name,
             email: session.user.email,
             location: form.location,
@@ -417,7 +421,7 @@ export default function ApplyPage() {
 
     return (
         <div className="p-4 text-white relative min-h-screen">
-            <div className="max-w-md mx-auto">
+            <div className="w-full max-w-xl mx-auto">
 
 
 
@@ -484,7 +488,7 @@ export default function ApplyPage() {
 
                 <form
                     onSubmit={handleSubmit}
-                    className="bg-black text-white p-2 pb-16 rounded-2xl space-y-4 max-w-md mx-auto"
+                    className="bg-black text-white p-2 pb-16 rounded-2xl space-y-4 max-w-xl mx-auto"
                 >
                     <div className="bg-gray-900 rounded-xl p-2 border border-gray-700">
                         <p><strong>Name:</strong> {session.user.name}</p>

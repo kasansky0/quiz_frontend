@@ -72,7 +72,7 @@ export default function SubjectPage() {
                 </div>
             ) : subject ? (
                 <div
-                    className={`mx-auto max-w-4xl pb-16 transition-opacity duration-700 ease-in-out ${
+                    className={`mx-auto max-w-xl pb-16 transition-opacity duration-700 ease-in-out ${
                         fade ? "opacity-100" : "opacity-0"
                     }`}
                 >
@@ -121,7 +121,7 @@ export default function SubjectPage() {
 
                     </div>
 
-                    <h1 className="text-2xl font-bold mb-4 text-blue-500">{subject.title}</h1>
+                    <h1 className="text-2xl text-center font-bold mb-4 text-blue-500">{subject.title}</h1>
                     <p className="mb-4 text-gray-300">{subject.description}</p>
 
                     {subject.isQuiz && (

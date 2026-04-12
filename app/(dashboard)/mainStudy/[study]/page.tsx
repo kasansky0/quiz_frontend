@@ -58,10 +58,8 @@ export default function StudyPage() {
     }
 
     return (
-        <div className="p-4 md:p-4 text-white relative min-h-screen">
-            <div className={`mx-auto max-w-4xl pb-16 transition-opacity duration-700 ease-in-out ${
-                fade ? "opacity-100" : "opacity-0"
-            }`}>
+        <div className="min-h-screen w-full flex justify-center items-start p-4 md:p-8 text-white">
+            <div className={`w-full max-w-xl pb-16 transition-opacity duration-700 ease-in-out ${fade ? "opacity-100" : "opacity-0"}`}>
                 {errorSubjects && <div className="p-6 text-red-400">{errorSubjects}</div>}
                 {!errorSubjects && subjects.length === 0 && <div className="p-6 text-white">No subjects found.</div>}
 

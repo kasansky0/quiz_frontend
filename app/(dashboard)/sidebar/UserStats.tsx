@@ -1,15 +1,14 @@
 "use client";
 
 import { useSession, signOut } from "next-auth/react";
-import { useState } from "react";        // ✅ React hook
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useRouter } from "next/navigation"; // make sure this is at the top
+import { useRouter } from "next/navigation";
 import Calculator from "./calculator"
 import FormulaSheet from "./formulasSheet"
 import { useMotionValue, useTransform, animate } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { SeenQuestionsType } from "@/types/userStats";
-import { useMemo } from "react";
 
 
 

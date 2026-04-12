@@ -1,6 +1,10 @@
 import { getSession } from "next-auth/react";
 
 export interface ApplyFormPayload {
+    jobId: number;
+    company: string;
+    jobTitle: string;
+    jobLocation: string;
     name: string;
     email: string;
     background: boolean;

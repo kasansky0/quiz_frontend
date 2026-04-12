@@ -439,7 +439,7 @@ export default function ChatStats() {
 
 
     return (
-        <div className="w-full max-w-4xl mx-auto relative">
+        <div className="w-full max-w-xl mx-auto relative">
             {/* Loading / Error Banner */}
             {(showLoading || serverError) && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white pointer-events-none">

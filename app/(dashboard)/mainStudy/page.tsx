@@ -76,10 +76,8 @@ export default function MainStudyPage() {
 
     // Then render all your full content with headings, subscription text, grid, etc.
     return (
-        <div className="p-4 md:p-4 text-white relative min-h-screen">
-            <div className={`mx-auto max-w-4xl pb-16 transition-opacity duration-700 ease-in-out ${
-                fade ? "opacity-100" : "opacity-0"
-            }`}>
+        <div className="min-h-screen w-full flex justify-center items-start p-4 md:p-8 text-white">
+            <div className={`w-full max-w-xl 2xl:max-w-2xl pb-16 transition-opacity duration-700 ease-in-out ${fade ? "opacity-100" : "opacity-0"}`}>
                 {error && <div className="p-6 text-red-400">{error}</div>}
                 {!error && mainTopics.length === 0 && <div className="p-6 text-white">No main topics found.</div>}
 

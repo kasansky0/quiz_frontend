@@ -10,6 +10,9 @@ import { fetchWithToken, handleSessionExpired } from "@/app/hooks/refreshToken";
 interface Application {
     _id: string;
     userId: string;
+    company: string;
+    jobTitle: string;
+    jobLocation: string;
     name: string;
     email: string;
     location: string;
@@ -24,6 +27,7 @@ interface Application {
     message: string;
     consent: boolean;
     submitted_at: string;
+    isApproved: boolean;
 }
 
 
@@ -190,7 +194,7 @@ export default function LoggedInAdmin() {
                 }
 
                 if (!res.success) {
-                    const err = await res.data.catch(() => null);
+                    const err = res.data;
                     if (res.status === 401 || res.status === 403) {
                         await handleSessionExpired(); // uses the same logic as in add comment
                         return;
@@ -280,9 +284,64 @@ export default function LoggedInAdmin() {
         return <LoggedOut />;
     }
 
+
+    const handleApprove = async (applicationId: string) => {
+        try {
+            const res = await fetchWithToken(`${apiUrl}/posts/admin/approve-application`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    application_id: applicationId,
+                }),
+            });
+
+            if (!res) {
+                showError("Network error");
+                return;
+            }
+
+            if (!res.success) {
+                const err = await res.data;
+
+                if (res.status === 401 || res.status === 403) {
+                    await handleSessionExpired();
+                    return;
+                }
+
+                showError(err?.detail || "Failed to approve application");
+                return;
+            }
+
+            const data = await res.data;
+
+            alert("Application approved!");
+
+            setSummary(prev => {
+                if (!prev) return prev;
+
+                return {
+                    ...prev,
+                    applications: prev.applications?.map(app =>
+                        app._id === applicationId
+                            ? { ...app, isApproved: true }
+                            : app
+                    ),
+                };
+            });
+
+        } catch (err) {
+            console.error(err);
+            showError("Error approving application");
+        }
+    };
+
+
+
     return (
         <div ref={topRef} className="min-h-screen bg-black text-white relative">
-            <div className="mx-auto max-w-2xl p-4 sm:p-10">
+            <div className="mx-auto max-w-xl p-4 sm:p-10">
                 {/* Header */}
                 <h1 className="text-2xl sm:text-3xl mb-2 font-bold text-white-400">
                     Logs
@@ -476,21 +535,36 @@ export default function LoggedInAdmin() {
                 {/* Recent Admin Logins */}
                 {summary?.admin_logged_in && summary.admin_logged_in.length > 0 && (
                     <div className="bg-black/90 p-4 sm:p-6 rounded-xl mb-2 border border-white text-sm sm:text-base">
-                        <h3 className="font-bold text-white-400 mb-1">Recent Admin Logins:</h3>
-                        {summary.admin_logged_in.map((login, i) => (
-                            <div key={i} className="mb-2">
-                                <div className="text-yellow-500 font-bold">{login.nickname}</div>
-                                <div className="text-gray-400 text-xs">
-                                    ({login.email}) <br /> IP: {login.ip} | {login.success ? "✅ Success" : "❌ Failed"}
+                        <h3 className="font-bold text-white-400 mb-1">
+                            Recent Admin Logins: ({summary.admin_logged_in.length})
+                        </h3>
+
+                        {/* 👇 scroll container */}
+                        <div className="max-h-60 overflow-y-auto pr-2 space-y-3">
+                            {summary.admin_logged_in.map((login, i) => (
+                                <div key={i} className="mb-2">
+                                    <div className="text-yellow-500 font-bold">
+                                        {login.nickname}
+                                    </div>
+
+                                    <div className="text-gray-400 text-xs">
+                                        ({login.email}) <br />
+                                        IP: {login.ip} |{" "}
+                                        {login.success ? "✅ Success" : "❌ Failed"}
+                                    </div>
+
+                                    <div className="text-gray-400 text-xs">
+                                        [{formatLocalDate(login.timestamp)}]
+                                    </div>
+
+                                    {login.reason && (
+                                        <div className="text-red-400 text-xs">
+                                            Reason: {login.reason}
+                                        </div>
+                                    )}
                                 </div>
-                                <div className="text-gray-400 text-xs">
-                                    [{formatLocalDate(login.timestamp)}]
-                                </div>
-                                {login.reason && (
-                                    <div className="text-red-400 text-xs">Reason: {login.reason}</div>
-                                )}
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 )}
 
@@ -687,13 +761,47 @@ export default function LoggedInAdmin() {
                         </h3>
 
                         <div className="max-h-80 overflow-y-auto space-y-4 pr-2">
-                            {summary.applications.map((app, i) => (
+                            {[...summary.applications]
+                                .sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime())
+                                .map((app, i) => (
                                 <div key={i} className="bg-black/80 p-3 rounded-lg border border-gray-700">
+                                    <p className="text-gray-400 text-xs mt-1">
+                                        Submitted at: {formatLocalDate(app.submitted_at)}
+                                    </p>
+                                    <p className="flex items-center gap-3">
+                                        <span className="font-bold text-yellow-500">Approved:</span>
+
+                                        {app.isApproved ? (
+                                            <span className="text-green-400 font-bold">Yes</span>
+                                        ) : (
+                                            <span className="text-red-400 font-bold">No</span>
+                                        )}
+
+                                        {!app.isApproved && (
+                                            <svg
+                                                onClick={() => handleApprove(app._id)}
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 -960 960 960"
+                                                className="w-5 h-5 fill-green-500 cursor-pointer hover:fill-green-400"
+                                            >
+                                                <path d="m381-240 424-424-57-56-368 367-169-170-57 57 227 226Zm0 113L42-466l169-170 170 170 366-367 172 168-538 538Z" />
+                                            </svg>
+                                        )}
+                                    </p>
                                     <p>
                                         <span className="font-bold text-yellow-500">Name:</span> {app.name}
                                     </p>
                                     <p>
                                         <span className="font-bold text-yellow-500">Email:</span> {app.email}
+                                    </p>
+                                    <p>
+                                        <span className="font-bold text-yellow-500">Company:</span> {app.company || "-"}
+                                    </p>
+                                    <p>
+                                        <span className="font-bold text-yellow-500">Job Title:</span> {app.jobTitle || "-"}
+                                    </p>
+                                    <p>
+                                        <span className="font-bold text-yellow-500">Job Location:</span> {app.jobLocation || "-"}
                                     </p>
                                     <p>
                                         <span className="font-bold text-yellow-500">Veteran?:</span>{" "}
@@ -728,9 +836,6 @@ export default function LoggedInAdmin() {
                                     </p>
                                     <p>
                                         <span className="font-bold text-yellow-500">Consent:</span> {app.consent ? "Yes" : "No"}
-                                    </p>
-                                    <p className="text-gray-400 text-xs mt-1">
-                                        Submitted at: {formatLocalDate(app.submitted_at)}
                                     </p>
                                 </div>
                             ))}
