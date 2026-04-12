@@ -492,6 +492,108 @@ export default function LoggedInAdmin() {
 
 
 
+
+
+
+
+
+                {/* Applications */}
+                {summary?.applications && summary.applications.length > 0 && (
+                    <div className="bg-black/90 p-4 sm:p-6 rounded-xl mb-6 border border-white text-sm sm:text-base">
+                        <h3 className="font-bold text-white-400 mb-2">
+                            Applications: ({summary.applications.length})
+                        </h3>
+
+                        <div className="max-h-80 overflow-y-auto space-y-4 pr-2">
+                            {[...summary.applications]
+                                .sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime())
+                                .map((app, i) => (
+                                    <div key={i} className="bg-black/80 p-3 rounded-lg border border-gray-700">
+                                        <p className="text-gray-400 text-xs mt-1">
+                                            Submitted at: {formatLocalDate(app.submitted_at)}
+                                        </p>
+                                        <p className="flex items-center gap-3">
+                                            <span className="font-bold text-yellow-500">Approved:</span>
+
+                                            {app.isApproved ? (
+                                                <span className="text-green-400 font-bold">Yes</span>
+                                            ) : (
+                                                <span className="text-red-400 font-bold">No</span>
+                                            )}
+
+                                            {!app.isApproved && (
+                                                <svg
+                                                    onClick={() => handleApprove(app._id)}
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    viewBox="0 -960 960 960"
+                                                    className="w-5 h-5 fill-green-500 cursor-pointer hover:fill-green-400"
+                                                >
+                                                    <path d="m381-240 424-424-57-56-368 367-169-170-57 57 227 226Zm0 113L42-466l169-170 170 170 366-367 172 168-538 538Z" />
+                                                </svg>
+                                            )}
+                                        </p>
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Name:</span> {app.name}
+                                        </p>
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Email:</span> {app.email}
+                                        </p>
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Company:</span> {app.company || "-"}
+                                        </p>
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Job Title:</span> {app.jobTitle || "-"}
+                                        </p>
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Job Location:</span> {app.jobLocation || "-"}
+                                        </p>
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Veteran?:</span>{" "}
+                                            {isTrue(app.background) ? "✅" : "❌"}
+                                        </p>
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Location:</span> {app.location}
+                                        </p>
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Availability:</span> {app.availability}
+                                        </p>
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Certifications:</span> {app.certifications}
+                                        </p>
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Travel:</span> {app.travel}
+                                        </p>
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Overtime:</span> {app.overtime}
+                                        </p>
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Ready to Move:</span> {app.readyToMove}
+                                        </p>
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Experience:</span> {app.experience} years
+                                        </p>
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Position:</span> {app.position}
+                                        </p>
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Message:</span> {app.message || "-"}
+                                        </p>
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Consent:</span> {app.consent ? "Yes" : "No"}
+                                        </p>
+                                    </div>
+                                ))}
+                        </div>
+                    </div>
+                )}
+
+
+
+
+
+
+
+
                 {/* Recent Limiter Hits */}
                 {summary?.limiter_hits && summary.limiter_hits.length > 0 && (
                     <div className="bg-black/90 p-4 sm:p-6 rounded-xl mb-2 border border-white text-sm sm:text-base">
@@ -746,99 +848,6 @@ export default function LoggedInAdmin() {
                                         <span className="text-gray-400">({user.nickname})</span>
                                     </span>
                                 ))}
-                        </div>
-                    </div>
-                )}
-
-
-
-
-                {/* Applications */}
-                {summary?.applications && summary.applications.length > 0 && (
-                    <div className="bg-black/90 p-4 sm:p-6 rounded-xl mb-6 border border-white text-sm sm:text-base">
-                        <h3 className="font-bold text-white-400 mb-2">
-                            Applications: ({summary.applications.length})
-                        </h3>
-
-                        <div className="max-h-80 overflow-y-auto space-y-4 pr-2">
-                            {[...summary.applications]
-                                .sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime())
-                                .map((app, i) => (
-                                <div key={i} className="bg-black/80 p-3 rounded-lg border border-gray-700">
-                                    <p className="text-gray-400 text-xs mt-1">
-                                        Submitted at: {formatLocalDate(app.submitted_at)}
-                                    </p>
-                                    <p className="flex items-center gap-3">
-                                        <span className="font-bold text-yellow-500">Approved:</span>
-
-                                        {app.isApproved ? (
-                                            <span className="text-green-400 font-bold">Yes</span>
-                                        ) : (
-                                            <span className="text-red-400 font-bold">No</span>
-                                        )}
-
-                                        {!app.isApproved && (
-                                            <svg
-                                                onClick={() => handleApprove(app._id)}
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 -960 960 960"
-                                                className="w-5 h-5 fill-green-500 cursor-pointer hover:fill-green-400"
-                                            >
-                                                <path d="m381-240 424-424-57-56-368 367-169-170-57 57 227 226Zm0 113L42-466l169-170 170 170 366-367 172 168-538 538Z" />
-                                            </svg>
-                                        )}
-                                    </p>
-                                    <p>
-                                        <span className="font-bold text-yellow-500">Name:</span> {app.name}
-                                    </p>
-                                    <p>
-                                        <span className="font-bold text-yellow-500">Email:</span> {app.email}
-                                    </p>
-                                    <p>
-                                        <span className="font-bold text-yellow-500">Company:</span> {app.company || "-"}
-                                    </p>
-                                    <p>
-                                        <span className="font-bold text-yellow-500">Job Title:</span> {app.jobTitle || "-"}
-                                    </p>
-                                    <p>
-                                        <span className="font-bold text-yellow-500">Job Location:</span> {app.jobLocation || "-"}
-                                    </p>
-                                    <p>
-                                        <span className="font-bold text-yellow-500">Veteran?:</span>{" "}
-                                        {isTrue(app.background) ? "✅" : "❌"}
-                                    </p>
-                                    <p>
-                                        <span className="font-bold text-yellow-500">Location:</span> {app.location}
-                                    </p>
-                                    <p>
-                                        <span className="font-bold text-yellow-500">Availability:</span> {app.availability}
-                                    </p>
-                                    <p>
-                                        <span className="font-bold text-yellow-500">Certifications:</span> {app.certifications}
-                                    </p>
-                                    <p>
-                                        <span className="font-bold text-yellow-500">Travel:</span> {app.travel}
-                                    </p>
-                                    <p>
-                                        <span className="font-bold text-yellow-500">Overtime:</span> {app.overtime}
-                                    </p>
-                                    <p>
-                                        <span className="font-bold text-yellow-500">Ready to Move:</span> {app.readyToMove}
-                                    </p>
-                                    <p>
-                                        <span className="font-bold text-yellow-500">Experience:</span> {app.experience} years
-                                    </p>
-                                    <p>
-                                        <span className="font-bold text-yellow-500">Position:</span> {app.position}
-                                    </p>
-                                    <p>
-                                        <span className="font-bold text-yellow-500">Message:</span> {app.message || "-"}
-                                    </p>
-                                    <p>
-                                        <span className="font-bold text-yellow-500">Consent:</span> {app.consent ? "Yes" : "No"}
-                                    </p>
-                                </div>
-                            ))}
                         </div>
                     </div>
                 )}
