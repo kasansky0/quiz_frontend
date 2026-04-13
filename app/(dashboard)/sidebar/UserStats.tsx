@@ -13,6 +13,7 @@ import { SeenQuestionsType } from "@/types/userStats";
 
 
 
+
 interface UserStatsProps {
     userPercentage: number;
     nickname?: string;
@@ -71,18 +72,32 @@ function calculateQuestionStats(seenQuestions?: SeenQuestionsType) {
 }
 
 
+function PercentageBar({ correct, total }: { correct: number; total: number }) {
+    const progressValue = useMotionValue(0);
 
-function PercentageBar({ correct, total, onRefreshStats }: { correct: number; total: number; onRefreshStats?: () => void }) {
+    // ✅ safe progress calculation
+    const progress =
+        total === 0 ? 0 : Math.max(0, Math.min(100, (correct / total) * 100));
+
     const [percent, setPercent] = useState(0);
-    const progress = (correct / total) * 100;
 
     useEffect(() => {
-        if (onRefreshStats) {
-            onRefreshStats();
+        // ✅ handle ZERO progress explicitly
+        if (total === 0 || progress === 0) {
+            progressValue.set(0);
+            setPercent(0);
+            return;
         }
 
+        // animate bar
+        animate(progressValue, progress, {
+            duration: 1.8,
+            ease: "easeInOut",
+        });
+
+        // animate number
         const controls = animate(0, progress, {
-            duration: 2,
+            duration: 1.8,
             ease: "easeInOut",
             onUpdate(value) {
                 setPercent(Math.round(value));
@@ -90,22 +105,58 @@ function PercentageBar({ correct, total, onRefreshStats }: { correct: number; to
         });
 
         return () => controls.stop();
-    }, [progress, onRefreshStats]); // ✅ both stable
+    }, [progress, total]);
+
+    // ✅ HARD COLOR ZONES
+    const getColor = (v: number) => {
+        if (v < 50) return "#dc2626";   // red
+        if (v < 70) return "#f97316";   // orange
+        return "#16a34a";               // green
+    };
+
+    const width = useTransform(progressValue, (v) => `${v}%`);
+    const backgroundColor = useTransform(progressValue, (v) => getColor(v));
+
+    const boxShadow = useTransform(progressValue, (v) => {
+        if (v > 75) return "0 0 12px rgba(22,163,74,0.3)";
+        if (v < 40) return "0 0 10px rgba(220,38,38,0.25)";
+        return "none";
+    });
 
     return (
-        <div className="flex flex-col w-full space-y-1 mt-1">
-<span className="text-white/60 text-sm italic">
-  Aim to stay above <span className="text-green-400 font-semibold">70%</span>
-</span>            <div className="w-full h-6 bg-white/20 rounded overflow-hidden relative">
-                <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${progress}%` }}
-                    transition={{ duration: 2, ease: "easeInOut" }}
-                    className="h-full bg-green-500 rounded"
+        <div className="flex flex-col w-full space-y-1">
+
+            <span className="text-white/60 text-sm italic">
+                Aim for <span className="text-green-400 font-semibold">70%</span>
+            </span>
+
+            <div className="w-full h-6 bg-white/10 rounded-xl overflow-hidden backdrop-blur-sm border border-white/10 relative">
+
+                {/* 🎯 70% marker */}
+                <div
+                    style={{ left: "70%" }}
+                    className="absolute top-0 h-full w-[2px] bg-white/30"
                 />
-                <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white/50 text-sm font-medium">
+
+                {/* 🔥 Progress bar */}
+                <motion.div
+                    className="h-full rounded-xl"
+                    style={{
+                        width,
+                        backgroundColor,
+                        boxShadow,
+                    }}
+                />
+
+                {/* % text */}
+                <motion.span
+                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white/90 text-sm font-semibold"
+                    style={{
+                        opacity: useTransform(progressValue, (v) => (v > 5 ? 1 : 0)),
+                    }}
+                >
                     {percent}%
-                </span>
+                </motion.span>
             </div>
         </div>
     );

@@ -27,19 +27,44 @@ const InfoAndFormulas = () => {
                 </Link>
 
 
-                {/* Authentication Notice */}
-                <h1 className="w-full text-2xl sm:text-3xl md:text-3xl font-bold text-white-400 mb-6 text-center">
-                    🔐 Authentication
-                </h1>
-                <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-8 leading-relaxed">
-                    This platform uses Google authentication tokens. Tokens expire automatically after approximately <strong>1 hour</strong>.
-                    When a token expires, your session will end and you will need to log in again.
+
+                {/* 4. Quiz Progress & Performance */}
+                <Link
+                    href="/quiz"
+                    className="w-full text-center text-sm py-1 transition block active:bg-transparent focus:bg-transparent [-webkit-tap-highlight-color:transparent]">
+                    <h1 className="w-full text-2xl sm:text-3xl md:text-3xl font-bold text-white-400 mb-1 text-center cursor-pointer hover:text-white transition">
+                        📊 Quiz progress
+                    </h1>
+                    <div className="text-blue-400 text-xs mt-2">
+                        Test your knowledge with random questions →
+                    </div>
+                </Link>
+                <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-4  leading-relaxed">
+                    Your quiz progress is tracked using a progress bar that reflects your performance.
+                    The percentage is calculated as:
+                </p>
+                <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-4  leading-relaxed font-semibold">
+                    <strong>Correct Questions Answered ÷ Total Questions Answered × 100%</strong>
+                </p>
+                <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-4  leading-relaxed">
+                    For example, if you have answered 15 questions and 12 are correct, your progress percentage would be 80%.
+                    This gives you a real-time view of your understanding and helps track your study progress.
                 </p>
 
+
                 {/* Page Title & Introduction */}
-                <h1 className="w-full text-2xl sm:text-3xl md:text-3xl font-bold text-white-400 mb-6 text-center">
-                    💬 Messaging
-                </h1>
+                <Link
+                    href="/chat"
+                    className="w-full text-center text-sm py-1 transition block active:bg-transparent focus:bg-transparent [-webkit-tap-highlight-color:transparent]"
+                >
+                    <h1 className="w-full text-2xl sm:text-3xl md:text-3xl font-bold text-white-400 mb-1 text-center cursor-pointer hover:text-white transition">
+                        💬 Messaging
+                    </h1>
+
+                    <div className="text-blue-400 text-xs mt-2">
+                        Share your test experience →
+                    </div>
+                </Link>
                 <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-8 leading-relaxed">
                     We are committed to maintaining a professional, respectful, and focused learning environment.
                     All posts and comments are subject to automated moderation and content validation.
@@ -99,38 +124,13 @@ const InfoAndFormulas = () => {
                     Flooding comments within a short time window will trigger automatic blocking.
                 </p>
 
-                {/* 3. Writing Recommendations */}
-                <h2 className="w-full text-lg sm:text-xl md:text-2xl font-bold text-white-400 mb-4 text-center">
-                    📝 Writing Recommendations
-                </h2>
-                <div className="max-w-md sm:max-w-2xl md:max-w-3xl ">
-                    <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base md:text-lg text-white/80 leading-relaxed">
-                        <li>Keep messages under 500 characters</li>
-                        <li>Avoid excessive capitalization or punctuation</li>
-                        <li>Stay focused on exam-related topics</li>
-                        <li>Be respectful, assume good intent from others</li>
-                    </ul>
-                </div>
-                <br/>
-                <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl  mb-8 leading-relaxed">
-                    Our goal is to provide a distraction-free, professional learning environment.
-                    Thank you for helping keep NetaPrep focused, respectful, and high-quality.
-                </p>
-
-                {/* 4. Quiz Progress & Performance */}
+                {/* Authentication Notice */}
                 <h1 className="w-full text-2xl sm:text-3xl md:text-3xl font-bold text-white-400 mb-6 text-center">
-                    📊 Quiz Progress
+                    🔐 Authentication
                 </h1>
-                <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-4  leading-relaxed">
-                    Your quiz progress is tracked using a progress bar that reflects your performance.
-                    The percentage is calculated as:
-                </p>
-                <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-4  leading-relaxed font-semibold">
-                    <strong>Correct Questions Answered ÷ Total Questions Answered × 100%</strong>
-                </p>
-                <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-4  leading-relaxed">
-                    For example, if you have answered 15 questions and 12 are correct, your progress percentage would be 80%.
-                    This gives you a real-time view of your understanding and helps track your study progress.
+                <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-8 leading-relaxed">
+                    This platform uses Google authentication tokens. Tokens expire automatically after approximately <strong>1 hour</strong>.
+                    When a token expires, your session will end and you will need to log in again.
                 </p>
 
                 <br/>
