@@ -53,7 +53,7 @@ interface QuizSampleSectionProps {
     loadingDone?: boolean;
     style?: React.CSSProperties;
     scrollContainerRef?: React.RefObject<HTMLElement | null>;
-    onAnswer?: (isCorrect: boolean, questionId: number) => void;
+    onAnswer?: (isCorrect: boolean, questionId: number, selectedOption: string) => void;
     subjectId?: string; // <-- add this
     mode?: "random" | "smart"; // ✅ ADD THIS
     token?: string;
@@ -466,7 +466,7 @@ export default function QuizSampleSection({
                 });
             }
 
-            if (onAnswer && questionData) onAnswer(correct, questionData.id);
+            if (onAnswer && questionData) onAnswer(correct, questionData.id, option);
 
             setAnswerResult({ correct, answer, explanation });
         }

@@ -102,28 +102,6 @@ const InfoAndFormulas = () => {
                 </div>
                 <br/>
 
-                {/* 2. Automated Moderation & Enforcement */}
-                <h2 className="w-full text-lg sm:text-xl md:text-2xl font-bold text-white-400 mb-4 text-center">
-                    ⚖ Automated Moderation
-                </h2>
-                <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-6  leading-relaxed">
-                    All content is automatically scanned for prohibited language, spam patterns,
-                    malicious links, excessive formatting, and abusive behavior.
-                    Comments that violate policy may be:
-                </p>
-                <div className="max-w-md sm:max-w-2xl md:max-w-3xl ">
-                    <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base md:text-lg text-white/80 leading-relaxed">
-                        <li>Rejected before posting</li>
-                        <li>Automatically removed</li>
-                        <li>Subject to temporary posting restrictions</li>
-                    </ul>
-                </div>
-                <br/>
-                <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl  mb-8 leading-relaxed">
-                    Repeated violations may result in temporary or permanent account restrictions.
-                    Flooding comments within a short time window will trigger automatic blocking.
-                </p>
-
                 {/* Authentication Notice */}
                 <h1 className="w-full text-2xl sm:text-3xl md:text-3xl font-bold text-white-400 mb-6 text-center">
                     🔐 Authentication

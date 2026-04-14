@@ -25,7 +25,7 @@ export default function QuizNoSubjectPage() {
             mode="random"
             token={token}
             loadingDone={true}
-            onAnswer={async (isCorrect, questionId) => {
+            onAnswer={async (isCorrect, questionId, selectedOption) => {
                 setAnswerCount(prev => prev + 1);
 
                 if (!apiUrl || !userId) return;
@@ -40,7 +40,7 @@ export default function QuizNoSubjectPage() {
                         body: JSON.stringify({
                             user_id: userId,
                             question_id: questionId,
-                            correct: isCorrect,
+                            selected_option: selectedOption,
                         }),
                     });
 

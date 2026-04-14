@@ -350,32 +350,47 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             }
 
             if (!res.success) {
-                const err = res.data || { error: res.message };
-                const detail = err?.detail;
+                const err = res.data || {};
+                const detail = err?.detail || {};
 
-                // Backend blocked message (rate-limit or admin block)
-                if (detail?.blocked) {
-                    const message = detail.error || "You are temporarily blocked. Please wait.";
-                    setBlockMessage(message);
-                    if (detail.remaining) setBlockSeconds(detail.remaining);
+                // normalize backend shape
+                const type = detail?.type;
+                const message = detail?.error || err?.error || res?.message;
+
+                // 🔴 BLOCKED USER
+                if (detail?.blocked || type === "blocked") {
+                    const msg = message || "You are temporarily blocked. Please wait.";
+                    setBlockMessage(msg);
+                    if (detail?.remaining) setBlockSeconds(detail.remaining);
                     setIsBlocked(true);
-                    showError(message); // only string
+                    showError(msg);
                     return;
                 }
 
-                // Rate limiting (429) without block
-                if (res.status === 429) {
+                // 🔴 RATE LIMIT
+                if (res.status === 429 || type === "rate_limit") {
                     const seconds = detail?.remaining || 60;
                     setIsBlocked(true);
                     setBlockSeconds(seconds);
-                    showError(`Slow down. Wait ${seconds} second${seconds > 1 ? "s" : ""}.`);
+                    showError(`Slow down. Wait ${seconds} second${seconds !== 1 ? "s" : ""}.`);
                     return;
                 }
 
-                // Fallback for session / other errors
-                setShowLoading(true);
-                const message = detail?.error || err.error || "Oops! You need to log in again. 🥲";
-                showError(message, true);
+                // 🔴 PROFANITY / VALIDATION ERROR
+                if (type === "profanity" || type === "validation_error") {
+                    showError(message || "Please avoid inappropriate language.");
+                    return;
+                }
+
+                // 🔴 AUTH / SESSION EXPIRED
+                if (type === "auth" || res.status === 401) {
+                    setShowLoading(true);
+                    showError("Session expired. Please log in again. 🥲", true);
+                    return;
+                }
+
+                // 🔴 FALLBACK (REAL ERROR ONLY)
+                showError(message || "Something went wrong.");
                 return;
             }
 

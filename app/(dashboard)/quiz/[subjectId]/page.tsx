@@ -32,7 +32,7 @@
                 mode="smart"
                 token={token}
                 subjectId={subjectId} // pass dynamic param here
-                onAnswer={async (isCorrect, questionId) => {
+                onAnswer={async (isCorrect, questionId, selectedOption) => {
                     setAnswerCount(prev => prev + 1);
 
                     if (!apiUrl || !userId) {
@@ -47,7 +47,7 @@
                             body: JSON.stringify({
                                 user_id: userId,
                                 question_id: questionId,
-                                correct: isCorrect
+                                selected_option: selectedOption
                             }),
                         });
 
