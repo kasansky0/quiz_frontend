@@ -7,13 +7,20 @@ import type { QuestionType } from "@/app/(dashboard)/quiz/components/QuizSampleS
 import { useError } from "@/app/ErrorProvider";
 
 export default function QuizNoSubjectPage() {
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
     const [wrongQueue, setWrongQueue] = useState<QuestionType[]>([]);
     const [answerCount, setAnswerCount] = useState(0);
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     const userId = session?.user?.id;
     const token = session?.idToken;
     const { showError } = useError();
+
+    if (status === "loading") {
+        return <div className="p-6 text-white">Loading session...</div>;
+    }
+    if (!session) {
+        return <div className="p-6 text-white">Authenticating...</div>;
+    }
 
     return (
         <QuizSampleSection

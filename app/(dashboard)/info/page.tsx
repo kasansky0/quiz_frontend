@@ -39,16 +39,12 @@ const InfoAndFormulas = () => {
                         Test your knowledge with random questions →
                     </div>
                 </Link>
-                <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-4  leading-relaxed">
-                    Your quiz progress is tracked using a progress bar that reflects your performance.
-                    The percentage is calculated as:
+                <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-4 leading-relaxed">
+                    Take a quiz to track your progress in real time using a simple performance percentage.
                 </p>
-                <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-4  leading-relaxed font-semibold">
-                    <strong>Correct Questions Answered ÷ Total Questions Answered × 100%</strong>
-                </p>
-                <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-4  leading-relaxed">
-                    For example, if you have answered 15 questions and 12 are correct, your progress percentage would be 80%.
-                    This gives you a real-time view of your understanding and helps track your study progress.
+
+                <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-4 leading-relaxed font-semibold">
+                    <strong>Percentage = (Correct Answers ÷ Total Answers) × 100%</strong>
                 </p>
 
 
@@ -66,40 +62,9 @@ const InfoAndFormulas = () => {
                     </div>
                 </Link>
                 <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-8 leading-relaxed">
-                    We are committed to maintaining a professional, respectful, and focused learning environment.
-                    All posts and comments are subject to automated moderation and content validation.
-                    By participating in discussions, you agree to follow the guidelines outlined below.
+                    We maintain a respectful and focused learning environment. All posts and comments are automatically moderated to ensure quality. By participating, you agree to follow the guidelines.
                 </p>
 
-                {/* 1. Community Guidelines */}
-                <h2 className="w-full text-lg sm:text-xl md:text-2xl font-bold text-white-400 mb-4 text-center">
-                    👍 Allowed
-                </h2>
-                <div className="max-w-md sm:max-w-2xl md:max-w-3xl">
-                    <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base md:text-lg text-white/80 leading-relaxed">
-                        <li>Professional and respectful discussion</li>
-                        <li>Constructive questions about practice problems</li>
-                        <li>Sharing exam study strategies</li>
-                        <li>Disagreement supported by technical reasoning</li>
-                        <li>Clear and concise communication</li>
-                    </ul>
-                </div>
-                <br/>
-
-                <h2 className="w-full text-lg sm:text-xl md:text-2xl font-bold text-white-400 mb-4 text-center">
-                    🚫 Not Allowed
-                </h2>
-                <div className="max-w-md sm:max-w-2xl md:max-w-3xl">
-                    <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base md:text-lg text-white/80 leading-relaxed">
-                        <li>Profanity, harassment or offensive language</li>
-                        <li>Attacks, insults or discriminatory remarks</li>
-                        <li>Spam, advertisements or promotional links</li>
-                        <li>Posting malicious or suspicious URLs</li>
-                        <li>Explicit or inappropriate content</li>
-                        <li>Excessive repeated or flooding comments</li>
-                        <li>Attempts to bypass moderation systems</li>
-                    </ul>
-                </div>
                 <br/>
 
                 {/* Authentication Notice */}

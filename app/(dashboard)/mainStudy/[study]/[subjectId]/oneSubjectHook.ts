@@ -64,7 +64,7 @@ export function useSubjectById(apiUrl: string, subjectId: string, token?: string
                 }
 
                 if (!res.ok) {
-                    throw new Error("Failed to fetch subject. Please log in again.");
+                    showError("Oops! You need to log in again. 🥸", true);
                 }
 
                 const data: Subject = await res.json();

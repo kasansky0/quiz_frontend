@@ -138,7 +138,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             if (!res.ok) {
                 const errData = await res.json().catch(() => null);
                 const msg = errData?.error || errData?.detail || `Failed to refresh stats (status ${res.status})`;
-                showError(msg);
+                showError(msg, true);
                 return;
             }
 

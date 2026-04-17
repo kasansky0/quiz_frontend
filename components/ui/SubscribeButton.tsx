@@ -13,7 +13,7 @@ export default function SubscribeButton() {
     const handleSubscribe = async () => {
 
         if (!token) {
-            showError("You need to log in to subscribe.", true);
+            showError("You need to log in to subscribe. 😟", true);
             return;
         }
 

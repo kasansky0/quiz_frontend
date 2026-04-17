@@ -70,12 +70,6 @@ export default function CreatePost({
         } finally {
             setIsSending(false);
         }
-
-        // Optionally hide form or reset fields after submission
-        // setTitle("");
-        // setMessage("");
-        // setErrors({});
-        // setIsSending(false); // You might leave it if parent navigates
     };
 
     const handlePassNETA = () => {

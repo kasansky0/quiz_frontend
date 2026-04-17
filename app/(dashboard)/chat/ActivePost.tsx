@@ -111,7 +111,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         commentsKey(post.id, 0),
         fetcher,
         {
-            refreshInterval: 300,
+            refreshInterval: 5000,
             fallbackData: comments, // use the comments prop you already have
             revalidateOnMount: false // prevents SWR from fetching immediately on mount
         }
@@ -385,7 +385,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 // 🔴 AUTH / SESSION EXPIRED
                 if (type === "auth" || res.status === 401) {
                     setShowLoading(true);
-                    showError("Session expired. Please log in again. 🥲", true);
+                    showError("Oops! You need to log in again. 🫡", true);
                     return;
                 }
 
@@ -512,7 +512,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 setActivePost(prev =>
                     prev ? { ...prev, comments: previousComments } : prev
                 );
-                showError("Refresh the page or log in again.");
+                showError("Oops! You need to log in again.😎", true);
             }
         } catch (err) {
             setDeletedCommentIds(prev => {
@@ -1370,12 +1370,22 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                             {/* Load more button */}
                             {hasMoreComments && (
                                 <button
-                                    onClick={() => {
-                                        setIsButtonLoading(true); // start visual loading
-                                        setTimeout(() => {
-                                            setIsButtonLoading(false); // stop loading after 1s (or any delay)
-                                            handleLoadMore(); // still call your real handler
-                                        }, 5000); // 5 second delay
+                                    onClick={async () => {
+                                        setIsButtonLoading(true);
+
+                                        const start = Date.now();
+
+                                        await handleLoadMore();
+
+                                        // force spinner to be visible at least 400–600ms
+                                        const elapsed = Date.now() - start;
+                                        const minTime = 500;
+
+                                        if (elapsed < minTime) {
+                                            await new Promise((r) => setTimeout(r, minTime - elapsed));
+                                        }
+
+                                        setIsButtonLoading(false);
                                     }}
                                     style={{ touchAction: "manipulation" }}
                                     className="w-full flex justify-center items-center py-3 bg-blue-50 hover:bg-blue-100 rounded-xl mt-2 transition"
