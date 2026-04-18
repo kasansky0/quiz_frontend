@@ -1,17 +1,16 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { submitApplication, ApplyFormPayload } from "@/app/(dashboard)/position/apply/[jobId]/submitApplication";
 import { useError } from "@/app/ErrorProvider";
-import { useSearchParams } from "next/navigation";
 import { useParams } from "next/navigation";
 
 
 
 export default function ApplyPage() {
-    const params = useParams();
-    const selectedJobId = parseInt(params.jobId as string);
+    const params = useParams<{ jobId: string }>();
+    const [selectedJob, setSelectedJob] = useState<any>(null);
     const { data: session, status } = useSession();
     const router = useRouter();
     const [agreed, setAgreed] = useState(false);
@@ -19,7 +18,7 @@ export default function ApplyPage() {
     const [loading, setLoading] = useState(false);
     const { showError } = useError();
     const shortFields = ["travel", "overtime", "readyToMove"]; // only the text-limited fields
-
+    const [initialLoading, setInitialLoading] = useState(true);
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1); // move to next day
     const localTomorrow = new Date(tomorrow.getTime() - tomorrow.getTimezoneOffset() * 60000)
@@ -28,56 +27,14 @@ export default function ApplyPage() {
 
 
 
-    const jobs = [
-        {
-            id: 1,
-            company: "ABM",
-            location: "Charlotte, Raleigh NC area, New York, Miami FL",
-            title: "NETA 3 Technician",
-            pay: "$40–$55/hr",
-            relocation: "Paid relocation",
-            perDiem: "$120/day",
-            overtime: "OT available",
-            travel: "Nationwide",
-            type: "Full-time / Travel"
-        },
-        {
-            id: 2,
-            company: "CBS",
-            location: "Raleigh NC",
-            title: "NETA 2 Technician",
-            pay: "$30–$45/hr",
-            relocation: "No relocation",
-            perDiem: "$100/day",
-            overtime: "OT available",
-            travel: "Regional",
-            type: "Local / Full-time"
-        },
-        {
-            id: 3,
-            company: "Schneider",
-            location: "Dallas TX",
-            title: "Substation Technician",
-            pay: "$45–$60/hr",
-            relocation: "Paid relocation",
-            perDiem: "$150/day",
-            overtime: "Guaranteed OT",
-            travel: "Nationwide",
-            type: "Travel / Field"
-        },
-    ];
 
-    const selectedJob = jobs.find(job => job.id === selectedJobId);
-
-    if (!selectedJob) {
-        return <p>Job not found</p>;
-    }
-
-    const company = {
-        name: selectedJob.company,
-        role: selectedJob.title,
-        location: selectedJob.location
-    };
+    const company = selectedJob
+        ? {
+            name: selectedJob.company,
+            role: selectedJob.title,
+            location: selectedJob.location
+        }
+        : null;
 
 
     interface ApplyForm {
@@ -92,7 +49,7 @@ export default function ApplyPage() {
         readyToMove: string;       // Ready to Relocate? (yes/no)
         experience: string;        // Years of Electrical Experience
         position: string;          // Position Applying For
-        message: string;           // Additional Information
+
     }
 
     const [form, setForm] = useState<ApplyForm>({
@@ -107,12 +64,11 @@ export default function ApplyPage() {
         readyToMove: "",
         experience: "",
         position: "",
-        message: "",
     });
 
     const [errors, setErrors] = useState<{[key:string]: string}>({});
 
-    const requiredFields = ["location", "experience", "position", "message", "availability", "travel", "overtime", "readyToMove"];
+    const requiredFields = ["location", "experience", "position", "availability", "travel", "overtime", "readyToMove"];
     const isFormComplete = requiredFields.every(field => {
         const value = form[field as keyof typeof form];
         if (Array.isArray(value)) return value.length > 0;
@@ -252,11 +208,6 @@ export default function ApplyPage() {
             }
         });
 
-        // --- Message max 100 chars ---
-        if (form.message && form.message.length > 200) {
-            newErrors.message = "Message cannot exceed 200 characters.";
-        }
-
         // --- Consent ---
         if (!agreed) {
             showError("You must agree to the terms before submitting.");
@@ -278,7 +229,7 @@ export default function ApplyPage() {
         setLoading(true);
 
         const payload: ApplyFormPayload = {
-            jobId: selectedJob.id,
+            jobId: selectedJob._id,
             company: selectedJob.company,
             jobTitle: selectedJob.title,
             jobLocation: selectedJob.location,
@@ -293,7 +244,6 @@ export default function ApplyPage() {
             background: form.background,
             experience: form.experience,
             position: form.position,
-            message: form.message,
             consent: agreed,
         };
 
@@ -333,7 +283,6 @@ export default function ApplyPage() {
                     readyToMove: "",
                     experience: "",
                     position: "",
-                    message: "",
                 });
                 setAgreed(false);
                 setErrors({});
@@ -357,7 +306,6 @@ export default function ApplyPage() {
                     readyToMove: "",
                     experience: "",
                     position: "",
-                    message: "",
                 });
                 setAgreed(false);
                 setErrors({});
@@ -378,7 +326,6 @@ export default function ApplyPage() {
                 readyToMove: "",
                 experience: "",
                 position: "",
-                message: "",
             });
             setAgreed(false);
             setErrors({});
@@ -386,6 +333,40 @@ export default function ApplyPage() {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        const fetchJob = async () => {
+            if (!params.jobId) return;
+
+            setInitialLoading(true);
+
+            try {
+                const res = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_URL}/submitAds/${params.jobId}`
+                );
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    showError?.(data.detail || "Failed to load job");
+                    return;
+                }
+
+                setSelectedJob(data.data);
+
+                // 👇 force minimum loader time
+                setTimeout(() => {
+                    setInitialLoading(false);
+                }, 500);
+
+            } catch (err) {
+                showError?.("Network error. Please try again.");
+                setInitialLoading(false);
+            }
+        };
+
+        fetchJob();
+    }, [params.jobId]);
 
     if (status === "loading") return <p>Loading...</p>;
     if (!session) return <p>Please log in with Google to submit an application.</p>;
@@ -415,6 +396,21 @@ export default function ApplyPage() {
                         Go Back
                     </button>
                 </div>
+            </div>
+        );
+    }
+
+    if (initialLoading || !selectedJob) {
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white">
+                <p className="text-xl flex items-center">
+                    Loading
+                    <span className="ml-2 flex space-x-1">
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                </span>
+                </p>
             </div>
         );
     }
@@ -700,20 +696,6 @@ export default function ApplyPage() {
 
 
 
-                    <div className="flex flex-col">
-                        <label htmlFor="message" className="text-white text-lg font-semibold mb-1">
-                            Additional Information
-                        </label>
-                        <textarea
-                            id="message"
-                            name="message"
-                            placeholder="Write any additional details here, e.g., skills, availability, or notes"
-                            value={form.message}
-                            onChange={handleChange}
-                            className={inputClass("message")}
-                            rows={4}
-                        />
-                    </div>
 
 
 

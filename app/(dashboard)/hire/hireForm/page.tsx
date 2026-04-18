@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useError } from "@/app/ErrorProvider";
 import { useRouter } from "next/navigation";
@@ -8,7 +8,7 @@ import { submitAd } from "./submitAd";
 
 export default function HireFormPage() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
     const token = session?.idToken;
 
     const { showError } = useError();
@@ -53,6 +53,16 @@ export default function HireFormPage() {
         `w-full h-10 px-2 rounded-xl border text-sm
         ${errors[field] ? "border-red-500 bg-gray-900" : "border-gray-700 bg-gray-900"}
         placeholder:text-xs placeholder:text-gray-500`;
+
+    useEffect(() => {
+        if (status !== "authenticated") return;
+
+        const role = (session as any)?.user?.role;
+
+        if (role && role !== "employer") {
+            router.replace("/info");
+        }
+    }, [status, session, router]);
 
     const handleChange = (e: any) => {
         const { name, value } = e.target;
@@ -131,10 +141,6 @@ export default function HireFormPage() {
                 travel: form.travel,
                 overtime: form.overtime,
                 relocation: form.relocation,
-                perDiem:
-                    form.perDiem === "no" || form.perDiem === ""
-                        ? null
-                        : Number(form.perDiem),
             },
             token!
         );
@@ -149,17 +155,61 @@ export default function HireFormPage() {
         setLoading(false);
     };
 
-    if (!session) return <p className="text-white p-4">Please log in.</p>;
+    const role = (session as any)?.user?.role;
+
+    if (status === "loading") {
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
+                <p className="text-xl flex items-center">
+                    Loading
+                    <span className="ml-2 flex space-x-1">
+                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce" />
+                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]" />
+                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]" />
+                    </span>
+                </p>
+            </div>
+        );
+    }
+
+    if (role !== "employer") {
+        return null;
+    }
 
     return (
         <div className="p-4 text-white min-h-screen">
             <div className="w-full max-w-xl mx-auto">
 
-                <div className="mb-4">
-                    <h1 className="text-2xl font-bold">Create Job Ad</h1>
-                    <p className="text-sm text-gray-400">
-                        Fill in job details below
-                    </p>
+                <div className="relative flex items-center mb-4">
+                    {/* Back button (left) */}
+                    <button
+                        onClick={() => router.push("/hire")}
+                        title="Back"
+                        className="absolute left-0"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-8 h-8"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M15.75 19.5 8.25 12l7.5-7.5"
+                            />
+                        </svg>
+                    </button>
+
+                    {/* Centered title */}
+                    <div className="mx-auto text-center">
+                        <h1 className="text-2xl font-bold">Create Job Ad</h1>
+                        <p className="text-sm text-gray-400">
+                            Fill in job details below
+                        </p>
+                    </div>
                 </div>
 
                 <form
@@ -264,18 +314,6 @@ export default function HireFormPage() {
                         <option value="Partial relocation">Partial relocation</option>
                         <option value="No relocation">No relocation</option>
                     </select>
-
-                    {/* PER DIEM */}
-                    <div>
-                        <label className="text-sm">Per Diem ($ or "no")</label>
-                        <input
-                            name="perDiem"
-                            value={form.perDiem}
-                            onChange={handleChange}
-                            placeholder="120 or no"
-                            className={inputClass("perDiem")}
-                        />
-                    </div>
 
                     <button
                         type="submit"

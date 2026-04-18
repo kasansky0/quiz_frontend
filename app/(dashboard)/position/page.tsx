@@ -2,59 +2,94 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { useError } from "@/app/ErrorProvider";
 
-const jobs = [
-    {
-        id: 1,
-        company: "ABM",
-        location: "Charlotte, Raleigh NC area, New York, Miami FL",
-        title: "NETA 3 Technician",
-        pay: "$40–$55/hr",
-        relocation: "Paid relocation",
-        perDiem: "$120/day",
-        overtime: "OT available",
-        travel: "Nationwide",
-        type: "Full-time / Travel",
-        createdAt: "2026-02-10T14:30:00Z"
-    },
-    {
-        id: 2,
-        company: "CBS",
-        location: "Raleigh NC",
-        title: "NETA 2 Technician",
-        pay: "$30–$45/hr",
-        relocation: "No relocation",
-        perDiem: "$100/day",
-        overtime: "OT available",
-        travel: "Regional",
-        type: "Local / Full-time",
-        createdAt: "2026-04-10T14:30:00Z"
-    },
-    {
-        id: 3,
-        company: "Schneider",
-        location: "Dallas TX",
-        title: "Substation Technician",
-        pay: "$45–$60/hr",
-        relocation: "Paid relocation",
-        perDiem: "$150/day",
-        overtime: "Guaranteed OT",
-        travel: "Nationwide",
-        type: "Travel / Field",
-        createdAt: "2026-03-10T14:30:00Z"
-    },
-];
-
-const sortedJobs = [...jobs].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-);
+type Job = {
+    _id: string;
+    company: string;
+    location: string;
+    title: string;
+    pay: {
+        min: number;
+        max: number;
+    };
+    relocation: string;
+    perDiem?: string;
+    overtime: string;
+    travel?: string;
+    type: string;
+    createdAt: string;
+};
 
 export default function AdsPage() {
     const router = useRouter();
+    const { data: session } = useSession();
+    const token = session?.idToken;
+    const { showError } = useError();
+
+    const [jobs, setJobs] = useState<Job[]>([]);
+    const [loading, setLoading] = useState(true);
 
     const onBack = () => {
         router.back();
     };
+
+    // -----------------------------
+    // FETCH ADS FROM DB
+    // -----------------------------
+    useEffect(() => {
+        const fetchAds = async () => {
+            try {
+                const res = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_URL}/submitAds/public`
+                );
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    showError?.(data.detail || "Failed to load ads");
+                    return;
+                }
+
+                setJobs(data.data || []);
+            } catch (err) {
+                showError?.("Network error");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAds();
+    }, []);
+
+    // -----------------------------
+    // SORT JOBS (UNCHANGED LOGIC)
+    // -----------------------------
+    const sortedJobs = [...jobs].sort(
+        (a, b) =>
+            new Date(b.createdAt).getTime() -
+            new Date(a.createdAt).getTime()
+    );
+
+    // -----------------------------
+    // LOADING STATE (OPTIONAL SIMPLE)
+    // -----------------------------
+    if (loading) {
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white">
+                <p className="text-xl flex items-center">
+                    Loading
+                    <span className="ml-2 flex space-x-1">
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                </span>
+                </p>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen w-full flex justify-center items-start p-4 md:p-8">
@@ -84,78 +119,74 @@ export default function AdsPage() {
                         💼 Job Opportunities
                     </h1>
 
-                    {/* spacer */}
                     <div className="w-8" />
                 </div>
 
-                {/* Subtitle BELOW header */}
+                {/* Subtitle */}
                 <p className="text-xs text-white/60 text-center mb-6">
                     Choose a job that matches your position and location
                 </p>
 
                 {/* Jobs */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-center">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {sortedJobs.map((job) => (
                         <Link
-                            key={job.id}
-                            href={`/position/apply/${job.id}`}
+                            key={job._id}
+                            href={`/position/apply/${job._id}`}
                             className="block w-full rounded-lg transition
-                                flex flex-col items-center justify-center gap-1 mb-4
+                                flex flex-col items-start justify-start gap-1 mb-4
                                 active:bg-transparent focus:bg-transparent
                                 [-webkit-tap-highlight-color:transparent]"
                         >
-                            <div className="text-sm font-semibold">
-                                Company: {job.company}
-                            </div>
 
-                            <div className="text-xs text-white/80">
-                                Position: {job.title}
-                            </div>
+                            <div className="flex flex-col gap-2 text-xs text-white/80 p-2 rounded-xl border border-white/20">
 
-                            <div className="text-xs text-white/60">
-                                Location: 📍 {job.location}
-                            </div>
+                                {/* TOP ROW (tags) */}
 
-                            {/* 💰 MONEY */}
-                            <div className="mt-2 flex flex-wrap gap-1 justify-center">
-                                {job.pay && (
-                                    <span className="text-[10px] px-2 py-0.5 rounded bg-green-500/20 text-green-300">
-                                        {job.pay}
-                                      </span>
-                                )}
-
-                                {job.perDiem && (
-                                    <span className="text-[10px] px-2 py-0.5 rounded bg-green-500/10 text-green-200">
-                                        Per Diem: {job.perDiem}
-                                      </span>
-                                )}
-                                <span className="text-[10px] px-2 py-0.5 rounded bg-blue-500/20 text-blue-300">
-                                  {job.relocation}
-                                </span>
-                            </div>
-
-                            {/* ⚙️ WORK */}
-                            <div className="flex flex-wrap gap-1 justify-center">
-                                <span className="text-[10px] px-2 py-0.5 rounded bg-white/10 text-white/70">
-                                  {job.type}
+                                <span className="font-semibold text-sm text-white">
+                                    Company: {job.company}
                                 </span>
 
-                                {job.overtime && (
-                                    <span className="text-[10px] px-2 py-0.5 rounded bg-white/5 text-white/60">
-                                      {job.overtime}
+                                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                                    <span className="text-white/60">
+                                        Location: 📍 {job.location}
                                     </span>
-                                )}
-                                <span className="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-200">
-                                  {job.travel}
-                                </span>
+                                    <span className="text-white/80">
+                                        Position: {job.title}
+                                    </span>
+
+                                    {job.pay && (
+                                        <span className="text-[10px] rounded bg-green-500/20 text-green-300 leading-none">
+                                            ${job.pay.min}–${job.pay.max}/hr
+                                        </span>
+                                    )}
+
+                                    <span className="text-[10px] rounded bg-blue-500/20 text-blue-300 leading-none">
+                                        {job.relocation}
+                                    </span>
+
+                                    <span className="text-[10px] rounded bg-white/10 text-yellow-600 leading-none">
+                                        {job.type}
+                                    </span>
+
+                                    {job.overtime && (
+                                        <span className="text-[10px] rounded bg-white/5 text-blue-300 leading-none">
+                                            {job.overtime}
+                                        </span>
+                                    )}
+                                </div>
+
+                                {/* BOTTOM ROW (posted date) */}
+                                <p className="text-xs text-white/50">
+                                    Posted:{" "}
+                                    {new Date(job.createdAt).toLocaleDateString("en-US", {
+                                        year: "numeric",
+                                        month: "long",
+                                        day: "numeric",
+                                    })}
+                                </p>
+
                             </div>
-                            <p className="text-xs text-white/50">
-                                Posted: {new Date(job.createdAt).toLocaleDateString("en-US", {
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                            })}
-                            </p>
                         </Link>
                     ))}
                 </div>

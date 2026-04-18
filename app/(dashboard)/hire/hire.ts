@@ -1,6 +1,14 @@
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-export async function fetchEmployerAds(token: string) {
+type FetchEmployerAdsResponse = {
+    data?: any;
+    error?: string;
+    status: number;
+};
+
+export async function fetchEmployerAds(
+    token: string
+): Promise<FetchEmployerAdsResponse> {
     try {
         const res = await fetch(`${apiUrl}/submitAds/my`, {
             method: "GET",
@@ -10,14 +18,24 @@ export async function fetchEmployerAds(token: string) {
             },
         });
 
+        const data = await res.json().catch(() => null);
+
         if (!res.ok) {
-            const error = await res.json().catch(() => null);
-            return { error: error?.detail || "Failed to fetch ads" };
+            return {
+                error: data?.detail || "Failed to fetch ads",
+                status: res.status
+            };
         }
 
-        const data = await res.json();
-        return { data };
+        return {
+            data,
+            status: res.status
+        };
+
     } catch {
-        return { error: "Network error" };
+        return {
+            error: "Network error",
+            status: 0
+        };
     }
 }

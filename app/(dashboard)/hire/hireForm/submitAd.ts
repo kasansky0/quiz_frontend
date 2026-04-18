@@ -13,8 +13,6 @@ export interface SubmitAdPayload {
     travel: string;
     overtime: string;
     relocation: string;
-
-    perDiem: number | null;
 }
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;

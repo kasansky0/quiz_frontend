@@ -16,7 +16,6 @@ export interface ApplyFormPayload {
     readyToMove: string;
     experience: string;
     position: string;
-    message: string;
     consent: boolean;
 }
 
