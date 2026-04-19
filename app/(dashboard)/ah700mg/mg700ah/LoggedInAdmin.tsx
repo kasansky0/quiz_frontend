@@ -30,6 +30,25 @@ interface Application {
     isApproved: boolean;
 }
 
+interface HiringAd {
+    _id: string;
+    userId: string;
+    company: string;
+    title: string;
+    location: string;
+    pay: {
+        min: number;
+        max: number;
+    };
+    type: string;
+    travel: string;
+    overtime: string;
+    relocation: string;
+    status: string;
+    createdAt: string;
+    publishedAt?: string | null;
+}
+
 
 interface LimiterHit {
     user_id?: string;
@@ -77,6 +96,7 @@ interface AdminSummary {
     admin_logged_in: AdminLoggedIn[];
     limiter_hits: LimiterHit[];
     applications?: Application[];
+    hiring_ads?: HiringAd[];
 }
 
 
@@ -338,6 +358,75 @@ export default function LoggedInAdmin() {
     };
 
 
+    const handleAdStatus = async (adId: string, status: string) => {
+        const ok = confirm(`Are you sure you want to change status to "${status}"?`);
+        if (!ok) return;
+
+        try {
+            const res = await fetchWithToken(
+                `${apiUrl}/posts/admin/update-ad-status`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        ad_id: adId,
+                        status,
+                    }),
+                }
+            );
+
+            console.log("RAW FETCH RESPONSE:", res);
+
+            if (!res?.success) {
+                showError(res?.data?.detail || "Failed to update ad status");
+                return;
+            }
+
+            setSummary(prev => {
+                if (!prev) return prev;
+
+                return {
+                    ...prev,
+                    hiring_ads: prev.hiring_ads?.map(ad =>
+                        ad._id === adId ? { ...ad, status } : ad
+                    ),
+                };
+            });
+
+            alert(`Ad status updated to "${status}"`);
+        } catch (err) {
+            console.error(err);
+            showError("Something went wrong");
+        }
+    };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     return (
         <div ref={topRef} className="min-h-screen bg-black text-white relative">
@@ -581,6 +670,103 @@ export default function LoggedInAdmin() {
                                         <p>
                                             <span className="font-bold text-yellow-500">Consent:</span> {app.consent ? "Yes" : "No"}
                                         </p>
+                                    </div>
+                                ))}
+                        </div>
+                    </div>
+                )}
+
+
+
+
+
+
+
+
+
+
+
+
+
+                {/* Hiring Ads */}
+                {summary?.hiring_ads && summary.hiring_ads.length > 0 && (
+                    <div className="bg-black/90 p-4 sm:p-6 rounded-xl mb-6 border border-white text-sm sm:text-base">
+                        <h3 className="font-bold text-white-400 mb-2">
+                            Hiring Ads: ({summary.hiring_ads.length})
+                        </h3>
+
+                        <div className="max-h-80 overflow-y-auto space-y-4 pr-2">
+                            {[...summary.hiring_ads]
+                                .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                                .map((ad, i) => (
+                                    <div key={i} className="bg-black/80 p-3 rounded-lg border border-gray-700">
+
+                                        <p className="text-gray-400 text-xs mt-1">
+                                            Created at: {formatLocalDate(ad.createdAt)}
+                                        </p>
+
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Company:</span>{" "}
+                                            {ad.company}
+                                        </p>
+
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Title:</span>{" "}
+                                            {ad.title}
+                                        </p>
+
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Location:</span>{" "}
+                                            {ad.location}
+                                        </p>
+
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Type:</span>{" "}
+                                            {ad.type}
+                                        </p>
+
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Pay:</span>{" "}
+                                            ${ad.pay?.min} - ${ad.pay?.max}
+                                        </p>
+
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Travel:</span>{" "}
+                                            {ad.travel}
+                                        </p>
+
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Overtime:</span>{" "}
+                                            {ad.overtime}
+                                        </p>
+
+                                        <p>
+                                            <span className="font-bold text-yellow-500">Relocation:</span>{" "}
+                                            {ad.relocation}
+                                        </p>
+
+                                        <div className="flex items-center gap-3 flex-wrap">
+                                            <span className="font-bold text-yellow-500">Status:</span>
+
+                                            {["pending", "approved", "published", "archived"].map((status) => {
+                                                const isActive = ad.status === status;
+
+                                                return (
+                                                    <button
+                                                        key={status}
+                                                        onClick={() => handleAdStatus(ad._id, status)}
+                                                        className={`text-xs px-2 py-1 rounded border transition
+                    ${
+                                                            isActive
+                                                                ? "bg-green-500 text-black border-green-400 font-bold"
+                                                                : "bg-black text-gray-400 border-gray-600 hover:border-gray-400"
+                                                        }`}
+                                                    >
+                                                        {status.charAt(0).toUpperCase() + status.slice(1)}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
                                     </div>
                                 ))}
                         </div>
@@ -962,57 +1148,7 @@ export default function LoggedInAdmin() {
                 )}
 
 
-                {/*
-                {selectedUser && (
-                    <div className="mt-6 p-4 bg-gray-900 rounded border border-green-500">
-                        <h2 className="text-lg font-bold text-white mb-2">
-                            Seen Questions for {selectedUser.name}
-                        </h2>
 
-                        {Object.keys(selectedUser.seenQuestions).length === 0 ? (
-                            <p>No questions seen yet.</p>
-                        ) : (
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full text-left border border-gray-700 text-xs sm:text-sm">
-                                    <thead>
-                                    <tr className="border-b border-gray-700">
-                                        <th className="px-2 sm:px-4 py-1 sm:py-2">Question ID</th>
-                                        <th className="px-2 sm:px-4 py-1 sm:py-2">Attempts</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {Object.entries(selectedUser.seenQuestions).map(([qid, attemptsRaw]) => {
-                                        const attempts: SeenQuestion[] = Array.isArray(attemptsRaw)
-                                            ? attemptsRaw
-                                            : Object.values(attemptsRaw || {});
-                                        return (
-                                            <tr key={qid} className="border-b border-gray-700 align-top">
-                                                <td className="px-2 sm:px-4 py-1 sm:py-2">{qid}</td>
-                                                <td className="px-2 sm:px-4 py-1 sm:py-2">
-                                                    {attempts.map((a, i) => (
-                                                        <div key={i}>
-                                                            {a.answered_correctly ? "✅" : "❌"} at {formatDate(a.seen_at)} {formatTime(a.seen_at)}
-                                                        </div>
-                                                    ))}
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-
-                        <button
-                            className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                            onClick={() => setSelectedUser(null)}
-                        >
-                            Close
-                        </button>
-                    </div>
-                )}
-
-                */}
 
 
             </div>
