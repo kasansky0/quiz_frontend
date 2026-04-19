@@ -5,14 +5,18 @@ import { useSession } from "next-auth/react";
 import { useError } from "@/app/ErrorProvider";
 import { useRouter } from "next/navigation";
 import { submitAd } from "./submitAd";
+import { useUser } from "@/app/UserContext";
+
 
 export default function HireFormPage() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
     const { data: session, status } = useSession();
     const token = session?.idToken;
-
+    const [checkingRole, setCheckingRole] = useState(true);
+    const { isEmployer, userId } = useUser();
     const { showError } = useError();
     const router = useRouter();
+    const [blocked, setBlocked] = useState(false);
 
     const [loading, setLoading] = useState(false);
 
@@ -54,15 +58,14 @@ export default function HireFormPage() {
         ${errors[field] ? "border-red-500 bg-gray-900" : "border-gray-700 bg-gray-900"}
         placeholder:text-xs placeholder:text-gray-500`;
 
+
     useEffect(() => {
-        if (status !== "authenticated") return;
+        if (userId === null || isEmployer === undefined) return;
 
-        const role = (session as any)?.user?.role;
-
-        if (role && role !== "employer") {
+        if (!isEmployer) {
             router.replace("/info");
         }
-    }, [status, session, router]);
+    }, [isEmployer, userId, router]);
 
     const handleChange = (e: any) => {
         const { name, value } = e.target;
@@ -155,8 +158,6 @@ export default function HireFormPage() {
         setLoading(false);
     };
 
-    const role = (session as any)?.user?.role;
-
     if (status === "loading") {
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
@@ -172,7 +173,28 @@ export default function HireFormPage() {
         );
     }
 
-    if (role !== "employer") {
+    const isReady =
+        session &&
+        isEmployer !== undefined &&
+        userId !== null &&
+        !loading;
+
+    if (!isReady) {
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
+                <p className="text-xl flex items-center">
+                    Loading
+                    <span className="ml-2 flex space-x-1">
+                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce" />
+                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]" />
+                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]" />
+                    </span>
+                </p>
+            </div>
+        );
+    }
+
+    if (!isEmployer) {
         return null;
     }
 

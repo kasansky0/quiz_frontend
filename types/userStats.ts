@@ -17,5 +17,6 @@ export interface UserStatsType {
     nickname: string;
     totalOnlineTime: number;
     loading: boolean;
-    seenQuestions?: SeenQuestionsType; // ✅ use updated type
+    seenQuestions?: SeenQuestionsType;
+    isEmployer: boolean;
 }

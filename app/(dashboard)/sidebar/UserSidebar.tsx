@@ -8,6 +8,7 @@ import { SeenQuestionsType } from "@/types/userStats";
 
 interface UserSidebarProps {
     userPercentage: number;
+    isEmployer: boolean;
     nickname?: string;
     totalOnlineTime: number;
     loading: boolean;
@@ -15,7 +16,7 @@ interface UserSidebarProps {
     seenQuestions?: SeenQuestionsType;
 }
 
-export default function UserSidebar({ userPercentage, nickname, totalOnlineTime, loading, onLinkClick, seenQuestions }: UserSidebarProps) {
+export default function UserSidebar({ userPercentage, nickname, isEmployer, totalOnlineTime, loading, onLinkClick, seenQuestions }: UserSidebarProps) {
     const { data: session } = useSession();
     const router = useRouter(); // ✅ must be inside component
 
@@ -25,11 +26,12 @@ export default function UserSidebar({ userPercentage, nickname, totalOnlineTime,
         <aside className="flex flex-col w-64 h-full bg-black-200 backdrop-blur-xl space-y-4 text-white p-4">
             <UserStats
                 userPercentage={userPercentage}
+                isEmployer={isEmployer}
                 seenQuestions={seenQuestions}
                 nickname={nickname}
                 totalOnlineTime={totalOnlineTime}
                 loading={loading}
-                onLinkClick={onLinkClick} // ✅ pass callback
+                onLinkClick={onLinkClick}
             />
 
         </aside>

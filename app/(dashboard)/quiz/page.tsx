@@ -15,11 +15,19 @@ export default function QuizNoSubjectPage() {
     const token = session?.idToken;
     const { showError } = useError();
 
-    if (status === "loading") {
-        return <div className="p-6 text-white">Loading session...</div>;
-    }
-    if (!session) {
-        return <div className="p-6 text-white">Authenticating...</div>;
+    if (status === "loading" || !session) {
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white">
+                <p className="text-xl flex items-center">
+                    Loading
+                    <span className="ml-2 flex space-x-1">
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce" />
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]" />
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]" />
+                </span>
+                </p>
+            </div>
+        );
     }
 
     return (

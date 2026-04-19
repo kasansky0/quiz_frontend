@@ -55,7 +55,18 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
     // 1️⃣ While session is loading, just show a placeholder
     if (status === "loading") {
-        return <div>Loading post...</div>;
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white">
+                <p className="text-xl flex items-center">
+                    Loading
+                    <span className="ml-2 flex space-x-1">
+                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
+                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                        </span>
+                </p>
+            </div>
+        );
     }
 
     // 2️⃣ If session is unauthenticated but userId prop exists,

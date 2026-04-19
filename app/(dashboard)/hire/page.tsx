@@ -6,7 +6,9 @@ import { useError } from "@/app/ErrorProvider";
 import Link from "next/link";
 import { fetchEmployerAds } from "@/app/(dashboard)/hire/hire"; // 👈 adjust path if needed
 import PayAdButton from "@/components/ui/PayAdButton";
-import HowItWorks from "@/components/ui/HowItWords"
+import HowItWorks from "@/app/(dashboard)/hire/HowItWords"
+import { AnimatePresence, motion } from "framer-motion";
+import { useUser } from "@/app/UserContext";
 
 type Application = {
     _id: string;
@@ -32,30 +34,28 @@ type Ad = {
 };
 
 export default function HirePage() {
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
     const token = session?.idToken;
     const { showError } = useError();
     const [loading, setLoading] = useState(true);
     const [fade, setFade] = useState(false);
     const [ads, setAds] = useState<Ad[]>([]);
+    const [openAdId, setOpenAdId] = useState<string | null>(null);
+    const { isEmployer, userId } = useUser();
+    const [blocked, setBlocked] = useState(false);
 
     const totalApplications = ads.reduce((total, ad) => {
         return total + (ad.applications?.length ?? 0);
     }, 0);
 
     useEffect(() => {
-        if (session === undefined) return; // still loading
+        // wait until context is initialized (important)
+        if (userId === null || isEmployer === undefined) return;
 
-        const role = (session as any)?.user?.role;
-
-        if (!session) return; // no session yet, do nothing
-
-        if (role === undefined) return; // wait until role is known
-
-        if (role !== "employer") {
+        if (!isEmployer) {
             window.location.replace("/info");
         }
-    }, [session]);
+    }, [isEmployer, userId]);
 
     // -----------------------------
     // LOAD ADS ONLY (NO DIRECT FETCH)
@@ -70,8 +70,11 @@ export default function HirePage() {
                 if (res.error) {
                     showError?.(res.error, true);
 
+                    setBlocked(true);   // 🚨 force loading screen
+
                     if (res.status === 403) {
                         window.location.replace("/info");
+                        return;
                     }
 
                     return;
@@ -80,6 +83,8 @@ export default function HirePage() {
                 setAds(res.data?.data || []);
             } catch (err) {
                 showError?.("Failed to load ads");
+
+                setBlocked(true);
             } finally {
                 setLoading(false);
             }
@@ -98,10 +103,7 @@ export default function HirePage() {
         }
     }, [loading]);
 
-    // -----------------------------
-    // LOADING SCREEN
-    // -----------------------------
-    if (!token || loading) {
+    if (status === "loading") {
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
                 <p className="text-xl flex items-center">
@@ -114,6 +116,31 @@ export default function HirePage() {
                 </p>
             </div>
         );
+    }
+
+    const isReady =
+        session &&
+        isEmployer !== undefined &&
+        userId !== null &&
+        !loading;
+
+    if (!isReady || blocked) {
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
+                <p className="text-xl flex items-center">
+                    Loading
+                    <span className="ml-2 flex space-x-1">
+                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce" />
+                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]" />
+                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]" />
+                    </span>
+                </p>
+            </div>
+        );
+    }
+
+    if (!isEmployer) {
+        return null;
     }
 
     return (
@@ -159,6 +186,7 @@ export default function HirePage() {
                             {ads.map((ad) => {
                                 const status = ad.status?.toLowerCase();
                                 const apps = ad.applications ?? [];
+                                const isOpen = openAdId === ad._id;
 
                                 return (
                                     <div
@@ -174,26 +202,26 @@ export default function HirePage() {
                                         <div className="flex items-center gap-2 mb-2">
                                             {status === "pending" && (
                                                 <span className="text-xs text-yellow-400">
-                                                Pending Review
-                                            </span>
+                                    Pending Review
+                                </span>
                                             )}
 
                                             {status === "approved" && (
                                                 <span className="text-xs text-blue-400">
-                                                Approved (Awaiting Payment)
-                                            </span>
+                                    Approved (Awaiting Payment)
+                                </span>
                                             )}
 
                                             {status === "rejected" && (
                                                 <span className="text-xs text-red-500">
-                                                Rejected
-                                            </span>
+                                    Rejected
+                                </span>
                                             )}
 
                                             {status === "published" && (
                                                 <span className="text-xs text-green-400">
-                                                Published
-                                            </span>
+                                    Published
+                                </span>
                                             )}
                                         </div>
 
@@ -210,88 +238,114 @@ export default function HirePage() {
                                             <PayAdButton adId={ad._id} />
                                         )}
 
-                                        {/* ---------------- APPLICATIONS (INSIDE AD) ---------------- */}
+                                        {/* ---------------- APPLICATIONS DROPDOWN ---------------- */}
                                         <div className="mt-4 border-t border-gray-700 pt-3">
-                                            <h4 className="text-xs font-semibold text-white mb-2">
-                                                Applications ({apps.length})
-                                            </h4>
 
-                                            {apps.length > 0 ? (
-                                                <div className="space-y-3">
-                                                    {apps.map((app, index) => (
-                                                        <div key={app._id}>
-                                                            <div className="text-xs space-y-1">
+                                            {/* HEADER (CLICK TO TOGGLE) */}
+                                            <div
+                                                onClick={() =>
+                                                    setOpenAdId(isOpen ? null : ad._id)
+                                                }
+                                                className="flex justify-between items-center cursor-pointer"
+                                            >
+                                                <h4 className="text-xs font-semibold text-white">
+                                                    Applications ({apps.length})
+                                                </h4>
 
-                                                                <div className="text-white space-y-1">
-                                                                    <p>
-                                                                        <span className="font-bold text-blue-400">Name:</span>{" "}
-                                                                        <span className="text-white/80">{app.name}</span>
-                                                                    </p>
+                                                <span className="text-xs text-blue-400">
+                                    {isOpen ? "Hide" : "View"}
+                                </span>
+                                            </div>
 
-                                                                    <p>
-                                                                        <span className="font-bold text-blue-400">Email:</span>{" "}
-                                                                        <a
-                                                                            href={`mailto:${app.email}`}
-                                                                            className="text-blue-300 hover:text-blue-200 underline"
-                                                                        >
-                                                                            {app.email}
-                                                                        </a>
-                                                                    </p>
-                                                                </div>
+                                            {/* DROPDOWN CONTENT */}
+                                            <AnimatePresence>
+                                                {isOpen && (
+                                                    <motion.div
+                                                        initial={{ opacity: 0, height: 0 }}
+                                                        animate={{ opacity: 1, height: "auto" }}
+                                                        exit={{ opacity: 0, height: 0 }}
+                                                        transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                                                        className="overflow-hidden mt-3"
+                                                    >
+                                                        {apps.length > 0 ? (
+                                                            <div className="space-y-3">
+                                                                {apps.map((app, index) => (
+                                                                    <div key={app._id}>
+                                                                        <div className="text-xs space-y-1">
 
-                                                                <p>
-                                                                    <span className="font-bold text-blue-400">Current location:</span>{" "}
-                                                                    <span className="text-white/60">📍 {app.location}</span>
-                                                                </p>
+                                                                            <div className="text-white space-y-1">
+                                                                                <p>
+                                                                                    <span className="font-bold text-blue-400">Name:</span>{" "}
+                                                                                    <span className="text-white/80">{app.name}</span>
+                                                                                </p>
 
-                                                                <p>
-                                                                    <span className="font-bold text-blue-400">Experience:</span>{" "}
-                                                                    <span className="text-white/60">{app.experience}</span>
-                                                                </p>
+                                                                                <p>
+                                                                                    <span className="font-bold text-blue-400">Email:</span>{" "}
+                                                                                    <a
+                                                                                        href={`mailto:${app.email}`}
+                                                                                        className="text-blue-300 hover:text-blue-200 underline"
+                                                                                    >
+                                                                                        {app.email}
+                                                                                    </a>
+                                                                                </p>
+                                                                            </div>
 
-                                                                <p>
-                                                                    <span className="font-bold text-blue-400">Availability:</span>{" "}
-                                                                    <span className="text-white/60">{app.availability}</span>
-                                                                </p>
+                                                                            <p>
+                                                                                <span className="font-bold text-blue-400">Current location:</span>{" "}
+                                                                                <span className="text-white/60">📍 {app.location}</span>
+                                                                            </p>
 
-                                                                <p>
-                                                                    <span className="font-bold text-blue-400">Position:</span>{" "}
-                                                                    <span className="text-white/60">{app.position}</span>
-                                                                </p>
+                                                                            <p>
+                                                                                <span className="font-bold text-blue-400">Experience:</span>{" "}
+                                                                                <span className="text-white/60">{app.experience}</span>
+                                                                            </p>
 
-                                                                <p>
-                                                                    <span className="font-bold text-blue-400">Certifications:</span>{" "}
-                                                                    <span className="text-white/60">{app.certifications}</span>
-                                                                </p>
+                                                                            <p>
+                                                                                <span className="font-bold text-blue-400">Availability:</span>{" "}
+                                                                                <span className="text-white/60">{app.availability}</span>
+                                                                            </p>
 
-                                                                <p>
-                                                                    <span className="font-bold text-blue-400">Travel:</span>{" "}
-                                                                    <span className="text-white/60">{app.travel}</span>
-                                                                </p>
+                                                                            <p>
+                                                                                <span className="font-bold text-blue-400">Position:</span>{" "}
+                                                                                <span className="text-white/60">{app.position}</span>
+                                                                            </p>
 
-                                                                <p>
-                                                                    <span className="font-bold text-blue-400">Overtime:</span>{" "}
-                                                                    <span className="text-white/60">{app.overtime}</span>
-                                                                </p>
+                                                                            <p>
+                                                                                <span className="font-bold text-blue-400">Certifications:</span>{" "}
+                                                                                <span className="text-white/60">{app.certifications}</span>
+                                                                            </p>
 
-                                                                <p>
-                                                                    <span className="font-bold text-blue-400">Ready to move:</span>{" "}
-                                                                    <span className="text-white/60">{app.readyToMove}</span>
-                                                                </p>
+                                                                            <p>
+                                                                                <span className="font-bold text-blue-400">Travel:</span>{" "}
+                                                                                <span className="text-white/60">{app.travel}</span>
+                                                                            </p>
+
+                                                                            <p>
+                                                                                <span className="font-bold text-blue-400">Overtime:</span>{" "}
+                                                                                <span className="text-white/60">{app.overtime}</span>
+                                                                            </p>
+
+                                                                            <p>
+                                                                                <span className="font-bold text-blue-400">Ready to move:</span>{" "}
+                                                                                <span className="text-white/60">{app.readyToMove}</span>
+                                                                            </p>
+                                                                        </div>
+
+                                                                        {/* DIVIDER */}
+                                                                        {index !== apps.length - 1 && (
+                                                                            <div className="border-t border-gray-800 my-3" />
+                                                                        )}
+                                                                    </div>
+                                                                ))}
                                                             </div>
-
-                                                            {/* ✅ DIVIDER BETWEEN APPLICATIONS */}
-                                                            {index !== apps.length - 1 && (
-                                                                <div className="border-t border-gray-800 my-3" />
-                                                            )}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <p className="text-white/50 text-xs">
-                                                    No applications yet
-                                                </p>
-                                            )}
+                                                        ) : (
+                                                            <p className="text-white/50 text-xs mt-2">
+                                                                No applications yet
+                                                            </p>
+                                                        )}
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
                                         </div>
                                     </div>
                                 );

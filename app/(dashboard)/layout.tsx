@@ -1,6 +1,6 @@
 "use client";
 
-import {getSession, signIn, signOut, useSession} from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect, useCallback } from "react";
 import UserSidebar from "./sidebar/UserSidebar";
@@ -33,10 +33,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const [errorState, setErrorState] = useState<string | null>(null);
     const tokenSentRef = useRef(false);
     const [cooldownSeconds, setCooldownSeconds] = useState<number | null>(null);
-    const { setUserId } = useUser();
+    const { setUserId, setIsEmployer } = useUser();
     type MobileSheet = "calculator" | "formula" | "sidebar" | null;
     const [activeSheet, setActiveSheet] = useState<MobileSheet>(null);
     const { showError } = useError();
+
+
+    useEffect(() => {
+        if (userStats?.user_id) {
+            setUserId(userStats.user_id);
+        }
+
+        setIsEmployer(userStats?.isEmployer ?? null);
+    }, [userStats, setUserId, setIsEmployer]);
+
 
 
 
@@ -486,8 +496,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     // Handle loading and unauthenticated state
     if (status === "loading") {
         return (
-            <div className="flex items-center justify-center h-screen text-white">
-                Loading...
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white">
+                <p className="text-xl flex items-center">
+                    Loading
+                    <span className="ml-2 flex space-x-1">
+                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
+                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                        </span>
+                </p>
             </div>
         );
     }
@@ -516,6 +533,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
+
+    const isEmployer = userStats?.isEmployer ?? false;
 
     return (
         <div className="h-screen flex flex-col bg-black-200 text-white">
@@ -735,6 +754,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         totalOnlineTime={onlineTime}
                         loading={loading || !userStats}
                         onLinkClick={() => {}}
+                        isEmployer={isEmployer}
                     />
                 </aside>
 
@@ -785,6 +805,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
                             { activeSheet === "sidebar" && <UserSidebar
                                 userPercentage={userPercentage}
+                                isEmployer={isEmployer}
                                 seenQuestions={userStats?.seenQuestions}
                                 nickname={userStats?.nickname}
                                 totalOnlineTime={onlineTime}

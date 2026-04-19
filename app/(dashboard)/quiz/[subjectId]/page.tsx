@@ -21,16 +21,19 @@ export default function QuizPage() {
     const params = useParams();
     const subjectId = params?.subjectId as string | undefined;
 
-    if (status === "loading") {
-        return <div className="p-6 text-white">Loading session...</div>;
-    }
-
-    if (!session) {
-        return <div className="p-6 text-white">Authenticating...</div>;
-    }
-
-    if (!subjectId) {
-        return <div className="p-6 text-white">Loading quiz...</div>;
+    if (status === "loading" || !session || !subjectId) {
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white">
+                <p className="text-xl flex items-center">
+                    Loading
+                    <span className="ml-2 flex space-x-1">
+                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
+                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                        </span>
+                </p>
+            </div>
+        );
     }
 
         return (

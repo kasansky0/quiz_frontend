@@ -278,6 +278,7 @@ export function useUserSidebarData({
 
     return {
         userStats,
+        isEmployer: userStats?.isEmployer ?? false,
         onlineTime,
         userPercentage,
         loading,
