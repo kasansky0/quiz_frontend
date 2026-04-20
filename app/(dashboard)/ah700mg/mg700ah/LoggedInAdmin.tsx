@@ -44,7 +44,7 @@ interface HiringAd {
     travel: string;
     overtime: string;
     relocation: string;
-    status: string;
+    status: AdStatus;
     createdAt: string;
     publishedAt?: string | null;
 }
@@ -88,6 +88,12 @@ interface BlockedUser {
     reason: string;
 }
 
+interface EmployerUser {
+    name: string;
+    email: string;
+    companyName: string;
+}
+
 interface AdminSummary {
     total_requests: number;
     apicall_history: ApiCall[];
@@ -97,7 +103,10 @@ interface AdminSummary {
     limiter_hits: LimiterHit[];
     applications?: Application[];
     hiring_ads?: HiringAd[];
+    employer_users?: EmployerUser[];
 }
+
+type AdStatus = "pending" | "approved" | "published" | "archived";
 
 
 
@@ -173,6 +182,40 @@ export default function LoggedInAdmin() {
     const [spanWidth, setSpanWidth] = useState(90);
     const spanRef = useRef<HTMLSpanElement>(null);
     const paidUsersCount = users.filter(user => user.is_paid).length;
+
+    const applicationCounts = summary?.applications?.reduce(
+        (acc, app) => {
+            if (app.isApproved) acc.approved += 1;
+            else acc.pending += 1;
+            return acc;
+        },
+        {
+            approved: 0,
+            pending: 0,
+        }
+    );
+
+    const adCounts = summary?.hiring_ads?.reduce(
+        (acc, ad) => {
+            acc[ad.status] = (acc[ad.status] || 0) + 1;
+            return acc;
+        },
+        {
+            pending: 0,
+            approved: 0,
+            published: 0,
+            archived: 0,
+        } as Record<AdStatus, number>
+    );
+
+    const statusStyles: Record<AdStatus, string> = {
+        pending: "bg-amber-500/20 text-amber-300 border-amber-500",
+        approved: "bg-sky-500/20 text-sky-300 border-sky-500",
+        published: "bg-emerald-500/20 text-emerald-300 border-emerald-500",
+        archived: "bg-red-500/10 text-red-400 border-red-500",
+    };
+
+    const statuses: AdStatus[] = ["pending", "approved", "published", "archived"]
 
     useEffect(() => {
         if (spanRef.current) {
@@ -358,7 +401,7 @@ export default function LoggedInAdmin() {
     };
 
 
-    const handleAdStatus = async (adId: string, status: string) => {
+    const handleAdStatus = async (adId: string, status: AdStatus) => {
         const ok = confirm(`Are you sure you want to change status to "${status}"?`);
         if (!ok) return;
 
@@ -591,6 +634,22 @@ export default function LoggedInAdmin() {
                     <div className="bg-black/90 p-4 sm:p-6 rounded-xl mb-6 border border-white text-sm sm:text-base">
                         <h3 className="font-bold text-white-400 mb-2">
                             Applications: ({summary.applications.length})
+
+                            <div className="mt-2 flex gap-4 text-xs text-gray-300">
+                                <div>
+                                    Approved:{" "}
+                                    <span className="text-green-400 font-semibold">
+                                        {applicationCounts?.approved}
+                                    </span>
+                                </div>
+
+                                <div>
+                                    Pending:{" "}
+                                    <span className="text-red-400 font-semibold">
+                                        {applicationCounts?.pending}
+                                    </span>
+                                </div>
+                            </div>
                         </h3>
 
                         <div className="max-h-80 overflow-y-auto space-y-4 pr-2">
@@ -665,13 +724,53 @@ export default function LoggedInAdmin() {
                                             <span className="font-bold text-yellow-500">Position:</span> {app.position}
                                         </p>
                                         <p>
-                                            <span className="font-bold text-yellow-500">Message:</span> {app.message || "-"}
-                                        </p>
-                                        <p>
                                             <span className="font-bold text-yellow-500">Consent:</span> {app.consent ? "Yes" : "No"}
                                         </p>
                                     </div>
                                 ))}
+                        </div>
+                    </div>
+                )}
+
+
+
+
+
+
+
+
+
+
+
+
+                {/* Employer Users */}
+                {summary?.employer_users && summary.employer_users.length > 0 && (
+                    <div className="bg-black/90 p-4 sm:p-6 rounded-xl mb-6 border border-white text-sm sm:text-base">
+                        <h3 className="font-bold text-white-400 mb-2">
+                            Employer Users: ({summary.employer_users.length})
+                        </h3>
+
+                        <div className="max-h-60 overflow-y-auto space-y-2 pr-2">
+                            {summary.employer_users.map((user, i) => (
+                                <div
+                                    key={i}
+                                    className="bg-black/80 p-3 rounded-lg border border-gray-700"
+                                >
+                                    <p>
+                                        <span className="font-bold text-yellow-500">Company:</span>{" "}
+                                        {user.companyName}
+                                    </p>
+                                    <p>
+                                        <span className="font-bold text-yellow-500">Name:</span>{" "}
+                                        {user.name}
+                                    </p>
+
+                                    <p>
+                                        <span className="font-bold text-yellow-500">Email:</span>{" "}
+                                        {user.email}
+                                    </p>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 )}
@@ -693,6 +792,12 @@ export default function LoggedInAdmin() {
                     <div className="bg-black/90 p-4 sm:p-6 rounded-xl mb-6 border border-white text-sm sm:text-base">
                         <h3 className="font-bold text-white-400 mb-2">
                             Hiring Ads: ({summary.hiring_ads.length})
+                            <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-gray-300">
+                                <div>Pending: <span className="text-amber-400">{adCounts?.pending}</span></div>
+                                <div>Approved: <span className="text-sky-400">{adCounts?.approved}</span></div>
+                                <div>Published: <span className="text-emerald-400">{adCounts?.published}</span></div>
+                                <div>Archived: <span className="text-red-400">{adCounts?.archived}</span></div>
+                            </div>
                         </h3>
 
                         <div className="max-h-80 overflow-y-auto space-y-4 pr-2">
@@ -748,7 +853,7 @@ export default function LoggedInAdmin() {
                                         <div className="flex items-center gap-3 flex-wrap">
                                             <span className="font-bold text-yellow-500">Status:</span>
 
-                                            {["pending", "approved", "published", "archived"].map((status) => {
+                                            {statuses.map((status) => {
                                                 const isActive = ad.status === status;
 
                                                 return (
@@ -756,11 +861,12 @@ export default function LoggedInAdmin() {
                                                         key={status}
                                                         onClick={() => handleAdStatus(ad._id, status)}
                                                         className={`text-xs px-2 py-1 rounded border transition
-                    ${
+                                                            ${
                                                             isActive
-                                                                ? "bg-green-500 text-black border-green-400 font-bold"
+                                                                ? statusStyles[status] // 👈 dynamic color per status
                                                                 : "bg-black text-gray-400 border-gray-600 hover:border-gray-400"
-                                                        }`}
+                                                        }
+                                                                `}
                                                     >
                                                         {status.charAt(0).toUpperCase() + status.slice(1)}
                                                     </button>
