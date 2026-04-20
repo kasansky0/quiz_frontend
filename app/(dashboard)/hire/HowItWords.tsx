@@ -6,12 +6,12 @@ export default function HowItWorks() {
     const [open, setOpen] = useState(false);
 
     return (
-        <div className="mb-6 rounded-xl bg-black/30 text-sm text-white/70 overflow-hidden">
+        <div className="rounded-xl bg-black/30 text-sm text-white/70 overflow-hidden">
 
             {/* HEADER */}
             <button
                 onClick={() => setOpen(!open)}
-                className="w-full flex items-center gap-2 p-4"
+                className="w-full flex items-center gap-2 p-2"
             >
                 <p className="font-semibold text-white">How it works</p>
 

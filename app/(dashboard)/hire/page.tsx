@@ -151,7 +151,7 @@ export default function HirePage() {
                 }`}
             >
                 {/* ---------------- HEADER ---------------- */}
-                <h1 className="text-2xl font-bold mb-6 text-center">
+                <h1 className="text-2xl font-bold mb-2 text-center">
                     Employer Dashboard
                 </h1>
 
@@ -248,13 +248,24 @@ export default function HirePage() {
                                                 }
                                                 className="flex justify-between items-center cursor-pointer"
                                             >
-                                                <h4 className="text-xs font-semibold text-white">
-                                                    Applications ({apps.length})
-                                                </h4>
+                                                <div className="flex items-center gap-2">
+                                                    <h4 className="text-sm font-semibold text-white">
+                                                        Applications
+                                                    </h4>
+
+                                                    <span className="
+                                                    bg-green-400/20 text-green-300
+                                                    text-xs font-semibold
+                                                    px-2.5 py-0.5
+                                                    rounded-full
+                                                  ">
+                                                    {apps.length}
+                                                  </span>
+                                                </div>
 
                                                 <span className="text-xs text-blue-400">
-                                    {isOpen ? "Hide" : "View"}
-                                </span>
+                                                    {isOpen ? "Hide" : "View"}
+                                                </span>
                                             </div>
 
                                             {/* DROPDOWN CONTENT */}
