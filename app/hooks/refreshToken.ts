@@ -38,7 +38,7 @@ export async function fetchWithToken(url: string, options: RequestInit = {}, ret
             const newToken = await refreshToken();
 
             if (!newToken) {
-                return { success: false, status: 401, message: "Session expired. Please log in again." };
+                return { success: false, status: 401, message: "Oops! You need to log in again." };
             }
 
             idToken = newToken;
