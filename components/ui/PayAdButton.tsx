@@ -24,7 +24,7 @@ export default function PayAdButton({ adId }: Props) {
 
         try {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/ads/create-checkout-session`,
+                `${process.env.NEXT_PUBLIC_API_URL}/employer/pay-ad`,
                 {
                     method: "POST",
                     headers: {
@@ -38,7 +38,7 @@ export default function PayAdButton({ adId }: Props) {
             const data = await res.json();
 
             if (!res.ok) {
-                if (res.status === 401 || res.status === 403 || !token) {
+                if (res.status === 401 || res.status === 403) {
                     showError("Oops! Please log in again. 🤠", true);
                     return;
                 }
@@ -47,7 +47,9 @@ export default function PayAdButton({ adId }: Props) {
                 return;
             }
 
-            window.location.href = data.checkoutUrl;
+            if (data.checkoutUrl) {
+                window.location.href = data.checkoutUrl;
+            }
         } catch (err) {
             showError("⚠️ Network error.");
         } finally {
