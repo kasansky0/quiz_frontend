@@ -229,7 +229,7 @@ export default function QuizSampleSection({
                 } catch {}
 
                 if (isMountedRef.current) {
-                    showError(msg, true);              // already showing the message
+                    showError(msg);              // already showing the message
                     if (msg.includes("Subscription required 🚫")) {
                         router.push("/mainStudy"); // just redirect
                     }
@@ -307,7 +307,7 @@ export default function QuizSampleSection({
                 } catch {}
 
 
-                if (isMountedRef.current) showError(msg, true);
+                if (isMountedRef.current) showError(msg);
                 setFetchError(true);
                 return null;
             }
