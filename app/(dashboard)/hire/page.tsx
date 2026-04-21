@@ -80,7 +80,7 @@ export default function HirePage() {
                     return;
                 }
 
-                setAds(res.data?.data || []);
+                setAds([...(res.data || [])].reverse());
             } catch (err) {
                 showError?.("Failed to load ads");
 

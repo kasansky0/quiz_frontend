@@ -18,17 +18,17 @@ export async function fetchEmployerAds(
             },
         });
 
-        const data = await res.json().catch(() => null);
+        const json = await res.json().catch(() => null);
 
         if (!res.ok) {
             return {
-                error: data?.detail || "Failed to fetch ads",
+                error: json?.detail || "Failed to fetch ads",
                 status: res.status
             };
         }
 
         return {
-            data,
+            data: json?.data || [],   // ✅ flatten here
             status: res.status
         };
 

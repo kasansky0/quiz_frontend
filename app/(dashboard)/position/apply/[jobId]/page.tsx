@@ -449,12 +449,13 @@ export default function ApplyPage() {
                   }
                 `}</style>
 
-                <div className="flex items-center justify-start mb-4 gap-3">
+                <div className="relative w-full mb-4 flex items-center min-h-[48px]">
 
+                    {/* Back button */}
                     <button
                         onClick={() => router.back()}
                         title="Back"
-                        className="p-0 m-0 flex items-center justify-center"
+                        className="p-2 rounded-full hover:bg-gray-800 transition z-10"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -462,7 +463,7 @@ export default function ApplyPage() {
                             viewBox="0 0 24 24"
                             strokeWidth={1.5}
                             stroke="currentColor"
-                            className="w-8 h-8"
+                            className="w-7 h-7"
                         >
                             <path
                                 strokeLinecap="round"
@@ -472,19 +473,25 @@ export default function ApplyPage() {
                         </svg>
                     </button>
 
-                    {company && (
-                        <div className="flex-1 text-sm sm:text-base text-left bg-gray-900 border border-gray-700 rounded-xl p-3">
-                            <p><strong>Company:</strong> {company.name}</p>
-                            <p><strong>Position:</strong> {company.role}</p>
-                            <p><strong>Location:</strong> 📍{company.location}</p>
-                        </div>
-                    )}
+                    {/* Center title */}
+                    <h1 className="absolute left-1/2 -translate-x-1/2 text-2xl font-semibold text-white whitespace-nowrap">
+                        Application Form
+                    </h1>
 
                 </div>
 
+                {/* ROW 2: company full width */}
+                {company && (
+                    <div className="w-full text-sm bg-gray-900 border border-gray-700 rounded-xl p-3 space-y-1">
+                        <p><span className="text-white/60">Company:</span> {company.name}</p>
+                        <p><span className="text-white/60">Position:</span> {company.role}</p>
+                        <p><span className="text-white/60">Location:</span> 📍{company.location}</p>
+                    </div>
+                )}
+
                 <form
                     onSubmit={handleSubmit}
-                    className="bg-black text-white p-2 pb-16 rounded-2xl space-y-4 max-w-xl mx-auto"
+                    className="bg-black text-white pt-6 pb-16 rounded-2xl space-y-4 max-w-xl mx-auto"
                 >
                     <div className="bg-gray-900 rounded-xl p-2 border border-gray-700">
                         <p><strong>Name:</strong> {session.user.name}</p>

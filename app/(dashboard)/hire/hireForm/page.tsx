@@ -150,7 +150,6 @@ export default function HireFormPage() {
 
         if (result.error) {
             showError(result.error, result.loginRequired);
-            setLoading(false);
             return;
         }
 
