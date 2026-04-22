@@ -9,6 +9,7 @@ import PayAdButton from "@/components/ui/PayAdButton";
 import HowItWorks from "@/app/(dashboard)/hire/HowItWords"
 import { AnimatePresence, motion } from "framer-motion";
 import { useUser } from "@/app/UserContext";
+import { formatLocalDate } from "@/app/hooks/formatLocalDate";
 
 type Application = {
     _id: string;
@@ -47,6 +48,8 @@ export default function HirePage() {
     const totalApplications = ads.reduce((total, ad) => {
         return total + (ad.applications?.length ?? 0);
     }, 0);
+
+
 
     useEffect(() => {
         // wait until context is initialized (important)
@@ -202,34 +205,33 @@ export default function HirePage() {
                                         <div className="flex items-center gap-2 mb-2">
                                             {status === "pending" && (
                                                 <span className="text-xs text-yellow-400">
-                                    Pending Review
-                                </span>
+                                                    Pending Review
+                                                </span>
                                             )}
 
                                             {status === "approved" && (
                                                 <span className="text-xs text-blue-400">
-                                    Approved (Awaiting Payment)
-                                </span>
+                                                    Approved (Awaiting Payment)
+                                                </span>
                                             )}
 
                                             {status === "rejected" && (
                                                 <span className="text-xs text-red-500">
-                                    Rejected
-                                </span>
+                                                    Rejected
+                                                </span>
                                             )}
 
                                             {status === "published" && (
                                                 <span className="text-xs text-green-400">
-                                    Published
-                                </span>
+                                                    Published
+                                                </span>
                                             )}
                                         </div>
 
                                         {/* PUBLISHED DATE */}
                                         {ad.publishedAt && status === "published" && (
                                             <p className="text-xs text-gray-400 mb-2">
-                                                Published on:{" "}
-                                                {new Date(ad.publishedAt).toLocaleDateString()}
+                                                Published {formatLocalDate(ad.publishedAt)}
                                             </p>
                                         )}
 

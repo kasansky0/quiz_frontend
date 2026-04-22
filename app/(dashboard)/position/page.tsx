@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useError } from "@/app/ErrorProvider";
 import { motion, AnimatePresence } from "framer-motion";
+import { formatLocalDate } from "@/app/hooks/formatLocalDate";
 
 type Job = {
     _id: string;
@@ -39,18 +40,6 @@ export default function AdsPage() {
 
     const [open, setOpen] = useState(false);
     const [sortBy, setSortBy] = useState("newest");
-
-    const formatPostedTime = (dateString: string) => {
-        const daysAgo = Math.floor(
-            (Date.now() - new Date(dateString).getTime()) / (1000 * 60 * 60 * 24)
-        );
-
-        if (daysAgo === 0) return "Posted today";
-        if (daysAgo === 1) return "Posted 1 day ago";
-        if (daysAgo < 7) return `Posted ${daysAgo} days ago`;
-        if (daysAgo < 30) return `Posted ${Math.floor(daysAgo / 7)} weeks ago`;
-        return `Posted ${Math.floor(daysAgo / 30)} months ago`;
-    };
 
     // -----------------------------
     // FETCH ADS FROM DB
@@ -102,7 +91,7 @@ export default function AdsPage() {
     // -----------------------------
     if (loading) {
         return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
@@ -248,7 +237,7 @@ export default function AdsPage() {
 
 
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3">
                     <AnimatePresence mode="popLayout">
                         {sortedJobs.map((job) => (
                             <motion.div
@@ -308,7 +297,7 @@ export default function AdsPage() {
 
                                         {/* BOTTOM ROW (posted date) */}
                                         <p className="text-xs text-yellow-500 text-white/50">
-                                            {formatPostedTime(job.createdAt)}
+                                            {formatLocalDate(job.createdAt)}
                                         </p>
 
                                     </div>

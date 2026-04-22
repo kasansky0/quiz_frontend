@@ -22,8 +22,8 @@ export default function FormulaSheet({ mobile }: FormulaSheetProps) {
     font-medium
     text-sm
     sm:text-base
-    md:text-lg
-    lg:text-xl
+    md:text-base
+    lg:text-base
     rounded
     transition-colors
     hover:text-white
@@ -106,12 +106,12 @@ export default function FormulaSheet({ mobile }: FormulaSheetProps) {
     return (
         <>
             <div
-                className={`${sidebarLink} mb-4 mt-4 flex items-center gap-2`} // <- added flex here
+                className={`${sidebarLink} group mb-4 mt-4 flex items-center gap-2`} // <- added flex here
                 onClick={() => setFormulaOpen((prev) => !prev)}
             >
 
                 <svg
-                    className="w-5 h-5 text-white"
+                    className="w-5 h-5 text-white group-hover:text-blue-400"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth={2}
@@ -124,14 +124,14 @@ export default function FormulaSheet({ mobile }: FormulaSheetProps) {
                     />
                 </svg>
 
-                <h2 className="text-white font-medium select-none">Formula Sheet</h2>
+                <h2 className="text-white group-hover:text-blue-400 font-medium select-none">Formula Sheet</h2>
                 <motion.div
                     animate={{ rotate: formulaOpen ? 180 : 0 }}
                     transition={{ duration: 0.3 }}
-                    className="w-6 h-6 flex-shrink-0 flex items-center justify-center text-white"
+                    className="w-6 h-6 flex-shrink-0 flex items-center justify-center text-white group-hover:text-blue-400"
                 >
                     <svg
-                        className="w-4 h-4 text-white"
+                        className="w-4 h-4"
                         fill="none"
                         stroke="currentColor"
                         strokeWidth={2}

@@ -1083,7 +1083,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                 ) : (
                                     <>
                                         {/* Topic / Title */}
-                                        <h3 className="text-white-800 font-bold mb-3 text-sm sm:text-base md:text-lg">
+                                        <h3 className="text-white-800 font-bold mb-3 text-sm sm:text-base md:text-base">
                                             {activePost.title}
                                         </h3>
 

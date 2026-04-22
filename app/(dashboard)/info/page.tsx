@@ -32,19 +32,15 @@ const InfoAndFormulas = () => {
                 <Link
                     href="/quiz"
                     className="w-full text-center text-sm py-1 transition block active:bg-transparent focus:bg-transparent [-webkit-tap-highlight-color:transparent]">
-                    <h1 className="w-full text-2xl sm:text-3xl md:text-3xl font-bold text-white-400 mb-1 text-center cursor-pointer hover:text-white transition">
-                        📊 Quiz progress
+                    <h1 className="w-full text-2xl sm:text-3xl md:text-lg font-bold text-white-400 mb-1 text-center cursor-pointer hover:text-white transition">
+                        📊 Take a Quiz
                     </h1>
                     <div className="text-blue-400 text-xs mt-2">
-                        Test your knowledge with random questions →
+                        Test your knowledge with 1000 random questions →
                     </div>
                 </Link>
-                <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-4 leading-relaxed">
-                    Take a quiz to track your progress in real time using a simple performance percentage.
-                </p>
-
-                <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-4 leading-relaxed font-semibold">
-                    <strong>Percentage = (Correct Answers ÷ Total Answers) × 100%</strong>
+                <p className="text-sm sm:text-base md:text-base text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-4 leading-relaxed">
+                    Take a quiz to track your progress with a percentage score. Keep it above 70%.
                 </p>
 
 
@@ -53,7 +49,7 @@ const InfoAndFormulas = () => {
                     href="/chat"
                     className="w-full text-center text-sm py-1 transition block active:bg-transparent focus:bg-transparent [-webkit-tap-highlight-color:transparent]"
                 >
-                    <h1 className="w-full text-2xl sm:text-3xl md:text-3xl font-bold text-white-400 mb-1 text-center cursor-pointer hover:text-white transition">
+                    <h1 className="w-full text-2xl sm:text-3xl md:text-lg font-bold text-white-400 mb-1 text-center cursor-pointer hover:text-white transition">
                         💬 Messaging
                     </h1>
 
@@ -61,17 +57,17 @@ const InfoAndFormulas = () => {
                         Share your test experience →
                     </div>
                 </Link>
-                <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-8 leading-relaxed">
+                <p className="text-sm sm:text-base md:text-base text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-8 leading-relaxed">
                     We maintain a respectful and focused learning environment. All posts and comments are automatically moderated to ensure quality. By participating, you agree to follow the guidelines.
                 </p>
 
                 <br/>
 
                 {/* Authentication Notice */}
-                <h1 className="w-full text-2xl sm:text-3xl md:text-3xl font-bold text-white-400 mb-6 text-center">
+                <h1 className="w-full text-2xl sm:text-3xl md:text-lg font-bold text-white-400 mb-6 text-center">
                     🔐 Authentication
                 </h1>
-                <p className="text-sm sm:text-base md:text-lg text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-8 leading-relaxed">
+                <p className="text-sm sm:text-base md:text-base text-white/80 text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-8 leading-relaxed">
                     This platform uses Google authentication tokens. Tokens expire automatically after approximately <strong>1 hour</strong>.
                     When a token expires, your session will end and you will need to log in again.
                 </p>
@@ -79,7 +75,7 @@ const InfoAndFormulas = () => {
                 <br/>
 
                 {/* 5. Contact Info Section */}
-                <p className="w-full text-sm sm:text-base md:text-lg text-white/80 text-center mb-6 leading-relaxed font-semibold">
+                <p className="w-full text-sm sm:text-base md:text-base text-white/80 text-center mb-6 leading-relaxed font-semibold">
                     <strong>
                         Contact:{" "}
                         <a

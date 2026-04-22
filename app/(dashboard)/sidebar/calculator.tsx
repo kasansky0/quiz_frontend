@@ -46,10 +46,10 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
                           py-1
                           text-white/70
                           font-medium
-                          text-sm        /* default for very small screens */
-                          sm:text-base   /* small screens and up */
-                          md:text-lg     /* medium screens and up */
-                          lg:text-xl     /* large screens and up */
+                          text-sm
+                          sm:text-base
+                          md:text-base
+                          lg:text-base
                           rounded
                           transition-colors
                           hover:text-white
@@ -145,7 +145,7 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
 
     <div ref={calcRef} className="w-full hidden md:block">
         <div
-            className={`${sidebarLink} mb-0 flex items-center justify-between cursor-pointer w-full`}
+            className={`${sidebarLink} group mb-0 flex items-center justify-between cursor-pointer w-full`}
             onClick={() => setCalcOpen(prev => !prev)}
         >
             {/* Centered flex row for text + arrow */}
@@ -157,7 +157,7 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
-                    className="w-6 h-6 text-white flex-shrink-0"
+                    className="w-6 h-6 text-white group-hover:text-blue-400 flex-shrink-0"
                 >
                     <path
                         strokeLinecap="round"
@@ -166,12 +166,12 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
                     />
                 </svg>
 
-                <h2 className="text-white text-lg font-medium select-none">
+                <h2 className="text-white group-hover:text-blue-400 text-lg font-medium select-none">
                     Calculator
                 </h2>
 
                 <svg
-                    className={`w-4 h-4 text-white transition-transform duration-200 ${calcOpen ? "rotate-180" : ""}`}
+                    className={`w-4 h-4 text-white transition-all duration-200 ${calcOpen ? "rotate-180" : ""} group-hover:text-blue-400`}
                     fill="none"
                     stroke="currentColor"
                     strokeWidth={2}
@@ -248,7 +248,7 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
                 {/* Display */}
                 <div
                     ref={displayRef}
-                    className={`w-full sm:w-72 md:w-full px-1 sm:px-3 py-2 sm:py-3 rounded-xl mb-1 mt-1 text-right font-bold text-sm sm:text-lg md:text-xl overflow-x-auto whitespace-nowrap hide-scrollbar
+                    className={`w-full sm:w-72 md:w-full px-1 sm:px-3 py-2 sm:py-3 rounded-xl mb-1 mt-1 text-right font-bold text-sm sm:text-base md:text-base overflow-x-auto whitespace-nowrap hide-scrollbar
                             border ${calcResult === "Error" || isNaN(Number(calcResult)) ? "border-red-500 shadow-[0_0_20px_rgba(255,0,0,0.5)] text-red-500" : "border-green-400/20 text-green-400"}
                             bg-black-200`}
                 >

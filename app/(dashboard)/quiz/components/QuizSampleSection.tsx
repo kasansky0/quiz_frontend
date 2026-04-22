@@ -220,21 +220,38 @@ export default function QuizSampleSection({
 
             // Check HTTP status
             if (!res.ok) {
-                let msg = "Failed to load question. Please try again.";
+                let msg = "Something went wrong. Please try again.";
+
                 try {
                     const json = await res.json().catch(() => null);
                     if (json?.detail) {
-                        msg = json.detail; // backend sends 'Subscription required for this subject'
+                        msg = json.detail;
                     }
                 } catch {}
 
+                const isAuthError = res.status === 401;
+                const isSubscriptionError = res.status === 403;
+
                 if (isMountedRef.current) {
-                    showError(msg);              // already showing the message
-                    if (msg.includes("Subscription required 🚫")) {
-                        router.push("/mainStudy"); // just redirect
+                    // 🔐 login required
+                    if (isAuthError) {
+                        showError(msg, true);
                     }
+
+                    // 💳 subscription required
+                    else if (isSubscriptionError) {
+                        showError(msg, false);
+                        router.push("/mainStudy");
+                    }
+
+                    // ⚠️ generic error
+                    else {
+                        showError(msg, false);
+                    }
+
                     setFetchError(true);
                 }
+
                 return;
             }
 

@@ -329,8 +329,6 @@ export default function ApplyPage() {
             });
             setAgreed(false);
             setErrors({});
-        } finally {
-            setLoading(false);
         }
     };
 
