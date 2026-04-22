@@ -276,7 +276,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                         <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
                         <path fill="none" d="M0 0h48v48H0z"/>
                     </svg>
-                    <span className="text-white hover:text-blue-400 font-medium">Sign out</span>
+                    <span className="text-white lg:hover:text-blue-400 font-medium">Sign out</span>
                 </div>
             </motion.div>
 
@@ -297,7 +297,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                       text-sm sm:text-base md:text-base lg:text-base
                       rounded
                       transition-colors
-                      hover:text-blue-400
+                      lg:hover:text-blue-400
                       cursor-pointer
                       flex items-center gap-2
                     `}
@@ -310,7 +310,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                             viewBox="0 0 24 24"
                             strokeWidth={1.5}
                             stroke="currentColor"
-                            className="w-7 h-7 text-white group-hover:text-blue-400"
+                            className="w-7 h-7 text-white lg:group-hover:text-blue-400"
                         >
                             <path
                                 strokeLinecap="round"
@@ -320,7 +320,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                         </svg>
 
                         {/* Nickname text */}
-                        <span className="group-hover:text-blue-400 ">
+                        <span className="lg:group-hover:text-blue-400 ">
                           {loading
                               ? <NicknameLoading />
                               : nickname ?? session?.user?.name ?? "User"}
@@ -471,7 +471,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                 className={`${sidebarLink} group hidden md:flex items-center gap-2`} // <-- flex added
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
-                     stroke="currentColor" className="size-6 group-hover:text-blue-400">
+                     stroke="currentColor" className="size-6 lg:group-hover:text-blue-400">
                     <path strokeLinecap="round" strokeLinejoin="round"
                           d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
                 </svg>
@@ -499,7 +499,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                 className={`${sidebarLink} group hidden md:flex items-center gap-2`} // <-- make inline like others
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
-                     stroke="currentColor" className="size-6 group-hover:text-blue-400">
+                     stroke="currentColor" className="size-6 lg:group-hover:text-blue-400">
                     <path strokeLinecap="round" strokeLinejoin="round"
                           d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"/>
                 </svg>
@@ -524,7 +524,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                 className={`${sidebarLink} group hidden md:flex items-center gap-2`} // keep inline like others
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
-                     stroke="currentColor" className="size-6 group-hover:text-blue-400">
+                     stroke="currentColor" className="size-6 lg:group-hover:text-blue-400">
                     <path strokeLinecap="round" strokeLinejoin="round"
                           d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5"/>
                 </svg>
@@ -555,7 +555,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                         viewBox="0 0 24 24"
                         strokeWidth={1.5}
                         stroke="currentColor"
-                        className="w-6 h-6 text-white group-hover:text-blue-400 flex-shrink-0"
+                        className="w-6 h-6 text-white lg:group-hover:text-blue-400 flex-shrink-0"
                     >
                         <path
                             strokeLinecap="round"
@@ -564,7 +564,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                         />
                     </svg>
 
-                    <span className="text-white group-hover:text-blue-400 font-medium">
+                    <span className="text-white lg:group-hover:text-blue-400 font-medium">
                         Employer
                     </span>
                 </div>
@@ -592,7 +592,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
-                    className="w-6 h-6 text-white group-hover:text-blue-400 flex-shrink-0"
+                    className="w-6 h-6 text-white lg:group-hover:text-blue-400 flex-shrink-0"
                 >
                     <path
                         strokeLinecap="round"
@@ -600,7 +600,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                         d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
                     />
                 </svg>
-                <span className="text-white group-hover:text-blue-400 font-medium">
+                <span className="text-white lg:group-hover:text-blue-400 font-medium">
                     Information
                 </span>
             </div>
