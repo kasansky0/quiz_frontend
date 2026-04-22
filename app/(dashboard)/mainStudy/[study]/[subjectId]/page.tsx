@@ -54,7 +54,7 @@ export default function SubjectPage() {
     return (
         <div className="p-4 md:p-4 text-white relative min-h-screen">
             {loading || subscriptionRequired === undefined ? (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
+                <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
                     <p className="text-xl flex items-center">
                         Loading
                         <span className="ml-2 flex space-x-1">

@@ -179,14 +179,16 @@ function formatTime(seconds: number) {
 
 function NicknameLoading() {
     return (
-        <span className="flex items-center space-x-1">
-      <span>Loading</span>
-      <span className="flex space-x-1">
-        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
-        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
-      </span>
-    </span>
+        <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
+            <p className="text-xl flex items-center">
+                Loading
+                <span className="ml-2 flex space-x-1">
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                </span>
+            </p>
+        </div>
     );
 }
 
