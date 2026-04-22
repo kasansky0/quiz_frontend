@@ -579,16 +579,14 @@ export default function QuizSampleSection({
                                                     `}
                                             >
                                                 {isFetchingNext ? (
-                                                    <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
-                                                        <p className="text-xl flex items-center">
-                                                            Loading
-                                                            <span className="ml-2 flex space-x-1">
-                                                                <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
-                                                                <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                                                                <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
-                                                            </span>
-                                                        </p>
-                                                    </div>
+                                                    <span className="flex items-center gap-2">
+                                                      Loading
+                                                      <span className="ml-2 flex space-x-1">
+                                                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
+                                                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                                                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                                                      </span>
+                                                    </span>
                                                 ) : (
                                                     <>
                                                         Next
