@@ -6,7 +6,7 @@ export default function Footer() {
 
 
 
-            <p className="text-xs text-gray-400 text-center">
+            <p className="text-xs text-black text-center">
                 &copy; 2026 NetaPrep. All rights reserved.
             </p>
         </div>

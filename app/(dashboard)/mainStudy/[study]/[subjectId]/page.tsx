@@ -45,26 +45,26 @@ export default function SubjectPage() {
     }, [loading, subject, router]);
 
     if (!subjectId)
-        return <div className="p-6 text-white">Invalid subject ID</div>;
+        return <div className="p-6 text-black">Invalid subject ID</div>;
 
     const handleQuizClick = () => {
         router.push(`/quiz/${subjectId}`);
     };
 
     return (
-        <div className="p-4 md:p-4 text-white relative min-h-screen">
+        <div className="p-4 md:p-4 text-black relative min-h-screen">
             {loading || subscriptionRequired === undefined ? (
-                <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
+                <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
                     <p className="text-xl flex items-center">
                         Loading
                         <span className="ml-2 flex space-x-1">
-                            <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
+                            <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
                             <span
-                                className="w-2 h-2 bg-white rounded-full animate-dot-bounce"
+                                className="w-2 h-2 bg-black rounded-full animate-dot-bounce"
                                 style={{ animationDelay: "0.2s" }}
                             ></span>
                             <span
-                                className="w-2 h-2 bg-white rounded-full animate-dot-bounce"
+                                className="w-2 h-2 bg-black rounded-full animate-dot-bounce"
                                 style={{ animationDelay: "0.4s" }}
                             ></span>
                         </span>
@@ -157,14 +157,14 @@ export default function SubjectPage() {
                             {subject.topics.map((topic) => (
                                 <div
                                     key={topic.id}
-                                    className="bg-dark-300/40 rounded-lg p-2 shadow-sm hover:bg-dark-300 transition"
+                                    className="bg-black-200 rounded-lg p-2 shadow-sm hover:bg-black-200 transition"
                                 >
                                     <h2 className="text-2xl text-green-500 font-semibold mb-3">{topic.title}</h2>
 
                                     {topic.subtopics?.length ? (
                                         <div className="space-y-3">
                                             {topic.subtopics.map((sub) => (
-                                                <div key={sub.id} className="bg-dark-300/20 rounded-md">
+                                                <div key={sub.id} className="bg-black-200 rounded-md">
                                                     <h3 className="font-medium text-lg">{sub.title}</h3>
 
                                                     <p className="text-gray-300 text-sm leading-relaxed">
@@ -177,7 +177,7 @@ export default function SubjectPage() {
                                                     </p>
 
                                                     {sub.resources && sub.resources.length > 0 && (
-                                                        <ul className="ml-4 list-disc text-sm text-gray-400">
+                                                        <ul className="ml-4 list-disc text-sm text-black">
                                                             {sub.resources.map((res, i) => (
                                                                 <li key={`${res.code}-${i}`}>
                                                                     <span className="font-semibold">{res.code}:</span>{" "}
@@ -196,7 +196,7 @@ export default function SubjectPage() {
                             ))}
                         </div>
                     ) : (
-                        <p className="text-gray-400">No topics found</p>
+                        <p className="text-black">No topics found</p>
                     )}
 
 

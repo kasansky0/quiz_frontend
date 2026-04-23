@@ -44,7 +44,7 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
                           text-left
                           px-2
                           py-1
-                          text-white/70
+                          text-black
                           font-medium
                           text-sm
                           sm:text-base
@@ -52,7 +52,7 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
                           lg:text-base
                           rounded
                           transition-colors
-                          hover:text-white
+                          hover:text-black
                           cursor-pointer
                         `;
 
@@ -157,7 +157,7 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
-                    className="w-6 h-6 text-white group-hover:text-blue-400 flex-shrink-0"
+                    className="w-6 h-6 text-black group-hover:text-blue-400 flex-shrink-0"
                 >
                     <path
                         strokeLinecap="round"
@@ -166,12 +166,12 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
                     />
                 </svg>
 
-                <h2 className="text-white group-hover:text-blue-400 text-lg font-medium select-none">
+                <h2 className="text-black group-hover:text-blue-400 text-lg font-medium select-none">
                     Calculator
                 </h2>
 
                 <svg
-                    className={`w-4 h-4 text-white transition-all duration-200 ${calcOpen ? "rotate-180" : ""} group-hover:text-blue-400`}
+                    className={`w-4 h-4 text-black transition-all duration-200 ${calcOpen ? "rotate-180" : ""} group-hover:text-blue-400`}
                     fill="none"
                     stroke="currentColor"
                     strokeWidth={2}
@@ -213,7 +213,7 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
         `}
             >
                 {/* History */}
-                <div className="text-white/70 text-xs overflow-y-auto max-h-16 hide-scrollbar w-full px-2 flex flex-col-reverse">
+                <div className="text-black text-xs overflow-y-auto max-h-16 hide-scrollbar w-full px-2 flex flex-col-reverse">
                     {history.map((item, i) => {
                         const parts = item.split(" = ");
                         const rawResult = parts[1] ?? parts[0]; // original value
@@ -227,7 +227,7 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
                         return (
                             <div
                                 key={i}
-                                className="cursor-pointer hover:text-white/70 transition-colors whitespace-nowrap overflow-hidden truncate"
+                                className="cursor-pointer hover:text-black transition-colors whitespace-nowrap overflow-hidden truncate"
                                 onClick={() =>
                                     // append formatted result to input
                                     setCalcInput(prev => prev + (!isNaN(Number(rawResult)) ? formatNumber(Number(rawResult)) : rawResult))
@@ -285,16 +285,16 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
                         const base = "h-6 sm:h-8 md:h-10 rounded-xl font-medium text-sm sm:text-base flex items-center justify-center transition-all duration-150 active:scale-95";
                         const colorClasses =
                             btn === "="
-                                ? "bg-green-500/80 text-white-900 font-bold shadow-[0_0_20px_rgba(0,255,120,0.5)] hover:bg-green-400"
+                                ? "bg-green-500/80 text-black font-bold shadow-[0_0_20px_rgba(0,255,120,0.5)] hover:bg-green-400"
                                 : btn === "C"
-                                    ? "bg-red-500/70 text-white hover:bg-red-600/80"
+                                    ? "bg-red-500/70 text-black hover:bg-red-600/80"
                                     : btn === "⌫"
-                                        ? "bg-yellow-500/60 text-white-900 hover:bg-yellow-400/70"
+                                        ? "bg-yellow-500/60 text-black hover:bg-yellow-400/70"
                                         : ["/","*","-","+","."].includes(btn)
-                                            ? "bg-white/10 text-white hover:bg-white/20"
+                                            ? "bg-white/10 text-black hover:bg-white/20"
                                             : ["√","x²","sin","cos","√3","π","tan"].includes(btn)
                                                 ? "bg-white/10 text-blue-300 hover:bg-white/20"
-                                                : "bg-white/5 text-white hover:bg-white/10";
+                                                : "bg-white/5 text-black hover:bg-white/10";
 
                         return (
                             <button

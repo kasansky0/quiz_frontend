@@ -18,7 +18,7 @@ export function HeroCard({ question }: { question: any }) {
             }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             style={{ transformStyle: "preserve-3d", perspective: 1400 }}
-            className="group relative max-w-xl w-full bg-gradient-to-br from-green-600/60 to-green-400/40 backdrop-blur-2xl border border-green-300/30 rounded-2xl shadow-[0_10px_40px_rgba(0,180,90,0.25)] p-4 md:p-6 text-white"
+            className="group relative max-w-xl w-full bg-gradient-to-br from-green-600/60 to-green-400/40 backdrop-blur-2xl border border-green-300/30 rounded-2xl shadow-[0_10px_40px_rgba(0,180,90,0.25)] p-4 md:p-6 text-black"
         >
             {/* Visual effects */}
             <div className="absolute inset-0 rounded-2xl pointer-events-none bg-gradient-to-tr from-white/5 to-transparent opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
@@ -37,12 +37,12 @@ export function HeroCard({ question }: { question: any }) {
             <QuestionOptions options={question.options} />
 
             <div className="mt-4">
-                <p className="text-sm font-bold text-white-100">Correct Answer:</p>
+                <p className="text-sm font-bold text-black">Correct Answer:</p>
                 <p className="text-sm mt-1">{question.answer}</p>
             </div>
 
             <div className="mt-3">
-                <p className="text-sm font-bold text-white-100">Explanation:</p>
+                <p className="text-sm font-bold text-black">Explanation:</p>
                 <p className="text-xs mt-1 leading-relaxed">
                     {question.explanation}
                 </p>

@@ -64,7 +64,7 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
             {children}
 
             {message && (
-                <div className="fixed top-12 left-1/2 -translate-x-1/2 z-50 max-w-xl w-full px-6 py-3 rounded-xl bg-red-500 bg-opacity-90 text-white shadow-md flex items-center justify-center animate-slide-down">
+                <div className="fixed top-12 left-1/2 -translate-x-1/2 z-50 max-w-xl w-full px-6 py-3 rounded-xl bg-red-500 bg-opacity-90 text-black shadow-md flex items-center justify-center animate-slide-down">
                     <div className="flex items-center gap-4 truncate">
                         <span className="text-sm md:text-base text-center justify-center">{message}</span>
 
@@ -80,7 +80,7 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
 
                     <button
                         onClick={hideError}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 text-white font-bold hover:opacity-80"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 text-black font-bold hover:opacity-80"
                     >
                         ✕
                     </button>

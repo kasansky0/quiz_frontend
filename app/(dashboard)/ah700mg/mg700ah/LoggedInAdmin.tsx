@@ -117,13 +117,13 @@ function LoggedOut() {
     const router = useRouter();
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
-            <div className="bg-black/70 border border-green-400/40 shadow-lg rounded-2xl max-w-md w-full p-6 text-center backdrop-blur-md">
-                <h2 className="text-white-400 text-lg font-semibold mb-2 drop-shadow-[0_0_12px_rgba(36,174,124,0.8)]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black-200 backdrop-blur-sm p-4">
+            <div className="bg-black-200 border border-green-400/40 shadow-lg rounded-2xl max-w-md w-full p-6 text-center backdrop-blur-md">
+                <h2 className="text-black text-lg font-semibold mb-2 drop-shadow-[0_0_12px_rgba(36,174,124,0.8)]">
                     Session Expired
                 </h2>
 
-                <p className="text-white-200 text-sm mb-6">
+                <p className="text-black text-sm mb-6">
                     Your session has expired. Please log in again to continue.
                 </p>
 
@@ -134,7 +134,7 @@ function LoggedOut() {
 
 function FullScreenMessage({ text }: { text: string }) {
     return (
-        <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        <div className="min-h-screen flex items-center justify-center bg-black-200 text-black">
             <p className="text-sm sm:text-base">{text}</p>
         </div>
     );
@@ -472,10 +472,10 @@ export default function LoggedInAdmin() {
 
 
     return (
-        <div ref={topRef} className="min-h-screen bg-black text-white relative">
+        <div ref={topRef} className="min-h-screen bg-black-200 text-black relative">
             <div className="mx-auto max-w-xl p-4 sm:p-10">
                 {/* Header */}
-                <h1 className="text-2xl sm:text-3xl mb-2 font-bold text-white-400">
+                <h1 className="text-2xl sm:text-3xl mb-2 font-bold text-black">
                     Logs
                 </h1>
 
@@ -490,7 +490,7 @@ export default function LoggedInAdmin() {
                             {/* Hidden span for measuring text width */}
                             <span
                                 ref={spanRef}
-                                className="invisible absolute whitespace-pre text-white"
+                                className="invisible absolute whitespace-pre text-black"
                             >
                               {blockUserId || "Block User"}
                             </span>
@@ -501,7 +501,7 @@ export default function LoggedInAdmin() {
                                 placeholder="Block User"
                                 value={blockUserId}
                                 onChange={(e) => setBlockUserId(e.target.value)}
-                                className="text-white placeholder-white bg-transparent focus:outline-none"
+                                className="text-black placeholder-white bg-transparent focus:outline-none"
                                 style={{
                                     width: `${spanWidth}px`,
                                     minWidth: "90px",
@@ -542,7 +542,7 @@ export default function LoggedInAdmin() {
                                         alert("Error occurred while blocking user.");
                                     }
                                 }}
-                                className="text-white hover:text-green-400 flex items-center justify-center ml-1" // small spacing
+                                className="text-black hover:text-green-400 flex items-center justify-center ml-1" // small spacing
                                 style={{ display: 'inline-flex' }}
                             >
                                 <svg
@@ -631,8 +631,8 @@ export default function LoggedInAdmin() {
 
                 {/* Applications */}
                 {summary?.applications && summary.applications.length > 0 && (
-                    <div className="bg-black/90 p-4 sm:p-6 rounded-xl mb-6 border border-white text-sm sm:text-base">
-                        <h3 className="font-bold text-white-400 mb-2">
+                    <div className="bg-black-200 p-4 sm:p-6 rounded-xl mb-6 border border-white text-sm sm:text-base">
+                        <h3 className="font-bold text-black mb-2">
                             Applications: ({summary.applications.length})
 
                             <div className="mt-2 flex gap-4 text-xs text-gray-300">
@@ -656,8 +656,8 @@ export default function LoggedInAdmin() {
                             {[...summary.applications]
                                 .sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime())
                                 .map((app, i) => (
-                                    <div key={i} className="bg-black/80 p-3 rounded-lg border border-gray-700">
-                                        <p className="text-gray-400 text-xs mt-1">
+                                    <div key={i} className="bg-black-200 p-3 rounded-lg border border-gray-700">
+                                        <p className="text-black text-xs mt-1">
                                             Submitted at: {formatLocalDate(app.submitted_at)}
                                         </p>
                                         <p className="flex items-center gap-3">
@@ -745,8 +745,8 @@ export default function LoggedInAdmin() {
 
                 {/* Employer Users */}
                 {summary?.employer_users && summary.employer_users.length > 0 && (
-                    <div className="bg-black/90 p-4 sm:p-6 rounded-xl mb-6 border border-white text-sm sm:text-base">
-                        <h3 className="font-bold text-white-400 mb-2">
+                    <div className="bg-black-200 p-4 sm:p-6 rounded-xl mb-6 border border-white text-sm sm:text-base">
+                        <h3 className="font-bold text-black mb-2">
                             Employer Users: ({summary.employer_users.length})
                         </h3>
 
@@ -754,7 +754,7 @@ export default function LoggedInAdmin() {
                             {summary.employer_users.map((user, i) => (
                                 <div
                                     key={i}
-                                    className="bg-black/80 p-3 rounded-lg border border-gray-700"
+                                    className="bg-black-200 p-3 rounded-lg border border-gray-700"
                                 >
                                     <p>
                                         <span className="font-bold text-yellow-500">Company:</span>{" "}
@@ -789,8 +789,8 @@ export default function LoggedInAdmin() {
 
                 {/* Hiring Ads */}
                 {summary?.hiring_ads && summary.hiring_ads.length > 0 && (
-                    <div className="bg-black/90 p-4 sm:p-6 rounded-xl mb-6 border border-white text-sm sm:text-base">
-                        <h3 className="font-bold text-white-400 mb-2">
+                    <div className="bg-black-200 p-4 sm:p-6 rounded-xl mb-6 border border-white text-sm sm:text-base">
+                        <h3 className="font-bold text-black mb-2">
                             Hiring Ads: ({summary.hiring_ads.length})
                             <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-gray-300">
                                 <div>Pending: <span className="text-amber-400">{adCounts?.pending}</span></div>
@@ -804,9 +804,9 @@ export default function LoggedInAdmin() {
                             {[...summary.hiring_ads]
                                 .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
                                 .map((ad, i) => (
-                                    <div key={i} className="bg-black/80 p-3 rounded-lg border border-gray-700">
+                                    <div key={i} className="bg-black-200 p-3 rounded-lg border border-gray-700">
 
-                                        <p className="text-gray-400 text-xs mt-1">
+                                        <p className="text-black text-xs mt-1">
                                             Created at: {formatLocalDate(ad.createdAt)}
                                         </p>
 
@@ -864,7 +864,7 @@ export default function LoggedInAdmin() {
                                                             ${
                                                             isActive
                                                                 ? statusStyles[status] // 👈 dynamic color per status
-                                                                : "bg-black text-gray-400 border-gray-600 hover:border-gray-400"
+                                                                : "bg-black-200 text-black border-gray-600 hover:border-gray-400"
                                                         }
                                                                 `}
                                                     >
@@ -888,8 +888,8 @@ export default function LoggedInAdmin() {
 
                 {/* Recent Limiter Hits */}
                 {summary?.limiter_hits && summary.limiter_hits.length > 0 && (
-                    <div className="bg-black/90 p-4 sm:p-6 rounded-xl mb-2 border border-white text-sm sm:text-base">
-                        <h3 className="font-bold text-white">
+                    <div className="bg-black-200 p-4 sm:p-6 rounded-xl mb-2 border border-white text-sm sm:text-base">
+                        <h3 className="font-bold text-black">
                             Recent Limiter Hits: ({summary.limiter_hits.length} unique IP{summary.limiter_hits.length > 1 ? "s" : ""})
                         </h3>
 
@@ -897,7 +897,7 @@ export default function LoggedInAdmin() {
                             {summary.limiter_hits.map((hit, i) => (
                                 <div
                                     key={i}
-                                    className="bg-black/90 rounded-xl text-sm sm:text-base"
+                                    className="bg-black-200 rounded-xl text-sm sm:text-base"
                                 >
                                     <div className="flex items-center mb-3 sm:mb-4">
                                         <div>
@@ -907,7 +907,7 @@ export default function LoggedInAdmin() {
                                                 </p>
                                             </div>
                                             <p className="text-blue-400 text-xs sm:text-sm">IP: {hit.ip}</p>
-                                            <p className="text-gray-400 text-xs sm:text-sm">Endpoint: {hit.endpoint}</p>
+                                            <p className="text-black text-xs sm:text-sm">Endpoint: {hit.endpoint}</p>
                                             <p className="text-red-500 text-xs sm:text-sm">
                                                 [{formatLocalDate(hit.createdAt)}]
                                             </p>
@@ -928,8 +928,8 @@ export default function LoggedInAdmin() {
 
                 {/* Recent Admin Logins */}
                 {summary?.admin_logged_in && summary.admin_logged_in.length > 0 && (
-                    <div className="bg-black/90 p-4 sm:p-6 rounded-xl mb-2 border border-white text-sm sm:text-base">
-                        <h3 className="font-bold text-white-400 mb-1">
+                    <div className="bg-black-200 p-4 sm:p-6 rounded-xl mb-2 border border-white text-sm sm:text-base">
+                        <h3 className="font-bold text-black mb-1">
                             Recent Admin Logins: ({summary.admin_logged_in.length})
                         </h3>
 
@@ -941,13 +941,13 @@ export default function LoggedInAdmin() {
                                         {login.nickname}
                                     </div>
 
-                                    <div className="text-gray-400 text-xs">
+                                    <div className="text-black text-xs">
                                         ({login.email}) <br />
                                         IP: {login.ip} |{" "}
                                         {login.success ? "✅ Success" : "❌ Failed"}
                                     </div>
 
-                                    <div className="text-gray-400 text-xs">
+                                    <div className="text-black text-xs">
                                         [{formatLocalDate(login.timestamp)}]
                                     </div>
 
@@ -975,15 +975,15 @@ export default function LoggedInAdmin() {
                     const blockedUsers = summary.blocked_users?.filter(u => Object.keys(u).length > 0) || [];
 
                     return (
-                        <div className="text-sm sm:text-base text-white space-y-2">
+                        <div className="text-sm sm:text-base text-black space-y-2">
 
                             {/* Total Requests */}
-                            <div className="bg-black/90 p-4 sm:p-6 rounded-xl border border-white text-sm sm:text-base">
+                            <div className="bg-black-200 p-4 sm:p-6 rounded-xl border border-white text-sm sm:text-base">
                                 Total API Requests: <span className="text-yellow-500 font-bold">{summary.total_requests ?? 0}</span>
                             </div>
 
                             {/* Blocked IPs */}
-                            <div className="bg-black/90 p-4 sm:p-6 rounded-xl mb-6 border border-white text-sm sm:text-base">
+                            <div className="bg-black-200 p-4 sm:p-6 rounded-xl mb-6 border border-white text-sm sm:text-base">
                                 Blocked IPs:{" "}
                                 {blockedIps.length > 0
                                     ? blockedIps.map((ip, i) => (
@@ -997,7 +997,7 @@ export default function LoggedInAdmin() {
 
 
                             {/* Blocked Users */}
-                            <div className="bg-black/90 p-4 sm:p-6 rounded-xl mb-6 border border-white text-sm sm:text-base">
+                            <div className="bg-black-200 p-4 sm:p-6 rounded-xl mb-6 border border-white text-sm sm:text-base">
                                 Blocked Users:{" "}
                                 {blockedUsers.length > 0
                                     ? blockedUsers.map((u, i) => (
@@ -1010,7 +1010,7 @@ export default function LoggedInAdmin() {
                             </div>
 
                             {/* Last API Calls */}
-                            <div className="bg-black/90 p-4 sm:p-6 rounded-xl mb-6 border border-white text-sm sm:text-base">
+                            <div className="bg-black-200 p-4 sm:p-6 rounded-xl mb-6 border border-white text-sm sm:text-base">
                                 <h3 className="mb-2">Last API Calls:</h3>
 
                                 <div className="max-h-60 overflow-y-auto space-y-2 pr-2">
@@ -1041,7 +1041,7 @@ export default function LoggedInAdmin() {
                                                 return (
                                                     <div
                                                         key={i}
-                                                        className="bg-black/80 rounded-lg text-sm shadow-sm flex items-center gap-4"
+                                                        className="bg-black-200 rounded-lg text-sm shadow-sm flex items-center gap-4"
                                                     >
                                                         <div className="text-gray-300">
                                                             Time: {formattedTime}
@@ -1076,14 +1076,14 @@ export default function LoggedInAdmin() {
 
 
                 {!usersLoading && users.length > 0 && (
-                    <div className="bg-black/90 p-4 sm:p-6 my-2 rounded-xl border border-white text-sm sm:text-base">
+                    <div className="bg-black-200 p-4 sm:p-6 my-2 rounded-xl border border-white text-sm sm:text-base">
                         {/* Total Users */}
-                        <p className="text-white-300 text-sm sm:text-base mb-2">
+                        <p className="text-black text-sm sm:text-base mb-2">
                             Total Users: <strong className="text-yellow-500">{users.length}</strong>
                         </p>
 
                         {/* Total Created Per Month */}
-                        <div className="text-white-300 text-sm sm:text-base mb-2 flex flex-col gap-3">
+                        <div className="text-black text-sm sm:text-base mb-2 flex flex-col gap-3">
                             {(() => {
                                 const monthNames = [
                                     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -1124,8 +1124,8 @@ export default function LoggedInAdmin() {
 
                 {/* Paid Users */}
                 {users.length > 0 && (
-                    <div className="bg-black/90 p-4 sm:p-6 my-2 rounded-xl border border-white text-sm sm:text-base">
-                        <p className="text-white-300 text-sm sm:text-base mb-2">
+                    <div className="bg-black-200 p-4 sm:p-6 my-2 rounded-xl border border-white text-sm sm:text-base">
+                        <p className="text-black text-sm sm:text-base mb-2">
                             Paid Users: <strong className="text-green-400">{paidUsersCount}</strong>
                         </p>
                         <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
@@ -1137,7 +1137,7 @@ export default function LoggedInAdmin() {
                                         className="text-xs sm:text-sm"
                                     >
                                         <span className="text-green-400">{user.email}</span>{" "}
-                                        <span className="text-gray-400">({user.nickname})</span>
+                                        <span className="text-black">({user.nickname})</span>
                                     </span>
                                 ))}
                         </div>
@@ -1153,7 +1153,7 @@ export default function LoggedInAdmin() {
 
                 {/* Users */}
                 {usersLoading ? (
-                    <p className="text-sm sm:text-base text-gray-400">Loading users…</p>
+                    <p className="text-sm sm:text-base text-black">Loading users…</p>
                 ) : users.length === 0 ? (
                     <p className="text-sm sm:text-base">No users found</p>
                 ) : (
@@ -1163,7 +1163,7 @@ export default function LoggedInAdmin() {
                             ref={(el) => {
                                 userRefs.current[index] = el;
                             }}
-                            className="bg-black/90 p-4 sm:p-6 rounded-xl mb-4 sm:mb-6 border border-white text-sm sm:text-base"
+                            className="bg-black-200 p-4 sm:p-6 rounded-xl mb-4 sm:mb-6 border border-white text-sm sm:text-base"
                         >
                             {/* User info with profile image */}
                             <div className="flex items-center mb-3 sm:mb-4">
@@ -1175,7 +1175,7 @@ export default function LoggedInAdmin() {
                                             className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border border-green-400/30"
                                         />
                                     ) : (
-                                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gray-700 flex items-center justify-center text-white font-semibold text-sm sm:text-lg border border-green-400/30">
+                                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gray-700 flex items-center justify-center text-black font-semibold text-sm sm:text-lg border border-green-400/30">
                                             {(() => {
                                                 if (!user.name) return "?";
 
@@ -1199,8 +1199,8 @@ export default function LoggedInAdmin() {
                                         </p>
                                     </div>
                                     <p className="font-bold">({user.nickname})</p>
-                                    <p className="text-gray-400 text-xs sm:text-sm">{user.email}</p>
-                                    <p className="text-gray-400 text-xs sm:text-sm flex items-center gap-1 flex-nowrap">
+                                    <p className="text-black text-xs sm:text-sm">{user.email}</p>
+                                    <p className="text-black text-xs sm:text-sm flex items-center gap-1 flex-nowrap">
                                         <strong className="whitespace-nowrap">User ID:</strong>
 
                                         <span className="whitespace-nowrap">{user._id}</span>
@@ -1262,7 +1262,7 @@ export default function LoggedInAdmin() {
             {/* Sticky navigation buttons */}
             {users.length > 0 && (
                 <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50
-                bg-black/70 backdrop-blur-sm p-2 sm:p-3 rounded
+                bg-black-200 backdrop-blur-sm p-2 sm:p-3 rounded
                 grid grid-cols-2 gap-2 sm:gap-4">
 
 

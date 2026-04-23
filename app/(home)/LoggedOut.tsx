@@ -24,11 +24,11 @@ export default function LoggedOutPage() {
                     <LoginSection />
 
                     <div className="mt-20 flex flex-row justify-center gap-4 text-center w-full">
-                        <div className="flex flex-col text-white items-center">
+                        <div className="flex flex-col text-black items-center">
                             <span className="text-2xl md:text-2xl font-bold">90%</span>
                             <span className="text-green-200 text-sm md:text-base font-normal">Pass Rate</span>
                         </div>
-                        <div className="flex flex-col text-white items-center">
+                        <div className="flex flex-col text-black items-center">
                             <span className="text-2xl md:text-2xl font-bold">1000+</span>
                             <span className="text-green-200 text-sm md:text-base font-normal">Practice Questions</span>
                         </div>

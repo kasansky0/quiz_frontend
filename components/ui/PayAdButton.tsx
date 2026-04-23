@@ -63,7 +63,7 @@ export default function PayAdButton({ adId }: Props) {
             disabled={loading}
             className="
                 w-full bg-blue-400 hover:bg-blue-600
-                text-white font-semibold
+                text-black font-semibold
                 py-2 px-4
                 rounded-xl
                 transition

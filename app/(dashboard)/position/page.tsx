@@ -91,13 +91,13 @@ export default function AdsPage() {
     // -----------------------------
     if (loading) {
         return (
-            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
+            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
-                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
-                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
                 </span>
                 </p>
             </div>
@@ -106,7 +106,7 @@ export default function AdsPage() {
 
     return (
         <div className="min-h-screen w-full flex justify-center items-start p-4 md:p-8">
-            <div className="w-full max-w-xl text-white">
+            <div className="w-full max-w-xl text-black">
 
                 {/* Header */}
                 <div className="flex items-center justify-between mb-2">
@@ -137,7 +137,7 @@ export default function AdsPage() {
 
 
                 {/* Subtitle */}
-                <p className="text-xs text-white/60 text-center mb-6">
+                <p className="text-xs text-black text-center mb-6">
                     Choose a job that matches your position and location
                 </p>
 
@@ -152,22 +152,22 @@ export default function AdsPage() {
 
 
 
-                <div className="rounded-xl bg-black/30 text-sm text-white/70 overflow-hidden">
+                <div className="rounded-xl bg-black-200 text-sm text-black overflow-hidden">
 
                     {/* HEADER */}
                     <button
                         onClick={() => setOpen(!open)}
                         className="w-full flex items-center gap-2 p-2"
                     >
-                        <p className="font-semibold text-white flex items-center gap-2">
+                        <p className="font-semibold text-black flex items-center gap-2">
                             Sort by:
-                            <span className="text-white/60 capitalize">
+                            <span className="text-black capitalize">
                                 {sortBy}
                             </span>
 
                             {/* arrow moved here */}
                             <span
-                                className={`text-white/60 transition-transform duration-500 ease-in-out ${
+                                className={`text-black transition-transform duration-500 ease-in-out ${
                                     open ? "rotate-180" : ""
                                 }`}
                             >
@@ -192,7 +192,7 @@ export default function AdsPage() {
                                         setSortBy("newest");
                                         setOpen(false);
                                     }}
-                                    className="w-full text-left hover:text-white"
+                                    className="w-full text-left hover:text-black"
                                 >
                                     Newest
                                 </button>
@@ -204,7 +204,7 @@ export default function AdsPage() {
                                         setSortBy("oldest");
                                         setOpen(false);
                                     }}
-                                    className="w-full text-left hover:text-white"
+                                    className="w-full text-left hover:text-black"
                                 >
                                     Oldest
                                 </button>
@@ -216,7 +216,7 @@ export default function AdsPage() {
                                         setSortBy("company");
                                         setOpen(false);
                                     }}
-                                    className="w-full text-left hover:text-white"
+                                    className="w-full text-left hover:text-black"
                                 >
                                     Company (A–Z)
                                 </button>
@@ -258,19 +258,19 @@ export default function AdsPage() {
                         active:bg-transparent focus:bg-transparent
                         [-webkit-tap-highlight-color:transparent]"
                                 >
-                                    <div className="flex flex-col gap-2 text-xs text-white/80 p-2 rounded-xl border border-white/20">
+                                    <div className="flex flex-col gap-2 text-xs text-black p-2 rounded-xl border border-white/20">
 
                                         {/* TOP ROW (tags) */}
 
-                                        <span className="font-semibold text-sm text-white">
+                                        <span className="font-semibold text-sm text-black">
                             Company: {job.company}
                         </span>
 
                                         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                            <span className="text-white/60">
+                            <span className="text-black">
                                 Location: 📍 {job.location}
                             </span>
-                                            <span className="text-white/80">
+                                            <span className="text-black">
                                 Position: {job.title}
                             </span>
 
@@ -296,7 +296,7 @@ export default function AdsPage() {
                                         </div>
 
                                         {/* BOTTOM ROW (posted date) */}
-                                        <p className="text-xs text-yellow-500 text-white/50">
+                                        <p className="text-xs text-yellow-500 text-black">
                                             {formatLocalDate(job.createdAt)}
                                         </p>
 

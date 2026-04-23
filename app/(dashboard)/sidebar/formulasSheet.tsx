@@ -18,7 +18,7 @@ export default function FormulaSheet({ mobile }: FormulaSheetProps) {
     px-2
     py-1
     mb-5
-    text-white/70
+    text-black
     font-medium
     text-sm
     sm:text-base
@@ -26,7 +26,7 @@ export default function FormulaSheet({ mobile }: FormulaSheetProps) {
     lg:text-base
     rounded
     transition-colors
-    hover:text-white
+    hover:text-black
     cursor-pointer
   `;
 
@@ -41,51 +41,51 @@ export default function FormulaSheet({ mobile }: FormulaSheetProps) {
             onWheel={(e) => e.stopPropagation()} // prevent parent scroll
         >
             <li>
-                <span className="text-white font-medium">Find kVA:</span>
-                <div className="text-white/70 ml-2">1φ kVA = V * I / 1k</div>
-                <div className="text-white/70 ml-2">3φ kVA = √3 * V * I / 1k</div>
-                <div className="text-white/70 ml-2">kVA = kW / pf</div>
-                <div className="text-white/70 ml-2">kVA = kW / cosθ</div>
-                <div className="text-white/70 ml-2">kVA = √(kW² + kVAR²)</div>
+                <span className="text-black font-medium">Find kVA:</span>
+                <div className="text-black ml-2">1φ kVA = V * I / 1k</div>
+                <div className="text-black ml-2">3φ kVA = √3 * V * I / 1k</div>
+                <div className="text-black ml-2">kVA = kW / pf</div>
+                <div className="text-black ml-2">kVA = kW / cosθ</div>
+                <div className="text-black ml-2">kVA = √(kW² + kVAR²)</div>
             </li>
             <li>
-                <span className="text-white font-medium">Find kW:</span>
-                <div className="text-white/70 ml-2">1φ kW = V * I * pf / 1k</div>
-                <div className="text-white/70 ml-2">3φ kW = √3 * V * I * pf / 1k</div>
-                <div className="text-white/70 ml-2">kW = kVA × pf</div>
-                <div className="text-white/70 ml-2">kW = kVA × cosθ</div>
+                <span className="text-black font-medium">Find kW:</span>
+                <div className="text-black ml-2">1φ kW = V * I * pf / 1k</div>
+                <div className="text-black ml-2">3φ kW = √3 * V * I * pf / 1k</div>
+                <div className="text-black ml-2">kW = kVA × pf</div>
+                <div className="text-black ml-2">kW = kVA × cosθ</div>
             </li>
             <li>
-                <span className="text-white font-medium">Find kVAR:</span>
-                <div className="text-white/70 ml-2">kVAR = √(kVA² − kW²)</div>
-                <div className="text-white/70 ml-2">kVAR = kW × tanθ</div>
-                <div className="text-white/70 ml-2">kVAR = kVA × sinθ</div>
+                <span className="text-black font-medium">Find kVAR:</span>
+                <div className="text-black ml-2">kVAR = √(kVA² − kW²)</div>
+                <div className="text-black ml-2">kVAR = kW × tanθ</div>
+                <div className="text-black ml-2">kVAR = kVA × sinθ</div>
             </li>
             <li>
-                <span className="text-white font-medium">Find pf & Angle:</span>
-                <div className="text-white/70 ml-2">PF = kW / kVA</div>
-                <div className="text-white/70 ml-2">PF = cosθ</div>
-                <div className="text-white/70 ml-2">sinθ = √(1 − pf²)</div>
+                <span className="text-black font-medium">Find pf & Angle:</span>
+                <div className="text-black ml-2">PF = kW / kVA</div>
+                <div className="text-black ml-2">PF = cosθ</div>
+                <div className="text-black ml-2">sinθ = √(1 − pf²)</div>
             </li>
             <li>
-                <span className="text-white font-medium">Inductive Z :</span>
-                <div className="text-white/70 ml-2">XL = 2πfL</div>
+                <span className="text-black font-medium">Inductive Z :</span>
+                <div className="text-black ml-2">XL = 2πfL</div>
             </li>
             <li>
-                <span className="text-white font-medium">Capacitive Z :</span>
-                <div className="text-white/70 ml-2">XC = 1 / 2πfC</div>
+                <span className="text-black font-medium">Capacitive Z :</span>
+                <div className="text-black ml-2">XC = 1 / 2πfC</div>
             </li>
             <li>
-                <span className="text-white font-medium">Ohm's Law:</span>
-                <div className="text-white/70 ml-2">V = IR</div>
+                <span className="text-black font-medium">Ohm's Law:</span>
+                <div className="text-black ml-2">V = IR</div>
             </li>
             <li>
-                <span className="text-white font-medium">Series R :</span>
-                <div className="text-white/70 ml-2">Rₛ = R₁ + R₂ + ...</div>
+                <span className="text-black font-medium">Series R :</span>
+                <div className="text-black ml-2">Rₛ = R₁ + R₂ + ...</div>
             </li>
             <li>
-                <span className="text-white font-medium">Parallel R :</span>
-                <div className="text-white/70 ml-2">1/Rₚ = 1/R₁ + 1/R₂ + ...</div>
+                <span className="text-black font-medium">Parallel R :</span>
+                <div className="text-black ml-2">1/Rₚ = 1/R₁ + 1/R₂ + ...</div>
             </li>
         </ul>
     );
@@ -111,7 +111,7 @@ export default function FormulaSheet({ mobile }: FormulaSheetProps) {
             >
 
                 <svg
-                    className="w-5 h-5 text-white group-hover:text-blue-400"
+                    className="w-5 h-5 text-black group-hover:text-blue-400"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth={2}
@@ -124,11 +124,11 @@ export default function FormulaSheet({ mobile }: FormulaSheetProps) {
                     />
                 </svg>
 
-                <h2 className="text-white group-hover:text-blue-400 font-medium select-none">Formula Sheet</h2>
+                <h2 className="text-black group-hover:text-blue-400 font-medium select-none">Formula Sheet</h2>
                 <motion.div
                     animate={{ rotate: formulaOpen ? 180 : 0 }}
                     transition={{ duration: 0.3 }}
-                    className="w-6 h-6 flex-shrink-0 flex items-center justify-center text-white group-hover:text-blue-400"
+                    className="w-6 h-6 flex-shrink-0 flex items-center justify-center text-black group-hover:text-blue-400"
                 >
                     <svg
                         className="w-4 h-4"

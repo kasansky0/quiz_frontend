@@ -222,19 +222,19 @@ export default function ChatStats() {
     function LoggedOut() {
         const router = useRouter();
         return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black-200 backdrop-blur-sm p-4">
                 <div
-                    className="bg-black/70 border border-white/10 shadow-lg rounded-2xl max-w-md w-full p-6 text-center backdrop-blur-md">
-                    <h2 className="text-white-400 text-lg font-semibold mb-2 drop-shadow-[0_0_12px_rgba(36,174,124,0.8)]">
+                    className="bg-black-200 border border-white/10 shadow-lg rounded-2xl max-w-md w-full p-6 text-center backdrop-blur-md">
+                    <h2 className="text-black text-lg font-semibold mb-2 drop-shadow-[0_0_12px_rgba(36,174,124,0.8)]">
                         Session Expired
                     </h2>
-                    <p className="text-white-200 text-sm mb-6">
+                    <p className="text-black text-sm mb-6">
                         Your session has expired. Please log in again to continue.
                     </p>
                     <div className="flex justify-center">
                         <button
                             onClick={() => router.back()}
-                            className="flex items-center justify-center bg-black/70 backdrop-blur-xl border border-white/10 rounded-xl shadow-lg px-4 h-8 text-sm text-white-300/80 font-medium hover:bg-dark-400 active:scale-95 transition"
+                            className="flex items-center justify-center bg-black-200 backdrop-blur-xl border border-white/10 rounded-xl shadow-lg px-4 h-8 text-sm text-black font-medium hover:bg-black-200 active:scale-95 transition"
                         >
                             Go Back
                         </button>
@@ -426,19 +426,19 @@ export default function ChatStats() {
         <div className="w-full max-w-xl mx-auto relative">
             {/* Loading / Error Banner */}
             {(showLoading || serverError) && (
-                <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
+                <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
                     {showLoading && (
                         <p className="text-xl flex items-center">
                             Loading
                             <span className="ml-2 flex space-x-1">
-                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
-                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
                 </span>
                         </p>
                     )}
                     {!showLoading && serverError && (
-                        <p className="text-center px-4 text-white text-lg">{serverError}</p>
+                        <p className="text-center px-4 text-black text-lg">{serverError}</p>
                     )}
                 </div>
             )}
@@ -495,7 +495,7 @@ export default function ChatStats() {
                                             className={`relative px-1 sm:px-2 py-2 cursor-pointer rounded-xl transition-colors duration-200
                                                     ${newCommentPosts.has(post.id)
                                                 ? "bg-yellow-500/10 border border-yellow-400/30"
-                                                : "bg-transparent hover:bg-dark-800"
+                                                : "bg-transparent hover:bg-black-200"
                                             }
 `}
                                         >
@@ -521,18 +521,18 @@ export default function ChatStats() {
                                                         </svg>
                                                     )}
                                                 </span>
-                                                    <div className="flex items-center justify-center bg-black/70 backdrop-blur-xl border border-white/10 rounded-full shadow-lg px-3 h-6 min-w-[40px] truncate">
+                                                    <div className="flex items-center justify-center bg-black-200 backdrop-blur-xl border border-white/10 rounded-full shadow-lg px-3 h-6 min-w-[40px] truncate">
 
                                                         <svg
                                                             aria-hidden="true"
-                                                            className="w-3 h-3 mr-1 text-white-400"
+                                                            className="w-3 h-3 mr-1 text-black"
                                                             fill="currentColor"
                                                             viewBox="0 0 20 20"
                                                         >
                                                             <path d="M10 1a9 9 0 00-9 9c0 1.947.79 3.58 1.935 4.957L.231 17.661A.784.784 0 00.785 19H10a9 9 0 009-9 9 9 0 00-9-9zm0 16.2H6.162c-.994.004-1.907.053-3.045.144l-.076-.188a36.981 36.981 0 002.328-2.087l-1.05-1.263C3.297 12.576 2.8 11.331 2.8 10c0-3.97 3.23-7.2 7.2-7.2s7.2 3.23 7.2 7.2-3.23 7.2-7.2 7.2z" />
                                                         </svg>
 
-                                                        <span className="text-white-400 text-sm font-medium">
+                                                        <span className="text-black text-sm font-medium">
                                                             {post.commentCount ?? 0}
                                                         </span>
 
@@ -549,11 +549,11 @@ export default function ChatStats() {
                                                         )}
                                                     </div>
                                                 </div>
-                                                <span className="text-white-500/60 text-sm sm:text-sm md:text-base ml-auto whitespace-nowrap">
+                                                <span className="text-black text-sm sm:text-sm md:text-base ml-auto whitespace-nowrap">
                                                     {formatLocalDate(post.timestamp, post.edited)}
                                                 </span>
                                             </div>
-                                            <h3 className="text-white-800 font-bold mb-1 text-sm sm:text-base md:text-base line-clamp-2">{post.title}</h3>
+                                            <h3 className="text-black font-bold mb-1 text-sm sm:text-base md:text-base line-clamp-2">{post.title}</h3>
                                         </div>
                                     ))}
                                 </div>

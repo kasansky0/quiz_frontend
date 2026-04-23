@@ -56,13 +56,13 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     // 1️⃣ While session is loading, just show a placeholder
     if (status === "loading") {
         return (
-            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
+            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
-                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
-                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
                         </span>
                 </p>
             </div>
@@ -200,7 +200,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
         return (
             <span>
-            {relativeTime} {edited && <span className="text-white-500/60 text-[10px] ml-1">(Edited)</span>}
+            {relativeTime} {edited && <span className="text-black text-[10px] ml-1">(Edited)</span>}
         </span>
         );
     };
@@ -850,13 +850,13 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         <div className={`transition-opacity duration-500 ease-in-out ${fade ? "opacity-100" : "opacity-0"}`}>
 
             {showLoading ? (
-                <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
+                <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
                     <p className="text-xl flex items-center">
                         Loading
                         <span className="ml-2 flex space-x-1">
-                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
-                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
                         </span>
                     </p>
                     {blockMessage && (
@@ -1002,7 +1002,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
                                                     <button
                                                         onClick={() => startEditPost(activePost)}
-                                                        className="p-1 text-white-300 hover:text-white-400 rounded-full"
+                                                        className="p-1 text-black hover:text-black rounded-full"
                                                         title="Edit Post"
                                                     >
                                                         <svg
@@ -1058,9 +1058,9 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                             }}
                                             rows={3}
                                             placeholder="Edit title..."
-                                            className="bg-transparent w-full rounded-xl bg-black/70 border border-white/10 px-2 py-1 text-sm sm:text-sm md:text-base text-white resize-none focus:outline-none focus:ring-2 focus:ring-white/20"
+                                            className="bg-transparent w-full rounded-xl bg-black-200 border border-white/10 px-2 py-1 text-sm sm:text-sm md:text-base text-black resize-none focus:outline-none focus:ring-2 focus:ring-white/20"
                                         />
-                                        <div className="text-white/60 text-xs text-right">
+                                        <div className="text-black text-xs text-right">
                                             {editTitle.length}/100
                                         </div>
 
@@ -1074,21 +1074,21 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                             }}
                                             rows={11}
                                             placeholder="Edit message..."
-                                            className="bg-transparent w-full rounded-xl bg-black/70 border border-white/10 px-2 py-1 text-sm sm:text-sm md:text-base text-white resize-none focus:outline-none focus:ring-2 focus:ring-white/20"
+                                            className="bg-transparent w-full rounded-xl bg-black-200 border border-white/10 px-2 py-1 text-sm sm:text-sm md:text-base text-black resize-none focus:outline-none focus:ring-2 focus:ring-white/20"
                                         />
-                                        <div className="text-white/60 text-xs text-right">
+                                        <div className="text-black text-xs text-right">
                                             {editMessage.length}/500
                                         </div>
                                     </div>
                                 ) : (
                                     <>
                                         {/* Topic / Title */}
-                                        <h3 className="text-white-800 font-bold mb-3 text-sm sm:text-base md:text-base">
+                                        <h3 className="text-black font-bold mb-3 text-sm sm:text-base md:text-base">
                                             {activePost.title}
                                         </h3>
 
                                         {/* Message */}
-                                        <p className="text-white-100/90 break-words text-sm sm:text-sm md:text-base">
+                                        <p className="text-black break-words text-sm sm:text-sm md:text-base">
                                             {activePost.message}
                                         </p>
                                     </>
@@ -1099,7 +1099,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
 
                             {/* Add comment */}
-                            <div className="z-10 w-full bg-black/80 backdrop-blur-xl shrink-0">
+                            <div className="z-10 w-full bg-black-200 backdrop-blur-xl shrink-0">
 
                                 {/* 🚨 Block Banner */}
                                 {isBlocked && blockMessage && (
@@ -1134,11 +1134,11 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                           px-3
                                                           py-2
                                                           text-sm sm:text-sm md:text-base
-                                                          text-white
+                                                          text-black
                                                           placeholder:text-[10px] sm:placeholder:text-xs md:placeholder:text-sm
-                                                          placeholder-white/80
+                                                          placeholder-black
                                                           border
-                                                          border-white
+                                                          border-black
                                                           focus:outline-none
                                                           focus:ring-2
                                                           focus:ring-white/20
@@ -1214,7 +1214,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                 >
                                                     <div
                                                         className={`relative block w-full px-1 sm:px-2 pt-3 rounded-xl
-                                                                            ${isOwner ? `ml-auto bg-transparent` : "mr-auto bg-black/50"}`}
+                                                                            ${isOwner ? `ml-auto bg-transparent` : "mr-auto bg-black-200"}`}
 
                                                     >
                                                         {/* nickname + edit/delete */}
@@ -1254,12 +1254,12 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
                                                             {isOwner && (
                                                                 <div
-                                                                    className="flex items-center justify-center w-7 h-7 bg-black/50 rounded-lg">
+                                                                    className="flex items-center justify-center w-7 h-7 bg-black-200 rounded-lg">
                                                                     {!isEditing && (
                                                                         <>
                                                                             <button
                                                                                 onClick={() => startEditComment(comment)}
-                                                                                className="p-1 text-white-300 hover:text-white-400 rounded-full"
+                                                                                className="p-1 text-black hover:text-black rounded-full"
                                                                                 title="Edit Comment"
                                                                             >
                                                                                 <svg xmlns="http://www.w3.org/2000/svg"
@@ -1340,7 +1340,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                         <p
                                                             contentEditable={isEditing}
                                                             suppressContentEditableWarning
-                                                            className={`text-white-100 break-words whitespace-pre-wrap
+                                                            className={`text-black break-words whitespace-pre-wrap
                                                                                 ${isEditing ? "text-base border border-white px-2 py-1" : "text-sm sm:text-sm md:text-base"}
                                                                                 bg-transparent rounded-xl`}
                                                             ref={(el) => {
@@ -1369,7 +1369,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
                                                         {/* timestamp */}
                                                         <div
-                                                            className="mt-1 text-right text-white-500/60 text-[8px] sm:text-[10px] md:text-[12px]">
+                                                            className="mt-1 text-right text-black text-[8px] sm:text-[10px] md:text-[12px]">
                                                             {formatLocalDate(comment.timestamp, comment.edited)}
                                                         </div>
                                                     </div>

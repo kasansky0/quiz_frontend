@@ -43,7 +43,7 @@ export const formatLocalDate = (
         <span>
             {relativeTime}{" "}
     {edited && (
-        <span className="text-white-500/60 text-[10px] ml-1">
+        <span className="text-black text-[10px] ml-1">
             (Edited)
             </span>
     )}

@@ -24,9 +24,10 @@ module.exports = {
                 "dark-main": "#0f0f0f",      // main window
                 "dark-sidebar": "#111111",   // sidebar slightly different
                 black: {
-                    200: '#000000', // true black
-                    300: '#0A0A0A',
-                    400: '#1A1A1A',
+                    DEFAULT: '#000000',   // 👈 THIS restores text-black
+                    200: '#F5F7FA',
+                    300: '#E8E9E9',
+                    400: '#FFFFFF',
                 },
                 green: {
                     500: '#24AE7C', // main accent
@@ -48,13 +49,15 @@ module.exports = {
                     300: '#D1D5DB', // subtle borders / separators
                 },
                 dark: {
-                    200: '#0D0F10',
-                    300: '#131619', // sidebar default bg
-                    400: '#1A1D21', // sidebar hover bg
-                    500: '#363A3D', // sidebar active / selected
-                    600: '#76828D',
-                    700: '#ABB8C4',
-                    800: '#17191D'
+                    100: '#FFFFFF',  // pure background / pages
+                    200: '#F8FAFC',  // main surfaces
+                    300: '#F1F5F9',  // cards / panels
+                    400: '#E2E8F0',  // hover surfaces
+                    500: '#CBD5E1',  // borders / dividers
+                    600: '#94A3B8',  // muted text
+                    700: '#64748B',  // secondary text
+                    800: '#334155',  // strong text
+                    900: '#0F172A',  // deepest contrast text
                 },
                 sidebar: {
                     DEFAULT: '#131619', // matches dark-300

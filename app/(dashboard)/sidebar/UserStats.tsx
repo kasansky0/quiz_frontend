@@ -127,11 +127,12 @@ function PercentageBar({ correct, total }: { correct: number; total: number }) {
     return (
         <div className="flex flex-col w-full space-y-1">
 
-            <span className="text-white/60 text-sm italic">
-                Aim for <span className="text-green-400 font-semibold">70%</span>
+            <span className="flex items-center gap-4 text-black text-sm italic mb-2">
+                <span>Aim for</span>
+                <span className="text-green-400 font-semibold">70%</span>
             </span>
 
-            <div className="w-full h-6 bg-white/10 rounded-xl overflow-hidden backdrop-blur-sm border border-white/10 relative">
+            <div className="w-full h-5 bg-white/10 rounded-xl overflow-hidden backdrop-blur-sm border border-white/10 relative">
 
                 {/* 🎯 70% marker */}
                 <div
@@ -151,7 +152,7 @@ function PercentageBar({ correct, total }: { correct: number; total: number }) {
 
                 {/* % text */}
                 <motion.span
-                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white/90 text-sm font-semibold"
+                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-black text-sm font-semibold"
                     style={{
                         opacity: useTransform(progressValue, (v) => (v > 5 ? 1 : 0)),
                     }}
@@ -230,7 +231,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                           px-2
                           py-1
                           mb-5
-                          text-white/70
+                          text-black
                           font-medium
                           text-sm        /* default for very small screens */
                           sm:text-base   /* small screens and up */
@@ -238,7 +239,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                           lg:text-base     /* large screens and up */
                           rounded
                           transition-colors
-                          hover:text-white
+                          hover:text-black
                           cursor-pointer
                         `;
 
@@ -252,7 +253,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
 
 
     return (
-        <div className="flex flex-col items-center w-full text-white font-sans">
+        <div className="flex flex-col items-center w-full text-black font-sans">
 
             {/* Styled Google Sign-Out (icon left, text right) */}
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className=" w-full">
@@ -276,7 +277,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                         <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
                         <path fill="none" d="M0 0h48v48H0z"/>
                     </svg>
-                    <span className="text-white lg:hover:text-blue-400 font-medium">Sign out</span>
+                    <span className="text-black lg:hover:text-blue-400 font-medium">Sign out</span>
                 </div>
             </motion.div>
 
@@ -292,7 +293,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                       w-full
                       text-left
                       px-2 py-1
-                      text-white
+                      text-black
                       font-medium
                       text-sm sm:text-base md:text-base lg:text-base
                       rounded
@@ -310,7 +311,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                             viewBox="0 0 24 24"
                             strokeWidth={1.5}
                             stroke="currentColor"
-                            className="w-7 h-7 text-white lg:group-hover:text-blue-400"
+                            className="w-7 h-7 text-black lg:group-hover:text-blue-400"
                         >
                             <path
                                 strokeLinecap="round"
@@ -360,22 +361,22 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                                     <PercentageLoading />
                                 </>
                             ) : seenQuestions && Object.keys(seenQuestions).length > 0 ? (
-                                <div className="flex flex-col space-y-1 text-white/70 text-sm sm:text-base md:text-base lg:text-base">
+                                <div className="flex flex-col space-y-1 text-black text-sm">
 
                                     {/* Total Questions */}
-                                    <div className="flex justify-between w-full">
+                                    <div className="flex justify-start gap-4 w-full">
                                         <span>Total Questions:</span>
                                         <span>{questionStats.total}</span>
                                     </div>
 
                                     {/* Correct */}
-                                    <div className="flex justify-between w-full">
+                                    <div className="flex justify-start gap-4 w-full">
                                         <span>Correct:</span>
                                         <span>{questionStats.correct}</span>
                                     </div>
 
                                     {/* Wrong */}
-                                    <div className="flex justify-between w-full">
+                                    <div className="flex justify-start gap-4 w-full">
                                         <span>Wrong:</span>
                                         <span>{questionStats.wrong}</span>
                                     </div>
@@ -388,7 +389,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
 
                                 </div>
                             ) : (
-                                <div className="text-white/70">No questions answered yet</div>
+                                <div className="text-black">No questions answered yet</div>
                             )}
                         </motion.div>
                     )}
@@ -476,7 +477,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                           d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
                 </svg>
 
-                <span className="text-white group-hover:text-blue-400 font-medium">
+                <span className="text-black group-hover:text-blue-400 font-medium">
                     Messenger
                 </span>
             </div>
@@ -504,7 +505,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                           d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"/>
                 </svg>
 
-                <span className="text-white group-hover:text-blue-400 font-medium">
+                <span className="text-black group-hover:text-blue-400 font-medium">
                     Full Quiz
                 </span>
             </div>
@@ -529,7 +530,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                           d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5"/>
                 </svg>
 
-                <span className="text-white group-hover:text-blue-400 font-medium">
+                <span className="text-black group-hover:text-blue-400 font-medium">
                     Study
                 </span>
             </div>
@@ -555,7 +556,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                         viewBox="0 0 24 24"
                         strokeWidth={1.5}
                         stroke="currentColor"
-                        className="w-6 h-6 text-white lg:group-hover:text-blue-400 flex-shrink-0"
+                        className="w-6 h-6 text-black lg:group-hover:text-blue-400 flex-shrink-0"
                     >
                         <path
                             strokeLinecap="round"
@@ -564,7 +565,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                         />
                     </svg>
 
-                    <span className="text-white lg:group-hover:text-blue-400 font-medium">
+                    <span className="text-black lg:group-hover:text-blue-400 font-medium">
                         Employer
                     </span>
                 </div>
@@ -592,7 +593,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
-                    className="w-6 h-6 text-white lg:group-hover:text-blue-400 flex-shrink-0"
+                    className="w-6 h-6 text-black lg:group-hover:text-blue-400 flex-shrink-0"
                 >
                     <path
                         strokeLinecap="round"
@@ -600,7 +601,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                         d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
                     />
                 </svg>
-                <span className="text-white lg:group-hover:text-blue-400 font-medium">
+                <span className="text-black lg:group-hover:text-blue-400 font-medium">
                     Information
                 </span>
             </div>

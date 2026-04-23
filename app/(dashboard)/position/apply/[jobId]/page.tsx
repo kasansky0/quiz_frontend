@@ -25,6 +25,28 @@ export default function ApplyPage() {
         .toISOString()
         .split("T")[0];
 
+    const fieldLimits: Record<string, number> = {
+        location: 100,
+        certifications: 100,
+        travel: 100,
+        overtime: 100,
+        readyToMove: 100,
+        experience: 100,
+        position: 500,
+    };
+
+
+    const Counter = ({ field, value }: { field: string; value: string }) => {
+        const max = fieldLimits[field];
+        if (!max) return null;
+
+        return (
+            <div className="text-xs text-black text-right mt-1">
+                {value.length}/{max}
+            </div>
+        );
+    };
+
 
 
 
@@ -133,8 +155,14 @@ export default function ApplyPage() {
             }
         }
 
-        // --- MAX LENGTH
-        if (["location", "position", "travel", "overtime", "readyToMove"].includes(name)) {
+        // --- MAX LENGTH (UPDATED)
+        if (["position"].includes(name)) {
+            if (value.length > 500) {
+                error = "Max 500 chars";
+            }
+        }
+
+        if (name === "location") {
             if (value.length > 100) {
                 error = "Max 100 chars";
             }
@@ -371,14 +399,14 @@ export default function ApplyPage() {
 
     const inputClass = (field:string) =>
         `w-full h-10 px-2 rounded-xl border text-sm appearance-none
-     ${errors[field] ? "border-red-500 bg-gray-900" : "border-gray-700 bg-gray-900"}
+     ${errors[field] ? "border-red-500 bg-black-200" : "border-gray-700 bg-black-200"}
      placeholder:text-xs placeholder:text-gray-500`;
 
     // --- SUBMISSION SUCCESS SCREEN ---
     if (submitted) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen text-white p-4 bg-black">
-                <div className="bg-gray-900 rounded-2xl p-6 text-center border border-gray-700 max-w-md w-full">
+            <div className="flex flex-col items-center justify-center min-h-screen text-black p-4 bg-black">
+                <div className="bg-black-200 rounded-2xl p-6 text-center border border-gray-700 max-w-md w-full">
                     <svg className="w-24 h-24 mx-auto mb-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
@@ -389,7 +417,7 @@ export default function ApplyPage() {
                     </p>
                     <button
                         onClick={() => router.push("/info")} // go back to home or dashboard
-                        className="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 - border border-gray-700"
+                        className="bg-black-200 hover:bg-black-200 text-black px-4 py-2 - border border-gray-700"
                     >
                         Go Back
                     </button>
@@ -400,13 +428,13 @@ export default function ApplyPage() {
 
     if (initialLoading || !selectedJob) {
         return (
-            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
+            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
-                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
-                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
                 </span>
                 </p>
             </div>
@@ -414,7 +442,7 @@ export default function ApplyPage() {
     }
 
     return (
-        <div className="p-4 text-white relative min-h-screen">
+        <div className="p-4 text-black relative min-h-screen">
             <div className="w-full max-w-xl mx-auto">
 
 
@@ -453,7 +481,7 @@ export default function ApplyPage() {
                     <button
                         onClick={() => router.back()}
                         title="Back"
-                        className="p-2 rounded-full hover:bg-gray-800 transition z-10"
+                        className="p-2 rounded-full hover:bg-black-200 transition z-10"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -472,7 +500,7 @@ export default function ApplyPage() {
                     </button>
 
                     {/* Center title */}
-                    <h1 className="absolute left-1/2 -translate-x-1/2 text-2xl font-semibold text-white whitespace-nowrap">
+                    <h1 className="absolute left-1/2 -translate-x-1/2 text-2xl font-semibold text-black whitespace-nowrap">
                         Application Form
                     </h1>
 
@@ -480,18 +508,18 @@ export default function ApplyPage() {
 
                 {/* ROW 2: company full width */}
                 {company && (
-                    <div className="w-full text-sm bg-gray-900 border border-gray-700 rounded-xl p-3 space-y-1">
-                        <p><span className="text-white/60">Company:</span> {company.name}</p>
-                        <p><span className="text-white/60">Position:</span> {company.role}</p>
-                        <p><span className="text-white/60">Location:</span> 📍{company.location}</p>
+                    <div className="w-full text-sm bg-black-200 border border-gray-700 rounded-xl p-3 space-y-1">
+                        <p><span className="text-black">Company:</span> {company.name}</p>
+                        <p><span className="text-black">Position:</span> {company.role}</p>
+                        <p><span className="text-black">Location:</span> 📍{company.location}</p>
                     </div>
                 )}
 
                 <form
                     onSubmit={handleSubmit}
-                    className="bg-black text-white pt-6 pb-16 rounded-2xl space-y-4 max-w-xl mx-auto"
+                    className="bg-black-200 text-black pt-6 pb-16 rounded-2xl space-y-4 max-w-xl mx-auto"
                 >
-                    <div className="bg-gray-900 rounded-xl p-2 border border-gray-700">
+                    <div className="bg-black-200 rounded-xl p-2 border border-gray-700">
                         <p><strong>Name:</strong> {session.user.name}</p>
                         <p><strong>Email:</strong> {session.user.email}</p>
                     </div>
@@ -509,9 +537,9 @@ export default function ApplyPage() {
                             onChange={(e) =>
                                 setForm({ ...form, background: e.target.checked })
                             }
-                            className="w-5 h-5 text-blue-800 bg-gray-900 border-gray-700 rounded-xl focus:ring-yellow-400"
+                            className="w-5 h-5 text-blue-800 bg-black-200 border-gray-700 rounded-xl focus:ring-yellow-400"
                         />
-                        <label htmlFor="veteran" className="text-white text-sm select-none">
+                        <label htmlFor="veteran" className="text-black text-sm select-none">
                             Veteran
                         </label>
                     </div>
@@ -522,7 +550,7 @@ export default function ApplyPage() {
 
 
                     <div className="flex flex-col">
-                        <label htmlFor="location" className="text-white text-lg font-semibold mb-1">
+                        <label htmlFor="location" className="text-black text-lg font-semibold mb-1">
                             Your current Location
                         </label>
                         <input
@@ -533,6 +561,7 @@ export default function ApplyPage() {
                             onChange={handleChange}
                             className={inputClass("location")}
                         />
+                        <Counter field="location" value={form.location} />
                     </div>
 
 
@@ -544,7 +573,7 @@ export default function ApplyPage() {
 
 
                     <div className="flex flex-col">
-                        <label htmlFor="availability" className="text-white text-lg font-semibold mb-1">
+                        <label htmlFor="availability" className="text-black text-lg font-semibold mb-1">
                             Earliest Start Date
                         </label>
                         <input
@@ -568,7 +597,7 @@ export default function ApplyPage() {
 
 
                     <div className="flex flex-col">
-                        <label htmlFor="certifications" className="text-white text-lg font-semibold mb-1">
+                        <label htmlFor="certifications" className="text-black text-lg font-semibold mb-1">
                             Certifications
                         </label>
                         <input
@@ -580,6 +609,9 @@ export default function ApplyPage() {
                             onChange={handleChange}
                             className={inputClass("certifications")}
                         />
+                        <div className="text-xs text-black text-right mt-1">
+                            {form.certifications.length}/100
+                        </div>
                     </div>
 
 
@@ -593,7 +625,7 @@ export default function ApplyPage() {
 
 
                     <div className="flex flex-col">
-                        <label htmlFor="travel" className="text-white text-lg font-semibold mb-1">
+                        <label htmlFor="travel" className="text-black text-lg font-semibold mb-1">
                             Willing to Travel?
                         </label>
                         <input
@@ -605,6 +637,7 @@ export default function ApplyPage() {
                             onChange={handleChange}
                             className={inputClass("travel")}
                         />
+                        <Counter field="travel" value={form.travel} />
                     </div>
 
 
@@ -616,7 +649,7 @@ export default function ApplyPage() {
 
 
                     <div className="flex flex-col">
-                        <label htmlFor="overtime" className="text-white text-lg font-semibold mb-1">
+                        <label htmlFor="overtime" className="text-black text-lg font-semibold mb-1">
                             Willing to Work Overtime?
                         </label>
                         <input
@@ -628,6 +661,7 @@ export default function ApplyPage() {
                             onChange={handleChange}
                             className={inputClass("overtime")}
                         />
+                        <Counter field="overtime" value={form.overtime} />
                     </div>
 
 
@@ -639,7 +673,7 @@ export default function ApplyPage() {
 
 
                     <div className="flex flex-col">
-                        <label htmlFor="readyToMove" className="text-white text-lg font-semibold mb-1">
+                        <label htmlFor="readyToMove" className="text-black text-lg font-semibold mb-1">
                             Are you ready to relocate?
                         </label>
                         <input
@@ -651,6 +685,7 @@ export default function ApplyPage() {
                             onChange={handleChange}
                             className={inputClass("readyToMove")}
                         />
+                        <Counter field="readyToMove" value={form.readyToMove} />
                     </div>
 
 
@@ -665,17 +700,18 @@ export default function ApplyPage() {
 
 
                     <div className="flex flex-col">
-                        <label htmlFor="experience" className="text-white text-lg font-semibold mb-1">
-                            Years of Electrical Experience
+                        <label htmlFor="experience" className="text-black text-lg font-semibold mb-1">
+                            What is your electrical experience?
                         </label>
                         <input
                             id="experience"
                             name="experience"
-                            placeholder="e.g., 3"
+                            placeholder="e.g., three years at the company"
                             value={form.experience}
                             onChange={handleChange}
                             className={inputClass("experience")}
                         />
+                        <Counter field="experience" value={form.experience} />
                     </div>
 
 
@@ -683,17 +719,18 @@ export default function ApplyPage() {
 
 
                     <div className="flex flex-col">
-                        <label htmlFor="position" className="text-white text-lg font-semibold mb-1">
-                            Position Applying For
+                        <label htmlFor="position" className="text-black text-lg font-semibold mb-1">
+                            Briefly describe what are you looking for?
                         </label>
                         <input
                             id="position"
                             name="position"
-                            placeholder="e.g., NETA Level 1 Tech, Manager, Technician"
+                            placeholder="e.g., what is your goal?"
                             value={form.position}
                             onChange={handleChange}
                             className={inputClass("position")}
                         />
+                        <Counter field="position" value={form.position} />
                     </div>
 
 
@@ -717,7 +754,7 @@ export default function ApplyPage() {
                             disabled={!isFormComplete}
                             className={`mt-1 ${!isFormComplete ? "cursor-not-allowed opacity-50" : ""}`}
                         />
-                        <label htmlFor="agree" className="text-xs text-white">
+                        <label htmlFor="agree" className="text-xs text-black">
                             By submitting this application, I confirm that the information provided is accurate.
                             I consent to being contacted regarding this application and related job opportunities,
                             and I agree that my information, including my resume, may be shared with potential employers.
@@ -730,7 +767,7 @@ export default function ApplyPage() {
                     <button
                         type="submit"
                         disabled={loading || !agreed || submitted || !isFormComplete}
-                        className="w-full bg-gray-900 text-white p-2 rounded-xl font-semibold hover:bg-gray-800 border border-gray-700 disabled:opacity-50"
+                        className="w-full bg-black-200 text-black p-2 rounded-xl font-semibold hover:bg-black-200 border border-gray-700 disabled:opacity-50"
                     >
                         {loading ? "Submitting..." : submitted ? "Already Submitted" : "Apply"}
                     </button>

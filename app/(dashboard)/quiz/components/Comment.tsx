@@ -8,7 +8,7 @@
 
     export default function Comment({ isCorrect, text, correctAnswer }: CommentProps) {
         const baseClass = `p-3 sm:p-4 rounded-xl border font-medium transition-all duration-300 shadow-md
-            ${isCorrect ? "bg-green-600 border-green-500 text-white" : "bg-red-600 border-red-500 text-white"}`;
+            ${isCorrect ? "bg-green-500 border-green-500 text-black" : "bg-red-500 border-red-500 text-black"}`;
 
         // Split text by newlines to create paragraphs
         const paragraphs = text?.split("\n").filter(p => p.trim() !== "") || [];

@@ -496,13 +496,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     // Handle loading and unauthenticated state
     if (status === "loading") {
         return (
-            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
+            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
-                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
-                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
                         </span>
                 </p>
             </div>
@@ -511,7 +511,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     if (!session) {
         return (
-            <div className="flex items-center justify-center h-screen text-white">
+            <div className="flex items-center justify-center h-screen text-black">
                 Redirecting to login...
             </div>
         );
@@ -537,7 +537,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const isEmployer = userStats?.isEmployer ?? false;
 
     return (
-        <div className="h-screen flex flex-col bg-black-200 text-white">
+        <div className="h-screen flex flex-col bg-black-200 text-black">
 
 
 
@@ -585,7 +585,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
                     {/* MOBILE QUICK ICONS */}
-                    <div className="flex-1 flex justify-center md:hidden items-center gap-8 text-white">
+                    <div className="flex-1 flex justify-center md:hidden items-center gap-8 text-black">
 
                         {/* CHAT */}
                         <button
@@ -777,7 +777,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     <>
                         {/* Backdrop */}
                         <motion.div
-                            className="fixed inset-0 bg-black/50 z-50 md:hidden"
+                            className="fixed inset-0 bg-black-200 z-50 md:hidden"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
@@ -818,7 +818,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
                             <button
                                 onClick={() => setActiveSheet(null)}
-                                className="mt-3 w-full bg-green-500 text-black py-2 rounded-xl"
+                                className="mt-3 w-full bg-green-500 text-orange-50 py-2 rounded-xl"
                             >
                                 Close
                             </button>

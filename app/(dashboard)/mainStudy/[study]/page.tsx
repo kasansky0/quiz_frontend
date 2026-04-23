@@ -44,13 +44,13 @@ export default function StudyPage() {
     // ✅ HARD BLOCK LOADING (PASTE HERE)
     if (loadingSubjects || subscriptionRequired === null) {
         return (
-            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
+            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
-                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
-                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                    <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
                 </span>
                 </p>
             </div>
@@ -58,10 +58,10 @@ export default function StudyPage() {
     }
 
     return (
-        <div className="min-h-screen w-full flex justify-center items-start p-4 md:p-8 text-white">
+        <div className="min-h-screen w-full flex justify-center items-start p-4 md:p-8 text-black">
             <div className={`w-full max-w-xl pb-16 transition-opacity duration-700 ease-in-out ${fade ? "opacity-100" : "opacity-0"}`}>
                 {errorSubjects && <div className="p-6 text-red-400">{errorSubjects}</div>}
-                {!errorSubjects && subjects.length === 0 && <div className="p-6 text-white">No subjects found.</div>}
+                {!errorSubjects && subjects.length === 0 && <div className="p-6 text-black">No subjects found.</div>}
 
                 <div className="relative flex items-center mb-4">
 
@@ -114,7 +114,7 @@ export default function StudyPage() {
                         <Link
                             key={subject.id}
                             href={`/mainStudy/${mainTopic}/${subject.id}`}
-                            className="rounded-lg bg-dark-300/60 hover:bg-dark-300 transition p-2"
+                            className="rounded-lg bg-black-200 hover:bg-black-200 transition p-2"
                         >
                             <h2 className="font-semibold text-blue-500">{subject.title}</h2>
                             <p className="text-sm text-gray-300">{subject.description}</p>

@@ -17,7 +17,7 @@ export default function QuizNoSubjectPage() {
 
     if (status === "loading" || !session) {
         return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black text-white">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black-200 text-black">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">

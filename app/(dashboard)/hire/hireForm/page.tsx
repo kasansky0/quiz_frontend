@@ -55,7 +55,7 @@ export default function HireFormPage() {
 
     const inputClass = (field: string) =>
         `w-full h-10 px-2 rounded-xl border text-sm
-        ${errors[field] ? "border-red-500 bg-gray-900" : "border-gray-700 bg-gray-900"}
+        ${errors[field] ? "border-red-500 bg-black-200" : "border-gray-700 bg-black-200"}
         placeholder:text-xs placeholder:text-gray-500`;
 
 
@@ -159,13 +159,13 @@ export default function HireFormPage() {
 
     if (status === "loading") {
         return (
-            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
+            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
-                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce" />
-                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]" />
-                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]" />
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce" />
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]" />
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]" />
                     </span>
                 </p>
             </div>
@@ -180,13 +180,13 @@ export default function HireFormPage() {
 
     if (!isReady) {
         return (
-            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
+            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
-                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce" />
-                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]" />
-                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]" />
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce" />
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]" />
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]" />
                     </span>
                 </p>
             </div>
@@ -198,7 +198,7 @@ export default function HireFormPage() {
     }
 
     return (
-        <div className="p-4 text-white min-h-screen">
+        <div className="p-4 text-black min-h-screen">
             <div className="w-full max-w-xl mx-auto">
 
                 <div className="relative flex items-center mb-4">
@@ -227,7 +227,7 @@ export default function HireFormPage() {
                     {/* Centered title */}
                     <div className="mx-auto text-center">
                         <h1 className="text-2xl font-bold">Create Job Ad</h1>
-                        <p className="text-sm text-gray-400">
+                        <p className="text-sm text-black">
                             Fill in job details below
                         </p>
                     </div>
@@ -235,7 +235,7 @@ export default function HireFormPage() {
 
                 <form
                     onSubmit={handleSubmit}
-                    className="bg-black p-4 rounded-2xl space-y-4 border border-gray-800"
+                    className="bg-black-200 p-4 rounded-2xl space-y-4 border border-gray-800"
                 >
 
                     {/* TITLE */}
@@ -339,7 +339,7 @@ export default function HireFormPage() {
                     <button
                         type="submit"
                         disabled={loading || !isFormComplete}
-                        className="w-full bg-gray-900 text-white p-2 rounded-xl font-semibold hover:bg-gray-800 border border-gray-700 disabled:opacity-50"
+                        className="w-full bg-black-200 text-black p-2 rounded-xl font-semibold hover:bg-black-200 border border-gray-700 disabled:opacity-50"
                     >
                         {loading ? "Submitting..." : "Submit for Approval"}
                     </button>

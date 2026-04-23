@@ -95,7 +95,7 @@ export default function CreatePost({
 
 
     return (
-        <div className="w-full max-w-3xl min-h-screen flex flex-col space-y-4 rounded-xl bg-black">
+        <div className="w-full max-w-3xl min-h-screen flex flex-col space-y-4 rounded-xl bg-black-200">
 
             <div className={`w-full max-w-3xl transition-opacity duration-500 ease-in-out ${fade ? "opacity-100" : "opacity-0"}`}>
                 <form className="w-full flex flex-col space-y-4" onSubmit={handleSubmit}>
@@ -174,14 +174,14 @@ export default function CreatePost({
                                 }
                             }}
                             rows={3}
-                            className={`w-full rounded-xl px-3 py-2 text-lg font-semibold resize-none text-white bg-transparent border ${
-                                errors.title ? "border-red-500" : "border-white"
+                            className={`w-full placeholder:text-black rounded-xl px-3 py-2 text-lg font-semibold resize-none text-black bg-transparent border ${
+                                errors.title ? "border-red-500" : "border-black"
                             }`}
                         />
                         {errors.title && (
                             <p className="text-red-500 text-xs mt-1">{errors.title}</p>
                         )}
-                        <span className="text-white/60 text-sm self-end">
+                        <span className="text-black text-sm self-end">
                             {title.length}/{TITLE_LIMIT}
                         </span>
                     </div>
@@ -211,14 +211,14 @@ export default function CreatePost({
                                 }
                             }}
                             rows={15}
-                            className={`w-full rounded-xl px-2 py-2 text-base resize-none text-white bg-transparent border ${
-                                errors.message ? "border-red-500" : "border-white"
+                            className={`w-full placeholder:text-black rounded-xl px-2 py-2 text-base resize-none text-black bg-transparent border ${
+                                errors.message ? "border-red-500" : "border-black"
                             }`}
                         />
                         {errors.message && (
                             <p className="text-red-500 text-xs mt-1">{errors.message}</p>
                         )}
-                        <span className="text-white/60 text-sm self-end">
+                        <span className="text-black text-sm self-end">
                             {message.length}/{MESSAGE_LIMIT}
                         </span>
                     </div>

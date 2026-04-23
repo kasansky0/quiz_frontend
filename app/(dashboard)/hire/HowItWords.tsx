@@ -6,17 +6,17 @@ export default function HowItWorks() {
     const [open, setOpen] = useState(false);
 
     return (
-        <div className="rounded-xl bg-black/30 text-sm text-white/70 overflow-hidden">
+        <div className="rounded-xl bg-black-200 text-sm text-black overflow-hidden">
 
             {/* HEADER */}
             <button
                 onClick={() => setOpen(!open)}
                 className="w-full flex items-center gap-2 p-2"
             >
-                <p className="font-semibold text-white">How it works</p>
+                <p className="font-semibold text-black">How it works</p>
 
                 <span
-                    className={`text-white/60 transition-transform duration-500 ease-in-out ${
+                    className={`text-black transition-transform duration-500 ease-in-out ${
                         open ? "rotate-180" : ""
                     }`}
                 >
@@ -43,8 +43,8 @@ export default function HowItWorks() {
                         <li>Once approved, your ad becomes eligible for publishing.</li>
 
                         <li>
-                            Pay a <span className="text-white font-semibold">$150</span> one-time fee for{" "}
-                            <span className="text-white font-semibold">30 days of active publishing</span>.
+                            Pay a <span className="text-black font-semibold">$150</span> one-time fee for{" "}
+                            <span className="text-black font-semibold">30 days of active publishing</span>.
                         </li>
 
                         <li>After payment, your ad will go live on the platform.</li>
@@ -58,7 +58,7 @@ export default function HowItWorks() {
                         {/* ================= NEW SECTION ================= */}
                         <li>
                             Once a candidate applies, you will be able to view:
-                            <ul className="mt-1 space-y-1 list-disc pl-5 text-white/80">
+                            <ul className="mt-1 space-y-1 list-disc pl-5 text-black">
                                 <li>Basic profile information (name, email, experience, availability)</li>
                                 <li>
                                     Physical location at the time of application (📍 where the applicant is currently located)
@@ -74,10 +74,10 @@ export default function HowItWorks() {
 
                         {/* ================= QUIZ EXPLANATION ================= */}
                         <li>
-                            Each applicant includes a <span className="text-white font-semibold">Quiz Performance</span> section:
-                            <ul className="mt-1 space-y-1 list-disc pl-5 text-white/80">
+                            Each applicant includes a <span className="text-black font-semibold">Quiz Performance</span> section:
+                            <ul className="mt-1 space-y-1 list-disc pl-5 text-black">
                                 <li>
-                                    The system tracks how many questions were <span className="text-white">seen</span>, <span className="text-green-400">correct</span>, and <span className="text-red-400">incorrect</span>.
+                                    The system tracks how many questions were <span className="text-black">seen</span>, <span className="text-green-400">correct</span>, and <span className="text-red-400">incorrect</span>.
                                 </li>
 
                                 <li>
@@ -85,7 +85,7 @@ export default function HowItWorks() {
                                 </li>
 
                                 <li>
-                                    Below that, <span className="text-white font-semibold">Topic Breakdown</span> shows performance per category (example: relay, transformer, safety).
+                                    Below that, <span className="text-black font-semibold">Topic Breakdown</span> shows performance per category (example: relay, transformer, safety).
                                 </li>
 
                                 <li>

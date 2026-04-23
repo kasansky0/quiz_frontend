@@ -152,13 +152,13 @@ export default function HirePage() {
 
     if (status === "loading") {
         return (
-            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
+            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
-                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce" />
-                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]" />
-                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]" />
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce" />
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]" />
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]" />
                     </span>
                 </p>
             </div>
@@ -173,13 +173,13 @@ export default function HirePage() {
 
     if (!isReady || blocked) {
         return (
-            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black text-white pointer-events-none">
+            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
-                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce" />
-                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]" />
-                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]" />
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce" />
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]" />
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]" />
                     </span>
                 </p>
             </div>
@@ -193,7 +193,7 @@ export default function HirePage() {
     ========================= */
 
     return (
-        <div className="min-h-screen w-full flex justify-center items-start p-4 md:p-8 text-white">
+        <div className="min-h-screen w-full flex justify-center items-start p-4 md:p-8 text-black">
             <div className={`w-full max-w-xl 2xl:max-w-2xl pb-16 transition-opacity duration-700 ease-in-out ${fade ? "opacity-100" : "opacity-0"}`}>
 
                 {/* HEADER */}
@@ -207,7 +207,7 @@ export default function HirePage() {
                 <div className="mb-6 flex justify-center">
                     <Link
                         href="/hire/hireForm"
-                        className="w-full max-w-xs text-center bg-blue-400 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl transition active:scale-[0.98]"
+                        className="w-full max-w-xs text-center bg-blue-400 hover:bg-blue-600 text-black font-semibold py-3 px-6 rounded-xl transition active:scale-[0.98]"
                     >
                         + Create New Job Ad
                     </Link>
@@ -218,7 +218,7 @@ export default function HirePage() {
                     <h2 className="text-xl font-semibold mb-3">Your Ads</h2>
 
                     {ads.length === 0 ? (
-                        <p className="text-white/60">No ads yet.</p>
+                        <p className="text-black">No ads yet.</p>
                     ) : (
                         <div className="space-y-3">
 
@@ -228,10 +228,10 @@ export default function HirePage() {
                                 const isOpen = openAdId === ad._id;
 
                                 return (
-                                    <div key={ad._id} className="bg-black/40 p-4 rounded-xl border border-white">
+                                    <div key={ad._id} className="bg-black-200 p-4 rounded-xl border border-white">
 
                                         <h3 className="font-bold">Position: {ad.title}</h3>
-                                        <p className="text-white/70 text-sm">Location 📍 {ad.location}</p>
+                                        <p className="text-black text-sm">Location 📍 {ad.location}</p>
 
                                         {/* STATUS */}
                                         <div className="flex flex-col gap-1 mb-2">
@@ -275,8 +275,21 @@ export default function HirePage() {
                                                 onClick={() => setOpenAdId(isOpen ? null : ad._id)}
                                                 className="flex justify-between cursor-pointer"
                                             >
-                                                <h4 className="text-sm font-semibold">
-                                                    Applications ({apps.length})
+                                                <h4 className="text-sm font-semibold flex items-center gap-2">
+                                                    Applications
+                                                    <span
+                                                        className={`w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold transition-all duration-200
+                                                            ${
+                                                                apps.length === 0
+                                                                    ? "bg-white/10 text-black border border-white/10"
+                                                                    : apps.length < 5
+                                                                        ? "bg-blue-500/80 text-black"
+                                                                        : "bg-blue-600 text-black shadow-md shadow-blue-500/30"
+                                                            }
+                                                        `}
+                                                    >
+                                                        {apps.length}
+                                                    </span>
                                                 </h4>
                                                 <span className="text-xs text-blue-400">
                                                     {isOpen ? "Hide" : "View"}
@@ -298,10 +311,10 @@ export default function HirePage() {
 
                                                                         <div className="text-xs space-y-1">
 
-                                                                            <div className="text-white space-y-1">
+                                                                            <div className="text-black space-y-1">
                                                                                 <p>
                                                                                     <span className="font-bold text-blue-400">Name:</span>{" "}
-                                                                                    <span className="text-white/80">{app.name}</span>
+                                                                                    <span className="text-black">{app.name}</span>
                                                                                 </p>
 
                                                                                 <p>
@@ -315,20 +328,20 @@ export default function HirePage() {
                                                                                 </p>
                                                                             </div>
 
-                                                                            <p><span className="font-bold text-blue-400">Current location:</span> <span className="text-white/60">📍 {app.location}</span></p>
-                                                                            <p><span className="font-bold text-blue-400">Experience:</span> <span className="text-white/60">{app.experience}</span></p>
-                                                                            <p><span className="font-bold text-blue-400">Availability:</span> <span className="text-white/60">{app.availability}</span></p>
-                                                                            <p><span className="font-bold text-blue-400">Position:</span> <span className="text-white/60">{app.position}</span></p>
-                                                                            <p><span className="font-bold text-blue-400">Certifications:</span> <span className="text-white/60">{app.certifications}</span></p>
-                                                                            <p><span className="font-bold text-blue-400">Travel:</span> <span className="text-white/60">{app.travel}</span></p>
-                                                                            <p><span className="font-bold text-blue-400">Overtime:</span> <span className="text-white/60">{app.overtime}</span></p>
-                                                                            <p><span className="font-bold text-blue-400">Ready to move:</span> <span className="text-white/60">{app.readyToMove}</span></p>
+                                                                            <p><span className="font-bold text-blue-400">Current location:</span> <span className="text-black">📍 {app.location}</span></p>
+                                                                            <p><span className="font-bold text-blue-400">Experience:</span> <span className="text-black">{app.experience}</span></p>
+                                                                            <p><span className="font-bold text-blue-400">Availability:</span> <span className="text-black">{app.availability}</span></p>
+                                                                            <p><span className="font-bold text-blue-400">Goal:</span> <span className="text-black">{app.position}</span></p>
+                                                                            <p><span className="font-bold text-blue-400">Certifications:</span> <span className="text-black">{app.certifications}</span></p>
+                                                                            <p><span className="font-bold text-blue-400">Travel:</span> <span className="text-black">{app.travel}</span></p>
+                                                                            <p><span className="font-bold text-blue-400">Overtime:</span> <span className="text-black">{app.overtime}</span></p>
+                                                                            <p><span className="font-bold text-blue-400">Ready to move:</span> <span className="text-black">{app.readyToMove}</span></p>
 
                                                                             {/* =========================
                                                                                🔥 ADDED: USER STATS (UNDER EVERYTHING)
                                                                             ========================= */}
                                                                             {/* STATS DROPDOWN */}
-                                                                            <div className="mt-2 border-t border-gray-800 pt-2 text-[10px] text-gray-400">
+                                                                            <div className="mt-2 border-t border-gray-800 pt-2 text-[10px] text-black">
 
                                                                                 {(() => {
                                                                                     // ✅ normalize once (safe fallback)
@@ -340,7 +353,7 @@ export default function HirePage() {
                                                                                     return (
                                                                                         <>
                                                                                             {/* ================= ALWAYS VISIBLE OVERALL ================= */}
-                                                                                            <div className="bg-black/30 p-2 rounded-md border border-gray-800 flex items-center justify-between">
+                                                                                            <div className="bg-black-200 p-2 rounded-md border border-gray-800 flex items-center justify-between">
 
                                                                                                 {/* LEFT: summary */}
                                                                                                 <div className="space-y-1">
@@ -369,7 +382,7 @@ export default function HirePage() {
 
                                                                                             {/* ================= DROPDOWN: TOPICS ================= */}
                                                                                             {openStatsMap[app._id] && app.stats?.topics && Object.keys(app.stats.topics).length > 0 && (
-                                                                                                <div className="mt-2 bg-black/30 p-2 rounded-md border border-gray-800">
+                                                                                                <div className="mt-2 bg-black-200 p-2 rounded-md border border-gray-800">
 
                                                                                                     <div className="font-semibold text-gray-300 mb-1">
                                                                                                         Topic Breakdown
@@ -395,7 +408,7 @@ export default function HirePage() {
                                                                                                                             {topic}
                                                                                                                         </div>
 
-                                                                                                                        <div className="flex gap-2 text-gray-400">
+                                                                                                                        <div className="flex gap-2 text-black">
                                                                                                                             <span>{t.seen}</span>
                                                                                                                             <span className="text-green-400">✔ {t.correct}</span>
                                                                                                                             <span className="text-red-400">✖ {t.wrong}</span>
@@ -426,7 +439,7 @@ export default function HirePage() {
 
                                                             </div>
                                                         ) : (
-                                                            <p className="text-white/50 text-xs mt-2">
+                                                            <p className="text-black text-xs mt-2">
                                                                 No applications yet
                                                             </p>
                                                         )}

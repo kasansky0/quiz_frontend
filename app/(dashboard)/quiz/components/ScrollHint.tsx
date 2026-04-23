@@ -10,7 +10,7 @@ export function ScrollHint() {
             transition={{ repeat: Infinity, duration: 1.2 }}
         >
             <svg
-                className="w-6 h-6 text-white opacity-70"
+                className="w-6 h-6 text-black opacity-70"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth={2}
