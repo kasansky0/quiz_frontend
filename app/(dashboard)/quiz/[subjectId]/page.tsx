@@ -23,14 +23,14 @@ export default function QuizPage() {
 
     if (status === "loading" || !session || !subjectId) {
         return (
-            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
+            <div className="flex-1 flex items-start justify-center pt-[56px] text-black">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
-                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
-                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
-                        </span>
+                <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+            </span>
                 </p>
             </div>
         );

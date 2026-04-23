@@ -13,22 +13,22 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const buttonVariants: Record<ButtonVariants, string> = {
     primary: `
-    bg-green-500/80 text-white
-    hover:bg-green-500
+    bg-green-500/40 text-neutral-600
+    hover:bg-green-500/50
     active:scale-95
     shadow-sm hover:shadow-md
     `,
 
     secondary: `
-        bg-gray-100 text-gray-900
-        hover:bg-gray-200
+        bg-black-200 text-black
+        hover:bg-black-200
         active:scale-95
-        border border-gray-200
+        border border-black
     `,
 
     outline: `
-        border border-gray-300 text-gray-800
-        hover:bg-gray-100
+        border border-black text-black
+        hover:bg-black-200
     `,
 };
 

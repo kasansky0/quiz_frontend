@@ -495,12 +495,12 @@ export default function QuizSampleSection({
 
     return (
         <div
-            className="flex-1 flex flex-col items-center justify-start p-5 sm:p-5 md:p-8 min-h-[50vh] md:h-auto bg-black-200 w-full no-select"
+            className="flex-1 flex flex-col items-center justify-start p-5 sm:p-5 md:p-5 min-h-[50vh] md:h-auto bg-black-200 w-full no-select"
             onContextMenu={(e) => e.preventDefault()}
         >
 
             {showLoading ? (
-                <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
+                <div className="flex-1 flex items-start justify-center pt-[56px] text-black">
                     <p className="text-xl flex items-center">
                         Loading
                         <span className="ml-2 flex space-x-1">
@@ -527,7 +527,8 @@ export default function QuizSampleSection({
                             questionData && (
                                 <div
                                     key={questionData.id}
-                                    className={`w-full max-w-xl flex flex-col gap-6 justify-start transition-opacity duration-700 ease-in-out ${
+                                    className={`w-full max-w-xl flex flex-col gap-6 justify-start transition-opacity duration-700 ease-in-out
+                                        bg-white border border-black/10 rounded-xl shadow-sm p-5 sm:p-6 ${
                                         fade ? "opacity-100" : "opacity-0"
                                     }`}
                                 >

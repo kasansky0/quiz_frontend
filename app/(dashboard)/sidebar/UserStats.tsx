@@ -129,10 +129,10 @@ function PercentageBar({ correct, total }: { correct: number; total: number }) {
 
             <span className="flex items-center gap-4 text-black text-sm italic mb-2">
                 <span>Aim for</span>
-                <span className="text-green-400 font-semibold">70%</span>
+                <span className="text-green-500 font-semibold">70%</span>
             </span>
 
-            <div className="w-full h-5 bg-white/10 rounded-xl overflow-hidden backdrop-blur-sm border border-white/10 relative">
+            <div className="w-full h-5 bg-white/10 rounded-xl overflow-hidden backdrop-blur-sm border border-black/10 relative">
 
                 {/* 🎯 70% marker */}
                 <div
@@ -199,7 +199,7 @@ function PercentageLoading() {
 function TimeLoading() {
     return (
         <div className="w-16 h-4 bg-green-500/10 rounded overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-400/40 to-transparent animate-shimmer rounded" />
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-500/40 to-transparent animate-shimmer rounded" />
         </div>
     );
 }

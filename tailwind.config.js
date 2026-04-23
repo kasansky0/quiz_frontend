@@ -24,19 +24,38 @@ module.exports = {
                 "dark-main": "#0f0f0f",      // main window
                 "dark-sidebar": "#111111",   // sidebar slightly different
                 black: {
-                    DEFAULT: '#000000',   // 👈 THIS restores text-black
-                    200: '#F5F7FA',
-                    300: '#E8E9E9',
+                    DEFAULT: '#000000',
+
+                    // Premium app background (slightly darker, more depth)
+                    200: "#f5f5f4", // warm-neutral (very common modern UI)
+
+                    // Surface / secondary background
+                    300: '#DADFE6',
+
+                    // Cards / borders contrast
                     400: '#FFFFFF',
+                },
+                neutral: {
+                    50: "#fafafa",
+                    100: "#f5f5f5",
+                    200: "#e5e5e5",
+                    300: "#d4d4d4",
+                    400: "#a3a3a3",
+                    500: "#737373",
+                    600: "#525252", // <-- text-neutral-600
+                    700: "#404040",
+                    800: "#262626",
+                    900: "#171717",
                 },
                 green: {
                     500: '#24AE7C', // main accent
-                    600: '#0D2A1F', // dark accent
-                    700: '#28C76F', // hover accent
+                    600: '#16A34A', // hover (darker)
+                    700: '#15803D', // active / deeper
                 },
                 blue: {
-                    500: '#79B5EC',
-                    600: '#152432'
+                    400: "#0A66C2",
+                    500: '#2563EB', // darker primary
+                    600: '#1D4ED8', // hover
                 },
                 red: {
                     500: '#F37877',

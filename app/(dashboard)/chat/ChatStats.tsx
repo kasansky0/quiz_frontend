@@ -224,7 +224,7 @@ export default function ChatStats() {
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black-200 backdrop-blur-sm p-4">
                 <div
-                    className="bg-black-200 border border-white/10 shadow-lg rounded-2xl max-w-md w-full p-6 text-center backdrop-blur-md">
+                    className="bg-black-200 border border-black/10 shadow-lg rounded-2xl max-w-md w-full p-6 text-center backdrop-blur-md">
                     <h2 className="text-black text-lg font-semibold mb-2 drop-shadow-[0_0_12px_rgba(36,174,124,0.8)]">
                         Session Expired
                     </h2>
@@ -234,7 +234,7 @@ export default function ChatStats() {
                     <div className="flex justify-center">
                         <button
                             onClick={() => router.back()}
-                            className="flex items-center justify-center bg-black-200 backdrop-blur-xl border border-white/10 rounded-xl shadow-lg px-4 h-8 text-sm text-black font-medium hover:bg-black-200 active:scale-95 transition"
+                            className="flex items-center justify-center bg-black-200 backdrop-blur-xl border border-black/10 rounded-xl shadow-lg px-4 h-8 text-sm text-black font-medium hover:bg-black-200 active:scale-95 transition"
                         >
                             Go Back
                         </button>
@@ -423,10 +423,10 @@ export default function ChatStats() {
 
 
     return (
-        <div className="w-full max-w-xl mx-auto relative">
+        <div className="w-full max-w-lg mx-auto relative">
             {/* Loading / Error Banner */}
             {(showLoading || serverError) && (
-                <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
+                <div className="flex-1 flex items-center justify-center pt-[56px] text-black">
                     {showLoading && (
                         <p className="text-xl flex items-center">
                             Loading
@@ -445,7 +445,7 @@ export default function ChatStats() {
 
             {/* Main Content */}
             {!showLoading && allPosts.length > 0 && (
-                <div className="w-full max-w-4xl mx-auto flex flex-col pb-16">
+                <div className="w-full max-w-lg mx-auto flex flex-col pb-10">
                     {creatingPost && (
                         <CreatePost
                             onSubmit={handleCreatePost}
@@ -487,21 +487,34 @@ export default function ChatStats() {
                             </div>
 
                             <div className={`mx-auto max-w-4xl transition-opacity duration-500 ease-in-out ${listFade ? "opacity-100" : "opacity-0"}`}>
-                                <div className="space-y-4">
+                                <div className="space-y-2">
                                     {filteredPosts.map(post => (
                                         <div
                                             key={post.id}
                                             onClick={() => handleActivatePost(post)}
-                                            className={`relative px-1 sm:px-2 py-2 cursor-pointer rounded-xl transition-colors duration-200
-                                                    ${newCommentPosts.has(post.id)
-                                                ? "bg-yellow-500/10 border border-yellow-400/30"
-                                                : "bg-transparent hover:bg-black-200"
+                                            className={`
+    relative cursor-pointer
+    rounded-2xl p-3
+
+    bg-black-200/70 backdrop-blur-xl
+    border border-black/5
+
+    shadow-sm hover:shadow-md
+    hover:border-black/10
+    hover:translate-y-[-1px]
+
+    transition-all duration-200
+    active:scale-[0.99]
+
+    ${newCommentPosts.has(post.id)
+                                                ? "ring-1 ring-yellow-400/40 bg-yellow-400/10"
+                                                : "hover:bg-black-300/40"
                                             }
 `}
                                         >
-                                            <div className="flex items-center mb-1 w-full">
+                                            <div className="flex items-center mb-0.5 w-full">
                                                 <div className="flex items-center gap-2 truncate">
-                                                <span className="flex items-center gap-1 text-sm sm:text-sm md:text-base font-semibold truncate text-blue-400">
+                                                <span className="flex items-center gap-1 text-sm sm:text-sm md:text-base font-bold truncate text-blue-400">
                                                         {post.nickname}
 
                                                     {userId && post.userId === userId && (
@@ -510,8 +523,8 @@ export default function ChatStats() {
                                                             fill="none"
                                                             viewBox="0 0 24 24"
                                                             strokeWidth={1.5}
-                                                            stroke="yellow"
-                                                            className="size-4"
+                                                            stroke="currentColor"
+                                                            className="size-4 text-amber-500"
                                                         >
                                                             <path
                                                                 strokeLinecap="round"
@@ -521,7 +534,7 @@ export default function ChatStats() {
                                                         </svg>
                                                     )}
                                                 </span>
-                                                    <div className="flex items-center justify-center bg-black-200 backdrop-blur-xl border border-white/10 rounded-full shadow-lg px-3 h-6 min-w-[40px] truncate">
+                                                    <div className="flex items-center justify-center bg-black-200 backdrop-blur-xl border border-black/10 rounded-full shadow-lg px-2 h-5 min-w-[40px] truncate">
 
                                                         <svg
                                                             aria-hidden="true"
@@ -553,7 +566,7 @@ export default function ChatStats() {
                                                     {formatLocalDate(post.timestamp, post.edited)}
                                                 </span>
                                             </div>
-                                            <h3 className="text-black font-bold mb-1 text-sm sm:text-base md:text-base line-clamp-2">{post.title}</h3>
+                                            <h3 className="text-black font-bold mb-0.5 text-sm sm:text-base md:text-base line-clamp-2">{post.title}</h3>
                                         </div>
                                     ))}
                                 </div>
@@ -561,28 +574,47 @@ export default function ChatStats() {
 
                             {/* LOAD MORE POSTS BUTTON */}
                             {allPosts.length < totalPosts && (
-                                <div className="flex justify-center my-4 w-full">
+                                <div className="flex justify-center my-3 w-full">
                                     <button
                                         onClick={async () => {
+                                            if (loadingMore) return; // 🔥 HARD GUARD
                                             setLoadingMore(true);
                                             await loadMorePosts();
                                             setLoadingMore(false);
                                         }}
-                                        style={{ touchAction: "manipulation" }}
-                                        className="w-full flex justify-center items-center py-3 bg-blue-50 hover:bg-blue-100 rounded-xl transition"
                                         disabled={loadingMore}
+                                        style={{ touchAction: "manipulation" }}
+                                        className={`
+                                            w-full sm:w-auto px-6 py-3
+                                            flex items-center justify-center gap-2
+                                            rounded-full font-medium text-sm sm:text-base
+                                            text-white bg-blue-400
+                                            hover:bg-blue-400 active:bg-blue-400
+                                            shadow-sm
+                                            transition-all duration-200
+                                            disabled:opacity-60 disabled:cursor-not-allowed
+                                        `}
                                     >
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             fill="none"
                                             viewBox="0 0 24 24"
-                                            strokeWidth={1.5}
+                                            strokeWidth={1.8}
                                             stroke="currentColor"
-                                            className={`w-6 h-6 text-blue-600 transition-transform ${loadingMore ? "animate-spin" : ""}`}
+                                            className={`w-5 h-5 transition-transform ${
+                                                loadingMore ? "animate-spin" : ""
+                                            }`}
                                         >
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="m9 12.75 3 3m0 0 3-3m-3 3v-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                d="m9 12.75 3 3m0 0 3-3m-3 3v-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                            />
                                         </svg>
-                                        <span className="ml-2 text-blue-600 font-medium text-sm sm:text-base">{loadingMore ? "Loading..." : "Load More Posts"}</span>
+
+                                        <span>
+                                            {loadingMore ? "Loading..." : "Load More Posts"}
+                                        </span>
                                     </button>
                                 </div>
                             )}

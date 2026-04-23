@@ -399,25 +399,25 @@ export default function ApplyPage() {
 
     const inputClass = (field:string) =>
         `w-full h-10 px-2 rounded-xl border text-sm appearance-none
-     ${errors[field] ? "border-red-500 bg-black-200" : "border-gray-700 bg-black-200"}
-     placeholder:text-xs placeholder:text-gray-500`;
+     ${errors[field] ? "border-red-500 bg-black-200" : "border-black bg-black-200"}
+     placeholder:text-xs placeholder:text-black`;
 
     // --- SUBMISSION SUCCESS SCREEN ---
     if (submitted) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen text-black p-4 bg-black">
-                <div className="bg-black-200 rounded-2xl p-6 text-center border border-gray-700 max-w-md w-full">
+                <div className="bg-black-200 rounded-2xl p-6 text-center border border-black max-w-md w-full">
                     <svg className="w-24 h-24 mx-auto mb-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                     <h2 className="text-2xl font-bold mb-2">Application Submitted!</h2>
-                    <p className="text-gray-300 mb-4">
+                    <p className="text-black mb-4">
                         Thank you for applying. Your application has been successfully submitted.
                         We will review it and get back to you soon.
                     </p>
                     <button
                         onClick={() => router.push("/info")} // go back to home or dashboard
-                        className="bg-black-200 hover:bg-black-200 text-black px-4 py-2 - border border-gray-700"
+                        className="bg-black-200 hover:bg-black-200 text-black px-4 py-2 - border border-black"
                     >
                         Go Back
                     </button>
@@ -428,7 +428,7 @@ export default function ApplyPage() {
 
     if (initialLoading || !selectedJob) {
         return (
-            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
+            <div className="flex-1 flex items-center justify-center pt-[56px] text-black">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
@@ -508,7 +508,7 @@ export default function ApplyPage() {
 
                 {/* ROW 2: company full width */}
                 {company && (
-                    <div className="w-full text-sm bg-black-200 border border-gray-700 rounded-xl p-3 space-y-1">
+                    <div className="w-full text-sm bg-black-200 border border-black rounded-xl p-3 space-y-1">
                         <p><span className="text-black">Company:</span> {company.name}</p>
                         <p><span className="text-black">Position:</span> {company.role}</p>
                         <p><span className="text-black">Location:</span> 📍{company.location}</p>
@@ -519,7 +519,7 @@ export default function ApplyPage() {
                     onSubmit={handleSubmit}
                     className="bg-black-200 text-black pt-6 pb-16 rounded-2xl space-y-4 max-w-xl mx-auto"
                 >
-                    <div className="bg-black-200 rounded-xl p-2 border border-gray-700">
+                    <div className="bg-black-200 rounded-xl p-2 border border-black">
                         <p><strong>Name:</strong> {session.user.name}</p>
                         <p><strong>Email:</strong> {session.user.email}</p>
                     </div>

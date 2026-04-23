@@ -52,7 +52,7 @@ export default function LoginSection() {
             </h1>
 
             {/* Hero Tagline */}
-            <p className="mt-3 text-sm md:text-base font-medium text-green-400/90 text-center leading-relaxed">
+            <p className="mt-3 text-sm md:text-base font-medium text-green-500/90 text-center leading-relaxed">
                 Completely Free, No Ads
                 <br/>
                 Non-stop NETA Level 2 Quizzes with clear explanations
@@ -76,7 +76,7 @@ export default function LoginSection() {
             <motion.div className="mt-6" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <button
                     onClick={() => signIn("google")}
-                    className="flex items-center gap-3 px-4 py-2 rounded-full bg-black-200 backdrop-blur-xl border border-green-400/20 shadow-lg hover:bg-black-200"
+                    className="flex items-center gap-3 px-4 py-2 rounded-full bg-black-200 backdrop-blur-xl border border-green-500/20 shadow-lg hover:bg-black-200"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className="w-6 h-6">
                         <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />

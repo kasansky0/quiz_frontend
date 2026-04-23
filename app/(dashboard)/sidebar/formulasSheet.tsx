@@ -94,7 +94,7 @@ export default function FormulaSheet({ mobile }: FormulaSheetProps) {
     if (mobile) {
         return (
             <div
-                className="w-full p-4 bg-black-200 backdrop-blur-xl border border-green-400/20 rounded-2xl shadow-lg flex flex-col h-64 overflow-auto"
+                className="w-full p-4 bg-black-200 backdrop-blur-xl border border-green-500/20 rounded-2xl shadow-lg flex flex-col h-64 overflow-auto"
                 ref={formulaRef}
             >
                 {formulaContent}
@@ -150,7 +150,7 @@ export default function FormulaSheet({ mobile }: FormulaSheetProps) {
                         exit={{ scaleY: 0, opacity: 0, transition: { duration: 0.25, ease: "easeInOut" } }}
                         transition={{ duration: 0.25, ease: "easeInOut" }}
                         style={{ transformOrigin: "top" }}
-                        className="w-full p-4 bg-black-200 backdrop-blur-xl border border-green-400/20 rounded-2xl shadow-lg flex flex-col h-64 overflow-auto"
+                        className="w-full p-4 bg-black-200 backdrop-blur-xl border border-green-500/20 rounded-2xl shadow-lg flex flex-col h-64 overflow-auto"
                         ref={formulaRef}
                     >
                         {formulaContent}

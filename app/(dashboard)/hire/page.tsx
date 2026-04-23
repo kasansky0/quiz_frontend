@@ -152,7 +152,7 @@ export default function HirePage() {
 
     if (status === "loading") {
         return (
-            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
+            <div className="flex-1 flex items-center justify-center pt-[56px] text-black">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
@@ -173,7 +173,7 @@ export default function HirePage() {
 
     if (!isReady || blocked) {
         return (
-            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
+            <div className="flex-1 flex items-center justify-center pt-[56px] text-black">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
@@ -228,7 +228,7 @@ export default function HirePage() {
                                 const isOpen = openAdId === ad._id;
 
                                 return (
-                                    <div key={ad._id} className="bg-black-200 p-4 rounded-xl border border-white">
+                                    <div key={ad._id} className="bg-black-200 p-4 rounded-xl border border-black">
 
                                         <h3 className="font-bold">Position: {ad.title}</h3>
                                         <p className="text-black text-sm">Location 📍 {ad.location}</p>
@@ -257,7 +257,7 @@ export default function HirePage() {
                                                 )}
 
                                                 {status === "published" && (
-                                                    <span className="text-green-400 text-xs">
+                                                    <span className="text-green-500 text-xs">
                                                         Published • {ad.publishedAt && formatLocalDate(ad.publishedAt)}
                                                     </span>
                                                 )}
@@ -269,7 +269,7 @@ export default function HirePage() {
                                         {status === "approved" && <PayAdButton adId={ad._id} />}
 
                                         {/* APPLICATIONS */}
-                                        <div className="mt-4 border-t border-gray-700 pt-3">
+                                        <div className="mt-4 border-t border-black pt-3">
 
                                             <div
                                                 onClick={() => setOpenAdId(isOpen ? null : ad._id)}
@@ -281,7 +281,7 @@ export default function HirePage() {
                                                         className={`w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold transition-all duration-200
                                                             ${
                                                                 apps.length === 0
-                                                                    ? "bg-white/10 text-black border border-white/10"
+                                                                    ? "bg-white/10 text-black border border-black/10"
                                                                     : apps.length < 5
                                                                         ? "bg-blue-500/80 text-black"
                                                                         : "bg-blue-600 text-black shadow-md shadow-blue-500/30"
@@ -357,7 +357,7 @@ export default function HirePage() {
 
                                                                                                 {/* LEFT: summary */}
                                                                                                 <div className="space-y-1">
-                                                                                                    <div className="text-gray-300 font-semibold">
+                                                                                                    <div className="text-black font-semibold">
                                                                                                         Applicant Quiz Performance
                                                                                                     </div>
 
@@ -384,7 +384,7 @@ export default function HirePage() {
                                                                                             {openStatsMap[app._id] && app.stats?.topics && Object.keys(app.stats.topics).length > 0 && (
                                                                                                 <div className="mt-2 bg-black-200 p-2 rounded-md border border-gray-800">
 
-                                                                                                    <div className="font-semibold text-gray-300 mb-1">
+                                                                                                    <div className="font-semibold text-black mb-1">
                                                                                                         Topic Breakdown
                                                                                                     </div>
 
@@ -410,11 +410,11 @@ export default function HirePage() {
 
                                                                                                                         <div className="flex gap-2 text-black">
                                                                                                                             <span>{t.seen}</span>
-                                                                                                                            <span className="text-green-400">✔ {t.correct}</span>
+                                                                                                                            <span className="text-green-500">✔ {t.correct}</span>
                                                                                                                             <span className="text-red-400">✖ {t.wrong}</span>
                                                                                                                         </div>
 
-                                                                                                                        <div className="text-green-400 w-12 text-right">
+                                                                                                                        <div className="text-green-500 w-12 text-right">
                                                                                                                             {percent.toFixed(1)}%
                                                                                                                         </div>
                                                                                                                     </div>

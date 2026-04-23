@@ -53,14 +53,14 @@ export default function MainStudyPage() {
 
     if (!tokenValid || loading || tokenExpired) {
         return (
-            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
+            <div className="flex-1 flex items-start justify-center pt-[56px] text-black">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
-                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
-                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
-                </span>
+                <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+            </span>
                 </p>
             </div>
         );
@@ -86,7 +86,7 @@ export default function MainStudyPage() {
                 {/* Full subscription section */}
                 <div className="text-center mb-4">
                     {isPaid ? (
-                        <span className="flex items-center justify-center gap-2 text-green-400 font-semibold">
+                        <span className="flex items-center justify-center gap-2 text-green-500 font-semibold">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                         </svg>
@@ -99,7 +99,7 @@ export default function MainStudyPage() {
                                     Subscribe to unlock all study topics
                                 </p>
                                 <p className="text-black text-sm md:text-base">
-                                    Most importantly, access <span className="font-bold text-green-400">topic-targeted muscle memory quizzes</span> that focus on one topic at a time.
+                                    Most importantly, access <span className="font-bold text-green-500">topic-targeted muscle memory quizzes</span> that focus on one topic at a time.
                                     <br />
                                     Unlike the free version where questions come randomly from all 800+ questions, this ensures faster mastery and retention.
                                 </p>

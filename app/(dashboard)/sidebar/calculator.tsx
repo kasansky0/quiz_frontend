@@ -58,83 +58,61 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
 
 
 
-    useEffect(() => {
-        if (displayRef.current) {
-            displayRef.current.scrollLeft = displayRef.current.scrollWidth;
-        }
-    }, [calcInput, calcResult]);
-
     const showUI = mobile ? true : calcOpen;
 
     if (!session) return null;
 
-    useEffect(() => {
-        if (calcOpen && calcRef.current) {
-            calcRef.current.scrollIntoView({
-                behavior: "smooth", // smooth scrolling animation
-                block: "start",     // align top of element with top of viewport
-            });
-        }
-    }, [calcOpen]);
 
 
 
+    const handleRageClick = () => {
+        setRageClicks(prev => {
+            const next = prev + 1;
 
-    useEffect(() => {
-        if (rageClicks === 0) return;
-
-        // 1 CLICK — SHAKE
-        if (rageClicks === 1) {
+            // ALWAYS immediate feedback
             setShake(true);
-            setTimeout(() => setShake(false), 400);
-        }
+            setTimeout(() => setShake(false), 150);
 
-        // 2 CLICKS — EXPLOSION
-        if (rageClicks === 2) {
-            setExplosion(true);
-            setCalcResult(null);
-            setCalcInput("");
-            setTimeout(() => {
-                setExplosion(false);
+            if (next === 1) {
+                // small shake already handled
+            }
+
+            if (next === 2) {
+                setExplosion(true);
                 setCalcResult(null);
-            }, 1200);
-        }
+                setCalcInput("");
+                setTimeout(() => setExplosion(false), 1200);
+            }
 
-        // 3 CLICKS — CHAOS MODE
-        if (rageClicks === 3) {
-            setChaos(true);
-            setTimeout(() => {
-                setChaos(false);
-            }, 3000);
-        }
+            if (next === 3) {
+                setChaos(true);
+                setTimeout(() => setChaos(false), 3000);
+            }
 
-        // 4 CLICKS — CALM MODE
-        if (rageClicks === 4) {
-            setCalm(true);
-            setTimeout(() => {
-                setCalm(false);
-            }, 3000);
-        }
+            if (next === 4) {
+                setCalm(true);
+                setTimeout(() => setCalm(false), 3000);
+            }
 
-        // 5 CLICKS — RAINBOW MODE
-        if (rageClicks >= 5) {
-            setPowerSurge(true);
-            setTimeout(() => {
-                setPowerSurge(false);
-                setRageClicks(0);
-            }, 3000);
-        }
+            if (next === 5) {
+                setPowerSurge(true);
+                setTimeout(() => {
+                    setPowerSurge(false);
+                    setRageClicks(0);
+                }, 3000);
+            }
 
-        // 6 CLICKS — BREAKER MODE
-        if (rageClicks >= 6) {
-            setBreakerMode(true);
-            setTimeout(() => {
-                setBreakerMode(false);
-                setRageClicks(0);
-            }, 5000);
-        }
+            if (next >= 6) {
+                setBreakerMode(true);
+                setTimeout(() => {
+                    setBreakerMode(false);
+                    setRageClicks(0);
+                }, 5000);
+            }
 
-    }, [rageClicks]);
+            return next;
+        });
+    };
 
 
     return (
@@ -203,7 +181,7 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
                 exit={{ scaleY: 0, opacity: 0, transition: { duration: 0.25, ease: "easeInOut" } }}
                 transition={{ duration: 0.25, ease: "easeInOut" }}
                 style={{ transformOrigin: "top" }}
-                className={`max-w-full px-1 sm:px-2 w-full backdrop-blur-xl rounded-2xl shadow-2xl flex flex-col items-center overflow-hidden
+                className={`max-w-full px-1 sm:px-2 pt-2 pb-4 w-full backdrop-blur-xl rounded-2xl shadow-2xl flex flex-col items-center overflow-hidden border border-black/20
         ${powerSurge
                     ? "bg-blue-900 border-2 border-blue-400 shadow-[0_0_40px_rgba(0,150,255,0.8)] animate-pulse"
                     : breakerMode
@@ -227,7 +205,7 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
                         return (
                             <div
                                 key={i}
-                                className="cursor-pointer hover:text-black transition-colors whitespace-nowrap overflow-hidden truncate"
+                                className="cursor-pointer pt-1 hover:text-black transition-colors whitespace-nowrap overflow-hidden truncate"
                                 onClick={() =>
                                     // append formatted result to input
                                     setCalcInput(prev => prev + (!isNaN(Number(rawResult)) ? formatNumber(Number(rawResult)) : rawResult))
@@ -248,8 +226,8 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
                 {/* Display */}
                 <div
                     ref={displayRef}
-                    className={`w-full sm:w-72 md:w-full px-1 sm:px-3 py-2 sm:py-3 rounded-xl mb-1 mt-1 text-right font-bold text-sm sm:text-base md:text-base overflow-x-auto whitespace-nowrap hide-scrollbar
-                            border ${calcResult === "Error" || isNaN(Number(calcResult)) ? "border-red-500 shadow-[0_0_20px_rgba(255,0,0,0.5)] text-red-500" : "border-green-400/20 text-green-400"}
+                    className={`w-full sm:w-72 md:w-full px-1 sm:px-3 py-2 sm:py-3 rounded-xl mb-1 mt-1 text-right font-bold text-sm sm:text-base md:text-base overflow-hidden whitespace-nowrap
+                            border ${calcResult === "Error" || isNaN(Number(calcResult)) ? "border-red-500 shadow-[0_0_20px_rgba(255,0,0,0.5)] text-red-500" : "border-black/20 text-black"}
                             bg-black-200`}
                 >
                     {calcResult !== null
@@ -259,9 +237,9 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
                         : explosion
                             ? "💥 MATH OVERLOAD 💥"
                             : calm
-                                ? "Breathe in... Breathe out... 🌿"
+                                ? "Breathe in... 🌿"
                                 : powerSurge
-                                    ? "⚡ HIGH VOLTAGE MODE ⚡"
+                                    ? "⚡ HIGH VOLTAGE ⚡"
                                     : calcInput || "0"}
                 </div>
 
@@ -282,10 +260,10 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
                         "√3","π","x²","😤"
                     ].map((btn) => {
                         // Dynamic button classes
-                        const base = "h-6 sm:h-8 md:h-10 rounded-xl font-medium text-sm sm:text-base flex items-center justify-center transition-all duration-150 active:scale-95";
+                        const base = "h-6 sm:h-8 md:h-10 rounded-xl font-medium text-sm sm:text-base flex items-center justify-center transition-all duration-150 active:scale-95 border border-black/20";
                         const colorClasses =
                             btn === "="
-                                ? "bg-green-500/80 text-black font-bold shadow-[0_0_20px_rgba(0,255,120,0.5)] hover:bg-green-400"
+                                ? "bg-green-500/80 text-black font-bold shadow-[0_0_20px_rgba(0,255,120,0.5)] hover:bg-green-500"
                                 : btn === "C"
                                     ? "bg-red-500/70 text-black hover:bg-red-600/80"
                                     : btn === "⌫"
@@ -293,8 +271,8 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
                                         : ["/","*","-","+","."].includes(btn)
                                             ? "bg-white/10 text-black hover:bg-white/20"
                                             : ["√","x²","sin","cos","√3","π","tan"].includes(btn)
-                                                ? "bg-white/10 text-blue-300 hover:bg-white/20"
-                                                : "bg-white/5 text-black hover:bg-white/10";
+                                                ? "bg-black-200 text-blue-300 hover:bg-white/20"
+                                                : "bg-black-200 text-black hover:bg-white/10";
 
                         return (
                             <button
@@ -360,7 +338,7 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
                                     } else if (btn === "π") {
                                         setCalcInput(prev => prev + "π");
                                     } else if (btn === "😤") {
-                                        setRageClicks(prev => prev + 1);
+                                        handleRageClick();
                                         return;
                                     } else if (btn === "√3") {
                                         setCalcInput(prev => prev + "√3");

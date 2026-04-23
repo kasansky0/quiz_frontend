@@ -97,7 +97,7 @@ export default function InfoPage() {
     // Optional: you can show a loading spinner if session is still loading
     if (status === "loading")
         return (
-            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
+            <div className="flex-1 flex items-center justify-center pt-[56px] text-black">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">

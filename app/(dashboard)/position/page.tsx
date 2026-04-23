@@ -91,7 +91,7 @@ export default function AdsPage() {
     // -----------------------------
     if (loading) {
         return (
-            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
+            <div className="flex-1 flex items-center justify-center pt-[56px] text-black">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
@@ -258,7 +258,7 @@ export default function AdsPage() {
                         active:bg-transparent focus:bg-transparent
                         [-webkit-tap-highlight-color:transparent]"
                                 >
-                                    <div className="flex flex-col gap-2 text-xs text-black p-2 rounded-xl border border-white/20">
+                                    <div className="flex flex-col gap-2 text-xs text-black p-2 rounded-xl border border-black/20">
 
                                         {/* TOP ROW (tags) */}
 

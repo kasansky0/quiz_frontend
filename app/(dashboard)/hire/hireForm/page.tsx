@@ -55,8 +55,8 @@ export default function HireFormPage() {
 
     const inputClass = (field: string) =>
         `w-full h-10 px-2 rounded-xl border text-sm
-        ${errors[field] ? "border-red-500 bg-black-200" : "border-gray-700 bg-black-200"}
-        placeholder:text-xs placeholder:text-gray-500`;
+        ${errors[field] ? "border-red-500 bg-black-200" : "border-black bg-black-200"}
+        placeholder:text-xs placeholder:text-black`;
 
 
     useEffect(() => {
@@ -159,7 +159,7 @@ export default function HireFormPage() {
 
     if (status === "loading") {
         return (
-            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
+            <div className="flex-1 flex items-center justify-center pt-[56px] text-black">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
@@ -180,7 +180,7 @@ export default function HireFormPage() {
 
     if (!isReady) {
         return (
-            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
+            <div className="flex-1 flex items-center justify-center pt-[56px] text-black">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
@@ -235,7 +235,7 @@ export default function HireFormPage() {
 
                 <form
                     onSubmit={handleSubmit}
-                    className="bg-black-200 p-4 rounded-2xl space-y-4 border border-gray-800"
+                    className="bg-black-200 p-4 rounded-2xl space-y-4 border border-black"
                 >
 
                     {/* TITLE */}
@@ -339,7 +339,7 @@ export default function HireFormPage() {
                     <button
                         type="submit"
                         disabled={loading || !isFormComplete}
-                        className="w-full bg-black-200 text-black p-2 rounded-xl font-semibold hover:bg-black-200 border border-gray-700 disabled:opacity-50"
+                        className="w-full bg-black-200 text-black p-2 rounded-xl font-semibold hover:bg-black-200 border border-black disabled:opacity-50"
                     >
                         {loading ? "Submitting..." : "Submit for Approval"}
                     </button>

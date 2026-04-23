@@ -44,7 +44,7 @@ export default function StudyPage() {
     // ✅ HARD BLOCK LOADING (PASTE HERE)
     if (loadingSubjects || subscriptionRequired === null) {
         return (
-            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
+            <div className="flex-1 flex items-center justify-center pt-[56px] text-black">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
@@ -117,7 +117,7 @@ export default function StudyPage() {
                             className="rounded-lg bg-black-200 hover:bg-black-200 transition p-2"
                         >
                             <h2 className="font-semibold text-blue-500">{subject.title}</h2>
-                            <p className="text-sm text-gray-300">{subject.description}</p>
+                            <p className="text-sm text-black">{subject.description}</p>
                         </Link>
                     ))}
                 </div>

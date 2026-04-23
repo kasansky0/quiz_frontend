@@ -18,7 +18,7 @@ export function HeroCard({ question }: { question: any }) {
             }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             style={{ transformStyle: "preserve-3d", perspective: 1400 }}
-            className="group relative max-w-xl w-full bg-gradient-to-br from-green-600/60 to-green-400/40 backdrop-blur-2xl border border-green-300/30 rounded-2xl shadow-[0_10px_40px_rgba(0,180,90,0.25)] p-4 md:p-6 text-black"
+            className="group relative max-w-xl w-full bg-gradient-to-br from-green-600/60 to-green-500/40 backdrop-blur-2xl border border-green-300/30 rounded-2xl shadow-[0_10px_40px_rgba(0,180,90,0.25)] p-4 md:p-6 text-black"
         >
             {/* Visual effects */}
             <div className="absolute inset-0 rounded-2xl pointer-events-none bg-gradient-to-tr from-white/5 to-transparent opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
@@ -28,7 +28,7 @@ export function HeroCard({ question }: { question: any }) {
                 transition={{ repeat: Infinity, duration: 6, ease: "linear" }}
                 className="absolute inset-y-0 w-1/3 left-0 bg-gradient-to-r from-white/5 via-white/10 to-transparent rounded-2xl blur-xl pointer-events-none"
             />
-            <div className="absolute inset-0 bg-gradient-to-br from-green-400/20 to-green-300/10 rounded-2xl pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/20 to-green-300/10 rounded-2xl pointer-events-none" />
 
             {/* Content */}
             <h2 className="text-xl font-bold mb-3">NETA Level 2 Practice Question</h2>

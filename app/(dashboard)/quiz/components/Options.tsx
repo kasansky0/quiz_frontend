@@ -15,16 +15,16 @@ export default function Option({ text, isSelected, isAnswer, disabled, onClick }
     if (disabled) {
         if (isSelected && isAnswer) {
             // Selected correct → dull green
-            baseClass += " bg-green-500/50 border-green-500/50 shadow-lg hover:scale-[1.02]";
+            baseClass += " bg-green-500/40 border-green-500/50 shadow-lg hover:scale-[1.02]";
         } else if (isSelected && !isAnswer) {
             // Selected wrong → dull red
-            baseClass += " bg-black-200 border-gray-700 shadow-md hover:scale-[1.02]";
+            baseClass += " bg-white border-black shadow-md hover:scale-[1.02]";
         } else if (!isSelected && isAnswer) {
             // Correct answer not selected → dull green
-            baseClass += " bg-green-500/50 border-green-500/50 shadow-md hover:scale-[1.02]";
+            baseClass += " bg-green-500/40 border-green-500/50 shadow-md hover:scale-[1.02]";
         } else {
             // Unselected and not correct → dark gray + keep hover effect
-            baseClass += " bg-black-200 border-black text-black shadow-inner hover:bg-gray-700 hover:scale-[1.02]";
+            baseClass += " bg-white border-black text-black shadow-inner hover:bg-black-200 hover:scale-[1.02]";
         }
 
     } else if (isSelected) {
@@ -32,7 +32,7 @@ export default function Option({ text, isSelected, isAnswer, disabled, onClick }
     } else {
         // Normal unselected option
         baseClass +=
-            " bg-black-200 border-gray-700 hover:bg-black-200 hover:scale-[1.02] hover:shadow-md";
+            " bg-white border-black hover:bg-black-200 hover:scale-[1.02] hover:shadow-md";
     }
 
     return (

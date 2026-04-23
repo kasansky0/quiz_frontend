@@ -56,7 +56,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     // 1️⃣ While session is loading, just show a placeholder
     if (status === "loading") {
         return (
-            <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
+            <div className="flex-1 flex items-center justify-center pt-[56px] text-black">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
@@ -850,7 +850,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         <div className={`transition-opacity duration-500 ease-in-out ${fade ? "opacity-100" : "opacity-0"}`}>
 
             {showLoading ? (
-                <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
+                <div className="flex-1 flex items-center justify-center pt-[56px] text-black">
                     <p className="text-xl flex items-center">
                         Loading
                         <span className="ml-2 flex space-x-1">
@@ -894,7 +894,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                         {/* Future Ads / Message */}
                         <Link
                             href="/position"
-                            className="w-full text-center text-sm py-1 transition block active:bg-transparent focus:bg-transparent [-webkit-tap-highlight-color:transparent]"
+                            className="w-full text-center text-sm pt-1 pb-3 transition block active:bg-transparent focus:bg-transparent [-webkit-tap-highlight-color:transparent]"
                         >
                             <div className="font-semibold">
                                 💼 Hiring NETA Technicians
@@ -916,7 +916,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                         <div className="space-y-3 pb-16">
 
                             {/* Post */}
-                            <div className="z-10 sm:px-2 py-2 rounded-xl bg-transparent mb-2">
+                            <div className="z-10 sm:px-4 py-4 px-4 rounded-xl bg-white border border-black/10 shadow-sm mb-2">
 
 
                                 <div className="flex justify-between items-center pb-3">
@@ -931,8 +931,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                     fill="none"
                                                     viewBox="0 0 24 24"
                                                     strokeWidth={1.5}
-                                                    stroke="yellow"
-                                                    className="size-4"
+                                                    stroke="currentColor"
+                                                    className="size-4 text-amber-500"
                                                 >
                                                     <path
                                                         strokeLinecap="round"
@@ -1058,7 +1058,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                             }}
                                             rows={3}
                                             placeholder="Edit title..."
-                                            className="bg-transparent w-full rounded-xl bg-black-200 border border-white/10 px-2 py-1 text-sm sm:text-sm md:text-base text-black resize-none focus:outline-none focus:ring-2 focus:ring-white/20"
+                                            className="bg-transparent w-full rounded-xl bg-black-200 border border-black/10 px-2 py-1 text-sm sm:text-sm md:text-base text-black resize-none focus:outline-none focus:ring-2 focus:ring-white/20"
                                         />
                                         <div className="text-black text-xs text-right">
                                             {editTitle.length}/100
@@ -1074,7 +1074,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                             }}
                                             rows={11}
                                             placeholder="Edit message..."
-                                            className="bg-transparent w-full rounded-xl bg-black-200 border border-white/10 px-2 py-1 text-sm sm:text-sm md:text-base text-black resize-none focus:outline-none focus:ring-2 focus:ring-white/20"
+                                            className="bg-transparent w-full rounded-xl bg-black-200 border border-black/10 px-2 py-1 text-sm sm:text-sm md:text-base text-black resize-none focus:outline-none focus:ring-2 focus:ring-white/20"
                                         />
                                         <div className="text-black text-xs text-right">
                                             {editMessage.length}/500
@@ -1099,94 +1099,97 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
 
                             {/* Add comment */}
-                            <div className="z-10 w-full bg-black-200 backdrop-blur-xl shrink-0">
+                            <div className="z-10 w-full bg-white border border-black/10 rounded-xl shadow-sm p-2 mt-2">
 
                                 {/* 🚨 Block Banner */}
                                 {isBlocked && blockMessage && (
                                     <div className="mb-2 text-red-400 text-xs sm:text-sm text-center">
-                                        {blockMessage} {blockSeconds ? `Wait ${blockSeconds} second(s).` : null}
+                                        {blockMessage} {blockSeconds ? `Wait ${blockSeconds}s.` : null}
                                     </div>
                                 )}
 
-
-
                                 <form
-                                    className="flex items-center gap-2"
+                                    className="flex items-end gap-2"
                                     onSubmit={(e) => {
                                         e.preventDefault();
                                         if (!commentMessage.trim() || isBlocked) return;
                                         handleAddComment(commentMessage.trim());
-                                        requestAnimationFrame(() => {
-                                            setCommentMessage("");
-                                        });
+                                        requestAnimationFrame(() => setCommentMessage(""));
                                     }}
                                 >
-                                                    <textarea
-                                                        ref={commentInputRef}
-                                                        style={{ WebkitOverflowScrolling: "touch" }}
-                                                        placeholder={placeholderText}
-                                                        className={`
-                                                          my-1
-                                                          flex-1
-                                                          min-h-[40px]
-                                                          rounded-xl
-                                                          bg-transparent
-                                                          px-3
-                                                          py-2
-                                                          text-sm sm:text-sm md:text-base
-                                                          text-black
-                                                          placeholder:text-[10px] sm:placeholder:text-xs md:placeholder:text-sm
-                                                          placeholder-black
-                                                          border
-                                                          border-black
-                                                          focus:outline-none
-                                                          focus:ring-2
-                                                          focus:ring-white/20
-                                                          resize-none
-                                                          overflow-hidden
-                                                          ${isSending ? "opacity-50 cursor-not-allowed" : ""}
-                                                        `}
-                                                        rows={1}
-                                                        value={commentMessage}
-                                                        onChange={(e) => {
-                                                            if (isSending) return; // 🔒 HARD BLOCK
-                                                            const value = e.target.value;
-                                                            if (value.length <= 500) setCommentMessage(value);
-                                                            else setCommentMessage(value.slice(0, 500));
-                                                        }}
-                                                        disabled={isBlocked || isSending}
-                                                    />
+                                    {/* Input box */}
+                                    <textarea
+                                        ref={commentInputRef}
+                                        placeholder={placeholderText}
+                                        rows={1}
+                                        className="
+                flex-1
+                resize-none
+                bg-black-200
+                border border-black/10
+                rounded-xl
+                px-3 py-2
+                text-sm sm:text-base
+                text-black
+                placeholder-black/50
+                focus:outline-none
+                focus:ring-2
+                focus:ring-blue-400/30
+                focus:bg-white
+                transition
+                min-h-[42px]
+            "
+                                        value={commentMessage}
+                                        onChange={(e) => {
+                                            if (isSending) return;
+                                            const value = e.target.value;
+                                            if (value.length <= 500) setCommentMessage(value);
+                                            else setCommentMessage(value.slice(0, 500));
+                                        }}
+                                        disabled={isBlocked || isSending}
+                                    />
 
+                                    {/* Send button */}
                                     <button
                                         type="submit"
                                         disabled={!commentMessage.trim() || isBlocked || isSending}
+                                        className="
+                h-[42px] w-[42px]
+                flex items-center justify-center
+                rounded-xl
+                bg-blue-500
+                hover:bg-blue-600
+                disabled:opacity-40
+                transition
+            "
                                     >
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             fill="none"
                                             viewBox="0 0 24 24"
-                                            strokeWidth={1.5}
-                                            stroke="currentColor"
-                                            className="w-8 h-8"
+                                            strokeWidth={2}
+                                            stroke="white"
+                                            className="w-5 h-5"
                                         >
                                             <path
                                                 strokeLinecap="round"
                                                 strokeLinejoin="round"
-                                                d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                                d="M9 12.75 11.25 15 15 9.75"
                                             />
                                         </svg>
                                     </button>
-
-
                                 </form>
-                                {/* --- Inline Status Banner --- */}
+
+                                {/* Status */}
                                 {statusBanner && (
-                                    <StatusBanner
-                                        message={statusBanner.message}
-                                        type={statusBanner.type}
-                                        onClose={() => setStatusBanner(null)}
-                                        inline={true} // show above textarea
-                                    />
+                                    <div className="mt-2">
+                                        <StatusBanner
+                                            message={statusBanner.message}
+                                            type={statusBanner.type}
+                                            onClose={() => setStatusBanner(null)}
+                                            inline={true}
+                                        />
+                                    </div>
                                 )}
                             </div>
 
@@ -1213,8 +1216,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                     className={`w-full flex ${isOwner ? "justify-end" : "justify-start"}`}
                                                 >
                                                     <div
-                                                        className={`relative block w-full px-1 sm:px-2 pt-3 rounded-xl
-                                                                            ${isOwner ? `ml-auto bg-transparent` : "mr-auto bg-black-200"}`}
+                                                        className={`relative block w-full sm:px-4 py-4 px-4 rounded-xl
+                                                                            ${isOwner ? `mr-auto bg-white border border-black/10` : "mr-auto bg-white border border-black/10"}`}
 
                                                     >
                                                         {/* nickname + edit/delete */}
@@ -1239,8 +1242,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                                                         fill="none"
                                                                                         viewBox="0 0 24 24"
                                                                                         strokeWidth={1.5}
-                                                                                        stroke="yellow"
-                                                                                        className="size-4"
+                                                                                        stroke="currentColor"
+                                                                                        className="size-4 text-amber-500"
                                                                                     >
                                                                                         <path
                                                                                             strokeLinecap="round"
@@ -1341,7 +1344,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                             contentEditable={isEditing}
                                                             suppressContentEditableWarning
                                                             className={`text-black break-words whitespace-pre-wrap
-                                                                                ${isEditing ? "text-base border border-white px-2 py-1" : "text-sm sm:text-sm md:text-base"}
+                                                                                ${isEditing ? "text-base border border-black px-2 py-1" : "text-sm sm:text-sm md:text-base"}
                                                                                 bg-transparent rounded-xl`}
                                                             ref={(el) => {
                                                                 if (el && isEditing && el.innerText !== editCommentMessage) {
@@ -1382,24 +1385,28 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                             {hasMoreComments && (
                                 <button
                                     onClick={async () => {
+                                        if (isButtonLoading) return; // 🔒 HARD BLOCK (prevents spam clicks)
+
                                         setIsButtonLoading(true);
 
                                         const start = Date.now();
 
-                                        await handleLoadMore();
+                                        try {
+                                            await handleLoadMore();
 
-                                        // force spinner to be visible at least 400–600ms
-                                        const elapsed = Date.now() - start;
-                                        const minTime = 500;
+                                            // force spinner to be visible at least 400–600ms
+                                            const elapsed = Date.now() - start;
+                                            const minTime = 500;
 
-                                        if (elapsed < minTime) {
-                                            await new Promise((r) => setTimeout(r, minTime - elapsed));
+                                            if (elapsed < minTime) {
+                                                await new Promise((r) => setTimeout(r, minTime - elapsed));
+                                            }
+                                        } finally {
+                                            setIsButtonLoading(false);
                                         }
-
-                                        setIsButtonLoading(false);
                                     }}
                                     style={{ touchAction: "manipulation" }}
-                                    className="w-full flex justify-center items-center py-3 bg-blue-50 hover:bg-blue-100 rounded-xl mt-2 transition"
+                                    className="w-full flex justify-center items-center py-3 bg-blue-500/90 hover:bg-blue-500 rounded-xl mt-2 transition"
                                 >
                                     {/* Icon: spins when loading */}
                                     <svg
@@ -1408,7 +1415,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                         viewBox="0 0 24 24"
                                         strokeWidth={1.5}
                                         stroke="currentColor"
-                                        className={`w-6 h-6 text-blue-600 transition-transform ${
+                                        className={`w-6 h-6 text-white transition-transform ${
                                             isButtonLoading ? "animate-spin" : ""
                                         }`}
                                     >
@@ -1418,7 +1425,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                             d="m9 12.75 3 3m0 0 3-3m-3 3v-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
                                         />
                                     </svg>
-                                    <span className="ml-2 text-blue-600 font-medium text-sm sm:text-base">
+                                    <span className="ml-2 text-white font-medium text-sm sm:text-base">
                                       {isButtonLoading ? "Loading..." : "Load More"}
                                     </span>
                                 </button>

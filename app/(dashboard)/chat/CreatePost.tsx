@@ -95,16 +95,25 @@ export default function CreatePost({
 
 
     return (
-        <div className="w-full max-w-3xl min-h-screen flex flex-col space-y-4 rounded-xl bg-black-200">
+        <div className="w-full min-h-screen flex justify-center bg-black-200">
 
-            <div className={`w-full max-w-3xl transition-opacity duration-500 ease-in-out ${fade ? "opacity-100" : "opacity-0"}`}>
-                <form className="w-full flex flex-col space-y-4" onSubmit={handleSubmit}>
+            <div className={`w-full max-w-3xl lg:max-w-5xl xl:max-w-6xl transition-opacity duration-500 ease-in-out ${
+                fade ? "opacity-100" : "opacity-0"
+            }`}>
 
+                <form
+                    className="w-full flex flex-col space-y-4 bg-white border border-black/10 rounded-xl p-4 shadow-sm"
+                    onSubmit={handleSubmit}
+                >
 
-                    <div className="flex items-center justify-start">
+                    {/* HEADER */}
+                    <div className="flex items-center justify-between">
+
+                        {/* Back */}
                         <button
                             type="button"
                             onClick={onCancel}
+                            className="p-2 rounded-full hover:bg-black/5 transition"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -122,45 +131,39 @@ export default function CreatePost({
                             </svg>
                         </button>
 
-                        {/* Future Ads / Message */}
+                        {/* Center message */}
                         <Link
                             href="/position"
-                            className="w-full text-center text-sm py-1 transition block active:bg-transparent focus:bg-transparent [-webkit-tap-highlight-color:transparent]"
+                            className="text-center text-xs sm:text-sm flex-1 px-2"
                         >
                             <div className="font-semibold">
                                 💼 Hiring NETA Technicians
                             </div>
-
-                            <div className="text-xs mt-1">
-                                📍 Multiple locations • Relocation assistance
+                            <div className="text-black/60 text-xs">
+                                Multiple locations • Relocation assistance
                             </div>
-
-                            <div className="text-blue-400 text-xs mt-2">
+                            <div className="text-blue-500 text-xs mt-1">
                                 View positions →
                             </div>
                         </Link>
 
-
+                        {/* Post button (clean LinkedIn style) */}
                         <button
                             type="submit"
                             disabled={isSending}
-                            className={`transition ${
-                                isSending ? "opacity-40 cursor-not-allowed" : "hover:scale-105"
+                            className={`px-4 py-1.5 rounded-full text-sm font-semibold transition
+                        ${
+                                isSending
+                                    ? "bg-black/20 text-black/40 cursor-not-allowed"
+                                    : "bg-blue-600 text-white hover:bg-blue-700"
                             }`}
                         >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 -960 960 960"
-                                className="w-8 h-8 fill-green-500"
-                            >
-                                <path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z" />
-                            </svg>
+                            Post
                         </button>
 
                     </div>
 
-
-                    {/* Topic Field */}
+                    {/* TITLE */}
                     <div className="flex flex-col">
                         <Textarea
                             placeholder="Title..."
@@ -170,59 +173,53 @@ export default function CreatePost({
                                 if (value.length <= TITLE_LIMIT) setTitle(value);
 
                                 if (errors.title) {
-                                    setErrors((prev) => ({...prev, title: undefined}));
+                                    setErrors((prev) => ({ ...prev, title: undefined }));
                                 }
                             }}
-                            rows={3}
-                            className={`w-full placeholder:text-black rounded-xl px-3 py-2 text-lg font-semibold resize-none text-black bg-transparent border ${
-                                errors.title ? "border-red-500" : "border-black"
+                            rows={2}
+                            className={`w-full rounded-lg px-3 py-2 text-lg font-semibold resize-none bg-transparent border ${
+                                errors.title ? "border-red-500" : "border-black/10"
                             }`}
                         />
-                        {errors.title && (
-                            <p className="text-red-500 text-xs mt-1">{errors.title}</p>
-                        )}
-                        <span className="text-black text-sm self-end">
-                            {title.length}/{TITLE_LIMIT}
-                        </span>
+                        <span className="text-black/60 text-xs self-end">
+                        {title.length}/{TITLE_LIMIT}
+                    </span>
                     </div>
 
-                    {isSending && (<StatusBanner type="loading" message="Sending post..." />)}
-
-
-                    {/* --- Blocked Banner Between Title and Message --- */}
+                    {/* BLOCK MESSAGE */}
                     {isBlocked && blockMessage && (
-                        <div className="mb-2 text-red-400 text-xs sm:text-sm text-center">
-                            {blockMessage} {blockSeconds ? `Wait ${blockSeconds} second(s).` : null}
+                        <div className="text-red-500 text-xs text-center">
+                            {blockMessage}{" "}
+                            {blockSeconds ? `Wait ${blockSeconds}s.` : null}
                         </div>
                     )}
 
-
-                    {/* Main Body */}
+                    {/* MESSAGE */}
                     <div className="flex flex-col">
                         <Textarea
-                            placeholder="Body text..."
+                            placeholder="What do you want to talk about?"
                             value={message}
                             onChange={(e) => {
                                 const value = e.target.value;
                                 if (value.length <= MESSAGE_LIMIT) setMessage(value);
 
                                 if (errors.message) {
-                                    setErrors((prev) => ({...prev, message: undefined}));
+                                    setErrors((prev) => ({ ...prev, message: undefined }));
                                 }
                             }}
-                            rows={15}
-                            className={`w-full placeholder:text-black rounded-xl px-2 py-2 text-base resize-none text-black bg-transparent border ${
-                                errors.message ? "border-red-500" : "border-black"
+                            rows={10}
+                            className={`w-full rounded-lg px-3 py-2 text-base resize-none bg-transparent border ${
+                                errors.message ? "border-red-500" : "border-black/10"
                             }`}
                         />
-                        {errors.message && (
-                            <p className="text-red-500 text-xs mt-1">{errors.message}</p>
-                        )}
-                        <span className="text-black text-sm self-end">
-                            {message.length}/{MESSAGE_LIMIT}
-                        </span>
+                        <span className="text-black/60 text-xs self-end">
+                        {message.length}/{MESSAGE_LIMIT}
+                    </span>
                     </div>
 
+                    {isSending && (
+                        <StatusBanner type="loading" message="Sending post..." />
+                    )}
 
                 </form>
             </div>

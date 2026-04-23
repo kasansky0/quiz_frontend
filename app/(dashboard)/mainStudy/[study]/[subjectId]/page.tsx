@@ -54,7 +54,7 @@ export default function SubjectPage() {
     return (
         <div className="p-4 md:p-4 text-black relative min-h-screen">
             {loading || subscriptionRequired === undefined ? (
-                <div className="fixed inset-0 md:left-64 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
+                <div className="flex-1 flex items-center justify-center pt-[56px] text-black">
                     <p className="text-xl flex items-center">
                         Loading
                         <span className="ml-2 flex space-x-1">
@@ -122,7 +122,7 @@ export default function SubjectPage() {
                     </div>
 
                     <h1 className="text-2xl text-center font-bold mb-4 text-blue-500">{subject.title}</h1>
-                    <p className="mb-4 text-gray-300">{subject.description}</p>
+                    <p className="mb-4 text-black">{subject.description}</p>
 
                     {subject.isQuiz && (
                         <div className="flex justify-center my-4 w-full">
@@ -167,7 +167,7 @@ export default function SubjectPage() {
                                                 <div key={sub.id} className="bg-black-200 rounded-md">
                                                     <h3 className="font-medium text-lg">{sub.title}</h3>
 
-                                                    <p className="text-gray-300 text-sm leading-relaxed">
+                                                    <p className="text-black text-sm leading-relaxed">
                                                         {sub.content?.split("\n").map((line, i) => (
                                                             <span key={i}>
                                                                 {line}
@@ -190,7 +190,7 @@ export default function SubjectPage() {
                                             ))}
                                         </div>
                                     ) : (
-                                        <p className="ml-4 text-gray-500">No subtopics</p>
+                                        <p className="ml-4 text-black">No subtopics</p>
                                     )}
                                 </div>
                             ))}

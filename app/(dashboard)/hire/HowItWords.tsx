@@ -77,7 +77,7 @@ export default function HowItWorks() {
                             Each applicant includes a <span className="text-black font-semibold">Quiz Performance</span> section:
                             <ul className="mt-1 space-y-1 list-disc pl-5 text-black">
                                 <li>
-                                    The system tracks how many questions were <span className="text-black">seen</span>, <span className="text-green-400">correct</span>, and <span className="text-red-400">incorrect</span>.
+                                    The system tracks how many questions were <span className="text-black">seen</span>, <span className="text-green-500">correct</span>, and <span className="text-red-400">incorrect</span>.
                                 </li>
 
                                 <li>

@@ -9,7 +9,7 @@ export default function TopBar() {
             </div>
 
             {/* Right side info */}
-            <div className="text-sm text-green-400">
+            <div className="text-sm text-green-500">
                 Free • No Ads
             </div>
         </div>
