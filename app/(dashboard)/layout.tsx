@@ -542,7 +542,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
             {/* ===== TOP BAR ===== */}
-            <div className="fixed top-0 left-0 right-0 z-50
+            <div className="fixed top-0 left-0 right-0 z-[100]
                 pt-[env(safe-area-inset-top)]
                 h-[calc(56px+env(safe-area-inset-top))]
                 bg-green-500 shadow-md flex items-center px-4 justify-between">
@@ -777,7 +777,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     <>
                         {/* Backdrop */}
                         <motion.div
-                            className="fixed inset-0 bg-black-200 z-50 md:hidden"
+                            className="fixed inset-0 bg-black-200/60 z-50 md:hidden"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}

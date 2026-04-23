@@ -22,9 +22,9 @@ export default function Page() {
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
-                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
-                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                          <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
                         </span>
                 </p>
             </div>

@@ -572,11 +572,7 @@ export default function QuizSampleSection({
                                             <Button
                                                 onClick={handleNextQuestion}
                                                 disabled={isFetchingNext}
-                                                className={`flex items-center justify-center gap-2 px-6 py-3 text-sm sm:text-base font-medium rounded-full shadow-md transition-all duration-200
-                                                ${isFetchingNext
-                                                    ? "bg-blue-400 cursor-not-allowed opacity-70 shadow-none"
-                                                    : "bg-blue-600 hover:bg-blue-700 active:scale-95 hover:shadow-lg"}
-                                                    `}
+                                                className="flex items-center justify-center gap-2 px-6 py-3 text-sm sm:text-base font-medium rounded-full disabled:cursor-not-allowed"
                                             >
                                                 {isFetchingNext ? (
                                                     <span className="flex items-center gap-2">
