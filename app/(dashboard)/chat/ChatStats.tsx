@@ -423,18 +423,18 @@ export default function ChatStats() {
 
 
     return (
-        <div className="w-full max-w-lg mx-auto relative">
+        <div className="w-full relative sm:px-4">
             {/* Loading / Error Banner */}
             {(showLoading || serverError) && (
-                <div className="flex-1 flex items-center justify-center pt-[56px] text-black">
+                <div className="flex-1 flex items-center justify-center pt-[56px] text-black w-full">
                     {showLoading && (
                         <p className="text-xl flex items-center">
                             Loading
                             <span className="ml-2 flex space-x-1">
-                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
-                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
-                </span>
+                            <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                            <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                            <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                        </span>
                         </p>
                     )}
                     {!showLoading && serverError && (
@@ -445,19 +445,19 @@ export default function ChatStats() {
 
             {/* Main Content */}
             {!showLoading && allPosts.length > 0 && (
-                <div className="w-full max-w-lg mx-auto flex flex-col pb-10">
+                <div className="w-full flex flex-col pb-10">
                     {creatingPost && (
                         <CreatePost
                             onSubmit={handleCreatePost}
                             onCancel={() => setCreatingPost(false)}
-                            isBlocked={false} // no block while loading already done
+                            isBlocked={false}
                         />
                     )}
 
                     {!creatingPost && !activePost && (
                         <>
-                            {/* Posts list */}
-                            <div className="flex items-center justify-start relative">
+                            {/* Top bar */}
+                            <div className="flex items-center justify-start relative w-full">
                                 <button onClick={() => setCreatingPost(true)}>
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -467,10 +467,11 @@ export default function ChatStats() {
                                         <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h360v80H200v560h560v-360h80v360q0 33-23.5 56.5T760-120H200Zm120-160v-80h320v80H320Zm0-120v-80h320v80H320Zm0-120v-80h320v80H320Zm360-80v-80h-80v-80h80v-80h80v80h80v80h-80v80h-80Z"/>
                                     </svg>
                                 </button>
+
                                 {/* Future Ads / Message */}
                                 <Link
                                     href="/position"
-                                    className="w-full text-center text-sm py-1 transition block active:bg-transparent focus:bg-transparent [-webkit-tap-highlight-color:transparent]"
+                                    className="flex-1 text-center text-sm py-1 transition block active:bg-transparent focus:bg-transparent [-webkit-tap-highlight-color:transparent]"
                                 >
                                     <div className="font-semibold">
                                         💼 Hiring NETA Technicians
@@ -486,36 +487,41 @@ export default function ChatStats() {
                                 </Link>
                             </div>
 
-                            <div className={`mx-auto max-w-4xl transition-opacity duration-500 ease-in-out ${listFade ? "opacity-100" : "opacity-0"}`}>
-                                <div className="space-y-2">
+                            {/* Posts list */}
+                            <div
+                                className={`w-full transition-opacity duration-500 ease-in-out ${
+                                    listFade ? "opacity-100" : "opacity-0"
+                                }`}
+                            >
+                                <div className="space-y-2 w-full">
                                     {filteredPosts.map(post => (
                                         <div
                                             key={post.id}
                                             onClick={() => handleActivatePost(post)}
                                             className={`
-    relative cursor-pointer
-    rounded-2xl p-3
+                                            relative cursor-pointer
+                                            rounded-2xl p-3 w-full
 
-    bg-black-200/70 backdrop-blur-xl
-    border border-black/5
+                                            bg-white backdrop-blur-xl
+                                            border border-black/5
 
-    shadow-sm hover:shadow-md
-    hover:border-black/10
-    hover:translate-y-[-1px]
+                                            shadow-sm hover:shadow-md
+                                            hover:border-black/10
+                                            hover:translate-y-[-1px]
 
-    transition-all duration-200
-    active:scale-[0.99]
+                                            transition-all duration-200
+                                            active:scale-[0.99]
 
-    ${newCommentPosts.has(post.id)
+                                            ${newCommentPosts.has(post.id)
                                                 ? "ring-1 ring-yellow-400/40 bg-yellow-400/10"
                                                 : "hover:bg-black-300/40"
                                             }
-`}
+                                        `}
                                         >
                                             <div className="flex items-center mb-0.5 w-full">
-                                                <div className="flex items-center gap-2 truncate">
+                                                <div className="flex items-center gap-2 truncate w-full">
                                                 <span className="flex items-center gap-1 text-sm sm:text-sm md:text-base font-bold truncate text-blue-400">
-                                                        {post.nickname}
+                                                    {post.nickname}
 
                                                     {userId && post.userId === userId && (
                                                         <svg
@@ -534,8 +540,8 @@ export default function ChatStats() {
                                                         </svg>
                                                     )}
                                                 </span>
-                                                    <div className="flex items-center justify-center bg-black-200 backdrop-blur-xl border border-black/10 rounded-full shadow-lg px-2 h-5 min-w-[40px] truncate">
 
+                                                    <div className="flex items-center justify-center bg-black-200 backdrop-blur-xl border border-black/10 rounded-full shadow-lg px-2 h-5 min-w-[40px] truncate">
                                                         <svg
                                                             aria-hidden="true"
                                                             className="w-3 h-3 mr-1 text-black"
@@ -546,27 +552,31 @@ export default function ChatStats() {
                                                         </svg>
 
                                                         <span className="text-black text-sm font-medium">
-                                                            {post.commentCount ?? 0}
-                                                        </span>
+                                                        {post.commentCount ?? 0}
+                                                    </span>
 
                                                         {newCommentPosts.has(post.id) && (
                                                             <span className="ml-1 text-yellow-400 text-sm font-semibold">
-                                                                +1
-                                                            </span>
+                                                            +1
+                                                        </span>
                                                         )}
 
                                                         {post.pinned && (
                                                             <span className="ml-1 text-yellow-400 text-sm font-bold">
-                                                                📌
-                                                            </span>
+                                                            📌
+                                                        </span>
                                                         )}
                                                     </div>
                                                 </div>
+
                                                 <span className="text-black text-sm sm:text-sm md:text-base ml-auto whitespace-nowrap">
-                                                    {formatLocalDate(post.timestamp, post.edited)}
-                                                </span>
+                                                {formatLocalDate(post.timestamp, post.edited)}
+                                            </span>
                                             </div>
-                                            <h3 className="text-black font-bold mb-0.5 text-sm sm:text-base md:text-base line-clamp-2">{post.title}</h3>
+
+                                            <h3 className="text-black font-bold mb-0.5 text-sm sm:text-base md:text-base line-clamp-2">
+                                                {post.title}
+                                            </h3>
                                         </div>
                                     ))}
                                 </div>
@@ -577,7 +587,7 @@ export default function ChatStats() {
                                 <div className="flex justify-center my-3 w-full">
                                     <button
                                         onClick={async () => {
-                                            if (loadingMore) return; // 🔥 HARD GUARD
+                                            if (loadingMore) return;
                                             setLoadingMore(true);
                                             await loadMorePosts();
                                             setLoadingMore(false);
@@ -585,15 +595,15 @@ export default function ChatStats() {
                                         disabled={loadingMore}
                                         style={{ touchAction: "manipulation" }}
                                         className={`
-                                            w-full sm:w-auto px-6 py-3
-                                            flex items-center justify-center gap-2
-                                            rounded-full font-medium text-sm sm:text-base
-                                            text-white bg-blue-400
-                                            hover:bg-blue-400 active:bg-blue-400
-                                            shadow-sm
-                                            transition-all duration-200
-                                            disabled:opacity-60 disabled:cursor-not-allowed
-                                        `}
+                                        w-full sm:w-auto px-6 py-3
+                                        flex items-center justify-center gap-2
+                                        rounded-full font-medium text-sm sm:text-base
+                                        text-white bg-blue-400
+                                        hover:bg-blue-400 active:bg-blue-400
+                                        shadow-sm
+                                        transition-all duration-200
+                                        disabled:opacity-60 disabled:cursor-not-allowed
+                                    `}
                                     >
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
@@ -613,8 +623,8 @@ export default function ChatStats() {
                                         </svg>
 
                                         <span>
-                                            {loadingMore ? "Loading..." : "Load More Posts"}
-                                        </span>
+                                        {loadingMore ? "Loading..." : "Load More Posts"}
+                                    </span>
                                     </button>
                                 </div>
                             )}
@@ -622,29 +632,44 @@ export default function ChatStats() {
                     )}
 
                     {/* Active Post */}
-                    <div className={`transition-opacity duration-500 ease-in-out ${listFade ? "opacity-100" : "opacity-0"} w-full flex-1`}>
+                    <div
+                        className={`transition-opacity duration-500 ease-in-out ${
+                            listFade ? "opacity-100" : "opacity-0"
+                        } w-full flex-1`}
+                    >
                         {activePost && (
                             <ActivePost
                                 deletedCommentIds={deletedCommentIds}
                                 setDeletedCommentIds={setDeletedCommentIds}
                                 post={activePost}
-                                comments={{ comments: activePostComments, total: Number(activePost.commentCount ?? 0) }}
+                                comments={{
+                                    comments: activePostComments,
+                                    total: Number(activePost.commentCount ?? 0),
+                                }}
                                 userId={userId}
                                 onBack={handleBackToList}
                                 totalComments={Number(activePost.commentCount ?? 0)}
                                 onPostUpdate={(updatedPost: Post) => {
-                                    setAllPosts(prev => prev.map(p => p.id === updatedPost.id ? updatedPost : p));
+                                    setAllPosts(prev =>
+                                        prev.map(p => (p.id === updatedPost.id ? updatedPost : p))
+                                    );
                                 }}
                                 onPostDelete={(deletedPostId: string) => {
-                                    setAllPosts(prev => prev.filter(p => p.id !== deletedPostId));
+                                    setAllPosts(prev =>
+                                        prev.filter(p => p.id !== deletedPostId)
+                                    );
                                     setTotalPosts(prev => prev - 1);
                                 }}
                                 onCommentCountChange={(postId: string, newCount: number) => {
                                     if (activePost.id === postId) {
-                                        setActivePost(prev => prev ? { ...prev, commentCount: newCount } : prev);
+                                        setActivePost(prev =>
+                                            prev ? { ...prev, commentCount: newCount } : prev
+                                        );
                                     }
                                     setAllPosts(prev =>
-                                        prev.map(p => (p.id === postId ? { ...p, commentCount: newCount } : p))
+                                        prev.map(p =>
+                                            p.id === postId ? { ...p, commentCount: newCount } : p
+                                        )
                                     );
                                 }}
                             />
@@ -652,6 +677,8 @@ export default function ChatStats() {
                     </div>
                 </div>
             )}
+
+            {/* Active post outside main content still controlled */}
         </div>
     );
 }

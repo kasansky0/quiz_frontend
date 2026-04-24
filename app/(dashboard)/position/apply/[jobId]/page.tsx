@@ -284,7 +284,6 @@ export default function ApplyPage() {
                 let friendlyMsg = "Something went wrong. Please try again.";
 
                 if (typeof result.error === "string") {
-                    // if backend returned a string with prohibited content
                     if (result.error.includes("Prohibited content detected") || result.error.includes("<script")) {
                         friendlyMsg = "Check your content and try again.";
                     } else if (result.error.includes("already submitted")) {
@@ -293,13 +292,11 @@ export default function ApplyPage() {
                         friendlyMsg = result.error;
                     }
                 } else if (typeof result.error === "object") {
-                    // field-level errors or unknown object
                     friendlyMsg = "Check your content and try again.";
                 }
 
                 showError(friendlyMsg, result.loginRequired);
 
-                // clear form
                 setForm({
                     ...form,
                     background: false,
@@ -312,8 +309,12 @@ export default function ApplyPage() {
                     experience: "",
                     position: "",
                 });
+
                 setAgreed(false);
                 setErrors({});
+
+                setLoading(false); // ✅ IMPORTANT FIX HERE
+
                 return;
             }
 
@@ -337,6 +338,7 @@ export default function ApplyPage() {
                 });
                 setAgreed(false);
                 setErrors({});
+                setLoading(false);
             }
 
         } catch (err: any) {
@@ -385,9 +387,25 @@ export default function ApplyPage() {
                     setInitialLoading(false);
                 }, 500);
 
-            } catch (err) {
-                showError?.("Network error. Please try again.");
-                setInitialLoading(false);
+            } catch (err: any) {
+                showError(err?.message || "Submission failed, please try again.");
+
+                setForm({
+                    ...form,
+                    background: false,
+                    location: "",
+                    availability: "",
+                    certifications: "",
+                    travel: "",
+                    overtime: "",
+                    readyToMove: "",
+                    experience: "",
+                    position: "",
+                });
+
+                setAgreed(false);
+                setErrors({});
+                setLoading(false); // ✅ make sure ALWAYS reset
             }
         };
 
@@ -442,46 +460,41 @@ export default function ApplyPage() {
     }
 
     return (
-        <div className="p-4 text-black relative min-h-screen">
+        <div className="min-h-screen w-full flex justify-center items-start p-4 md:p-8 bg-black-200 text-black">
             <div className="w-full max-w-xl mx-auto">
 
-
-
                 <style jsx>{`
-                  input[type="date"] {
-                    text-align: left;
-                    padding-left: 0.5rem;
-                
-                    display: block;
-                    width: 100%;
-                    min-width: 0;
-                    -webkit-appearance: none;
-                
-                    height: 2.5rem;
-                    line-height: 2.5rem;
-                    padding-top: 0;
-                    padding-bottom: 0;
-                  }
-                
-                  /* iOS inner text fix */
-                  input[type="date"]::-webkit-date-and-time-value {
-                    text-align: left;
-                  }
-                
-                  /* Make calendar icon white */
-                  input[type="date"]::-webkit-calendar-picker-indicator {
-                    filter: invert(1);
-                    cursor: pointer;
-                  }
-                `}</style>
+              input[type="date"] {
+                text-align: left;
+                padding-left: 0.5rem;
+                display: block;
+                width: 100%;
+                min-width: 0;
+                -webkit-appearance: none;
+                height: 2.5rem;
+                line-height: 2.5rem;
+                padding-top: 0;
+                padding-bottom: 0;
+              }
 
+              input[type="date"]::-webkit-calendar-picker-indicator {
+                  opacity: 0.6;
+                  cursor: pointer;
+                  filter: none;
+              }
+
+              input[type="date"]::-webkit-calendar-picker-indicator:hover {
+                  opacity: 1;
+              }
+            `}</style>
+
+                {/* HEADER */}
                 <div className="relative w-full mb-4 flex items-center min-h-[48px]">
 
-                    {/* Back button */}
                     <button
                         onClick={() => router.back()}
                         title="Back"
-                        className="p-2 rounded-full hover:bg-black-200 transition z-10"
+                        className="p-2 rounded-full hover:bg-white border border-transparent hover:border-neutral-200 transition z-10"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -489,7 +502,7 @@ export default function ApplyPage() {
                             viewBox="0 0 24 24"
                             strokeWidth={1.5}
                             stroke="currentColor"
-                            className="w-7 h-7"
+                            className="w-7 h-7 text-neutral-700"
                         >
                             <path
                                 strokeLinecap="round"
@@ -499,37 +512,35 @@ export default function ApplyPage() {
                         </svg>
                     </button>
 
-                    {/* Center title */}
-                    <h1 className="absolute left-1/2 -translate-x-1/2 text-2xl font-semibold text-black whitespace-nowrap">
+                    <h1 className="absolute left-1/2 -translate-x-1/2 text-xl font-semibold text-neutral-800 whitespace-nowrap">
                         Application Form
                     </h1>
 
                 </div>
 
-                {/* ROW 2: company full width */}
+                {/* COMPANY CARD */}
                 {company && (
-                    <div className="w-full text-sm bg-black-200 border border-black rounded-xl p-3 space-y-1">
-                        <p><span className="text-black">Company:</span> {company.name}</p>
-                        <p><span className="text-black">Position:</span> {company.role}</p>
-                        <p><span className="text-black">Location:</span> 📍{company.location}</p>
+                    <div className="w-full text-sm bg-white border border-neutral-200 rounded-xl p-4 space-y-1 shadow-sm mb-4">
+                        <p><span className="text-neutral-500">Company:</span> {company.name}</p>
+                        <p><span className="text-neutral-500">Position:</span> {company.role}</p>
+                        <p><span className="text-neutral-500">Location:</span> 📍{company.location}</p>
                     </div>
                 )}
 
+                {/* FORM CARD */}
                 <form
                     onSubmit={handleSubmit}
-                    className="bg-black-200 text-black pt-6 pb-16 rounded-2xl space-y-4 max-w-xl mx-auto"
+                    className="bg-white border border-neutral-200 shadow-sm rounded-2xl p-5 space-y-4 max-w-xl mx-auto"
                 >
-                    <div className="bg-black-200 rounded-xl p-2 border border-black">
+
+                    {/* USER INFO */}
+                    <div className="bg-neutral-50 rounded-xl p-3 border border-neutral-200 text-sm">
                         <p><strong>Name:</strong> {session.user.name}</p>
                         <p><strong>Email:</strong> {session.user.email}</p>
                     </div>
 
-
-
-
-
-
-                    <div className="flex items-center space-x-2 mb-4">
+                    {/* VETERAN */}
+                    <div className="flex items-center space-x-2">
                         <input
                             type="checkbox"
                             id="veteran"
@@ -537,20 +548,16 @@ export default function ApplyPage() {
                             onChange={(e) =>
                                 setForm({ ...form, background: e.target.checked })
                             }
-                            className="w-5 h-5 text-blue-800 bg-black-200 border-gray-700 rounded-xl focus:ring-yellow-400"
+                            className="w-4 h-4 accent-blue-600"
                         />
-                        <label htmlFor="veteran" className="text-black text-sm select-none">
+                        <label htmlFor="veteran" className="text-sm text-neutral-700">
                             Veteran
                         </label>
                     </div>
 
-
-
-
-
-
+                    {/* LOCATION */}
                     <div className="flex flex-col">
-                        <label htmlFor="location" className="text-black text-lg font-semibold mb-1">
+                        <label htmlFor="location" className="text-sm font-medium text-neutral-700 mb-1">
                             Your current Location
                         </label>
                         <input
@@ -559,21 +566,14 @@ export default function ApplyPage() {
                             placeholder="Dallas TX"
                             value={form.location}
                             onChange={handleChange}
-                            className={inputClass("location")}
+                            className={inputClass("location") + " bg-white border-neutral-300 rounded-lg"}
                         />
                         <Counter field="location" value={form.location} />
                     </div>
 
-
-
-
-
-
-
-
-
+                    {/* DATE */}
                     <div className="flex flex-col">
-                        <label htmlFor="availability" className="text-black text-lg font-semibold mb-1">
+                        <label htmlFor="availability" className="text-sm font-medium text-neutral-700 mb-1">
                             Earliest Start Date
                         </label>
                         <input
@@ -583,21 +583,13 @@ export default function ApplyPage() {
                             value={form.availability || ""}
                             onChange={handleChange}
                             min={localTomorrow}
-                            className={inputClass("availability")}
+                            className={inputClass("availability") + " bg-white border-neutral-300 rounded-lg"}
                         />
                     </div>
 
-
-
-
-
-
-
-
-
-
+                    {/* CERTIFICATIONS */}
                     <div className="flex flex-col">
-                        <label htmlFor="certifications" className="text-black text-lg font-semibold mb-1">
+                        <label htmlFor="certifications" className="text-sm font-medium text-neutral-700 mb-1">
                             Certifications
                         </label>
                         <input
@@ -605,27 +597,18 @@ export default function ApplyPage() {
                             id="certifications"
                             name="certifications"
                             placeholder="NETA 2"
-                            value={form.certifications as unknown as string} // treat as string for input
+                            value={form.certifications as unknown as string}
                             onChange={handleChange}
-                            className={inputClass("certifications")}
+                            className={inputClass("certifications") + " bg-white border-neutral-300 rounded-lg"}
                         />
-                        <div className="text-xs text-black text-right mt-1">
+                        <div className="text-xs text-neutral-500 text-right mt-1">
                             {form.certifications.length}/100
                         </div>
                     </div>
 
-
-
-
-
-
-
-
-
-
-
+                    {/* TRAVEL */}
                     <div className="flex flex-col">
-                        <label htmlFor="travel" className="text-black text-lg font-semibold mb-1">
+                        <label htmlFor="travel" className="text-sm font-medium text-neutral-700 mb-1">
                             Willing to Travel?
                         </label>
                         <input
@@ -635,21 +618,14 @@ export default function ApplyPage() {
                             placeholder="Yes or No"
                             value={form.travel}
                             onChange={handleChange}
-                            className={inputClass("travel")}
+                            className={inputClass("travel") + " bg-white border-neutral-300 rounded-lg"}
                         />
                         <Counter field="travel" value={form.travel} />
                     </div>
 
-
-
-
-
-
-
-
-
+                    {/* OVERTIME */}
                     <div className="flex flex-col">
-                        <label htmlFor="overtime" className="text-black text-lg font-semibold mb-1">
+                        <label htmlFor="overtime" className="text-sm font-medium text-neutral-700 mb-1">
                             Willing to Work Overtime?
                         </label>
                         <input
@@ -659,21 +635,14 @@ export default function ApplyPage() {
                             placeholder="Yes or No"
                             value={form.overtime}
                             onChange={handleChange}
-                            className={inputClass("overtime")}
+                            className={inputClass("overtime") + " bg-white border-neutral-300 rounded-lg"}
                         />
                         <Counter field="overtime" value={form.overtime} />
                     </div>
 
-
-
-
-
-
-
-
-
+                    {/* RELOCATE */}
                     <div className="flex flex-col">
-                        <label htmlFor="readyToMove" className="text-black text-lg font-semibold mb-1">
+                        <label htmlFor="readyToMove" className="text-sm font-medium text-neutral-700 mb-1">
                             Are you ready to relocate?
                         </label>
                         <input
@@ -683,24 +652,14 @@ export default function ApplyPage() {
                             placeholder="Yes or No"
                             value={form.readyToMove}
                             onChange={handleChange}
-                            className={inputClass("readyToMove")}
+                            className={inputClass("readyToMove") + " bg-white border-neutral-300 rounded-lg"}
                         />
                         <Counter field="readyToMove" value={form.readyToMove} />
                     </div>
 
-
-
-
-
-
-
-
-
-
-
-
+                    {/* EXPERIENCE */}
                     <div className="flex flex-col">
-                        <label htmlFor="experience" className="text-black text-lg font-semibold mb-1">
+                        <label htmlFor="experience" className="text-sm font-medium text-neutral-700 mb-1">
                             What is your electrical experience?
                         </label>
                         <input
@@ -709,17 +668,14 @@ export default function ApplyPage() {
                             placeholder="e.g., three years at the company"
                             value={form.experience}
                             onChange={handleChange}
-                            className={inputClass("experience")}
+                            className={inputClass("experience") + " bg-white border-neutral-300 rounded-lg"}
                         />
                         <Counter field="experience" value={form.experience} />
                     </div>
 
-
-
-
-
+                    {/* POSITION */}
                     <div className="flex flex-col">
-                        <label htmlFor="position" className="text-black text-lg font-semibold mb-1">
+                        <label htmlFor="position" className="text-sm font-medium text-neutral-700 mb-1">
                             Briefly describe what are you looking for?
                         </label>
                         <input
@@ -728,23 +684,12 @@ export default function ApplyPage() {
                             placeholder="e.g., what is your goal?"
                             value={form.position}
                             onChange={handleChange}
-                            className={inputClass("position")}
+                            className={inputClass("position") + " bg-white border-neutral-300 rounded-lg"}
                         />
                         <Counter field="position" value={form.position} />
                     </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
+                    {/* ✅ CONSENT (UNCHANGED FULL BLOCK - KEPT EXACT) */}
                     <div className="flex items-start space-x-2">
                         <input
                             type="checkbox"
@@ -754,7 +699,7 @@ export default function ApplyPage() {
                             disabled={!isFormComplete}
                             className={`mt-1 ${!isFormComplete ? "cursor-not-allowed opacity-50" : ""}`}
                         />
-                        <label htmlFor="agree" className="text-xs text-black">
+                        <label htmlFor="agree" className="text-xs text-neutral-600 leading-relaxed">
                             By submitting this application, I confirm that the information provided is accurate.
                             I consent to being contacted regarding this application and related job opportunities,
                             and I agree that my information, including my resume, may be shared with potential employers.
@@ -762,19 +707,17 @@ export default function ApplyPage() {
                         </label>
                     </div>
 
-
-
+                    {/* SUBMIT */}
                     <button
                         type="submit"
                         disabled={loading || !agreed || submitted || !isFormComplete}
-                        className="w-full bg-black-200 text-black p-2 rounded-xl font-semibold hover:bg-black-200 border border-gray-700 disabled:opacity-50"
+                        className="w-full bg-[#0a66c2] hover:bg-[#004182] text-white p-3 rounded-full font-semibold transition disabled:opacity-50"
                     >
                         {loading ? "Submitting..." : submitted ? "Already Submitted" : "Apply"}
                     </button>
 
-
                 </form>
             </div>
         </div>
-    )
+    );
 }

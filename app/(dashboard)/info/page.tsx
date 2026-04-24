@@ -1,14 +1,15 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import Link from "next/link"
+import Link from "next/link";
 
 // Info & Formulas Component
 const InfoAndFormulas = () => {
     return (
-        <div className="min-h-screen bg-black-200 text-black flex justify-center px-4 py-4">
+        <div className="min-h-screen bg-black-200 text-black flex justify-center px-4 py-6">
             <div className="w-full max-w-xl space-y-4">
-                {/* Future Ads / Message */}
+
+                {/* JOB CARD (UNCHANGED — AS REQUESTED) */}
                 <Link
                     href="/position"
                     className="w-full text-center text-sm py-1 transition block active:bg-transparent focus:bg-transparent [-webkit-tap-highlight-color:transparent]"
@@ -26,88 +27,90 @@ const InfoAndFormulas = () => {
                     </div>
                 </Link>
 
-
-
-                {/* 4. Quiz Progress & Performance */}
+                {/* QUIZ CARD */}
                 <Link
                     href="/quiz"
-                    className="w-full text-center text-sm py-1 transition block active:bg-transparent focus:bg-transparent [-webkit-tap-highlight-color:transparent]">
-                    <h1 className="w-full text-2xl sm:text-3xl md:text-lg font-bold text-black mb-1 text-center cursor-pointer hover:text-black transition">
+                    className="block bg-white border border-neutral-200 rounded-xl p-5 shadow-sm hover:shadow-md transition active:scale-[0.99] text-center"
+                >
+                    <div className="text-sm font-semibold">
                         📊 Take a Quiz
-                    </h1>
-                    <div className="text-blue-400 text-xs mt-2">
-                        Test your knowledge with 1000 random questions →
+                    </div>
+
+                    <div className="text-xs text-neutral-600 mt-1">
+                        Test your knowledge with 1000 random questions. Track your progress with a percentage score and aim to stay above 70%.
+                    </div>
+
+                    <div className="text-blue-500 text-xs mt-3 font-medium">
+                        Start quiz →
                     </div>
                 </Link>
-                <p className="text-sm sm:text-base md:text-base text-black text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-4 leading-relaxed">
-                    Take a quiz to track your progress with a percentage score. Keep it above 70%.
-                </p>
 
-
-                {/* Page Title & Introduction */}
+                {/* CHAT CARD */}
                 <Link
                     href="/chat"
-                    className="w-full text-center text-sm py-1 transition block active:bg-transparent focus:bg-transparent [-webkit-tap-highlight-color:transparent]"
+                    className="block bg-white border border-neutral-200 rounded-xl p-5 shadow-sm hover:shadow-md transition active:scale-[0.99] text-center"
                 >
-                    <h1 className="w-full text-2xl sm:text-3xl md:text-lg font-bold text-black mb-1 text-center cursor-pointer hover:text-black transition">
+                    <div className="text-sm font-semibold">
                         💬 Messaging
-                    </h1>
+                    </div>
 
-                    <div className="text-blue-400 text-xs mt-2">
-                        Share your test experience →
+                    <div className="text-xs text-neutral-600 mt-1">
+                        Share your study strategies, ask questions, and let us know if you passed. We maintain a respectful and focused learning environment where all posts and comments are automatically moderated.
+                    </div>
+
+                    <div className="text-blue-500 text-xs mt-3 font-medium">
+                        Open chat →
                     </div>
                 </Link>
-                <p className="text-sm sm:text-base md:text-base text-black text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-8 leading-relaxed">
-                    We maintain a respectful and focused learning environment. All posts and comments are automatically moderated to ensure quality. By participating, you agree to follow the guidelines.
-                </p>
 
-                <br/>
+                {/* AUTH CARD */}
+                <div className="bg-white border border-neutral-200 rounded-xl p-5 shadow-sm text-center">
+                    <div className="text-sm font-semibold mb-2">
+                        🔐 Authentication
+                    </div>
 
-                {/* Authentication Notice */}
-                <h1 className="w-full text-2xl sm:text-3xl md:text-lg font-bold text-black mb-6 text-center">
-                    🔐 Authentication
-                </h1>
-                <p className="text-sm sm:text-base md:text-base text-black text-left max-w-md sm:max-w-2xl md:max-w-3xl mb-8 leading-relaxed">
-                    This platform uses Google authentication tokens. Tokens expire automatically after approximately <strong>1 hour</strong>.
-                    When a token expires, your session will end and you will need to log in again.
-                </p>
+                    <div className="text-xs text-neutral-600 leading-relaxed">
+                        This platform uses Google authentication tokens. Tokens expire automatically after approximately{" "}
+                        <strong>1 hour</strong>. When a token expires, you will need to log in again.
+                    </div>
+                </div>
 
-                <br/>
+                {/* CONTACT CARD */}
+                <div className="bg-white border border-neutral-200 rounded-xl p-5 shadow-sm text-center">
+                    <div className="text-sm font-semibold mb-2">
+                        Contact
+                    </div>
 
-                {/* 5. Contact Info Section */}
-                <p className="w-full text-sm sm:text-base md:text-base text-black text-center mb-6 leading-relaxed font-semibold">
-                    <strong>
-                        Contact:{" "}
-                        <a
-                            href="mailto:info@netaprep.com"
-                            className="underline hover:text-black transition-colors"
-                        >
-                            info@netaprep.com
-                        </a>
-                    </strong>
-                </p>
+                    <a
+                        href="mailto:info@netaprep.com"
+                        className="text-blue-500 text-xs font-medium hover:underline"
+                    >
+                        info@netaprep.com
+                    </a>
+                </div>
+
             </div>
         </div>
     );
 };
 
 export default function InfoPage() {
-    const { data: session, status } = useSession();
+    const { status } = useSession();
 
-    // Optional: you can show a loading spinner if session is still loading
-    if (status === "loading")
+    if (status === "loading") {
         return (
             <div className="flex-1 flex items-center justify-center pt-[56px] text-black">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
-                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
-                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
-                        </span>
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                    </span>
                 </p>
             </div>
         );
+    }
 
     return <InfoAndFormulas />;
 }

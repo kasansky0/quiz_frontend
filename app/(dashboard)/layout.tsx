@@ -548,7 +548,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             bg-white shadow-md">
 
                 {/* CENTERED CONTAINER */}
-                <div className="h-full max-w-6xl mx-auto px-4 flex items-center justify-between">
+                <div className="h-full max-w-4xl mx-auto px-4 flex items-center justify-between">
 
                     {/* LEFT SIDE */}
                     <div className="flex items-center gap-3">
@@ -723,7 +723,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
                     {/* LOGO (RIGHT SIDE) */}
-                    <div className="flex items-center">
+                    <div className="flex items-center pr-6">
                         <button
                             onClick={() => router.push("/quiz/")}
                             className="transition hover:scale-105 active:scale-95"
@@ -749,28 +749,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             {/* ===== BODY WRAPPER ===== */}
             <div className="flex flex-1 pt-[calc(56px+env(safe-area-inset-top))] justify-center">
-                <div className="flex w-full max-w-6xl items-start">
+                <div className="flex w-full max-w-4xl items-start">
 
                     {/* ===== SIDEBAR ===== */}
                     <aside
                         ref={sidebarRef}
                         className="
-    hidden md:flex
-    w-64
-
-    sticky
-    top-[calc(56px+env(safe-area-inset-top)+16px)]
-
-    max-h-[calc(100vh-(56px+env(safe-area-inset-top)+32px))]
-
-    bg-white
-    rounded-2xl
-    shadow-lg
-    border border-neutral-200
-    overflow-hidden
-  "
+                        hidden md:flex
+                        w-64
+                        sticky
+                        top-[calc(56px+env(safe-area-inset-top)+16px)]
+                        max-h-[calc(100vh-(56px+env(safe-area-inset-top)+32px))]
+                        bg-white
+                        rounded-2xl
+                        shadow-lg
+                        border border-neutral-200
+                        overflow-hidden
+                      "
                     >
-                        <div className="flex-1 overflow-y-auto">
+                        <div className="flex-1 overflow-y-auto hide-scrollbar">
                             <UserSidebar
                                 userPercentage={userPercentage}
                                 seenQuestions={userStats?.seenQuestions}
@@ -786,7 +783,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     {/* ===== MAIN CONTENT ===== */}
                     <div className="flex-1 flex flex-col overflow-hidden">
 
-                        <main className="flex-1 overflow-y-auto">
+                        <main className="flex-1 overflow-y-auto hide-scrollbar">
                             {children}
                         </main>
 

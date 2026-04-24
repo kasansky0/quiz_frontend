@@ -54,9 +54,36 @@ export default function SubscribeButton() {
         <button
             onClick={handleSubscribe}
             disabled={loading}
-            className="w-full bg-blue-400 hover:bg-blue-600 text-black font-semibold py-3 px-6 rounded-xl transition"
+            className="
+            w-full
+            bg-white
+            border border-blue-200
+            text-blue-600
+            font-semibold
+            py-3 px-6
+            rounded-xl
+            transition
+            shadow-sm
+            hover:shadow-md
+            hover:border-blue-300
+            hover:bg-blue-50
+            active:scale-[0.99]
+            disabled:opacity-60
+            disabled:cursor-not-allowed
+        "
         >
-            {loading ? "Redirecting..." : "Subscribe for just 24.99$"}
+            {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                Redirecting
+                <span className="flex space-x-1">
+                    <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></span>
+                    <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:0.15s]"></span>
+                    <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:0.3s]"></span>
+                </span>
+            </span>
+            ) : (
+                "Subscribe for $24.99"
+            )}
         </button>
     );
 }

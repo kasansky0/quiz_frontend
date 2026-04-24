@@ -56,8 +56,29 @@ export default function HireSubscribeButton() {
         <button
             onClick={handleSubscribe}
             disabled={loading}
-            className="w-full bg-blue-400 hover:bg-blue-600 text-black font-semibold py-3 px-6 rounded-xl transition"
+            className="
+                w-full
+                flex items-center justify-center
+                gap-2
+                bg-white
+                border border-neutral-300
+                text-[#0a66c2]
+                font-semibold
+                py-3 px-6
+                rounded-full
+                transition
+                hover:bg-neutral-50
+                hover:border-neutral-400
+                active:scale-[0.99]
+                disabled:opacity-50
+                disabled:cursor-not-allowed
+            "
         >
+            {/* subtle loading spinner */}
+            {loading && (
+                <span className="w-4 h-4 border-2 border-[#0a66c2] border-t-transparent rounded-full animate-spin" />
+            )}
+
             {loading ? "Redirecting..." : "Unlock Hire Access ($150/month)"}
         </button>
     );

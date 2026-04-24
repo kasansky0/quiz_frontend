@@ -64,36 +64,60 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
             {children}
 
             {message && (
-                <div className="fixed top-12 left-1/2 -translate-x-1/2 z-50 max-w-xl w-full px-6 py-3 rounded-xl bg-red-500 bg-opacity-90 text-black shadow-md flex items-center justify-center animate-slide-down">
-                    <div className="flex items-center gap-4 truncate">
-                        <span className="text-sm md:text-base text-center justify-center">{message}</span>
+                <div className="fixed top-16 sm:top-16 left-0 w-full z-50 flex justify-center px-4 pointer-events-none">
+                    <div className="w-full max-w-xl pointer-events-auto">
+                        <div className="flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-white border border-neutral-200 shadow-md animate-slide-down">
 
-                        {showLoginButton && (
+                            {/* LEFT ACCENT */}
+                            <div className="w-1 self-stretch rounded-full bg-red-400/80" />
+
+                            {/* MESSAGE */}
+                            <div className="flex-1 text-sm text-neutral-800 leading-snug">
+                                {message}
+                            </div>
+
+                            {/* LOGIN BUTTON */}
+                            {showLoginButton && (
+                                <button
+                                    onClick={() => signIn("google")}
+                                    className="text-sm font-medium text-blue-600 hover:text-blue-700 transition whitespace-nowrap"
+                                >
+                                    Log in
+                                </button>
+                            )}
+
+                            {/* CLOSE */}
                             <button
-                                onClick={() => signIn("google")}
-                                className="px-3 py-1 bg-white text-black rounded-full shadow-sm hover:bg-gray-100 font-medium whitespace-nowrap transition"
+                                onClick={hideError}
+                                className="text-neutral-400 hover:text-neutral-600 text-base leading-none transition"
                             >
-                                Log In
+                                ✕
                             </button>
-                        )}
+                        </div>
                     </div>
-
-                    <button
-                        onClick={hideError}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 text-black font-bold hover:opacity-80"
-                    >
-                        ✕
-                    </button>
                 </div>
             )}
 
             <style jsx>{`
-                @keyframes slide-down {
-                    0% { transform: translate(-50%, -20px); opacity: 0; }
-                    100% { transform: translate(-50%, 0); opacity: 1; }
+            @keyframes slide-down {
+                0% {
+                    transform: translateY(-16px) scale(0.98);
+                    opacity: 0;
                 }
-                .animate-slide-down { animation: slide-down 0.3s ease-out; }
-            `}</style>
+                60% {
+                    transform: translateY(2px) scale(1.01);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(0) scale(1);
+                    opacity: 1;
+                }
+            }
+
+            .animate-slide-down {
+                animation: slide-down 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+            }
+        `}</style>
         </ErrorContext.Provider>
     );
 }

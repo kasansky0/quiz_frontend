@@ -76,73 +76,113 @@ export default function MainStudyPage() {
 
     // Then render all your full content with headings, subscription text, grid, etc.
     return (
-        <div className="min-h-screen w-full flex justify-center items-start p-4 md:p-8 text-black">
-            <div className={`w-full max-w-xl 2xl:max-w-2xl pb-16 transition-opacity duration-700 ease-in-out ${fade ? "opacity-100" : "opacity-0"}`}>
-                {error && <div className="p-6 text-red-400">{error}</div>}
-                {!error && mainTopics.length === 0 && <div className="p-6 text-black">No main topics found.</div>}
+        <div className="min-h-screen w-full flex justify-center items-start p-4 md:p-8 bg-black-200 text-black">
+            <div
+                className={`w-full max-w-xl 2xl:max-w-2xl pb-16 transition-opacity duration-700 ease-in-out ${
+                    fade ? "opacity-100" : "opacity-0"
+                }`}
+            >
+                {error && <div className="p-6 text-red-500 text-sm">{error}</div>}
+                {!error && mainTopics.length === 0 && (
+                    <div className="p-6 text-neutral-600 text-sm">
+                        No main topics found.
+                    </div>
+                )}
 
-                <h1 className="text-2xl font-bold mb-6 text-center">Main Study Topics</h1>
+                <h1 className="text-2xl font-semibold mb-6 text-center text-neutral-900">
+                    Main Study Topics
+                </h1>
 
-                {/* Full subscription section */}
-                <div className="text-center mb-4">
+                {/* Subscription section (LinkedIn card style) */}
+                <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-5 text-center mb-4">
                     {isPaid ? (
-                        <span className="flex items-center justify-center gap-2 text-green-500 font-semibold">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                        <span className="flex items-center justify-center gap-2 text-green-600 font-medium">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-5 h-5"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M4.5 12.75l6 6 9-13.5"
+                            />
                         </svg>
-                        Includes topic targeted questions
+                        Includes topic-targeted questions
                     </span>
                     ) : (
-                        <div className="flex flex-col items-center gap-2">
-                            <div className="flex flex-col items-center gap-3 text-center px-4">
-                                <p className="text-yellow-400 font-semibold text-lg">
-                                    Subscribe to unlock all study topics
-                                </p>
-                                <p className="text-black text-sm md:text-base">
-                                    Most importantly, access <span className="font-bold text-green-500">topic-targeted muscle memory quizzes</span> that focus on one topic at a time.
-                                    <br />
-                                    Unlike the free version where questions come randomly from all 800+ questions, this ensures faster mastery and retention.
-                                </p>
-                            </div>
+                        <div className="flex flex-col items-center gap-3">
+                            <p className="text-neutral-900 font-semibold text-lg">
+                                Subscribe to unlock all study topics
+                            </p>
+
+                            <p className="text-neutral-600 text-sm md:text-base leading-relaxed">
+                                Access{" "}
+                                <span className="font-semibold text-neutral-900">
+                                topic-targeted muscle memory quizzes
+                            </span>{" "}
+                                that focus on one topic at a time.
+                                <br />
+                                Unlike the free version where questions are random across
+                                800+ questions, this improves retention and speed.
+                            </p>
 
                             <div className="w-full max-w-xs">
                                 <SubscribeButton />
                             </div>
-                            <div className="mt-2 text-center text-xs text-black space-y-1">
-                                <p>🔒 Secure payment via Stripe.</p>
-                            </div>
+
+                            <p className="text-xs text-neutral-500">
+                                🔒 Secure payment via Stripe.
+                            </p>
                         </div>
                     )}
                 </div>
 
-                {/* Grid container with 2 columns */}
+                {/* Topics grid */}
                 <div className="grid grid-cols-1 gap-4">
                     {Object.entries(groupedTopics).map(([mainTopic, titles]) => {
                         const locked = !isPaid;
 
-                        // Card content
                         const cardContent = (
                             <div
                                 className={`
-                                  w-full rounded-2xl p-4 transition
-                                  ${locked ? "bg-gray-700 opacity-50 cursor-not-allowed" : "bg-black-200 hover:bg-black-200 "}
-                                `}
+                                w-full rounded-xl p-4
+                                bg-white border border-neutral-200
+                                shadow-sm transition-all duration-200
+                                ${
+                                    !locked
+                                        ? "hover:shadow-md hover:-translate-y-[1px] cursor-pointer"
+                                        : ""
+                                }
+                            `}
                             >
-                                {/* Main Topic */}
-                                <h2 className="font-semibold text-blue-400 mb-2">
-                                    {mainTopic} {locked && "🔒"}
-                                </h2>
+                                {/* Header */}
+                                <div className="flex items-center justify-between mb-2">
+                                    <h2 className="font-semibold text-neutral-900">
+                                        {mainTopic}
+                                    </h2>
 
-                                {/* Titles under main topic */}
-                                <ul className="text-sm text-black space-y-1 mt-2">
+                                    {locked && (
+                                        <span className="text-xs text-neutral-400 font-medium">
+                                        🔒 Locked
+                                    </span>
+                                    )}
+                                </div>
+
+                                {/* Titles */}
+                                <ul className="text-sm text-neutral-600 space-y-1 mt-2">
                                     {titles.map((title, i) => (
-                                        <li key={i}>• {title}</li>
+                                        <li key={i} className="truncate">
+                                            • {title}
+                                        </li>
                                     ))}
                                 </ul>
                             </div>
                         );
 
-                        // Wrap the card in a Link if unlocked
                         return locked ? (
                             <div key={mainTopic}>{cardContent}</div>
                         ) : (

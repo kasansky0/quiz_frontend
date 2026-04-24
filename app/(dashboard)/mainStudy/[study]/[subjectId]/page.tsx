@@ -58,16 +58,16 @@ export default function SubjectPage() {
                     <p className="text-xl flex items-center">
                         Loading
                         <span className="ml-2 flex space-x-1">
-                            <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
-                            <span
-                                className="w-2 h-2 bg-black rounded-full animate-dot-bounce"
-                                style={{ animationDelay: "0.2s" }}
-                            ></span>
-                            <span
-                                className="w-2 h-2 bg-black rounded-full animate-dot-bounce"
-                                style={{ animationDelay: "0.4s" }}
-                            ></span>
-                        </span>
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                        <span
+                            className="w-2 h-2 bg-black rounded-full animate-dot-bounce"
+                            style={{ animationDelay: "0.2s" }}
+                        ></span>
+                        <span
+                            className="w-2 h-2 bg-black rounded-full animate-dot-bounce"
+                            style={{ animationDelay: "0.4s" }}
+                        ></span>
+                    </span>
                     </p>
                 </div>
             ) : subject ? (
@@ -76,8 +76,13 @@ export default function SubjectPage() {
                         fade ? "opacity-100" : "opacity-0"
                     }`}
                 >
-                    {error && <div className="p-6 text-red-400">Error: {error}</div>}
+                    {error && (
+                        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-red-500 text-sm">
+                            Error: {error}
+                        </div>
+                    )}
 
+                    {/* KEEP THIS EXACTLY AS YOU SAID (UNCHANGED) */}
                     <div className="relative flex items-center mb-4">
 
                         {/* Left button */}
@@ -121,15 +126,22 @@ export default function SubjectPage() {
 
                     </div>
 
-                    <h1 className="text-2xl text-center font-bold mb-4 text-blue-500">{subject.title}</h1>
-                    <p className="mb-4 text-black">{subject.description}</p>
+                    {/* TITLE (LinkedIn style hierarchy) */}
+                    <h1 className="text-xl font-semibold text-center mb-2 text-neutral-900">
+                        {subject.title}
+                    </h1>
 
+                    <p className="mb-6 text-sm text-neutral-600 text-center leading-relaxed">
+                        {subject.description}
+                    </p>
+
+                    {/* QUIZ BUTTON (LinkedIn card button style) */}
                     {subject.isQuiz && (
                         <div className="flex justify-center my-4 w-full">
                             <button
                                 onClick={handleQuizClick}
                                 style={{ touchAction: "manipulation" }}
-                                className="w-full flex justify-center items-center py-3 bg-blue-50 hover:bg-blue-100 rounded-xl transition"
+                                className="w-full flex justify-center items-center gap-2 py-3 rounded-xl border border-neutral-200 bg-white shadow-sm hover:shadow-md hover:bg-neutral-50 transition"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -137,7 +149,7 @@ export default function SubjectPage() {
                                     viewBox="0 0 24 24"
                                     strokeWidth={1.5}
                                     stroke="currentColor"
-                                    className="w-6 h-6 text-blue-600 transition-transform"
+                                    className="w-5 h-5 text-blue-600"
                                 >
                                     <path
                                         strokeLinecap="round"
@@ -145,42 +157,53 @@ export default function SubjectPage() {
                                         d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
                                     />
                                 </svg>
-                                <span className="ml-2 text-blue-600 font-medium text-sm sm:text-base">
-                                    Practice targeted questions
-                                </span>
+
+                                <span className="text-sm font-medium text-neutral-700">
+                                Practice targeted questions
+                            </span>
                             </button>
                         </div>
                     )}
 
+                    {/* TOPICS */}
                     {subject.topics?.length ? (
-                        <div className="space-y-6">
+                        <div className="space-y-4">
                             {subject.topics.map((topic) => (
                                 <div
                                     key={topic.id}
-                                    className="bg-black-200 rounded-lg p-2 shadow-sm hover:bg-black-200 transition"
+                                    className="rounded-xl border border-neutral-200 bg-white shadow-sm hover:shadow-md transition p-4"
                                 >
-                                    <h2 className="text-2xl text-green-500 font-semibold mb-3">{topic.title}</h2>
+                                    <h2 className="text-lg font-semibold text-green-600 mb-3">
+                                        {topic.title}
+                                    </h2>
 
                                     {topic.subtopics?.length ? (
                                         <div className="space-y-3">
                                             {topic.subtopics.map((sub) => (
-                                                <div key={sub.id} className="bg-black-200 rounded-md">
-                                                    <h3 className="font-medium text-lg">{sub.title}</h3>
+                                                <div
+                                                    key={sub.id}
+                                                    className="rounded-lg border border-neutral-100 bg-neutral-50 p-3"
+                                                >
+                                                    <h3 className="font-medium text-neutral-900 text-base mb-1">
+                                                        {sub.title}
+                                                    </h3>
 
-                                                    <p className="text-black text-sm leading-relaxed">
+                                                    <p className="text-sm text-neutral-700 leading-relaxed">
                                                         {sub.content?.split("\n").map((line, i) => (
                                                             <span key={i}>
-                                                                {line}
+                                                            {line}
                                                                 <br />
-                                                            </span>
+                                                        </span>
                                                         ))}
                                                     </p>
 
                                                     {sub.resources && sub.resources.length > 0 && (
-                                                        <ul className="ml-4 list-disc text-sm text-black">
+                                                        <ul className="mt-2 ml-4 list-disc text-sm text-neutral-600">
                                                             {sub.resources.map((res, i) => (
                                                                 <li key={`${res.code}-${i}`}>
-                                                                    <span className="font-semibold">{res.code}:</span>{" "}
+                                                                <span className="font-medium">
+                                                                    {res.code}:
+                                                                </span>{" "}
                                                                     {res.description}
                                                                 </li>
                                                             ))}
@@ -190,22 +213,24 @@ export default function SubjectPage() {
                                             ))}
                                         </div>
                                     ) : (
-                                        <p className="ml-4 text-black">No subtopics</p>
+                                        <p className="ml-2 text-sm text-neutral-500">
+                                            No subtopics
+                                        </p>
                                     )}
                                 </div>
                             ))}
                         </div>
                     ) : (
-                        <p className="text-black">No topics found</p>
+                        <p className="text-sm text-neutral-500">No topics found</p>
                     )}
 
-
+                    {/* QUIZ BUTTON AGAIN (same LinkedIn style consistency) */}
                     {subject.isQuiz && (
                         <div className="flex justify-center my-4 w-full">
                             <button
                                 onClick={handleQuizClick}
                                 style={{ touchAction: "manipulation" }}
-                                className="w-full flex justify-center items-center py-3 bg-blue-50 hover:bg-blue-100 rounded-xl transition"
+                                className="w-full flex justify-center items-center gap-2 py-3 rounded-xl border border-neutral-200 bg-white shadow-sm hover:shadow-md hover:bg-neutral-50 transition"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -213,7 +238,7 @@ export default function SubjectPage() {
                                     viewBox="0 0 24 24"
                                     strokeWidth={1.5}
                                     stroke="currentColor"
-                                    className="w-6 h-6 text-blue-600 transition-transform"
+                                    className="w-5 h-5 text-blue-600"
                                 >
                                     <path
                                         strokeLinecap="round"
@@ -221,16 +246,15 @@ export default function SubjectPage() {
                                         d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
                                     />
                                 </svg>
-                                <span className="ml-2 text-blue-600 font-medium text-sm sm:text-base">
-                                    Practice targeted questions
-                                </span>
+
+                                <span className="text-sm font-medium text-neutral-700">
+                                Practice targeted questions
+                            </span>
                             </button>
                         </div>
                     )}
-
-
                 </div>
-            ) : null }
+            ) : null}
         </div>
     );
 }

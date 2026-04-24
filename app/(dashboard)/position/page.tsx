@@ -105,7 +105,7 @@ export default function AdsPage() {
     }
 
     return (
-        <div className="min-h-screen w-full flex justify-center items-start p-4 md:p-8">
+        <div className="min-h-screen w-full flex justify-center items-start p-4 md:p-8 bg-black-200">
             <div className="w-full max-w-xl text-black">
 
                 {/* Header */}
@@ -118,7 +118,7 @@ export default function AdsPage() {
                             viewBox="0 0 24 24"
                             strokeWidth={1.5}
                             stroke="currentColor"
-                            className="w-8 h-8"
+                            className="w-8 h-8 text-neutral-700"
                         >
                             <path
                                 strokeLinecap="round"
@@ -128,116 +128,84 @@ export default function AdsPage() {
                         </svg>
                     </button>
 
-                    <h1 className="text-2xl font-bold text-center flex-1">
+                    <h1 className="text-xl font-semibold text-center flex-1">
                         💼 Job Opportunities
                     </h1>
 
                     <div className="w-8" />
                 </div>
 
-
                 {/* Subtitle */}
-                <p className="text-xs text-black text-center mb-6">
+                <p className="text-xs text-neutral-600 text-center mb-5">
                     Choose a job that matches your position and location
                 </p>
 
-
-
-
-
-
-
-
-
-
-
-
-                <div className="rounded-xl bg-black-200 text-sm text-black overflow-hidden">
+                {/* SORT CARD */}
+                <div className="bg-white border border-neutral-200 rounded-xl shadow-sm overflow-hidden mb-4">
 
                     {/* HEADER */}
                     <button
                         onClick={() => setOpen(!open)}
-                        className="w-full flex items-center gap-2 p-2"
+                        className="w-full flex items-center justify-between p-3"
                     >
-                        <p className="font-semibold text-black flex items-center gap-2">
-                            Sort by:
-                            <span className="text-black capitalize">
-                                {sortBy}
-                            </span>
+                    <span className="font-medium text-sm text-neutral-700">
+                        Sort by: <span className="font-semibold capitalize">{sortBy}</span>
+                    </span>
 
-                            {/* arrow moved here */}
-                            <span
-                                className={`text-black transition-transform duration-500 ease-in-out ${
-                                    open ? "rotate-180" : ""
-                                }`}
-                            >
-                                ▼
-                            </span>
-                        </p>
+                        <span
+                            className={`text-neutral-500 transition-transform duration-300 ${
+                                open ? "rotate-180" : ""
+                            }`}
+                        >
+                        ▼
+                    </span>
                     </button>
 
-                    {/* DROPDOWN CONTENT */}
+                    {/* DROPDOWN */}
                     <div
-                        className={`px-4 pb-4 transition-all duration-700 ease-in-out overflow-hidden ${
-                            open
-                                ? "max-h-40 opacity-100 translate-y-0"
-                                : "max-h-0 opacity-0 -translate-y-2"
+                        className={`px-3 pb-3 transition-all duration-300 overflow-hidden ${
+                            open ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
                         }`}
                     >
-                        <ul className="space-y-2">
+                        <div className="space-y-2 text-sm text-neutral-600">
 
-                            <li>
-                                <button
-                                    onClick={() => {
-                                        setSortBy("newest");
-                                        setOpen(false);
-                                    }}
-                                    className="w-full text-left hover:text-black"
-                                >
-                                    Newest
-                                </button>
-                            </li>
+                            <button
+                                onClick={() => {
+                                    setSortBy("newest");
+                                    setOpen(false);
+                                }}
+                                className="w-full text-left hover:text-black"
+                            >
+                                Newest
+                            </button>
 
-                            <li>
-                                <button
-                                    onClick={() => {
-                                        setSortBy("oldest");
-                                        setOpen(false);
-                                    }}
-                                    className="w-full text-left hover:text-black"
-                                >
-                                    Oldest
-                                </button>
-                            </li>
+                            <button
+                                onClick={() => {
+                                    setSortBy("oldest");
+                                    setOpen(false);
+                                }}
+                                className="w-full text-left hover:text-black"
+                            >
+                                Oldest
+                            </button>
 
-                            <li>
-                                <button
-                                    onClick={() => {
-                                        setSortBy("company");
-                                        setOpen(false);
-                                    }}
-                                    className="w-full text-left hover:text-black"
-                                >
-                                    Company (A–Z)
-                                </button>
-                            </li>
+                            <button
+                                onClick={() => {
+                                    setSortBy("company");
+                                    setOpen(false);
+                                }}
+                                className="w-full text-left hover:text-black"
+                            >
+                                Company (A–Z)
+                            </button>
 
-                        </ul>
+                        </div>
                     </div>
                 </div>
 
+                {/* FEED */}
+                <div className="space-y-3">
 
-
-
-
-
-
-
-
-
-
-
-                <div className="grid grid-cols-1 gap-3">
                     <AnimatePresence mode="popLayout">
                         {sortedJobs.map((job) => (
                             <motion.div
@@ -246,65 +214,61 @@ export default function AdsPage() {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
-                                transition={{
-                                    duration: 0.35,
-                                    ease: "easeInOut",
-                                }}
+                                transition={{ duration: 0.3, ease: "easeInOut" }}
                             >
                                 <Link
                                     href={`/position/apply/${job._id}`}
-                                    className="block w-full rounded-lg transition
-                        flex flex-col items-start justify-start gap-1 mb-4
-                        active:bg-transparent focus:bg-transparent
-                        [-webkit-tap-highlight-color:transparent]"
+                                    className="block"
                                 >
-                                    <div className="flex flex-col gap-2 text-xs text-black p-2 rounded-xl border border-black/20">
+                                    <div className="bg-white border border-neutral-200 rounded-xl shadow-sm hover:shadow-md transition p-4">
 
-                                        {/* TOP ROW (tags) */}
+                                        {/* COMPANY */}
+                                        <div className="font-semibold text-sm text-neutral-900 mb-1">
+                                            Company: {job.company}
+                                        </div>
 
-                                        <span className="font-semibold text-sm text-black">
-                            Company: {job.company}
-                        </span>
+                                        {/* TITLE */}
+                                        <div className="text-base font-medium text-neutral-800 mb-2">
+                                            Position: {job.title}
+                                        </div>
 
-                                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                            <span className="text-black">
-                                Location: 📍 {job.location}
-                            </span>
-                                            <span className="text-black">
-                                Position: {job.title}
-                            </span>
+                                        {/* META ROW */}
+                                        <div className="flex flex-wrap gap-2 text-xs text-neutral-600 mb-3">
 
-                                            {job.pay && (
-                                                <span className="text-[10px] rounded bg-green-500/20 text-green-300 leading-none">
-                                    ${job.pay.min}–${job.pay.max}/hr
-                                </span>
-                                            )}
+                                        <span className="flex items-center gap-1">
+                                            📍 {job.location}
+                                        </span>
 
-                                            <span className="text-[10px] rounded bg-blue-500/20 text-blue-300 leading-none">
-                                {job.relocation}
-                            </span>
+                                            <span className="px-2 py-0.5 rounded-full bg-green-50 text-green-700">
+                                            ${job.pay.min}–${job.pay.max}/hr
+                                        </span>
 
-                                            <span className="text-[10px] rounded bg-white/10 text-yellow-600 leading-none">
-                                {job.type}
-                            </span>
+                                            <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">
+                                            {job.relocation}
+                                        </span>
+
+                                            <span className="px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700">
+                                            {job.type}
+                                        </span>
 
                                             {job.overtime && (
-                                                <span className="text-[10px] rounded bg-white/5 text-blue-300 leading-none">
-                                    {job.overtime}
-                                </span>
+                                                <span className="px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-700">
+                                                {job.overtime}
+                                            </span>
                                             )}
                                         </div>
 
-                                        {/* BOTTOM ROW (posted date) */}
-                                        <p className="text-xs text-yellow-500 text-black">
+                                        {/* FOOTER DATE */}
+                                        <div className="text-xs text-neutral-500">
                                             {formatLocalDate(job.createdAt)}
-                                        </p>
+                                        </div>
 
                                     </div>
                                 </Link>
                             </motion.div>
                         ))}
                     </AnimatePresence>
+
                 </div>
             </div>
         </div>
