@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import LoggedOut from "./LoggedOut";
+import LoggedOutPage from "./LoggedOut";
 import DashboardLayout from "@/app/(dashboard)/layout";
 import { useState, useEffect } from "react";
 
@@ -10,28 +10,30 @@ export default function Page() {
     const [showLoader, setShowLoader] = useState(true);
 
     useEffect(() => {
-        // Minimum loader time 2 seconds
-        const timer = setTimeout(() => setShowLoader(false), 2000);
+        const timer = setTimeout(() => setShowLoader(false), 1500);
         return () => clearTimeout(timer);
     }, []);
 
-    // While NextAuth is loading OR minimum loader time not passed
     if (status === "loading" || showLoader) {
         return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black-200 text-black pointer-events-none">
+            <div className="fixed inset-0 flex items-center justify-center bg-black-200 text-black">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
-                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
-                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
-                        </span>
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                </span>
                 </p>
             </div>
         );
     }
 
-    return session ? <DashboardLayout>
-        <div />
-    </DashboardLayout> : <LoggedOut />;
+    return session ? (
+        <DashboardLayout>
+            <div />
+        </DashboardLayout>
+    ) : (
+        <LoggedOutPage />
+    );
 }

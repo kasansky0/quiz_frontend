@@ -473,20 +473,20 @@ export default function LoggedInAdmin() {
 
     return (
         <div ref={topRef} className="min-h-screen bg-black-200 text-black relative">
-            <div className="mx-auto max-w-xl p-4 sm:p-10">
+            <div className="mx-auto max-w-4xl px-4 sm:px-8 py-6 sm:py-10 space-y-6">
                 {/* Header */}
-                <h1 className="text-2xl sm:text-3xl mb-2 font-bold text-black">
+                <h1 className="text-2xl sm:text-3xl font-bold text-black mb-4">
                     Logs
                 </h1>
 
 
 
 
-                <div className="my-2 flex items-center gap-4">
+                <div className="flex flex-wrap items-center gap-3 p-3 bg-black-200 rounded-xl border border-black">
                     {/* --- Block User by Email --- */}
-                    <div className="flex items-center">
+                    <div className="flex items-center gap-2">
                         {/* Wrapper for input + button */}
-                        <div className="flex items-center bg-transparent">
+                        <div className="flex items-center bg-black-200 px-2 py-1 rounded-lg border border-black">
                             {/* Hidden span for measuring text width */}
                             <span
                                 ref={spanRef}
@@ -501,7 +501,7 @@ export default function LoggedInAdmin() {
                                 placeholder="Block User"
                                 value={blockUserId}
                                 onChange={(e) => setBlockUserId(e.target.value)}
-                                className="text-black placeholder-white bg-transparent focus:outline-none"
+                                className="text-black placeholder-black bg-transparent focus:outline-none"
                                 style={{
                                     width: `${spanWidth}px`,
                                     minWidth: "90px",
@@ -550,7 +550,7 @@ export default function LoggedInAdmin() {
                                     fill="none"
                                     viewBox="0 0 24 24"
                                     strokeWidth={1.5}
-                                    stroke="currentColor"
+                                    stroke="black"
                                     className="w-6 h-6"
                                 >
                                     <path
@@ -568,13 +568,13 @@ export default function LoggedInAdmin() {
 
 
                     {/* Archive Deleted SVG */}
-                    <div >
+                    <div className="p-2 rounded-lg hover:bg-black-200 transition">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
                             viewBox="0 0 24 24"
                             strokeWidth={1.5}
-                            stroke="white"
+                            stroke="black"
                             className="w-6 h-6 cursor-pointer text-blue-600 hover:text-blue-700"
                             onClick={async () => {
                                 if (!confirm("Are you sure you want to archive all deleted posts and comments?")) return;
@@ -631,7 +631,7 @@ export default function LoggedInAdmin() {
 
                 {/* Applications */}
                 {summary?.applications && summary.applications.length > 0 && (
-                    <div className="bg-black-200 p-4 sm:p-6 rounded-xl mb-6 border border-black text-sm sm:text-base">
+                    <div className="bg-black-200 p-4 sm:p-6 rounded-xl border border-black space-y-3">
                         <h3 className="font-bold text-black mb-2">
                             Applications: ({summary.applications.length})
 
@@ -652,11 +652,11 @@ export default function LoggedInAdmin() {
                             </div>
                         </h3>
 
-                        <div className="max-h-80 overflow-y-auto space-y-4 pr-2">
+                        <div className="max-h-[420px] overflow-y-auto space-y-3 pr-2">
                             {[...summary.applications]
                                 .sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime())
                                 .map((app, i) => (
-                                    <div key={i} className="bg-black-200 p-3 rounded-lg border border-black">
+                                    <div key={i} className="bg-white p-3 rounded-lg border border-black hover:bg-black-200 transition">
                                         <p className="text-black text-xs mt-1">
                                             Submitted at: {formatLocalDate(app.submitted_at)}
                                         </p>
@@ -745,7 +745,7 @@ export default function LoggedInAdmin() {
 
                 {/* Employer Users */}
                 {summary?.employer_users && summary.employer_users.length > 0 && (
-                    <div className="bg-black-200 p-4 sm:p-6 rounded-xl mb-6 border border-black text-sm sm:text-base">
+                    <div className="bg-black-200 p-4 sm:p-6 rounded-xl border border-black space-y-3">
                         <h3 className="font-bold text-black mb-2">
                             Employer Users: ({summary.employer_users.length})
                         </h3>
@@ -754,7 +754,7 @@ export default function LoggedInAdmin() {
                             {summary.employer_users.map((user, i) => (
                                 <div
                                     key={i}
-                                    className="bg-black-200 p-3 rounded-lg border border-black"
+                                    className="bg-white p-3 rounded-lg border border-black hover:bg-black-200 transition"
                                 >
                                     <p>
                                         <span className="font-bold text-yellow-500">Company:</span>{" "}
@@ -789,7 +789,7 @@ export default function LoggedInAdmin() {
 
                 {/* Hiring Ads */}
                 {summary?.hiring_ads && summary.hiring_ads.length > 0 && (
-                    <div className="bg-black-200 p-4 sm:p-6 rounded-xl mb-6 border border-black text-sm sm:text-base">
+                    <div className="bg-black-200 p-4 sm:p-6 rounded-xl border border-black space-y-3">
                         <h3 className="font-bold text-black mb-2">
                             Hiring Ads: ({summary.hiring_ads.length})
                             <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-black">
@@ -800,11 +800,11 @@ export default function LoggedInAdmin() {
                             </div>
                         </h3>
 
-                        <div className="max-h-80 overflow-y-auto space-y-4 pr-2">
+                        <div className="max-h-[420px] overflow-y-auto space-y-3 pr-2">
                             {[...summary.hiring_ads]
                                 .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
                                 .map((ad, i) => (
-                                    <div key={i} className="bg-black-200 p-3 rounded-lg border border-black">
+                                    <div key={i} className="bg-white p-3 rounded-lg border border-black hover:bg-black-200 transition">
 
                                         <p className="text-black text-xs mt-1">
                                             Created at: {formatLocalDate(ad.createdAt)}
@@ -864,7 +864,7 @@ export default function LoggedInAdmin() {
                                                             ${
                                                             isActive
                                                                 ? statusStyles[status] // 👈 dynamic color per status
-                                                                : "bg-black-200 text-black border-gray-600 hover:border-black"
+                                                                : "bg-black-200 text-black border-black hover:border-black"
                                                         }
                                                                 `}
                                                     >
@@ -983,7 +983,7 @@ export default function LoggedInAdmin() {
                             </div>
 
                             {/* Blocked IPs */}
-                            <div className="bg-black-200 p-4 sm:p-6 rounded-xl mb-6 border border-black text-sm sm:text-base">
+                            <div className="bg-black-200 p-4 sm:p-6 rounded-xl border border-black space-y-3">
                                 Blocked IPs:{" "}
                                 {blockedIps.length > 0
                                     ? blockedIps.map((ip, i) => (
@@ -997,7 +997,7 @@ export default function LoggedInAdmin() {
 
 
                             {/* Blocked Users */}
-                            <div className="bg-black-200 p-4 sm:p-6 rounded-xl mb-6 border border-black text-sm sm:text-base">
+                            <div className="bg-black-200 p-4 sm:p-6 rounded-xl border border-black space-y-3">
                                 Blocked Users:{" "}
                                 {blockedUsers.length > 0
                                     ? blockedUsers.map((u, i) => (
@@ -1010,7 +1010,7 @@ export default function LoggedInAdmin() {
                             </div>
 
                             {/* Last API Calls */}
-                            <div className="bg-black-200 p-4 sm:p-6 rounded-xl mb-6 border border-black text-sm sm:text-base">
+                            <div className="bg-black-200 p-4 sm:p-6 rounded-xl border border-black space-y-3">
                                 <h3 className="mb-2">Last API Calls:</h3>
 
                                 <div className="max-h-60 overflow-y-auto space-y-2 pr-2">
@@ -1124,7 +1124,7 @@ export default function LoggedInAdmin() {
 
                 {/* Paid Users */}
                 {users.length > 0 && (
-                    <div className="bg-black-200 p-4 sm:p-6 my-2 rounded-xl border border-white text-sm sm:text-base">
+                    <div className="bg-black-200 p-4 sm:p-6 my-2 rounded-xl border border-black text-sm sm:text-base">
                         <p className="text-black text-sm sm:text-base mb-2">
                             Paid Users: <strong className="text-green-500">{paidUsersCount}</strong>
                         </p>
@@ -1163,7 +1163,7 @@ export default function LoggedInAdmin() {
                             ref={(el) => {
                                 userRefs.current[index] = el;
                             }}
-                            className="bg-black-200 p-4 sm:p-6 rounded-xl mb-4 sm:mb-6 border border-white text-sm sm:text-base"
+                            className="bg-black-200 p-5 sm:p-6 rounded-xl border border-black space-y-3 hover:bg-white transition"
                         >
                             {/* User info with profile image */}
                             <div className="flex items-center mb-3 sm:mb-4">
@@ -1209,7 +1209,7 @@ export default function LoggedInAdmin() {
                                             xmlns="http://www.w3.org/2000/svg"
                                             viewBox="0 0 24 24"
                                             fill="none"
-                                            stroke="white"
+                                            stroke="black"
                                             strokeWidth="1.5"
                                             className="w-4 h-4 cursor-pointer hover:text-green-500 shrink-0"
                                             onClick={() => {
@@ -1262,8 +1262,8 @@ export default function LoggedInAdmin() {
             {/* Sticky navigation buttons */}
             {users.length > 0 && (
                 <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50
-                bg-black-200 backdrop-blur-sm p-2 sm:p-3 rounded
-                grid grid-cols-2 gap-2 sm:gap-4">
+                bg-white/90 backdrop-blur-md p-3 rounded-xl border border-black
+                grid grid-cols-2 gap-3 shadow-lg">
 
 
                 </div>

@@ -1,14 +1,9 @@
-import Link from "next/link";
-
 export default function Footer() {
     return (
-        <div className="w-full bg-black-200 py-6 flex flex-col items-center min-h-[120px]">
-
-
-
-            <p className="text-xs text-black text-center">
-                &copy; 2026 NetaPrep. All rights reserved.
+        <footer className="w-full border-t border-neutral-200 bg-white py-4 flex justify-center">
+            <p className="text-xs text-neutral-500">
+                © 2026 NetaPrep · All rights reserved
             </p>
-        </div>
+        </footer>
     );
 }

@@ -51,21 +51,6 @@ export default function MainStudyPage() {
         }
     }, [loading, mainTopics]);
 
-    if (!tokenValid || loading || tokenExpired) {
-        return (
-            <div className="flex-1 flex items-start justify-center pt-[56px] text-black">
-                <p className="text-xl flex items-center">
-                    Loading
-                    <span className="ml-2 flex space-x-1">
-                <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
-                <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
-            </span>
-                </p>
-            </div>
-        );
-    }
-
     const groupedTopics = mainTopics.reduce((acc: Record<string, string[]>, item) => {
         if (!acc[item.main_topic]) {
             acc[item.main_topic] = [];
@@ -76,7 +61,22 @@ export default function MainStudyPage() {
 
     // Then render all your full content with headings, subscription text, grid, etc.
     return (
-        <div className="min-h-screen w-full flex justify-center items-start p-4 md:p-8 bg-black-200 text-black">
+        <div className="relative min-h-screen w-full flex justify-center items-start p-4 md:p-8 bg-black-200 text-black">
+
+            {/* LOADER OVERLAY */}
+            {(loading || !tokenValid || tokenExpired) && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black-200/80 backdrop-blur-sm z-50 pointer-events-auto">
+                    <p className="text-xl flex items-center">
+                        Loading
+                        <span className="ml-2 flex space-x-1">
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                    </span>
+                    </p>
+                </div>
+            )}
+
             <div
                 className={`w-full max-w-xl 2xl:max-w-2xl pb-16 transition-opacity duration-700 ease-in-out ${
                     fade ? "opacity-100" : "opacity-0"

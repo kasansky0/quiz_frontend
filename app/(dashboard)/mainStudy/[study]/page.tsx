@@ -41,120 +41,126 @@ export default function StudyPage() {
         setFade(false);
     }, [loadingSubjects]);
 
-    // ✅ HARD BLOCK LOADING (PASTE HERE)
-    if (loadingSubjects || subscriptionRequired === null) {
-        return (
-            <div className="flex-1 flex items-center justify-center pt-[56px] text-black">
-                <p className="text-xl flex items-center">
-                    Loading
-                    <span className="ml-2 flex space-x-1">
-                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
-                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
-                </span>
-                </p>
-            </div>
-        );
-    }
+    const showLoader =
+        loadingSubjects ||
+        subscriptionRequired === null ||
+        (!subjects.length && !errorSubjects);
 
     return (
-        <div className="min-h-screen w-full flex justify-center items-start p-4 md:p-8 text-black bg-black-200">
-            <div className={`w-full max-w-xl pb-16 transition-opacity duration-700 ease-in-out ${fade ? "opacity-100" : "opacity-0"}`}>
+        <div className="relative min-h-screen w-full flex justify-center items-start p-4 md:p-8 text-black bg-black-200">
 
-                {errorSubjects && (
-                    <div className="mb-4 p-4 rounded-xl bg-white border border-red-200 text-red-500 shadow-sm">
-                        {errorSubjects}
-                    </div>
-                )}
-
-                {!errorSubjects && subjects.length === 0 && (
-                    <div className="mb-4 p-4 rounded-xl bg-white border border-neutral-200 text-black shadow-sm">
-                        No subjects found.
-                    </div>
-                )}
-
-                {/* KEEP EVERYTHING ABOVE EXACTLY THE SAME (NETA SECTION UNTOUCHED) */}
-                <div className="relative flex items-center mb-4">
-
-                    {/* Left button (clean LinkedIn icon style) */}
-                    <button
-                        onClick={() => router.back()}
-                        className="absolute left-0 p-2 rounded-full hover:bg-neutral-200 transition"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.8}
-                            stroke="currentColor"
-                            className="w-6 h-6 text-neutral-700"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M15.75 19.5 8.25 12l7.5-7.5"
-                            />
-                        </svg>
-                    </button>
-
-                    {/* 🔥 DO NOT CHANGE THIS SECTION (as requested) */}
-                    <Link
-                        href="/position"
-                        className="w-full text-center text-sm py-1 transition block active:bg-transparent focus:bg-transparent [-webkit-tap-highlight-color:transparent]"
-                    >
-                        <div className="font-semibold">
-                            💼 Hiring NETA Technicians
-                        </div>
-
-                        <div className="text-xs mt-1">
-                            📍 Multiple locations • Relocation assistance
-                        </div>
-
-                        <div className="text-blue-400 text-xs mt-2">
-                            View positions →
-                        </div>
-                    </Link>
-
+            {/* LOADER OVERLAY */}
+            {showLoader && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black-200/80 backdrop-blur-sm z-50 pointer-events-auto">
+                    <p className="text-xl flex items-center">
+                        Loading
+                        <span className="ml-2 flex space-x-1">
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                    </span>
+                    </p>
                 </div>
+            )}
 
-                {/* TITLE (LinkedIn-style typography) */}
-                <h1 className="text-2xl font-semibold mb-5 text-center text-neutral-900">
-                    {mainTopic} Subjects
-                </h1>
+            {!showLoader && (
+                <div className={`w-full max-w-xl pb-16 transition-opacity duration-700 ease-in-out ${fade ? "opacity-100" : "opacity-0"}`}>
 
-                {/* SUBJECTS LIST (LinkedIn feed cards) */}
-                <div className="flex flex-col space-y-3">
+                    {errorSubjects && (
+                        <div className="mb-4 p-4 rounded-xl bg-white border border-red-200 text-red-500 shadow-sm">
+                            {errorSubjects}
+                        </div>
+                    )}
 
-                    {subjects.map(subject => (
+                    {!errorSubjects && subjects.length === 0 && (
+                        <div className="mb-4 p-4 rounded-xl bg-white border border-neutral-200 text-black shadow-sm">
+                            No subjects found.
+                        </div>
+                    )}
+
+                    {/* KEEP EVERYTHING ABOVE EXACTLY THE SAME (NETA SECTION UNTOUCHED) */}
+                    <div className="relative flex items-center mb-4">
+
+                        {/* Left button (clean LinkedIn icon style) */}
+                        <button
+                            onClick={() => router.back()}
+                            className="absolute left-0 p-2 rounded-full hover:bg-neutral-200 transition"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.8}
+                                stroke="currentColor"
+                                className="w-6 h-6 text-neutral-700"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M15.75 19.5 8.25 12l7.5-7.5"
+                                />
+                            </svg>
+                        </button>
+
+                        {/* 🔥 DO NOT CHANGE THIS SECTION (as requested) */}
                         <Link
-                            key={subject.id}
-                            href={`/mainStudy/${mainTopic}/${subject.id}`}
-                            className="
-                            group
-                            rounded-xl
-                            bg-white
-                            border border-neutral-200
-                            shadow-sm
-                            p-4
-                            transition
-                            hover:shadow-md
-                            hover:-translate-y-[1px]
-                            active:scale-[0.99]
-                        "
+                            href="/position"
+                            className="w-full text-center text-sm py-1 transition block active:bg-transparent focus:bg-transparent [-webkit-tap-highlight-color:transparent]"
                         >
-                            <h2 className="font-semibold text-blue-600 group-hover:text-blue-700 transition">
-                                {subject.title}
-                            </h2>
+                            <div className="font-semibold">
+                                💼 Hiring NETA Technicians
+                            </div>
 
-                            <p className="text-sm text-neutral-600 mt-1">
-                                {subject.description}
-                            </p>
+                            <div className="text-xs mt-1">
+                                📍 Multiple locations • Relocation assistance
+                            </div>
+
+                            <div className="text-blue-400 text-xs mt-2">
+                                View positions →
+                            </div>
                         </Link>
-                    ))}
+
+                    </div>
+
+                    {/* TITLE (LinkedIn-style typography) */}
+                    <h1 className="text-2xl font-semibold mb-5 text-center text-neutral-900">
+                        {mainTopic} Subjects
+                    </h1>
+
+                    {/* SUBJECTS LIST (LinkedIn feed cards) */}
+                    <div className="flex flex-col space-y-3">
+
+                        {subjects.map(subject => (
+                            <Link
+                                key={subject.id}
+                                href={`/mainStudy/${mainTopic}/${subject.id}`}
+                                className="
+                                group
+                                rounded-xl
+                                bg-white
+                                border border-neutral-200
+                                shadow-sm
+                                p-4
+                                transition
+                                hover:shadow-md
+                                hover:-translate-y-[1px]
+                                active:scale-[0.99]
+                            "
+                            >
+                                <h2 className="font-semibold text-blue-600 group-hover:text-blue-700 transition">
+                                    {subject.title}
+                                </h2>
+
+                                <p className="text-sm text-neutral-600 mt-1">
+                                    {subject.description}
+                                </p>
+                            </Link>
+                        ))}
+
+                    </div>
 
                 </div>
-
-            </div>
+            )}
         </div>
     );
 }

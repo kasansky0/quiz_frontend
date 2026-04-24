@@ -54,20 +54,20 @@ export default function SubjectPage() {
     return (
         <div className="p-4 md:p-4 text-black relative min-h-screen">
             {loading || subscriptionRequired === undefined ? (
-                <div className="flex-1 flex items-center justify-center pt-[56px] text-black">
+                <div className="absolute inset-0 flex items-center justify-center bg-black-200/80 backdrop-blur-sm z-50">
                     <p className="text-xl flex items-center">
                         Loading
                         <span className="ml-2 flex space-x-1">
-                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
-                        <span
-                            className="w-2 h-2 bg-black rounded-full animate-dot-bounce"
-                            style={{ animationDelay: "0.2s" }}
-                        ></span>
-                        <span
-                            className="w-2 h-2 bg-black rounded-full animate-dot-bounce"
-                            style={{ animationDelay: "0.4s" }}
-                        ></span>
-                    </span>
+                <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                <span
+                    className="w-2 h-2 bg-black rounded-full animate-dot-bounce"
+                    style={{ animationDelay: "0.2s" }}
+                ></span>
+                <span
+                    className="w-2 h-2 bg-black rounded-full animate-dot-bounce"
+                    style={{ animationDelay: "0.4s" }}
+                ></span>
+            </span>
                     </p>
                 </div>
             ) : subject ? (
