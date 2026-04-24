@@ -629,6 +629,94 @@ export default function LoggedInAdmin() {
 
 
 
+
+                {/* TOP SUMMARY BAR */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+
+                    {/* Applications */}
+                    <div className="bg-white rounded-xl border border-black p-3 text-center">
+                        <p className="text-xs text-black">Applications</p>
+                        <p className="text-lg font-bold text-black">
+                            {summary?.applications?.length ?? 0}
+                        </p>
+                        <p className="text-xs text-red-400">
+                            Pending: {applicationCounts?.pending ?? 0}
+                        </p>
+                        <p className="text-xs text-green-500">
+                            Approved: {applicationCounts?.approved ?? 0}
+                        </p>
+                    </div>
+
+                    {/* Ads */}
+                    <div className="bg-white rounded-xl border border-black p-3 text-center">
+                        <p className="text-xs text-black">Hiring Ads</p>
+
+                        <p className="text-lg font-bold text-black mb-2">
+                            {summary?.hiring_ads?.length ?? 0}
+                        </p>
+
+                        <div className="flex flex-col gap-1 text-xs text-left">
+
+                            <div className="flex justify-between">
+                                <span className="text-amber-500">Pending</span>
+                                <span className="text-amber-500 font-semibold">
+                                    {adCounts?.pending ?? 0}
+                                </span>
+                            </div>
+
+                            <div className="flex justify-between">
+                                <span className="text-emerald-500">Published</span>
+                                <span className="text-emerald-500 font-semibold">
+                                    {adCounts?.published ?? 0}
+                                </span>
+                            </div>
+
+                            <div className="flex justify-between">
+                                <span className="text-sky-500">Approved</span>
+                                <span className="text-sky-500 font-semibold">
+                                    {adCounts?.approved ?? 0}
+                                </span>
+                            </div>
+
+                            <div className="flex justify-between">
+                                <span className="text-red-400">Archived</span>
+                                <span className="text-red-400 font-semibold">
+                                    {adCounts?.archived ?? 0}
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    {/* Employers */}
+                    <div className="bg-white rounded-xl border border-black p-3 text-center">
+                        <p className="text-xs text-black">Employers</p>
+                        <p className="text-lg font-bold text-black">
+                            {summary?.employer_users?.length ?? 0}
+                        </p>
+                    </div>
+
+                    {/* Users */}
+                    <div className="bg-white rounded-xl border border-black p-3 text-center">
+                        <p className="text-xs text-black">Users</p>
+                        <p className="text-lg font-bold text-black">
+                            {users.length}
+                        </p>
+                        <p className="text-xs text-green-500">
+                            Paid: {paidUsersCount}
+                        </p>
+                    </div>
+
+                </div>
+
+
+
+
+
+
+
+
+
                 {/* Applications */}
                 {summary?.applications && summary.applications.length > 0 && (
                     <div className="bg-black-200 p-4 sm:p-6 rounded-xl border border-black space-y-3">
@@ -1125,22 +1213,32 @@ export default function LoggedInAdmin() {
                 {/* Paid Users */}
                 {users.length > 0 && (
                     <div className="bg-black-200 p-4 sm:p-6 my-2 rounded-xl border border-black text-sm sm:text-base">
+
                         <p className="text-black text-sm sm:text-base mb-2">
                             Paid Users: <strong className="text-green-500">{paidUsersCount}</strong>
                         </p>
-                        <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+
+                        <div className="max-h-40 overflow-y-auto pr-2 space-y-1">
+
                             {users
                                 .filter(user => user.is_paid)
                                 .map(user => (
-                                    <span
+                                    <div
                                         key={user.user_id}
-                                        className="text-xs sm:text-sm"
+                                        className="flex items-center justify-between text-xs sm:text-sm"
                                     >
-                                        <span className="text-green-500">{user.email}</span>{" "}
-                                        <span className="text-black">({user.nickname})</span>
-                                    </span>
+                        <span className="text-green-500 truncate">
+                            {user.email}
+                        </span>
+
+                                        <span className="text-black ml-2 shrink-0">
+                            ({user.nickname})
+                        </span>
+                                    </div>
                                 ))}
+
                         </div>
+
                     </div>
                 )}
 
@@ -1247,7 +1345,17 @@ export default function LoggedInAdmin() {
                                     <span className="text-red-400 font-bold">No</span>
                                 )}
                             </p>
-                            <p><strong>IP Address:</strong> {user.ip_address}</p>
+                            <p>
+                                <strong>IP Address:</strong>{" "}
+                                <a
+                                    href={`https://whatismyipaddress.com/ip/${user.ip_address}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-400 hover:underline"
+                                >
+                                    {user.ip_address}
+                                </a>
+                            </p>
 
                         </div>
                     ))

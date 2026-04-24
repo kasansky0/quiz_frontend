@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { submitAd } from "./submitAd";
 import { useUser } from "@/app/UserContext";
 
-
 export default function HireFormPage() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
     const { data: session, status } = useSession();
@@ -24,15 +23,12 @@ export default function HireFormPage() {
         company: "",
         title: "",
         location: "",
-
         payMin: "",
         payMax: "",
-
         type: "",
         travel: "",
         overtime: "",
         relocation: "",
-
         perDiem: "",
     });
 
@@ -54,10 +50,10 @@ export default function HireFormPage() {
     );
 
     const inputClass = (field: string) =>
-        `w-full h-10 px-2 rounded-xl border text-sm
-        ${errors[field] ? "border-red-500 bg-black-200" : "border-black bg-black-200"}
-        placeholder:text-xs placeholder:text-black`;
-
+        `w-full h-10 px-3 rounded-lg border text-sm transition bg-white
+        ${errors[field] ? "border-red-500" : "border-neutral-300"}
+        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+        placeholder:text-xs placeholder:text-neutral-400`;
 
     useEffect(() => {
         if (userId === null || isEmployer === undefined) return;
@@ -198,15 +194,14 @@ export default function HireFormPage() {
     }
 
     return (
-        <div className="p-4 text-black min-h-screen">
+        <div className="min-h-screen bg-neutral-100 p-6 text-black">
             <div className="w-full max-w-xl mx-auto">
 
-                <div className="relative flex items-center mb-4">
-                    {/* Back button (left) */}
+                {/* HEADER */}
+                <div className="relative flex items-center mb-6">
                     <button
                         onClick={() => router.push("/hire")}
-                        title="Back"
-                        className="absolute left-0"
+                        className="absolute left-0 text-neutral-500 hover:text-neutral-700"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -214,7 +209,7 @@ export default function HireFormPage() {
                             viewBox="0 0 24 24"
                             strokeWidth={1.5}
                             stroke="currentColor"
-                            className="w-8 h-8"
+                            className="w-7 h-7"
                         >
                             <path
                                 strokeLinecap="round"
@@ -224,46 +219,82 @@ export default function HireFormPage() {
                         </svg>
                     </button>
 
-                    {/* Centered title */}
                     <div className="mx-auto text-center">
-                        <h1 className="text-2xl font-bold">Create Job Ad</h1>
-                        <p className="text-sm text-black">
+                        <h1 className="text-2xl font-semibold">Create Job Ad</h1>
+                        <p className="text-sm text-neutral-500">
                             Fill in job details below
                         </p>
                     </div>
                 </div>
 
+                {/* FORM CARD (LinkedIn style) */}
                 <form
                     onSubmit={handleSubmit}
-                    className="bg-black-200 p-4 rounded-2xl space-y-4 border border-black"
+                    className="bg-white p-6 rounded-2xl space-y-5 border border-neutral-200 shadow-sm"
                 >
 
                     {/* TITLE */}
                     <div>
-                        <label className="text-sm">Job Title</label>
+                        <label className="text-sm text-neutral-600">Job Title</label>
+
+                        <div className="text-xs text-neutral-500 mb-1">
+                            List active positions you are currently hiring for or will be hiring for soon. Do not include roles that are not available.
+                        </div>
+
                         <input
                             name="title"
                             value={form.title}
+                            maxLength={300}
                             onChange={handleChange}
                             className={inputClass("title")}
                         />
+
+                        {/* helper bottom note */}
+                        <div className="text-[11px] text-neutral-400 mt-1">
+                            Tip: Use clear role names like “NETA Level 2 Technician” instead of vague titles.
+                        </div>
+
+                        {/* character counter */}
+                        <div className="text-[11px] text-neutral-400 mt-1 flex justify-end">
+                            {form.title.length}/300
+                        </div>
                     </div>
 
                     {/* LOCATION */}
                     <div>
-                        <label className="text-sm">Location</label>
+                        <label className="text-sm text-neutral-600">Location</label>
+
+                        <div className="text-xs text-neutral-500 mb-1">
+                            You can list multiple locations where these positions are open or will be available.
+                        </div>
+
                         <input
                             name="location"
                             value={form.location}
+                            maxLength={300}
                             onChange={handleChange}
                             className={inputClass("location")}
                         />
+
+                        {/* helper bottom note */}
+                        <div className="text-[11px] text-neutral-400 mt-1">
+                            Tip: Separate multiple locations with commas (e.g. “Miami FL, Charlotte NC, Remote”).
+                        </div>
+
+                        {/* character counter */}
+                        <div className="text-[11px] text-neutral-400 mt-1 flex justify-end">
+                            {form.location.length}/300
+                        </div>
                     </div>
 
                     {/* PAY */}
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="text-sm">Pay Min ($/hr)</label>
+                            <label className="text-sm text-neutral-600">Pay Min ($/hr)</label>
+                            <div className="text-xs text-neutral-500 mb-1">
+                                Minimum hourly rate across all positions (lowest paid role).
+                            </div>
+
                             <input
                                 name="payMin"
                                 value={form.payMin}
@@ -271,8 +302,13 @@ export default function HireFormPage() {
                                 className={inputClass("payMin")}
                             />
                         </div>
+
                         <div>
-                            <label className="text-sm">Pay Max ($/hr)</label>
+                            <label className="text-sm text-neutral-600">Pay Max ($/hr)</label>
+                            <div className="text-xs text-neutral-500 mb-1">
+                                Maximum hourly rate across all positions (highest paid role).
+                            </div>
+
                             <input
                                 name="payMax"
                                 value={form.payMax}
@@ -283,63 +319,108 @@ export default function HireFormPage() {
                     </div>
 
                     {/* TYPE */}
-                    <select
-                        name="type"
-                        value={form.type}
-                        onChange={handleChange}
-                        className={inputClass("type")}
-                    >
-                        <option value="">Job Type</option>
-                        <option value="Full-time">Full-time</option>
-                        <option value="Travel">Travel</option>
-                        <option value="Contract">Contract</option>
-                        <option value="Field">Field</option>
-                    </select>
+                    <div>
+                        <div className="text-sm font-medium text-neutral-700">
+                            Employment type
+                        </div>
+                        <div className="text-xs text-neutral-500 mb-1">
+                            Choose how this job is structured (full-time, contract, field work, etc.)
+                        </div>
+
+                        <select
+                            name="type"
+                            value={form.type}
+                            onChange={handleChange}
+                            className={inputClass("type")}
+                        >
+                            <option value="" disabled>
+                                -- Choose Job Type --
+                            </option>
+                            <option value="Full-time">Full-time</option>
+                            <option value="Travel">Travel</option>
+                            <option value="Contract">Contract</option>
+                            <option value="Field">Field</option>
+                        </select>
+                    </div>
 
                     {/* TRAVEL */}
-                    <select
-                        name="travel"
-                        value={form.travel}
-                        onChange={handleChange}
-                        className={inputClass("travel")}
-                    >
-                        <option value="">Travel</option>
-                        <option value="Nationwide">Nationwide</option>
-                        <option value="Regional">Regional</option>
-                        <option value="Local">Local</option>
-                        <option value="None">None</option>
-                    </select>
+                    <div>
+                        <div className="text-sm font-medium text-neutral-700">
+                            Travel requirements
+                        </div>
+                        <div className="text-xs text-neutral-500 mb-1">
+                            Define how often this role requires travel
+                        </div>
+
+                        <select
+                            name="travel"
+                            value={form.travel}
+                            onChange={handleChange}
+                            className={inputClass("travel")}
+                        >
+                            <option value="" disabled>
+                                -- Choose Travel --
+                            </option>
+                            <option value="Nationwide">Nationwide</option>
+                            <option value="Regional">Regional</option>
+                            <option value="Local">Local</option>
+                            <option value="None">None</option>
+                        </select>
+                    </div>
 
                     {/* OVERTIME */}
-                    <select
-                        name="overtime"
-                        value={form.overtime}
-                        onChange={handleChange}
-                        className={inputClass("overtime")}
-                    >
-                        <option value="">Overtime</option>
-                        <option value="OT available">OT available</option>
-                        <option value="Guaranteed OT">Guaranteed OT</option>
-                        <option value="No OT">No OT</option>
-                    </select>
+                    <div>
+                        <div className="text-sm font-medium text-neutral-700">
+                            Overtime policy
+                        </div>
+                        <div className="text-xs text-neutral-500 mb-1">
+                            Set expectations for overtime availability or guarantees
+                        </div>
+
+                        <select
+                            name="overtime"
+                            value={form.overtime}
+                            onChange={handleChange}
+                            className={inputClass("overtime")}
+                        >
+                            <option value="" disabled>
+                                -- Choose Overtime --
+                            </option>
+                            <option value="OT available">OT available</option>
+                            <option value="Guaranteed OT">Guaranteed OT</option>
+                            <option value="No OT">No OT</option>
+                        </select>
+                    </div>
 
                     {/* RELOCATION */}
-                    <select
-                        name="relocation"
-                        value={form.relocation}
-                        onChange={handleChange}
-                        className={inputClass("relocation")}
-                    >
-                        <option value="">Relocation</option>
-                        <option value="Paid relocation">Paid relocation</option>
-                        <option value="Partial relocation">Partial relocation</option>
-                        <option value="No relocation">No relocation</option>
-                    </select>
+                    <div>
+                        <div className="text-sm font-medium text-neutral-700">
+                            Relocation support
+                        </div>
+                        <div className="text-xs text-neutral-500 mb-1">
+                            Specify if relocation assistance is provided
+                        </div>
 
+                        <select
+                            name="relocation"
+                            value={form.relocation}
+                            onChange={handleChange}
+                            className={inputClass("relocation")}
+                        >
+                            <option value="" disabled>
+                                -- Choose Relocation --
+                            </option>
+                            <option value="Paid relocation">Paid relocation</option>
+                            <option value="Partial relocation">Partial relocation</option>
+                            <option value="No relocation">No relocation</option>
+                        </select>
+                    </div>
+
+                    {/* SUBMIT */}
                     <button
                         type="submit"
                         disabled={loading || !isFormComplete}
-                        className="w-full bg-black-200 text-black p-2 rounded-xl font-semibold hover:bg-black-200 border border-black disabled:opacity-50"
+                        className="w-full bg-blue-600 text-white py-2.5 rounded-full font-medium hover:bg-blue-700 active:scale-[0.99] transition disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                     >
                         {loading ? "Submitting..." : "Submit for Approval"}
                     </button>

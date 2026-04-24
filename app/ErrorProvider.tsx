@@ -69,7 +69,7 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
                         <div className="flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-white border border-neutral-200 shadow-md animate-slide-down">
 
                             {/* LEFT ACCENT */}
-                            <div className="w-1 self-stretch rounded-full bg-red-400/80" />
+                            <div className="w-1 self-stretch rounded-full bg-red-500" />
 
                             {/* MESSAGE */}
                             <div className="flex-1 text-sm text-neutral-800 leading-snug">

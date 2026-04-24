@@ -521,9 +521,11 @@ export default function ApplyPage() {
                 {/* COMPANY CARD */}
                 {company && (
                     <div className="w-full text-sm bg-white border border-neutral-200 rounded-xl p-4 space-y-1 shadow-sm mb-4">
-                        <p><span className="text-neutral-500">Company:</span> {company.name}</p>
-                        <p><span className="text-neutral-500">Position:</span> {company.role}</p>
-                        <p><span className="text-neutral-500">Location:</span> 📍{company.location}</p>
+                        <p><span className="font-semibold">Company:</span> {company.name}</p>
+                        <p><span className="font-semibold">Position:</span> {company.role}</p>
+                        <p><span className="font-semibold">Location:</span> 📍{company.location}</p>
+                        <p><span className="font-semibold">Name:</span> {session.user.name}</p>
+                        <p><span className="font-semibold">Email:</span> {session.user.email}</p>
                     </div>
                 )}
 
@@ -532,27 +534,26 @@ export default function ApplyPage() {
                     onSubmit={handleSubmit}
                     className="bg-white border border-neutral-200 shadow-sm rounded-2xl p-5 space-y-4 max-w-xl mx-auto"
                 >
-
-                    {/* USER INFO */}
-                    <div className="bg-neutral-50 rounded-xl p-3 border border-neutral-200 text-sm">
-                        <p><strong>Name:</strong> {session.user.name}</p>
-                        <p><strong>Email:</strong> {session.user.email}</p>
-                    </div>
-
                     {/* VETERAN */}
-                    <div className="flex items-center space-x-2">
-                        <input
-                            type="checkbox"
-                            id="veteran"
-                            checked={form.background}
-                            onChange={(e) =>
-                                setForm({ ...form, background: e.target.checked })
-                            }
-                            className="w-4 h-4 accent-blue-600"
-                        />
-                        <label htmlFor="veteran" className="text-sm text-neutral-700">
-                            Veteran
-                        </label>
+                    <div className="flex flex-col">
+                        <div className="flex items-center space-x-2">
+                            <input
+                                type="checkbox"
+                                id="veteran"
+                                checked={form.background}
+                                onChange={(e) =>
+                                    setForm({ ...form, background: e.target.checked })
+                                }
+                                className="w-4 h-4 accent-blue-600"
+                            />
+                            <label htmlFor="veteran" className="text-sm text-neutral-700">
+                                Veteran
+                            </label>
+                        </div>
+
+                        <div className="text-xs text-neutral-500 mt-1 ml-6">
+                            Check this if you have served in the U.S. military (Army, Navy, Air Force, Marine Corps, Coast Guard).
+                        </div>
                     </div>
 
                     {/* LOCATION */}
@@ -560,6 +561,11 @@ export default function ApplyPage() {
                         <label htmlFor="location" className="text-sm font-medium text-neutral-700 mb-1">
                             Your current Location
                         </label>
+
+                        <div className="text-xs text-neutral-500 mb-1">
+                            Write down your current location (city/state). This helps match you with nearby job opportunities.
+                        </div>
+
                         <input
                             id="location"
                             name="location"
@@ -568,6 +574,7 @@ export default function ApplyPage() {
                             onChange={handleChange}
                             className={inputClass("location") + " bg-white border-neutral-300 rounded-lg"}
                         />
+
                         <Counter field="location" value={form.location} />
                     </div>
 
@@ -576,6 +583,11 @@ export default function ApplyPage() {
                         <label htmlFor="availability" className="text-sm font-medium text-neutral-700 mb-1">
                             Earliest Start Date
                         </label>
+
+                        <div className="text-xs text-neutral-500 mb-1">
+                            When are you available to start working? Choose the earliest date you can begin.
+                        </div>
+
                         <input
                             type="date"
                             id="availability"
@@ -592,15 +604,23 @@ export default function ApplyPage() {
                         <label htmlFor="certifications" className="text-sm font-medium text-neutral-700 mb-1">
                             Certifications
                         </label>
+
+                        <div className="text-xs text-neutral-500 mb-1">
+                            Mention any related certifications you have (e.g. NETA, NICET).
+                            Include whether you have passed or previously attempted a certification.
+                            This helps match you with the right job opportunities.
+                        </div>
+
                         <input
                             type="text"
                             id="certifications"
                             name="certifications"
-                            placeholder="NETA 2"
+                            placeholder="NETA 2 (passed / scheduled / in progress)"
                             value={form.certifications as unknown as string}
                             onChange={handleChange}
                             className={inputClass("certifications") + " bg-white border-neutral-300 rounded-lg"}
                         />
+
                         <div className="text-xs text-neutral-500 text-right mt-1">
                             {form.certifications.length}/100
                         </div>
@@ -611,6 +631,12 @@ export default function ApplyPage() {
                         <label htmlFor="travel" className="text-sm font-medium text-neutral-700 mb-1">
                             Willing to Travel?
                         </label>
+
+                        <div className="text-xs text-neutral-500 mb-1">
+                            Many technician roles require extended travel assignments. Are you willing to travel for 2–4 weeks at a time?
+                            Employers typically provide a company vehicle, fuel, per diem, and hotel accommodations during travel periods.
+                        </div>
+
                         <input
                             type="text"
                             id="travel"
@@ -620,6 +646,7 @@ export default function ApplyPage() {
                             onChange={handleChange}
                             className={inputClass("travel") + " bg-white border-neutral-300 rounded-lg"}
                         />
+
                         <Counter field="travel" value={form.travel} />
                     </div>
 
@@ -628,6 +655,12 @@ export default function ApplyPage() {
                         <label htmlFor="overtime" className="text-sm font-medium text-neutral-700 mb-1">
                             Willing to Work Overtime?
                         </label>
+
+                        <div className="text-xs text-neutral-500 mb-1">
+                            In many technician roles, work must be completed regardless of time. NETA technicians may be required to respond to emergency power outages at any time.
+                            Overtime pay varies by company, but is typically time-and-a-half or double time on weekends and holidays.
+                        </div>
+
                         <input
                             type="text"
                             id="overtime"
@@ -637,6 +670,7 @@ export default function ApplyPage() {
                             onChange={handleChange}
                             className={inputClass("overtime") + " bg-white border-neutral-300 rounded-lg"}
                         />
+
                         <Counter field="overtime" value={form.overtime} />
                     </div>
 
@@ -645,15 +679,23 @@ export default function ApplyPage() {
                         <label htmlFor="readyToMove" className="text-sm font-medium text-neutral-700 mb-1">
                             Are you ready to relocate?
                         </label>
+
+                        <div className="text-xs text-neutral-500 mb-1">
+                            Many technician positions require relocation based on project demand.
+                            Please indicate if you are available to relocate on your start date, within 1–2 weeks of starting, or after the timeline discussed above.
+                            This helps match you with active job sites faster.
+                        </div>
+
                         <input
                             type="text"
                             id="readyToMove"
                             name="readyToMove"
-                            placeholder="Yes or No"
+                            placeholder="Yes / No / When (e.g. on start date, 2 weeks after)"
                             value={form.readyToMove}
                             onChange={handleChange}
                             className={inputClass("readyToMove") + " bg-white border-neutral-300 rounded-lg"}
                         />
+
                         <Counter field="readyToMove" value={form.readyToMove} />
                     </div>
 
@@ -662,14 +704,21 @@ export default function ApplyPage() {
                         <label htmlFor="experience" className="text-sm font-medium text-neutral-700 mb-1">
                             What is your electrical experience?
                         </label>
+
+                        <div className="text-xs text-neutral-500 mb-1">
+                            If applicable, include your total electrical experience (military and civilian).
+                            List your MOS, years in that role, and whether you are familiar with reading electrical schematics or technical diagrams.
+                        </div>
+
                         <input
                             id="experience"
                             name="experience"
-                            placeholder="e.g., three years at the company"
+                            placeholder="e.g., 3 years civilian electrician + 4 years military MOS (electrical systems)"
                             value={form.experience}
                             onChange={handleChange}
                             className={inputClass("experience") + " bg-white border-neutral-300 rounded-lg"}
                         />
+
                         <Counter field="experience" value={form.experience} />
                     </div>
 
@@ -678,6 +727,12 @@ export default function ApplyPage() {
                         <label htmlFor="position" className="text-sm font-medium text-neutral-700 mb-1">
                             Briefly describe what are you looking for?
                         </label>
+
+                        <div className="text-xs text-neutral-500 mb-1">
+                            This is general information about your goals and what you are looking for in this role.
+                            Include the type of work, schedule, or opportunities you are targeting.
+                        </div>
+
                         <input
                             id="position"
                             name="position"
@@ -686,6 +741,7 @@ export default function ApplyPage() {
                             onChange={handleChange}
                             className={inputClass("position") + " bg-white border-neutral-300 rounded-lg"}
                         />
+
                         <Counter field="position" value={form.position} />
                     </div>
 

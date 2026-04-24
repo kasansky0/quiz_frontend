@@ -207,7 +207,21 @@ export default function HirePage() {
                 <div className="mb-6 flex justify-center">
                     <Link
                         href="/hire/hireForm"
-                        className="w-full max-w-xs text-center bg-blue-400 hover:bg-blue-600 text-black font-semibold py-3 px-6 rounded-xl transition active:scale-[0.98]"
+                        className="
+                            w-full max-w-xs
+                            text-center
+                            bg-[#0a66c2]
+                            hover:bg-[#004182]
+                            text-white
+                            font-semibold
+                            py-2.5
+                            px-6
+                            rounded-full
+                            text-sm
+                            shadow-sm
+                            transition
+                            active:scale-[0.98]
+                        "
                     >
                         + Create New Job Ad
                     </Link>

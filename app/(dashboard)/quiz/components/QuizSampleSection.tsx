@@ -569,20 +569,35 @@ export default function QuizSampleSection({
                                     {/* NEXT BUTTON */}
                                     {selectedOption && (
                                         <div className="flex flex-col items-center gap-2 w-full">
+
                                             <Button
                                                 onClick={handleNextQuestion}
                                                 disabled={isFetchingNext}
-                                                className="flex items-center justify-center gap-2 px-6 py-3 text-sm sm:text-base font-medium rounded-full disabled:cursor-not-allowed"
+                                                className="
+                flex items-center justify-center gap-2
+                px-5 py-2.5
+                text-sm sm:text-base font-medium
+                rounded-full
+                bg-black-200
+                text-black
+                border border-black/10
+                shadow-sm
+                hover:bg-black-300
+                hover:border-black/20
+                transition
+                disabled:cursor-not-allowed
+                disabled:opacity-60
+            "
                                             >
                                                 {isFetchingNext ? (
-                                                    <span className="flex items-center gap-2">
-                                                      Loading
-                                                      <span className="ml-2 flex space-x-1">
-                                                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce"></span>
-                                                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                                                        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
-                                                      </span>
-                                                    </span>
+                                                    <span className="flex items-center gap-2 text-black">
+                    Loading
+                    <span className="ml-2 flex space-x-1">
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                    </span>
+                </span>
                                                 ) : (
                                                     <>
                                                         Next
@@ -594,11 +609,16 @@ export default function QuizSampleSection({
                                                             stroke="currentColor"
                                                             className="w-4 h-4 transition-transform group-hover:translate-x-1"
                                                         >
-                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 12H6.75m10.5 0-4.5-4.5m4.5 4.5-4.5 4.5" />
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                d="M17.25 12H6.75m10.5 0-4.5-4.5m4.5 4.5-4.5 4.5"
+                                                            />
                                                         </svg>
                                                     </>
                                                 )}
                                             </Button>
+
                                             <div className="flex flex-col items-center text-center">
                                                 <ScrollHint />
                                                 <span className="text-xs sm:text-sm text-black opacity-80 mt-1">

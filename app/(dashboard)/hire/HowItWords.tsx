@@ -35,7 +35,7 @@ export default function HowItWorks() {
             >
 
                 {/* 🔥 THIS IS THE IMPORTANT FIX */}
-                <div className="max-h-64 overflow-y-auto pr-2 space-y-2">
+                <div className="max-h-64 overflow-y-auto pr-2 space-y-2 hide-scrollbar">
 
                     <ul className="space-y-1 list-disc pl-5">
                         <li>Create a job ad and submit for review.</li>
