@@ -101,6 +101,65 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const [deletedCommentIds, setDeletedCommentIds] = useState<Set<string>>(new Set());
     const router = useRouter();
     const { fetchPostComments } = chatApis({ apiUrl });
+
+
+
+
+
+
+
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+    const confirmDelete = () => {
+        if (!pendingDeleteId) return;
+
+        handleDeletePost(pendingDeleteId);
+
+        setShowDeleteConfirm(false);
+        setPendingDeleteId(null);
+    };
+
+    const cancelDelete = () => {
+        setShowDeleteConfirm(false);
+        setPendingDeleteId(null);
+    };
+
+
+
+
+
+
+
+    const [showDeleteCommentConfirm, setShowDeleteCommentConfirm] = useState(false);
+    const [pendingDeleteCommentId, setPendingDeleteCommentId] = useState<string | null>(null);
+    const confirmCommentDelete = () => {
+        if (!pendingDeleteCommentId) return;
+
+        const comment = displayedComments.find(
+            c => c._id === pendingDeleteCommentId
+        );
+
+        if (!comment) return;
+
+        handleDeleteComment(comment);
+
+        setShowDeleteCommentConfirm(false);
+        setPendingDeleteCommentId(null);
+    };
+
+    const cancelCommentDelete = () => {
+        setShowDeleteCommentConfirm(false);
+        setPendingDeleteCommentId(null);
+    };
+
+
+
+
+
+
+
+
+
     const showStatusBanner = (message: string, type: "loading" | "success" | "error" = "loading") => {
         setStatusBanner({ message, type });
         setIsSending(true); // 🔒 lock
@@ -218,8 +277,6 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     useEffect(() => {
         if (commentsArray?.length || polledData?.comments?.length) {
             setShowLoading(false);
-        } else {
-            setShowLoading(true);
         }
     }, [commentsArray, polledData]);
 
@@ -435,9 +492,6 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
     const handleDeleteComment = async (comment: Comment) => {
         if (!activePost || !comment._id) return;
-
-        const confirmed = window.confirm("Are you sure you want to delete this comment?");
-        if (!confirmed) return;
 
         const previousComments = [...displayedComments]; // backup for rollback
 
@@ -674,10 +728,6 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 // POST DELETE AND UPDATE UI //
 
     const handleDeletePost = async (postId: string) => {
-
-        // ✅ Add confirmation before deleting
-        const confirmed = window.confirm("Are you sure you want to delete this post?");
-        if (!confirmed) return;
 
         try {
             const res = await fetchWithToken(`${apiUrl}/posts/${postId}`, {
@@ -1022,7 +1072,10 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                     </button>
 
                                                     <button
-                                                        onClick={() => handleDeletePost(activePost.id)}
+                                                        onClick={() => {
+                                                            setPendingDeleteId(activePost.id);
+                                                            setShowDeleteConfirm(true);
+                                                        }}
                                                         className="p-2 rounded-full active:bg-black/10"
                                                     >
                                                         <svg
@@ -1282,7 +1335,10 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                                             </button>
 
                                                                             <button
-                                                                                onClick={() => handleDeleteComment(comment)}
+                                                                                onClick={() => {
+                                                                                    setPendingDeleteCommentId(comment._id);
+                                                                                    setShowDeleteCommentConfirm(true);
+                                                                                }}
                                                                                 className="p-2 rounded-full active:bg-red-100"
                                                                                 style={{ touchAction: "manipulation" }}
                                                                                 title="Delete Comment"
@@ -1446,6 +1502,76 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
 
 
+                </div>
+            )}
+            {showDeleteConfirm && (
+                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+                    <div className="bg-white w-[92%] max-w-md rounded-2xl shadow-xl border border-black/10 p-5">
+
+                        {/* Title */}
+                        <h2 className="text-base font-semibold text-black">
+                            Confirm deletion
+                        </h2>
+
+                        {/* Message */}
+                        <p className="text-sm text-black/70 mt-2 leading-relaxed">
+                            Are you sure you want to delete this post? This action can’t be undone.
+                        </p>
+
+                        {/* Actions */}
+                        <div className="flex justify-end gap-2 mt-5">
+
+                            <button
+                                onClick={cancelDelete}
+                                className="px-4 py-2 text-sm font-medium text-black/70 bg-black/5 hover:bg-black/10 rounded-full transition"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                onClick={confirmDelete}
+                                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-full transition"
+                            >
+                                Delete
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            )}
+            {showDeleteCommentConfirm && (
+                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+                    <div className="bg-white w-[92%] max-w-md rounded-2xl shadow-xl border border-black/10 p-5">
+
+                        {/* Title */}
+                        <h2 className="text-base font-semibold text-black">
+                            Confirm deletion
+                        </h2>
+
+                        {/* Message */}
+                        <p className="text-sm text-black/70 mt-2 leading-relaxed">
+                            Are you sure you want to delete this comment? This action can’t be undone.
+                        </p>
+
+                        {/* Actions */}
+                        <div className="flex justify-end gap-2 mt-5">
+
+                            <button
+                                onClick={cancelCommentDelete}
+                                className="px-4 py-2 text-sm font-medium text-black/70 bg-black/5 hover:bg-black/10 rounded-full transition"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                onClick={confirmCommentDelete}
+                                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-full transition"
+                            >
+                                Delete
+                            </button>
+
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
