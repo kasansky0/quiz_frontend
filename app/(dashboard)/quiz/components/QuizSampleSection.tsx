@@ -141,9 +141,8 @@ export default function QuizSampleSection({
             }
 
             if (!token) {
-                setShowLoading(true);
                 showError("Oops! You need to log in again. 🫣", true);
-                return;
+                return null;
             }
 
             return await fetch(url, options);
@@ -159,14 +158,8 @@ export default function QuizSampleSection({
 // --- Controls when a loading screen and spinner appears and disappears --- //
 
     useEffect(() => {
-        if (!loadingDone) {
-            setShowLoading(true);
-        } else if (questionData) {
-            // ensure loading shows at least 1500ms
-            const timer = setTimeout(() => setShowLoading(false), 1500);
-            return () => clearTimeout(timer);
-        }
-    }, [loadingDone, questionData]);
+        setShowLoading(!loadingDone);
+    }, [loadingDone]);
 
 
 
@@ -179,19 +172,6 @@ export default function QuizSampleSection({
         optionsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, [selectedOption]);
 
-
-
-
-
-// --- Reset question state when loading starts --- //
-
-    useEffect(() => {
-        if (!loadingDone) {
-            setQuestionData(null);     // prevents leftover question
-            setSelectedOption(null);
-            setAnswerResult(null);
-        }
-    }, [loadingDone]);
 
 
 
@@ -281,7 +261,7 @@ export default function QuizSampleSection({
             // ✅ Update state safely
             if (isMounted) {
                 setQuestionData(data);
-                setTimeout(() => setFade(true), 100);
+                requestAnimationFrame(() => setFade(true));
                 setFetchError(false); // reset fetch error if successful
             }
         }
@@ -366,22 +346,13 @@ export default function QuizSampleSection({
 // --- Main controller for moving to the next quiz question --- //
 
     const handleNextQuestion = async () => {
-
         if (isFetchingNext) return;
         setIsFetchingNext(true);
 
-        // your existing logic
-        await new Promise(res => setTimeout(res, 500));
-
         setFade(false);
-        await new Promise(res => setTimeout(res, 200));
-
-        setSelectedOption(null);
-        setAnswerResult(null);
 
         let nextQuestion: QuestionType | null = null;
 
-        // Check if wrongQueue review is needed
         if (
             cycleCount === QUESTIONS_BEFORE_REVIEW &&
             wrongQueue &&
@@ -392,9 +363,9 @@ export default function QuizSampleSection({
             setWrongQueue(prev => prev.slice(1));
             setCycleCount(0);
         } else {
-            // Decide if this fetch is general or topic-specific
             const fetched = await fetchNextQuestion();
             if (!fetched) {
+                setIsFetchingNext(false);
                 setFetchError(true);
                 return;
             }
@@ -402,8 +373,17 @@ export default function QuizSampleSection({
             setCycleCount(prev => prev + 1);
         }
 
-        if (nextQuestion) setQuestionData(nextQuestion);
-        setFade(true);
+        // RESET STATE FIRST (IMPORTANT ORDER)
+        setSelectedOption(null);
+        setAnswerResult(null);
+
+        // THEN SET NEW QUESTION
+        setQuestionData(nextQuestion);
+
+        // THEN FADE IN
+        requestAnimationFrame(() => {
+            setFade(true);
+        });
 
         scrollContainerRef?.current?.scrollTo({ top: 0, behavior: "auto" });
         window.scrollTo({ top: 0, behavior: "auto" });
@@ -525,7 +505,6 @@ export default function QuizSampleSection({
                         ) : (
                             questionData && (
                                 <div
-                                    key={questionData.id}
                                     className={`w-full max-w-xl flex flex-col gap-6 justify-start transition-opacity duration-700 ease-in-out
                                         bg-white border border-black/10 rounded-xl shadow-sm p-5 sm:p-6 ${
                                         fade ? "opacity-100" : "opacity-0"

@@ -595,13 +595,12 @@ export default function ChatStats() {
                                         disabled={loadingMore}
                                         style={{ touchAction: "manipulation" }}
                                         className={`
-                                        w-full sm:w-auto px-6 py-3
-                                        flex items-center justify-center gap-2
-                                        rounded-full font-medium text-sm sm:text-base
-                                        text-white bg-blue-400
-                                        hover:bg-blue-400 active:bg-blue-400
+                                        w-full flex justify-center items-center gap-2
+                                        py-3 rounded-xl
+                                        text-white font-medium text-sm sm:text-base
+                                        bg-blue-500 hover:bg-blue-500 active:bg-blue-500
+                                        transition
                                         shadow-sm
-                                        transition-all duration-200
                                         disabled:opacity-60 disabled:cursor-not-allowed
                                     `}
                                     >

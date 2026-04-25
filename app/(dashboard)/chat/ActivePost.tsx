@@ -1474,7 +1474,13 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                         }
                                     }}
                                     style={{ touchAction: "manipulation" }}
-                                    className="w-full flex justify-center items-center py-3 bg-blue-500/90 hover:bg-blue-500 rounded-xl mt-2 transition"
+                                    className="w-full flex justify-center items-center gap-2
+                                    py-3 rounded-xl
+                                    text-white font-medium text-sm sm:text-base
+                                    bg-blue-500 hover:bg-blue-500 active:bg-blue-500
+                                    transition
+                                    shadow-sm
+                                    disabled:opacity-60 disabled:cursor-not-allowed"
                                 >
                                     {/* Icon: spins when loading */}
                                     <svg
@@ -1494,7 +1500,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                         />
                                     </svg>
                                     <span className="ml-2 text-white font-medium text-sm sm:text-base">
-                                      {isButtonLoading ? "Loading..." : "Load More"}
+                                      {isButtonLoading ? "Loading..." : "Load more Comments"}
                                     </span>
                                 </button>
                             )}
