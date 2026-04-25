@@ -426,7 +426,7 @@ export default function ChatStats() {
         <div className="w-full relative sm:px-4">
             {/* Loading / Error Banner */}
             {(showLoading || serverError) && (
-                <div className="flex-1 flex items-center justify-center pt-[56px] text-black w-full">
+                <div className="flex-1 flex items-center justify-center min-h-screen text-black w-full">
                     {showLoading && (
                         <p className="text-xl flex items-center">
                             Loading

@@ -496,7 +496,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     // Handle loading and unauthenticated state
     if (status === "loading") {
         return (
-            <div className="flex-1 flex items-center justify-center pt-[56px] text-black">
+            <div className="flex-1 flex items-center justify-center min-h-screen text-black">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">

@@ -56,7 +56,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     // 1️⃣ While session is loading, just show a placeholder
     if (status === "loading") {
         return (
-            <div className="flex-1 flex items-center justify-center pt-[56px] text-black">
+            <div className="flex-1 flex items-center justify-center min-h-screen text-black">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
@@ -900,7 +900,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         <div className={`transition-opacity duration-500 ease-in-out ${fade ? "opacity-100" : "opacity-0"}`}>
 
             {showLoading ? (
-                <div className="flex-1 flex items-center justify-center pt-[56px] text-black">
+                <div className="flex-1 flex items-center justify-center min-h-screen text-black">
                     <p className="text-xl flex items-center">
                         Loading
                         <span className="ml-2 flex space-x-1">

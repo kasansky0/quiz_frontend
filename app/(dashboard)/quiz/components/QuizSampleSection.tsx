@@ -84,9 +84,10 @@ export default function QuizSampleSection({
     const [fetchError, setFetchError] = useState(false); // <-- track fetch failures
     const QUESTIONS_BEFORE_REVIEW = 2;
     const { showError } = useError();
-    const [showLoading, setShowLoading] = useState(true);
     const router = useRouter();
     const isMountedRef = useRef(true);
+
+    const showLoading = !questionData && !fetchError;
 
 
     const [isFetchingNext, setIsFetchingNext] = useState(false);
@@ -151,15 +152,6 @@ export default function QuizSampleSection({
             return null;
         }
     }
-
-
-
-
-// --- Controls when a loading screen and spinner appears and disappears --- //
-
-    useEffect(() => {
-        setShowLoading(!loadingDone);
-    }, [loadingDone]);
 
 
 
@@ -480,7 +472,7 @@ export default function QuizSampleSection({
         >
 
             {showLoading ? (
-                <div className="w-full flex justify-center items-center min-h-[60vh]">
+                <div className="w-full flex justify-center items-center min-h-screen">
                     <p className="text-xl flex items-center">
                         Loading
                         <span className="ml-2 flex space-x-1">

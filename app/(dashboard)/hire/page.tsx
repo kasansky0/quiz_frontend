@@ -52,6 +52,7 @@ type Ad = {
     status: "pending" | "approved" | "rejected" | "published";
     publishedAt?: string;
     applications?: Application[];
+    company?: string;
 };
 
 /* =========================
@@ -334,8 +335,21 @@ export default function HirePage() {
                                                                                 <p>
                                                                                     <span className="font-bold text-blue-400">Email:</span>{" "}
                                                                                     <a
-                                                                                        href={`mailto:${app.email}`}
-                                                                                        className="text-blue-300 hover:text-blue-200 underline"
+                                                                                        href={`mailto:${app.email}?subject=${encodeURIComponent(
+                                                                                            "NETA Level 2 Technician Application"
+                                                                                        )}&body=${encodeURIComponent(
+                                                                                            `Hello,
+
+Thank you for your interest in the NETA Level 2 Technician position at ${ad.company ?? "Company"}.
+
+To move forward with your application, please reply to this email with your updated resume and any relevant certifications or experience.
+
+Looking forward to hearing from you.
+
+Best regards,
+${ad.company ?? "Company"} Hiring Team`
+                                                                                        )}`}
+                                                                                        className="text-blue-400 hover:text-blue-200 underline"
                                                                                     >
                                                                                         {app.email}
                                                                                     </a>
@@ -379,7 +393,7 @@ export default function HirePage() {
                                                                                                         Seen {stats.total.seen} | ✔ {stats.total.correct} | ✖ {stats.total.wrong}
                                                                                                     </div>
 
-                                                                                                    <div className="text-blue-300">
+                                                                                                    <div className="text-blue-400">
                                                                                                         Accuracy: {stats.total.accuracy.toFixed(1)}%
                                                                                                     </div>
                                                                                                 </div>
@@ -387,7 +401,7 @@ export default function HirePage() {
                                                                                                 {/* RIGHT: dropdown toggle */}
                                                                                                 <button
                                                                                                     onClick={() => toggleStats(app._id)}
-                                                                                                    className="text-[10px] text-blue-400 hover:text-blue-300"
+                                                                                                    className="text-[10px] text-blue-400 hover:text-blue-400"
                                                                                                 >
                                                                                                     {openStatsMap[app._id] ? "Hide details" : "View topics"}
                                                                                                 </button>
@@ -418,7 +432,7 @@ export default function HirePage() {
                                                                                                                         key={topic}
                                                                                                                         className="flex items-center justify-between text-[10px]"
                                                                                                                     >
-                                                                                                                        <div className="text-blue-300 w-28 truncate">
+                                                                                                                        <div className="text-blue-400 w-28 truncate">
                                                                                                                             {topic}
                                                                                                                         </div>
 
