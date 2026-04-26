@@ -420,25 +420,73 @@ export default function ApplyPage() {
      ${errors[field] ? "border-red-500 bg-black-200" : "border-black bg-black-200"}
      placeholder:text-xs placeholder:text-black`;
 
-    // --- SUBMISSION SUCCESS SCREEN ---
+    // --- SUBMISSION SUCCESS SCREEN (LinkedIn-style + growth loop) ---
     if (submitted) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen text-black p-4 bg-black">
-                <div className="bg-black-200 rounded-2xl p-6 text-center border border-black max-w-md w-full">
-                    <svg className="w-24 h-24 mx-auto mb-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <h2 className="text-2xl font-bold mb-2">Application Submitted!</h2>
-                    <p className="text-black mb-4">
-                        Thank you for applying. Your application has been successfully submitted.
-                        We will review it and get back to you soon.
+            <div className="min-h-screen bg-[#f3f2ef] flex items-start justify-center px-4 py-4">
+
+                <div className="w-full max-w-lg bg-white rounded-2xl border border-neutral-200 shadow-sm p-8 mt-2 text-center">
+
+                    {/* Success Icon */}
+                    <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-green-100 flex items-center justify-center">
+                        <svg
+                            className="w-10 h-10 text-green-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            strokeWidth={2.5}
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M5 13l4 4L19 7"
+                            />
+                        </svg>
+                    </div>
+
+                    {/* Headline */}
+                    <h2 className="text-3xl font-semibold text-neutral-900 mb-3">
+                        Application submitted
+                    </h2>
+
+                    <p className="text-neutral-600 text-sm leading-relaxed mb-6">
+                        Your application has been sent to{" "}
+                        <span className="font-semibold text-neutral-800">
+                            {selectedJob?.company}
+                        </span>.
+                        <br />
+                        The employer will review it and reach out if there’s a match.
+                        <br />
+                        <span className="text-xs text-neutral-500 block mt-2">
+                            Updates will be sent to your email address.
+                        </span>
                     </p>
-                    <button
-                        onClick={() => router.push("/info")} // go back to home or dashboard
-                        className="bg-black-200 hover:bg-black-200 text-black px-4 py-2 - border border-black"
-                    >
-                        Go Back
-                    </button>
+
+                    {/* Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-3">
+
+                        <button
+                            onClick={() => router.push("/position")}
+                            className="flex-1 bg-[#0a66c2] hover:bg-[#004182] text-white py-3 rounded-full font-semibold transition"
+                        >
+                            Back to Jobs
+                        </button>
+
+                        <button
+                            onClick={() => router.push("/quiz")}
+                            className="flex-1 border border-[#0a66c2] text-[#0a66c2] hover:bg-blue-50 py-3 rounded-full font-semibold transition"
+                        >
+                            Take Quiz
+                        </button>
+
+                    </div>
+
+                    {/* Footer note */}
+                    <p className="text-xs text-neutral-500 mt-6 leading-relaxed">
+                        Your quiz score and application information help employers evaluate your skill level.
+                        Consistent practice increases visibility and hiring chances.
+                    </p>
+
                 </div>
             </div>
         );
@@ -502,7 +550,7 @@ export default function ApplyPage() {
                             viewBox="0 0 24 24"
                             strokeWidth={1.5}
                             stroke="currentColor"
-                            className="w-7 h-7 text-neutral-700"
+                            className="w-7 h-7 text-black"
                         >
                             <path
                                 strokeLinecap="round"

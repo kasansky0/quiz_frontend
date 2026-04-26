@@ -508,7 +508,7 @@ export default function QuizSampleSection({
                                     {/* Future Ads / Message */}
                                     <Link
                                         href="/position"
-                                        className="w-full text-center text-sm py-1 transition block active:bg-transparent focus:bg-transparent [-webkit-tap-highlight-color:transparent]"
+                                        className="w-full text-center text-xs transition block active:bg-transparent focus:bg-transparent [-webkit-tap-highlight-color:transparent]"
                                     >
                                         <div className="font-semibold">
                                             💼 Hiring NETA Technicians
@@ -518,7 +518,7 @@ export default function QuizSampleSection({
                                             📍 Multiple locations • Relocation assistance
                                         </div>
 
-                                        <div className="text-blue-400 text-xs mt-2">
+                                        <div className="text-blue-400 text-xs mt-1">
                                             View positions →
                                         </div>
                                     </Link>

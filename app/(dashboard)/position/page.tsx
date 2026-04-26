@@ -146,7 +146,7 @@ export default function AdsPage() {
                     {/* HEADER */}
                     <button
                         onClick={() => setOpen(!open)}
-                        className="w-full flex items-center justify-between p-3"
+                        className="w-full flex items-center justify-between pt-3 px-3"
                     >
                     <span className="font-medium text-sm text-neutral-700">
                         Sort by: <span className="font-semibold capitalize">{sortBy}</span>
@@ -167,7 +167,7 @@ export default function AdsPage() {
                             open ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
                         }`}
                     >
-                        <div className="space-y-2 text-sm text-neutral-600">
+                        <div className="space-y-2 text-sm mt-1 text-neutral-600">
 
                             <button
                                 onClick={() => {

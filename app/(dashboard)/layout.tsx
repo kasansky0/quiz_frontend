@@ -557,14 +557,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         <button
                             ref={buttonRef}
                             className={`
-                                rounded-full
-                                p-2
-                                transition transform duration-150 ease-out
-                                active:scale-95 active:bg-neutral-200
-                                focus:outline-none focus:ring-0
-                                hover:scale-105 hover:bg-neutral-100
-                                touch-manipulation
-                            `}
+        md:hidden
+        rounded-full
+        p-2
+        transition transform duration-150 ease-out
+        active:scale-95 active:bg-neutral-200
+        focus:outline-none focus:ring-0
+        hover:scale-105 hover:bg-neutral-100
+        touch-manipulation
+    `}
                             onClick={() => setActiveSheet(prev => prev === "sidebar" ? null : "sidebar")}
                         >
                             <svg
@@ -573,7 +574,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                 viewBox="0 0 24 24"
                                 strokeWidth={2}
                                 stroke="currentColor"
-                                className="w-6 h-6 text-neutral-500"
+                                className="w-6 h-6 text-black"
                             >
                                 <path
                                     strokeLinecap="round"
@@ -613,7 +614,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                     viewBox="0 0 24 24"
                                     strokeWidth={1.5}
                                     stroke="currentColor"
-                                    className="w-6 h-6 text-neutral-500 transition-colors duration-150 group-hover:text-neutral-700"
+                                    className="w-6 h-6 text-black transition-colors duration-150 group-hover:text-neutral-700"
                                 >
                                     <path
                                         strokeLinecap="round"
@@ -643,7 +644,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                     viewBox="0 0 24 24"
                                     strokeWidth={1.5}
                                     stroke="currentColor"
-                                    className="w-7 h-7 text-neutral-500 transition-colors duration-150 group-hover:text-neutral-700"
+                                    className="w-7 h-7 text-black transition-colors duration-150 group-hover:text-neutral-700"
                                 >
                                     <path
                                         strokeLinecap="round"
@@ -674,7 +675,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                     viewBox="0 0 24 24"
                                     strokeWidth={1.5}
                                     stroke="currentColor"
-                                    className="w-7 h-7 text-neutral-600"
+                                    className="w-7 h-7 text-black"
                                 >
                                     <path
                                         strokeLinecap="round"
@@ -704,7 +705,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                     viewBox="0 0 24 24"
                                     strokeWidth={1.5}
                                     stroke="currentColor"
-                                    className="w-6 h-6 text-neutral-500 transition-colors duration-150 group-hover:text-neutral-700"
+                                    className="w-6 h-6 text-black transition-colors duration-150 group-hover:text-neutral-700"
                                 >
                                     <path
                                         strokeLinecap="round"

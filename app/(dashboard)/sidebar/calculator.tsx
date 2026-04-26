@@ -186,7 +186,7 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
                     ? "bg-blue-900 border-2 border-blue-400 shadow-[0_0_40px_rgba(0,150,255,0.8)] animate-pulse"
                     : breakerMode
                         ? "bg-red-900 border-2 border-red-400 shadow-[0_0_40px_rgba(255,50,50,0.8)] animate-pulse"
-                        : "bg-black-200 "
+                        : "bg-white "
                 }
         `}
             >
@@ -228,7 +228,7 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
                     ref={displayRef}
                     className={`w-full sm:w-72 md:w-full px-1 sm:px-3 py-2 sm:py-3 rounded-xl mb-1 mt-1 text-right font-bold text-sm sm:text-base md:text-base overflow-hidden whitespace-nowrap
                             border ${calcResult === "Error" || isNaN(Number(calcResult)) ? "border-red-500 shadow-[0_0_20px_rgba(255,0,0,0.5)] text-red-500" : "border-black/20 text-black"}
-                            bg-black-200`}
+                            bg-white`}
                 >
                     {calcResult !== null
                         ? calcResult === "Error" || isNaN(Number(calcResult))
@@ -271,8 +271,8 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
                                         : ["/","*","-","+","."].includes(btn)
                                             ? "bg-white/10 text-black hover:bg-white/20"
                                             : ["√","x²","sin","cos","√3","π","tan"].includes(btn)
-                                                ? "bg-black-200 text-blue-300 hover:bg-white/20"
-                                                : "bg-black-200 text-black hover:bg-white/10";
+                                                ? "bg-white text-blue-300 hover:bg-white/20"
+                                                : "bg-white text-black hover:bg-white/10";
 
                         return (
                             <button

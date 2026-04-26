@@ -134,7 +134,7 @@ export default function CreatePost({
                         {/* Center message */}
                         <Link
                             href="/position"
-                            className="text-center text-xs sm:text-sm flex-1 px-2"
+                            className="text-center text-xs sm:text-sm flex-1 px-2 py-2"
                         >
                             <div className="font-semibold">
                                 💼 Hiring NETA Technicians

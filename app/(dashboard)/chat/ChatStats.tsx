@@ -471,7 +471,7 @@ export default function ChatStats() {
                                 {/* Future Ads / Message */}
                                 <Link
                                     href="/position"
-                                    className="flex-1 text-center text-sm py-1 transition block active:bg-transparent focus:bg-transparent [-webkit-tap-highlight-color:transparent]"
+                                    className="flex-1 text-center text-xs pt-2 pb-3 transition block active:bg-transparent focus:bg-transparent [-webkit-tap-highlight-color:transparent]"
                                 >
                                     <div className="font-semibold">
                                         💼 Hiring NETA Technicians
@@ -481,7 +481,7 @@ export default function ChatStats() {
                                         📍 Multiple locations • Relocation assistance
                                     </div>
 
-                                    <div className="text-blue-400 text-xs mt-2">
+                                    <div className="text-blue-400 text-xs mt-1">
                                         View positions →
                                     </div>
                                 </Link>

@@ -243,7 +243,7 @@ export default function HirePage() {
                                 const isOpen = openAdId === ad._id;
 
                                 return (
-                                    <div key={ad._id} className="bg-black-200 p-4 rounded-xl border border-black">
+                                    <div key={ad._id} className="bg-white p-4 rounded-xl border border-black/10">
 
                                         <h3 className="font-bold">Position: {ad.title}</h3>
                                         <p className="text-black text-sm">Location 📍 {ad.location}</p>
@@ -284,10 +284,17 @@ export default function HirePage() {
                                         {status === "approved" && <PayAdButton adId={ad._id} />}
 
                                         {/* APPLICATIONS */}
-                                        <div className="mt-4 border-t border-black pt-3">
+                                        <div className="mt-3 border-t border-black/10 pt-3">
 
                                             <div
-                                                onClick={() => setOpenAdId(isOpen ? null : ad._id)}
+                                                onClick={() => {
+                                                    if (isOpen) {
+                                                        setOpenAdId(null);
+                                                        setOpenStatsMap({}); // reset all "View topics"
+                                                    } else {
+                                                        setOpenAdId(ad._id);
+                                                    }
+                                                }}
                                                 className="flex justify-between cursor-pointer"
                                             >
                                                 <h4 className="text-sm font-semibold flex items-center gap-2">
@@ -322,7 +329,10 @@ export default function HirePage() {
                                                             <div className="space-y-3">
 
                                                                 {apps.map((app, index) => (
-                                                                    <div key={app._id}>
+                                                                    <div
+                                                                        key={app._id}
+                                                                        className="bg-white border border-neutral-200 rounded-xl p-4 mt-3 shadow-sm"
+                                                                    >
 
                                                                         <div className="text-xs space-y-1">
 
@@ -336,20 +346,20 @@ export default function HirePage() {
                                                                                     <span className="font-bold text-blue-400">Email:</span>{" "}
                                                                                     <a
                                                                                         href={`mailto:${app.email}?subject=${encodeURIComponent(
-                                                                                            "NETA Level 2 Technician Application"
+                                                                                            `${ad.company} Job Application`
                                                                                         )}&body=${encodeURIComponent(
                                                                                             `Hello,
 
-Thank you for your interest in the NETA Level 2 Technician position at ${ad.company ?? "Company"}.
+Thank you for your interest in the position at ${ad.company}.
 
-To move forward with your application, please reply to this email with your updated resume and any relevant certifications or experience.
+We would like to move forward with your application. Please reply to this email with your updated resume.
 
-Looking forward to hearing from you.
+We look forward to reviewing your application.
 
 Best regards,
-${ad.company ?? "Company"} Hiring Team`
+${ad.company} Hiring Team`
                                                                                         )}`}
-                                                                                        className="text-blue-400 hover:text-blue-200 underline"
+                                                                                        className="text-blue-400 underline"
                                                                                     >
                                                                                         {app.email}
                                                                                     </a>
@@ -369,7 +379,7 @@ ${ad.company ?? "Company"} Hiring Team`
                                                                                🔥 ADDED: USER STATS (UNDER EVERYTHING)
                                                                             ========================= */}
                                                                             {/* STATS DROPDOWN */}
-                                                                            <div className="mt-2 border-t border-gray-800 pt-2 text-[10px] text-black">
+                                                                            <div className="mt-2 border-t border-black/10 pt-2 text-[10px] text-black">
 
                                                                                 {(() => {
                                                                                     // ✅ normalize once (safe fallback)
@@ -381,7 +391,7 @@ ${ad.company ?? "Company"} Hiring Team`
                                                                                     return (
                                                                                         <>
                                                                                             {/* ================= ALWAYS VISIBLE OVERALL ================= */}
-                                                                                            <div className="bg-black-200 p-2 rounded-md border border-gray-800 flex items-center justify-between">
+                                                                                            <div className="flex items-center justify-between">
 
                                                                                                 {/* LEFT: summary */}
                                                                                                 <div className="space-y-1">
@@ -409,49 +419,58 @@ ${ad.company ?? "Company"} Hiring Team`
                                                                                             </div>
 
                                                                                             {/* ================= DROPDOWN: TOPICS ================= */}
-                                                                                            {openStatsMap[app._id] && app.stats?.topics && Object.keys(app.stats.topics).length > 0 && (
-                                                                                                <div className="mt-2 bg-black-200 p-2 rounded-md border border-gray-800">
+                                                                                            <AnimatePresence initial={false}>
+                                                                                                {openStatsMap[app._id] &&
+                                                                                                    app.stats?.topics &&
+                                                                                                    Object.keys(app.stats.topics).length > 0 && (
+                                                                                                        <motion.div
+                                                                                                            initial={{ opacity: 0, height: 0 }}
+                                                                                                            animate={{ opacity: 1, height: "auto" }}
+                                                                                                            exit={{ opacity: 0, height: 0 }}
+                                                                                                            transition={{ duration: 0.25, ease: "easeInOut" }}
+                                                                                                            className="mt-2 overflow-hidden"
+                                                                                                        >
 
-                                                                                                    <div className="font-semibold text-black mb-1">
-                                                                                                        Topic Breakdown
-                                                                                                    </div>
+                                                                                                            {/* Divider */}
+                                                                                                            <div className="border-t border-black/10 mb-2" />
 
-                                                                                                    <div className="space-y-1">
+                                                                                                            <div className="font-semibold text-black mb-1">
+                                                                                                                Topic Breakdown
+                                                                                                            </div>
 
-                                                                                                        {Object.entries(app.stats.topics)
-                                                                                                            // ✅ SORT BY HIGHEST "seen"
-                                                                                                            .sort(([, a], [, b]) => b.seen - a.seen)
-                                                                                                            .map(([topic, t]) => {
+                                                                                                            <div className="space-y-1">
+                                                                                                                {Object.entries(app.stats.topics)
+                                                                                                                    .sort(([, a], [, b]) => b.seen - a.seen)
+                                                                                                                    .map(([topic, t]) => {
+                                                                                                                        const percent = t.seen
+                                                                                                                            ? (t.correct / t.seen) * 100
+                                                                                                                            : 0;
 
-                                                                                                                const percent = t.seen
-                                                                                                                    ? (t.correct / t.seen) * 100
-                                                                                                                    : 0;
+                                                                                                                        return (
+                                                                                                                            <div
+                                                                                                                                key={topic}
+                                                                                                                                className="flex items-center justify-between text-[10px]"
+                                                                                                                            >
+                                                                                                                                <div className="text-blue-400 w-28 truncate">
+                                                                                                                                    {topic}
+                                                                                                                                </div>
 
-                                                                                                                return (
-                                                                                                                    <div
-                                                                                                                        key={topic}
-                                                                                                                        className="flex items-center justify-between text-[10px]"
-                                                                                                                    >
-                                                                                                                        <div className="text-blue-400 w-28 truncate">
-                                                                                                                            {topic}
-                                                                                                                        </div>
+                                                                                                                                <div className="flex gap-2 text-black">
+                                                                                                                                    <span>{t.seen}</span>
+                                                                                                                                    <span className="text-green-500">✔ {t.correct}</span>
+                                                                                                                                    <span className="text-red-400">✖ {t.wrong}</span>
+                                                                                                                                </div>
 
-                                                                                                                        <div className="flex gap-2 text-black">
-                                                                                                                            <span>{t.seen}</span>
-                                                                                                                            <span className="text-green-500">✔ {t.correct}</span>
-                                                                                                                            <span className="text-red-400">✖ {t.wrong}</span>
-                                                                                                                        </div>
-
-                                                                                                                        <div className="text-green-500 w-12 text-right">
-                                                                                                                            {percent.toFixed(1)}%
-                                                                                                                        </div>
-                                                                                                                    </div>
-                                                                                                                );
-                                                                                                            })}
-
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            )}
+                                                                                                                                <div className="text-green-500 w-12 text-right">
+                                                                                                                                    {percent.toFixed(1)}%
+                                                                                                                                </div>
+                                                                                                                            </div>
+                                                                                                                        );
+                                                                                                                    })}
+                                                                                                            </div>
+                                                                                                        </motion.div>
+                                                                                                    )}
+                                                                                            </AnimatePresence>
                                                                                         </>
                                                                                     );
                                                                                 })()}
@@ -459,9 +478,6 @@ ${ad.company ?? "Company"} Hiring Team`
 
                                                                         </div>
 
-                                                                        {index !== apps.length - 1 && (
-                                                                            <div className="border-t border-gray-800 my-3" />
-                                                                        )}
                                                                     </div>
                                                                 ))}
 
