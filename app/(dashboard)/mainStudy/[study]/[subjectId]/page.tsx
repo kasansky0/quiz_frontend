@@ -54,7 +54,7 @@ export default function SubjectPage() {
     return (
         <div className="p-4 md:p-4 text-black relative min-h-screen">
             {loading || subscriptionRequired === undefined ? (
-                <div className="absolute inset-0 flex items-center justify-center bg-black-200/80 backdrop-blur-sm z-50">
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black-200/80 backdrop-blur-sm z-50 -translate-y-6">
                     <p className="text-xl flex items-center">
                         Loading
                         <span className="ml-2 flex space-x-1">
@@ -88,7 +88,7 @@ export default function SubjectPage() {
                         {/* Left button */}
                         <button
                             onClick={() => router.back()}
-                            className="absolute left-0"
+                            className="p-2 rounded-full hover:bg-white border border-transparent hover:border-neutral-200 transition z-10"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"

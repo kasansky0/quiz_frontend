@@ -458,7 +458,10 @@ export default function ChatStats() {
                         <>
                             {/* Top bar */}
                             <div className="flex items-center justify-start relative w-full">
-                                <button onClick={() => setCreatingPost(true)}>
+                                <button
+                                    onClick={() => setCreatingPost(true)}
+                                    className="p-2 rounded-full hover:bg-white border border-transparent hover:border-neutral-200 transition z-10"
+                                >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         viewBox="0 -960 960 960"

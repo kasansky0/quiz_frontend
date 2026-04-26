@@ -185,7 +185,7 @@ function NicknameLoading() {
       <span className="flex space-x-1">
         <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
         <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-        <span className="w-2 h-2 bg-white rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
       </span>
     </span>
     );
@@ -281,9 +281,9 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                 </div>
             </motion.div>
 
-            <div className="flex flex-col space-y-1 w-full mb-5">
 
 
+            <div className="flex flex-col space-y-1 w-full mb-3">
 
                 {/* Nickname badge with icon and arrow */}
                 <div

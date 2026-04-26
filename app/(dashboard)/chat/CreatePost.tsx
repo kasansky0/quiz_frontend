@@ -113,7 +113,7 @@ export default function CreatePost({
                         <button
                             type="button"
                             onClick={onCancel}
-                            className="p-2 rounded-full hover:bg-black/5 transition"
+                            className="p-2 rounded-full hover:bg-black-200 border border-transparent hover:border-black-200 transition z-10"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -151,12 +151,18 @@ export default function CreatePost({
                         <button
                             type="submit"
                             disabled={isSending}
-                            className={`px-4 py-1.5 rounded-full text-sm font-semibold transition
-                        ${
+                            className={`
+        px-4 py-1.5
+        rounded-full
+        text-sm font-semibold
+        transition
+        active:scale-[0.98]
+        ${
                                 isSending
-                                    ? "bg-black/20 text-black/40 cursor-not-allowed"
-                                    : "bg-blue-600 text-white hover:bg-blue-700"
-                            }`}
+                                    ? "bg-[#7FB3E6] text-white cursor-not-allowed"
+                                    : "bg-[#0a66c2] text-white hover:bg-[#004182]"
+                            }
+    `}
                         >
                             Post
                         </button>

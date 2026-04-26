@@ -924,7 +924,11 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
                     {/* Back button like Reddit, aligned left */}
                     <div className="flex items-center justify-start">
-                        <button onClick={onBack} title="Back">
+                        <button
+                            onClick={onBack}
+                            title="Back"
+                            className="p-2 rounded-full hover:bg-white border border-transparent hover:border-neutral-200 transition z-10"
+                        >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"

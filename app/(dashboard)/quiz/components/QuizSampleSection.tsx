@@ -545,30 +545,35 @@ export default function QuizSampleSection({
                                                 onClick={handleNextQuestion}
                                                 disabled={isFetchingNext}
                                                 className="
-                flex items-center justify-center gap-2
-                px-5 py-2.5
-                text-sm sm:text-base font-medium
-                rounded-full
-                bg-black-200
-                text-black
-                border border-black/10
-                shadow-sm
-                hover:bg-black-300
-                hover:border-black/20
-                transition
-                disabled:cursor-not-allowed
-                disabled:opacity-60
-            "
+                                                    flex items-center justify-center gap-2
+                                                    px-5 py-2.5
+                                                    text-sm sm:text-base font-medium
+                                                    rounded-full
+
+                                                    bg-white
+                                                    text-[#0a66c2]
+                                                    border border-[#0a66c2]
+
+                                                    hover:bg-blue-50
+                                                    hover:border-[#004182]
+                                                    hover:text-[#004182]
+
+                                                    transition
+                                                    active:scale-[0.98]
+
+                                                    disabled:opacity-50
+                                                    disabled:cursor-not-allowed
+                                                "
                                             >
                                                 {isFetchingNext ? (
-                                                    <span className="flex items-center gap-2 text-black">
-                    Loading
-                    <span className="ml-2 flex space-x-1">
-                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
-                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
-                    </span>
-                </span>
+                                                    <span className="flex items-center gap-2 text-[#0a66c2]">
+                                                        Loading
+                                                        <span className="ml-2 flex space-x-1">
+                                                            <span className="w-2 h-2 bg-[#0a66c2] rounded-full animate-dot-bounce"></span>
+                                                            <span className="w-2 h-2 bg-[#0a66c2] rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                                                            <span className="w-2 h-2 bg-[#0a66c2] rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                                                        </span>
+                                                    </span>
                                                 ) : (
                                                     <>
                                                         Next
@@ -592,7 +597,7 @@ export default function QuizSampleSection({
 
                                             <div className="flex flex-col items-center text-center">
                                                 <ScrollHint />
-                                                <span className="text-xs sm:text-sm text-black opacity-80 mt-1">
+                                                <span className="text-xs sm:text-sm text-black opacity-70 mt-1">
                                                     Study the explanation below ⬇️
                                                 </span>
                                             </div>

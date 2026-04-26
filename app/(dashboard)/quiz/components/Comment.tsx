@@ -1,37 +1,44 @@
-    "use client";
+"use client";
 
-    interface CommentProps {
-        isCorrect: boolean;
-        text: string;
-        correctAnswer?: string; // optional prop to display actual correct answer
-    }
+interface CommentProps {
+    isCorrect: boolean;
+    text: string;
+    correctAnswer?: string;
+}
 
-    export default function Comment({ isCorrect, text, correctAnswer }: CommentProps) {
-        const baseClass = `p-3 sm:p-4 rounded-xl border font-medium transition-all duration-300 shadow-md
-            ${isCorrect ? "bg-green-500/40 border-green-500/50 text-black" : "bg-red-500/40 border-red-500/50 text-black"}`;
+export default function Comment({ isCorrect, text, correctAnswer }: CommentProps) {
+    const paragraphs = text?.split("\n").filter(p => p.trim() !== "") || [];
 
-        // Split text by newlines to create paragraphs
-        const paragraphs = text?.split("\n").filter(p => p.trim() !== "") || [];
+    return (
+        <div className="p-4 sm:p-5 rounded-xl border border-black/10 bg-white shadow-sm transition">
 
-        return (
-            <div className={baseClass}>
-                <div className="mb-1 sm:mb-2 font-bold text-base sm:text-lg">
-                    {isCorrect ? "Correct ✅" : "Wrong ❌"}
-                </div>
-
-                <div className="space-y-2">
-                    {paragraphs.map((p, index) => (
-                        <p key={index} className="text-xs sm:text-sm leading-relaxed">
-                            {p}
-                        </p>
-                    ))}
-                    {/* Show correct answer if sidebar was wrong */}
-                    {!isCorrect && correctAnswer && (
-                        <p className="text-xs sm:text-sm font-semibold mt-1 sm:mt-2">
-                            Correct Answer: {correctAnswer}
-                        </p>
-                    )}
+            {/* HEADER */}
+            <div className="flex items-center gap-2 mb-3">
+                <span
+                    className={`w-2 h-2 rounded-full ${
+                        isCorrect ? "bg-green-500" : "bg-red-500"
+                    }`}
+                />
+                <div className="font-semibold text-sm sm:text-base text-black">
+                    {isCorrect ? "Correct" : "Incorrect"}
                 </div>
             </div>
-        );
-    }
+
+            {/* TEXT */}
+            <div className="space-y-2 text-sm sm:text-base text-black leading-relaxed">
+                {paragraphs.map((p, index) => (
+                    <p key={index}>{p}</p>
+                ))}
+
+                {!isCorrect && correctAnswer && (
+                    <div className="mt-3 pt-3 border-t border-black/10">
+                        <span className="font-semibold text-black">
+                            Correct answer:
+                        </span>{" "}
+                        <span className="text-black">{correctAnswer}</span>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}

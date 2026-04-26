@@ -51,7 +51,7 @@ export default function StudyPage() {
 
             {/* LOADER OVERLAY */}
             {showLoader && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black-200/80 backdrop-blur-sm z-50 pointer-events-auto">
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black-200/80 backdrop-blur-sm z-50 -translate-y-6">
                     <p className="text-xl flex items-center">
                         Loading
                         <span className="ml-2 flex space-x-1">
@@ -84,7 +84,7 @@ export default function StudyPage() {
                         {/* Left button (clean LinkedIn icon style) */}
                         <button
                             onClick={() => router.back()}
-                            className="absolute left-0 p-2 rounded-full hover:bg-neutral-200 transition"
+                            className="p-2 rounded-full hover:bg-white border border-transparent hover:border-neutral-200 transition z-10"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -92,7 +92,7 @@ export default function StudyPage() {
                                 viewBox="0 0 24 24"
                                 strokeWidth={1.8}
                                 stroke="currentColor"
-                                className="w-6 h-6 text-neutral-700"
+                                className="w-8 h-8 text-neutral-700"
                             >
                                 <path
                                     strokeLinecap="round"

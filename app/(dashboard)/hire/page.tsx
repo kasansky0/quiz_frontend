@@ -153,13 +153,13 @@ export default function HirePage() {
 
     if (status === "loading") {
         return (
-            <div className="flex-1 flex items-center justify-center pt-[56px] text-black">
+            <div className="absolute inset-0 flex items-center justify-center bg-black-200/80 backdrop-blur-sm z-50 pointer-events-auto">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
-                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce" />
-                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]" />
-                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]" />
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
                     </span>
                 </p>
             </div>
@@ -174,14 +174,14 @@ export default function HirePage() {
 
     if (!isReady || blocked) {
         return (
-            <div className="flex-1 flex items-center justify-center pt-[56px] text-black">
+            <div className="w-full min-h-screen flex items-center justify-center text-black">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
-                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce" />
-                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]" />
-                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]" />
-                    </span>
+                <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+            </span>
                 </p>
             </div>
         );

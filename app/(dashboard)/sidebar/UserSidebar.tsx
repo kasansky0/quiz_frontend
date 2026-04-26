@@ -23,7 +23,7 @@ export default function UserSidebar({ userPercentage, nickname, isEmployer, tota
     if (!session) return null;
 
     return (
-        <aside className="flex flex-col w-64 h-full bg-white backdrop-blur-xl space-y-4 text-black p-4">
+        <aside className="flex flex-col w-64 h-full bg-white backdrop-blur-xl space-y-4 text-black px-4 pt-4">
             <UserStats
                 userPercentage={userPercentage}
                 isEmployer={isEmployer}

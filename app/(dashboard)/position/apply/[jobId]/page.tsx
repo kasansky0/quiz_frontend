@@ -550,7 +550,7 @@ export default function ApplyPage() {
                             viewBox="0 0 24 24"
                             strokeWidth={1.5}
                             stroke="currentColor"
-                            className="w-7 h-7 text-black"
+                            className="w-8 h-8 text-black"
                         >
                             <path
                                 strokeLinecap="round"
@@ -643,7 +643,10 @@ export default function ApplyPage() {
                             value={form.availability || ""}
                             onChange={handleChange}
                             min={localTomorrow}
-                            className={inputClass("availability") + " bg-white border-neutral-300 rounded-lg"}
+                            className={
+                                inputClass("availability") +
+                                " bg-white border-neutral-300 rounded-lg text-left appearance-none"
+                            }
                         />
                     </div>
 

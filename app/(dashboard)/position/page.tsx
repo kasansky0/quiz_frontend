@@ -111,7 +111,11 @@ export default function AdsPage() {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-2">
 
-                    <button onClick={onBack} title="Back">
+                    <button
+                        onClick={onBack}
+                        title="Back"
+                        className="p-2 rounded-full hover:bg-white border border-transparent hover:border-neutral-200 transition z-10"
+                    >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"

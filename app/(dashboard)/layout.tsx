@@ -842,7 +842,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
                             <button
                                 onClick={() => setActiveSheet(null)}
-                                className="mt-3 w-full bg-green-500 text-orange-50 py-2 rounded-xl"
+                                className="
+                                    mt-3 w-full
+                                    bg-white
+                                    text-[#0a66c2]
+                                    border border-[#0a66c2]
+                                    py-2
+                                    rounded-full
+                                    font-semibold
+                                    text-sm
+                                    transition
+                                    hover:bg-blue-50
+                                    active:scale-[0.98]
+                                "
                             >
                                 Close
                             </button>
