@@ -222,6 +222,7 @@ export default function HirePage() {
                             shadow-sm
                             transition
                             active:scale-[0.98]
+                            mx-auto block
                         "
                     >
                         + Create New Job Ad

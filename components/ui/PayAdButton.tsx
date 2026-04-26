@@ -50,7 +50,7 @@ export default function PayAdButton({ adId }: Props) {
             if (data.checkoutUrl) {
                 window.location.href = data.checkoutUrl;
             }
-        } catch (err) {
+        } catch {
             showError("⚠️ Network error.");
         } finally {
             setLoading(false);
@@ -62,14 +62,26 @@ export default function PayAdButton({ adId }: Props) {
             onClick={handlePay}
             disabled={loading}
             className="
-                w-full bg-blue-400 hover:bg-blue-600
-                text-black font-semibold
-                py-2 px-4
-                rounded-xl
-                transition
-                active:scale-[0.98]
-                border border-blue-300
-            "
+            w-full max-w-xs
+            mx-auto block
+            text-center
+            bg-white
+            hover:bg-blue-50
+            disabled:bg-gray-100
+            text-[#0a66c2]
+            font-semibold
+            py-2.5
+            px-6
+            rounded-full
+            text-sm
+            shadow-sm
+            transition
+            active:scale-[0.98]
+            border border-[#0a66c2]
+            disabled:cursor-not-allowed
+            disabled:text-gray-400
+            disabled:border-gray-300
+        "
         >
             {loading ? "Redirecting..." : "Pay $150 to Publish"}
         </button>
