@@ -16,28 +16,25 @@ export default function Option({
                                    onClick,
                                }: OptionProps) {
     let baseClass =
-        "p-3 sm:p-4 rounded-2xl border text-sm sm:text-base font-medium cursor-pointer transition-all duration-200 select-none bg-white text-black";
+        "p-3 sm:p-4 rounded-2xl border text-sm sm:text-base font-medium cursor-pointer transition-all duration-200 select-none bg-white text-black border-neutral-200";
 
-    // DEFAULT (LinkedIn clean hover)
+    // BEFORE ANSWER IS REVEALED (interactive state)
     if (!disabled) {
         if (isSelected) {
-            baseClass += " border-[#0a66c2] bg-blue-50";
+            baseClass += " border-[#0a66c2] bg-blue-50 text-[#0a66c2]";
         } else {
-            baseClass += " border-neutral-200 hover:border-[#0a66c2] hover:bg-blue-50/40";
+            baseClass += " hover:border-[#0a66c2] hover:bg-blue-50/40";
         }
     }
 
+    // AFTER ANSWER IS REVEALED (review state)
     if (disabled) {
         if (isAnswer) {
-            baseClass += " border-green-500 bg-green-50";
+            baseClass += " bg-green-100 border-green-500 text-green-700";
         }
 
-        if (isSelected && !isAnswer) {
-            baseClass += " border-red-400 bg-red-50/40";
-        }
-
-        if (!isSelected && !isAnswer) {
-            baseClass += " opacity-60";
+        if (isSelected) {
+            baseClass += " border-[#0a66c2] bg-blue-50 text-[#0a66c2]";
         }
 
         baseClass += " cursor-default";
