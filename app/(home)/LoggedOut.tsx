@@ -13,14 +13,14 @@ export default function LoggedOutPage() {
                 {/* LOGO */}
                 <img
                     src="/images/left_computer_image.png"
-                    className="h-[100px] w-auto border border-gray-300 rounded-xl object-contain mb-4"
+                    className="h-[100px] w-auto border border-gray-300 rounded-xl object-contain my-4"
                 />
 
                 {/* LOGIN CARD */}
                 <LoginSection />
 
                 {/* STATS (LinkedIn-style info cards) */}
-                <div className="mt-4 grid grid-cols-2 gap-4 w-full max-w-sm">
+                <div className="my-4 grid grid-cols-2 gap-4 w-full max-w-sm">
 
                     <div className="bg-white border border-neutral-200 rounded-xl p-4 text-center shadow-sm">
                         <div className="text-xl font-bold text-black">90%</div>
