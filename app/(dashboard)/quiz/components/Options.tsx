@@ -8,45 +8,41 @@ interface OptionProps {
     onClick: () => void;
 }
 
-export default function Option({
-                                   text,
-                                   isSelected,
-                                   isAnswer,
-                                   disabled,
-                                   onClick,
-                               }: OptionProps) {
+export default function Option({ text, isSelected, isAnswer, disabled, onClick }: OptionProps) {
     let baseClass =
-        "p-3 sm:p-4 rounded-2xl border text-sm sm:text-base font-medium cursor-pointer transition-all duration-200 select-none bg-white text-black border-neutral-200";
+        "p-2 sm:p-3 rounded-xl border text-black text-sm sm:text-base font-medium cursor-pointer transition-all duration-300 shadow-sm select-none";
 
-    // BEFORE ANSWER IS REVEALED (interactive state)
-    if (!disabled) {
-        if (isSelected) {
-            baseClass += " border-[#0a66c2] bg-blue-50 text-[#0a66c2]";
-        } else {
-            baseClass += " hover:border-[#0a66c2] hover:bg-blue-50/40";
-        }
-    }
-
-    // AFTER ANSWER IS REVEALED (review state)
     if (disabled) {
-        if (isAnswer) {
-            baseClass += " bg-green-100 border-green-500 text-green-700";
+        if (isSelected && isAnswer) {
+            // Selected correct → dull green
+            baseClass += " bg-green-500/40 border-green-500/50 shadow-lg hover:scale-[1.02]";
+        } else if (isSelected && !isAnswer) {
+            // Selected wrong → dull red
+            baseClass += " bg-white border-gray-300 shadow-md hover:scale-[1.02]";
+        } else if (!isSelected && isAnswer) {
+            // Correct answer not selected → dull green
+            baseClass += " bg-green-500/40 border-green-500/50 shadow-md hover:scale-[1.02]";
+        } else {
+            // Unselected and not correct → dark gray + keep hover effect
+            baseClass += " bg-white border-gray-300 text-black shadow-inner hover:scale-[1.02]";
         }
 
-        if (isSelected) {
-            baseClass += " border-[#0a66c2] bg-blue-50 text-[#0a66c2]";
-        }
-
-        baseClass += " cursor-default";
+    } else if (isSelected) {
+        baseClass += " bg-gray-700 shadow-md";
+    } else {
+        // Normal unselected option
+        baseClass +=
+            " bg-white border-gray-300 hover:scale-[1.02] hover:shadow-md";
     }
 
     return (
         <div
             className={baseClass}
             onClick={() => !disabled && onClick()}
-            style={{ WebkitTapHighlightColor: "transparent" }}
+            style={{ WebkitTapHighlightColor: "transparent" }} // ✅ prevents iPhone tap flash
         >
             {text}
         </div>
     );
+
 }

@@ -117,8 +117,8 @@ function LoggedOut() {
     const router = useRouter();
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black-200 backdrop-blur-sm p-4">
-            <div className="bg-black-200 border border-green-500/40 shadow-lg rounded-2xl max-w-md w-full p-6 text-center backdrop-blur-md">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white backdrop-blur-sm p-4">
+            <div className="bg-white border border-green-500/40 shadow-lg rounded-2xl max-w-md w-full p-6 text-center backdrop-blur-md">
                 <h2 className="text-black text-lg font-semibold mb-2 drop-shadow-[0_0_12px_rgba(36,174,124,0.8)]">
                     Session Expired
                 </h2>
@@ -134,7 +134,7 @@ function LoggedOut() {
 
 function FullScreenMessage({ text }: { text: string }) {
     return (
-        <div className="min-h-screen flex items-center justify-center bg-black-200 text-black">
+        <div className="min-h-screen flex items-center justify-center bg-white text-black">
             <p className="text-sm sm:text-base">{text}</p>
         </div>
     );
@@ -482,11 +482,11 @@ export default function LoggedInAdmin() {
 
 
 
-                <div className="flex flex-wrap items-center gap-3 p-3 bg-black-200 rounded-xl border border-black">
+                <div className="flex flex-wrap items-center gap-3 p-3 bg-white rounded-xl border border-gray-300">
                     {/* --- Block User by Email --- */}
                     <div className="flex items-center gap-2">
                         {/* Wrapper for input + button */}
-                        <div className="flex items-center bg-black-200 px-2 py-1 rounded-lg border border-black">
+                        <div className="flex items-center bg-white px-2 py-1">
                             {/* Hidden span for measuring text width */}
                             <span
                                 ref={spanRef}
@@ -568,7 +568,7 @@ export default function LoggedInAdmin() {
 
 
                     {/* Archive Deleted SVG */}
-                    <div className="p-2 rounded-lg hover:bg-black-200 transition">
+                    <div className="p-2 rounded-xl hover:bg-white transition">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -634,21 +634,24 @@ export default function LoggedInAdmin() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
 
                     {/* Applications */}
-                    <div className="bg-white rounded-xl border border-black p-3 text-center">
+                    <div className="bg-white rounded-xl border border-gray-300 p-3 text-center">
                         <p className="text-xs text-black">Applications</p>
                         <p className="text-lg font-bold text-black">
                             {summary?.applications?.length ?? 0}
                         </p>
-                        <p className="text-xs text-red-400">
-                            Pending: {applicationCounts?.pending ?? 0}
-                        </p>
-                        <p className="text-xs text-green-500">
-                            Approved: {applicationCounts?.approved ?? 0}
-                        </p>
+                        <div className="flex flex-col gap-2">
+                            <p className="text-xs text-red-400">
+                                Pending: {applicationCounts?.pending ?? 0}
+                            </p>
+
+                            <p className="text-xs text-green-500">
+                                Approved: {applicationCounts?.approved ?? 0}
+                            </p>
+                        </div>
                     </div>
 
                     {/* Ads */}
-                    <div className="bg-white rounded-xl border border-black p-3 text-center">
+                    <div className="bg-white rounded-xl border border-gray-300 p-3 text-center">
                         <p className="text-xs text-black">Hiring Ads</p>
 
                         <p className="text-lg font-bold text-black mb-2">
@@ -657,29 +660,29 @@ export default function LoggedInAdmin() {
 
                         <div className="flex flex-col gap-1 text-xs text-left">
 
-                            <div className="flex justify-between">
-                                <span className="text-amber-500">Pending</span>
+                            <div className="flex items-center gap-2">
+                                <span className="text-amber-500">Pending :</span>
                                 <span className="text-amber-500 font-semibold">
                                     {adCounts?.pending ?? 0}
                                 </span>
                             </div>
 
-                            <div className="flex justify-between">
-                                <span className="text-emerald-500">Published</span>
+                            <div className="flex items-center gap-2">
+                                <span className="text-emerald-500">Published :</span>
                                 <span className="text-emerald-500 font-semibold">
                                     {adCounts?.published ?? 0}
                                 </span>
                             </div>
 
-                            <div className="flex justify-between">
-                                <span className="text-sky-500">Approved</span>
+                            <div className="flex items-center gap-2">
+                                <span className="text-sky-500">Approved :</span>
                                 <span className="text-sky-500 font-semibold">
                                     {adCounts?.approved ?? 0}
                                 </span>
                             </div>
 
-                            <div className="flex justify-between">
-                                <span className="text-red-400">Archived</span>
+                            <div className="flex items-center gap-2">
+                                <span className="text-red-400">Archived :</span>
                                 <span className="text-red-400 font-semibold">
                                     {adCounts?.archived ?? 0}
                                 </span>
@@ -689,7 +692,7 @@ export default function LoggedInAdmin() {
                     </div>
 
                     {/* Employers */}
-                    <div className="bg-white rounded-xl border border-black p-3 text-center">
+                    <div className="bg-white rounded-xl border border-gray-300 p-3 text-center">
                         <p className="text-xs text-black">Employers</p>
                         <p className="text-lg font-bold text-black">
                             {summary?.employer_users?.length ?? 0}
@@ -697,7 +700,7 @@ export default function LoggedInAdmin() {
                     </div>
 
                     {/* Users */}
-                    <div className="bg-white rounded-xl border border-black p-3 text-center">
+                    <div className="bg-white rounded-xl border border-gray-300 p-3 text-center">
                         <p className="text-xs text-black">Users</p>
                         <p className="text-lg font-bold text-black">
                             {users.length}
@@ -719,7 +722,7 @@ export default function LoggedInAdmin() {
 
                 {/* Applications */}
                 {summary?.applications && summary.applications.length > 0 && (
-                    <div className="bg-black-200 p-4 sm:p-6 rounded-xl border border-black space-y-3">
+                    <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-300 space-y-3">
                         <h3 className="font-bold text-black mb-2">
                             Applications: ({summary.applications.length})
 
@@ -744,7 +747,7 @@ export default function LoggedInAdmin() {
                             {[...summary.applications]
                                 .sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime())
                                 .map((app, i) => (
-                                    <div key={i} className="bg-white p-3 rounded-lg border border-black hover:bg-black-200 transition">
+                                    <div key={i} className="bg-white p-3 rounded-xl border border-gray-300 transition">
                                         <p className="text-black text-xs mt-1">
                                             Submitted at: {formatLocalDate(app.submitted_at)}
                                         </p>
@@ -833,7 +836,7 @@ export default function LoggedInAdmin() {
 
                 {/* Employer Users */}
                 {summary?.employer_users && summary.employer_users.length > 0 && (
-                    <div className="bg-black-200 p-4 sm:p-6 rounded-xl border border-black space-y-3">
+                    <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-300 space-y-3">
                         <h3 className="font-bold text-black mb-2">
                             Employer Users: ({summary.employer_users.length})
                         </h3>
@@ -842,7 +845,7 @@ export default function LoggedInAdmin() {
                             {summary.employer_users.map((user, i) => (
                                 <div
                                     key={i}
-                                    className="bg-white p-3 rounded-lg border border-black hover:bg-black-200 transition"
+                                    className="bg-white p-3 rounded-xl border border-gray-300 hover:bg-white transition"
                                 >
                                     <p>
                                         <span className="font-bold text-yellow-500">Company:</span>{" "}
@@ -877,7 +880,7 @@ export default function LoggedInAdmin() {
 
                 {/* Hiring Ads */}
                 {summary?.hiring_ads && summary.hiring_ads.length > 0 && (
-                    <div className="bg-black-200 p-4 sm:p-6 rounded-xl border border-black space-y-3">
+                    <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-300 space-y-3">
                         <h3 className="font-bold text-black mb-2">
                             Hiring Ads: ({summary.hiring_ads.length})
                             <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-black">
@@ -892,7 +895,7 @@ export default function LoggedInAdmin() {
                             {[...summary.hiring_ads]
                                 .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
                                 .map((ad, i) => (
-                                    <div key={i} className="bg-white p-3 rounded-lg border border-black hover:bg-black-200 transition">
+                                    <div key={i} className="bg-white p-3 rounded-xl border border-gray-300 hover:bg-white transition">
 
                                         <p className="text-black text-xs mt-1">
                                             Created at: {formatLocalDate(ad.createdAt)}
@@ -952,7 +955,7 @@ export default function LoggedInAdmin() {
                                                             ${
                                                             isActive
                                                                 ? statusStyles[status] // 👈 dynamic color per status
-                                                                : "bg-black-200 text-black border-black hover:border-black"
+                                                                : "bg-white text-black border-gray-300 hover:border-gray-300"
                                                         }
                                                                 `}
                                                     >
@@ -976,7 +979,7 @@ export default function LoggedInAdmin() {
 
                 {/* Recent Limiter Hits */}
                 {summary?.limiter_hits && summary.limiter_hits.length > 0 && (
-                    <div className="bg-black-200 p-4 sm:p-6 rounded-xl mb-2 border border-black text-sm sm:text-base">
+                    <div className="bg-white p-4 sm:p-6 rounded-xl mb-2 border border-gray-300 text-sm sm:text-base">
                         <h3 className="font-bold text-black">
                             Recent Limiter Hits: ({summary.limiter_hits.length} unique IP{summary.limiter_hits.length > 1 ? "s" : ""})
                         </h3>
@@ -985,7 +988,7 @@ export default function LoggedInAdmin() {
                             {summary.limiter_hits.map((hit, i) => (
                                 <div
                                     key={i}
-                                    className="bg-black-200 rounded-xl text-sm sm:text-base"
+                                    className="bg-white rounded-xl text-sm sm:text-base"
                                 >
                                     <div className="flex items-center mb-3 sm:mb-4">
                                         <div>
@@ -1016,7 +1019,7 @@ export default function LoggedInAdmin() {
 
                 {/* Recent Admin Logins */}
                 {summary?.admin_logged_in && summary.admin_logged_in.length > 0 && (
-                    <div className="bg-black-200 p-4 sm:p-6 rounded-xl mb-2 border border-black text-sm sm:text-base">
+                    <div className="bg-white p-4 sm:p-6 rounded-xl mb-2 border border-gray-300 text-sm sm:text-base">
                         <h3 className="font-bold text-black mb-1">
                             Recent Admin Logins: ({summary.admin_logged_in.length})
                         </h3>
@@ -1066,12 +1069,12 @@ export default function LoggedInAdmin() {
                         <div className="text-sm sm:text-base text-black space-y-2">
 
                             {/* Total Requests */}
-                            <div className="bg-black-200 p-4 sm:p-6 rounded-xl border border-black text-sm sm:text-base">
+                            <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-300 text-sm sm:text-base">
                                 Total API Requests: <span className="text-yellow-500 font-bold">{summary.total_requests ?? 0}</span>
                             </div>
 
                             {/* Blocked IPs */}
-                            <div className="bg-black-200 p-4 sm:p-6 rounded-xl border border-black space-y-3">
+                            <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-300 space-y-3">
                                 Blocked IPs:{" "}
                                 {blockedIps.length > 0
                                     ? blockedIps.map((ip, i) => (
@@ -1085,7 +1088,7 @@ export default function LoggedInAdmin() {
 
 
                             {/* Blocked Users */}
-                            <div className="bg-black-200 p-4 sm:p-6 rounded-xl border border-black space-y-3">
+                            <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-300 space-y-3">
                                 Blocked Users:{" "}
                                 {blockedUsers.length > 0
                                     ? blockedUsers.map((u, i) => (
@@ -1098,7 +1101,7 @@ export default function LoggedInAdmin() {
                             </div>
 
                             {/* Last API Calls */}
-                            <div className="bg-black-200 p-4 sm:p-6 rounded-xl border border-black space-y-3">
+                            <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-300 space-y-3">
                                 <h3 className="mb-2">Last API Calls:</h3>
 
                                 <div className="max-h-60 overflow-y-auto space-y-2 pr-2">
@@ -1129,7 +1132,7 @@ export default function LoggedInAdmin() {
                                                 return (
                                                     <div
                                                         key={i}
-                                                        className="bg-black-200 rounded-lg text-sm shadow-sm flex items-center gap-4"
+                                                        className="bg-white rounded-xl text-sm shadow-sm flex items-center gap-4"
                                                     >
                                                         <div className="text-black">
                                                             Time: {formattedTime}
@@ -1164,7 +1167,7 @@ export default function LoggedInAdmin() {
 
 
                 {!usersLoading && users.length > 0 && (
-                    <div className="bg-black-200 p-4 sm:p-6 my-2 rounded-xl border border-black text-sm sm:text-base">
+                    <div className="bg-white p-4 sm:p-6 my-2 rounded-xl border border-gray-300 text-sm sm:text-base">
                         {/* Total Users */}
                         <p className="text-black text-sm sm:text-base mb-2">
                             Total Users: <strong className="text-yellow-500">{users.length}</strong>
@@ -1212,7 +1215,7 @@ export default function LoggedInAdmin() {
 
                 {/* Paid Users */}
                 {users.length > 0 && (
-                    <div className="bg-black-200 p-4 sm:p-6 my-2 rounded-xl border border-black text-sm sm:text-base">
+                    <div className="bg-white p-4 sm:p-6 my-2 rounded-xl border border-gray-300 text-sm sm:text-base">
 
                         <p className="text-black text-sm sm:text-base mb-2">
                             Paid Users: <strong className="text-green-500">{paidUsersCount}</strong>
@@ -1261,7 +1264,7 @@ export default function LoggedInAdmin() {
                             ref={(el) => {
                                 userRefs.current[index] = el;
                             }}
-                            className="bg-black-200 p-5 sm:p-6 rounded-xl border border-black space-y-3 hover:bg-white transition"
+                            className="bg-white p-5 sm:p-6 rounded-xl border border-gray-300 space-y-3 hover:bg-white transition"
                         >
                             {/* User info with profile image */}
                             <div className="flex items-center mb-3 sm:mb-4">
@@ -1273,7 +1276,7 @@ export default function LoggedInAdmin() {
                                             className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border border-green-500/30"
                                         />
                                     ) : (
-                                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-black-200 flex items-center justify-center text-black font-semibold text-sm sm:text-lg border border-green-500/30">
+                                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-white flex items-center justify-center text-black font-semibold text-sm sm:text-lg border border-green-500/30">
                                             {(() => {
                                                 if (!user.name) return "?";
 
@@ -1366,17 +1369,6 @@ export default function LoggedInAdmin() {
 
 
             </div>
-
-            {/* Sticky navigation buttons */}
-            {users.length > 0 && (
-                <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50
-                bg-white/90 backdrop-blur-md p-3 rounded-xl border border-black
-                grid grid-cols-2 gap-3 shadow-lg">
-
-
-                </div>
-
-            )}
         </div>
     );
 }
