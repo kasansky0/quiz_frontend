@@ -166,7 +166,6 @@ interface UserData {
 export default function LoggedInAdmin() {
     const { data: session, status } = useSession();
     const router = useRouter();
-    const [sessionExpired, setSessionExpired] = useState(false);
     const [users, setUsers] = useState<UserData[]>([]);
     const [usersLoading, setUsersLoading] = useState<boolean>(true);
     const [expandedQuestions, setExpandedQuestions] = useState<Record<string, boolean>>({});
@@ -259,7 +258,7 @@ export default function LoggedInAdmin() {
                 if (!res.success) {
                     const err = res.data;
                     if (res.status === 401 || res.status === 403) {
-                        await handleSessionExpired(); // uses the same logic as in add comment
+                        showError("Your session is invalid or expired. Please refresh the page.");
                         return;
                     }
                     showError(err?.detail || `Failed to fetch users: ${res.status}`);
@@ -343,11 +342,6 @@ export default function LoggedInAdmin() {
         (a, b) => new Date(b.last_login).getTime() - new Date(a.last_login).getTime()
     );
 
-    if (sessionExpired) {
-        return <LoggedOut />;
-    }
-
-
     const handleApprove = async (applicationId: string) => {
         try {
             const res = await fetchWithToken(`${apiUrl}/posts/admin/approve-application`, {
@@ -369,7 +363,7 @@ export default function LoggedInAdmin() {
                 const err = await res.data;
 
                 if (res.status === 401 || res.status === 403) {
-                    await handleSessionExpired();
+                    showError("Your session is invalid or expired. Please refresh the page.");
                     return;
                 }
 
@@ -445,6 +439,96 @@ export default function LoggedInAdmin() {
 
 
 
+
+
+    const formatAdExpiry = (createdAt?: string | Date) => {
+        if (!createdAt) return "";
+
+        const parseDate = (d: string | Date) => {
+            if (d instanceof Date) return d;
+            if (typeof d === "string") return new Date(d.split(".")[0] + "Z");
+            return new Date();
+        };
+
+        const date = parseDate(createdAt);
+
+        const expiry = new Date(date);
+        expiry.setDate(expiry.getDate() + 15); // 15-day lifetime
+
+        const now = new Date();
+
+        const diffMs = expiry.getTime() - now.getTime();
+        const diffSeconds = Math.floor(diffMs / 1000);
+        const diffMinutes = Math.floor(diffSeconds / 60);
+        const diffHours = Math.floor(diffMinutes / 60);
+        const diffDays = Math.floor(diffHours / 24);
+
+        let relativeTime = "";
+
+        if (diffMs <= 0) {
+            relativeTime = "Expired";
+        } else if (diffSeconds < 60) {
+            relativeTime = `${diffSeconds} second${diffSeconds !== 1 ? "s" : ""}`;
+        } else if (diffMinutes < 60) {
+            relativeTime = `${diffMinutes} minute${diffMinutes !== 1 ? "s" : ""}`;
+        } else if (diffHours < 24) {
+            relativeTime = `${diffHours} hour${diffHours !== 1 ? "s" : ""}`;
+        } else if (diffDays < 30) {
+            relativeTime = `${diffDays} day${diffDays !== 1 ? "s" : ""}`;
+        } else {
+            const diffMonths = Math.floor(diffDays / 30);
+            if (diffMonths < 12) {
+                relativeTime = `${diffMonths} month${diffMonths !== 1 ? "s" : ""}`;
+            } else {
+                const diffYears = Math.floor(diffMonths / 12);
+                relativeTime = `${diffYears} year${diffYears !== 1 ? "s" : ""}`;
+            }
+        }
+
+        return <span>{relativeTime}</span>;
+    };
+
+
+
+
+
+
+    const adsWithExpiry =
+        summary?.hiring_ads?.map(ad => {
+            const created = new Date(ad.createdAt);
+            const expiry = new Date(created);
+            expiry.setDate(expiry.getDate() + 15);
+
+            const now = new Date();
+            const diffMs = expiry.getTime() - now.getTime();
+            const diffDays = diffMs / (1000 * 60 * 60 * 24);
+
+            return {
+                ...ad,
+                expiryDate: expiry,
+                diffDays,
+                isExpired: diffDays <= 0,
+                isExpiringSoon: diffDays > 0 && diffDays <= 3,
+            };
+        }) || [];
+
+    const sortedExpiringAds = [...adsWithExpiry]
+        .sort((a, b) => a.expiryDate.getTime() - b.expiryDate.getTime());
+
+
+
+
+    const expiringAds = adsWithExpiry.reduce(
+        (acc, ad) => {
+            if (ad.isExpired) acc.expired += 1;
+            else if (ad.isExpiringSoon) acc.expiringSoon += 1;
+            return acc;
+        },
+        {
+            expiringSoon: 0,
+            expired: 0,
+        }
+    );
 
 
 
@@ -528,7 +612,7 @@ export default function LoggedInAdmin() {
                                         if (!res.success) {
                                             const err = await res.data.catch(() => null);
                                             if (res.status === 401 || res.status === 403) {
-                                                await handleSessionExpired();
+                                                showError("Your session is invalid or expired. Please refresh the page.");
                                                 return;
                                             }
                                             showError(`Failed: ${err?.detail || "Unknown error"}`);
@@ -597,7 +681,7 @@ export default function LoggedInAdmin() {
                                     if (!res.success) {
                                         const err = await res.data.catch(() => null);
                                         if (res.status === 401 || res.status === 403) {
-                                            await handleSessionExpired();
+                                            showError("Your session is invalid or expired. Please refresh the page.");
                                             return;
                                         }
                                         showError(`Failed: ${err?.detail || "Unknown error"}`);
@@ -639,7 +723,7 @@ export default function LoggedInAdmin() {
                         <p className="text-lg font-bold text-black">
                             {summary?.applications?.length ?? 0}
                         </p>
-                        <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-2 mt-1">
                             <p className="text-xs text-red-400">
                                 Pending: {applicationCounts?.pending ?? 0}
                             </p>
@@ -691,23 +775,97 @@ export default function LoggedInAdmin() {
                         </div>
                     </div>
 
-                    {/* Employers */}
+                    {/* Expiring Ads */}
                     <div className="bg-white rounded-xl border border-gray-300 p-3 text-center">
-                        <p className="text-xs text-black">Employers</p>
-                        <p className="text-lg font-bold text-black">
-                            {summary?.employer_users?.length ?? 0}
-                        </p>
+
+                        <p className="text-xs text-black">Ad Expiry</p>
+
+                        {/* counters */}
+                        <div className="flex flex-col gap-1 mt-2 text-xs text-left">
+
+                            <div className="flex items-center justify-between">
+                                <span className="text-orange-400">Expiring (≤3d):</span>
+                                <span className="text-orange-400 font-semibold">
+                {expiringAds?.expiringSoon ?? 0}
+            </span>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                                <span className="text-red-500">Expired:</span>
+                                <span className="text-red-500 font-semibold">
+                {expiringAds?.expired ?? 0}
+            </span>
+                            </div>
+                        </div>
+
+                        {/* divider */}
+                        <div className="border-t border-gray-200 my-2"></div>
+
+                        {/* scrollable list */}
+                        <div className="max-h-40 overflow-y-auto text-left space-y-2 pr-1">
+
+                            {sortedExpiringAds.slice(0, 20).map((ad) => (
+                                <div
+                                    key={ad._id}
+                                    className="text-xs flex items-center justify-between"
+                                >
+                                    <div className="truncate pr-2">
+                                        <p className="text-gray-500 text-[10px]">
+                                            {ad.company}
+                                        </p>
+                                    </div>
+
+                                    <div className="shrink-0 text-right">
+                                        {ad.isExpired ? (
+                                            <span className="text-red-500 font-semibold">
+                                                Expired
+                                            </span>
+                                        ) : (
+                                            <span
+                                                className={
+                                                    ad.isExpiringSoon
+                                                        ? "text-orange-400 font-semibold"
+                                                        : "text-black"
+                                                }
+                                            >
+                                                {Math.ceil(ad.diffDays)}d
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+
+                        </div>
                     </div>
 
-                    {/* Users */}
-                    <div className="bg-white rounded-xl border border-gray-300 p-3 text-center">
-                        <p className="text-xs text-black">Users</p>
-                        <p className="text-lg font-bold text-black">
-                            {users.length}
-                        </p>
-                        <p className="text-xs text-green-500">
-                            Paid: {paidUsersCount}
-                        </p>
+                    {/* Users & Employers */}
+                    <div className="bg-white rounded-xl border border-gray-300 p-3 space-y-4 text-center">
+
+                        {/* USERS */}
+                        <div className="space-y-1">
+                            <p className="text-xs text-black">Users</p>
+
+                            <p className="text-lg font-bold text-black">
+                                {users.length}
+                            </p>
+
+                            <p className="text-xs text-green-500">
+                                Paid: {paidUsersCount}
+                            </p>
+                        </div>
+
+                        {/* divider */}
+                        <div className="border-t border-gray-200"></div>
+
+                        {/* EMPLOYERS */}
+                        <div className="space-y-1">
+                            <p className="text-xs text-black">Employers</p>
+
+                            <p className="text-lg font-bold text-black">
+                                {summary?.employer_users?.length ?? 0}
+                            </p>
+                        </div>
+
                     </div>
 
                 </div>
@@ -899,6 +1057,10 @@ export default function LoggedInAdmin() {
 
                                         <p className="text-black text-xs mt-1">
                                             Created at: {formatLocalDate(ad.createdAt)}
+                                        </p>
+
+                                        <p className="text-red-400 text-xs mt-1">
+                                            Expires in: {formatAdExpiry(ad.createdAt)}
                                         </p>
 
                                         <p>

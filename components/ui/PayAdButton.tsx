@@ -83,7 +83,7 @@ export default function PayAdButton({ adId }: Props) {
             disabled:border-gray-300
         "
         >
-            {loading ? "Redirecting..." : "Pay $150 to Publish"}
+            {loading ? "Redirecting..." : "Pay $500 to Publish"}
         </button>
     );
 }

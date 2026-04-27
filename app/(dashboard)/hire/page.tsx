@@ -49,7 +49,7 @@ type Ad = {
     _id: string;
     title: string;
     location: string;
-    status: "pending" | "approved" | "rejected" | "published";
+    status: "pending" | "approved" | "rejected" | "published" | "archived";
     publishedAt?: string;
     applications?: Application[];
     company?: string;
@@ -99,8 +99,10 @@ export default function HirePage() {
     }, [isEmployer, userId]);
 
     /* =========================
-       FETCH ADS + STATS
-    ========================= */
+   FETCH ADS + SORT
+   ACTIVE ADS FIRST (newest → oldest)
+   ARCHIVED ALWAYS LAST
+========================= */
 
     useEffect(() => {
         const loadAds = async () => {
@@ -120,14 +122,36 @@ export default function HirePage() {
                         window.location.replace("/info");
                         return;
                     }
+
                     return;
                 }
 
-                setAds([...(res.data?.ads || [])].reverse());
+                const sortedAds = [...(res.data?.ads || [])].sort((a, b) => {
+                    const aArchived = a.status?.toLowerCase() === "archived";
+                    const bArchived = b.status?.toLowerCase() === "archived";
+
+                    // ✅ Archived always at bottom
+                    if (aArchived && !bArchived) return 1;
+                    if (!aArchived && bArchived) return -1;
+
+                    // ✅ Sort remaining by newest date first
+                    const aDate = new Date(
+                        a.publishedAt || (a as any).createdAt || 0
+                    ).getTime();
+
+                    const bDate = new Date(
+                        b.publishedAt || (b as any).createdAt || 0
+                    ).getTime();
+
+                    return bDate - aDate;
+                });
+
+                setAds(sortedAds);
 
             } catch (err) {
                 showError?.("Failed to load ads");
                 setBlocked(true);
+
             } finally {
                 setLoading(false);
             }
@@ -275,6 +299,12 @@ export default function HirePage() {
                                                 {status === "published" && (
                                                     <span className="text-green-500 text-xs">
                                                         Published • {ad.publishedAt && formatLocalDate(ad.publishedAt)}
+                                                    </span>
+                                                )}
+
+                                                {status === "archived" && (
+                                                    <span className="text-red-500 text-xs">
+                                                        Archived • {ad.publishedAt && formatLocalDate(ad.publishedAt)}
                                                     </span>
                                                 )}
 

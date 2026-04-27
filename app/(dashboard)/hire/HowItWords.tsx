@@ -43,16 +43,22 @@ export default function HowItWorks() {
                         <li>Once approved, your ad becomes eligible for publishing.</li>
 
                         <li>
-                            Pay a <span className="text-black font-semibold">$150</span> one-time fee for{" "}
-                            <span className="text-black font-semibold">30 days of active publishing</span>.
+                            Pay a <span className="text-black font-semibold">$500</span> one-time fee for{" "}
+                            <span className="text-black font-semibold">15 days of active publishing</span>.
                         </li>
 
                         <li>After payment, your ad will go live on the platform.</li>
 
-                        <li>Your listing automatically expires after 30 days.</li>
+                        <li>
+                            Your ad will be published and visible to users for <span className="font-semibold">15 days</span>.
+                            After that, it will be <span className="font-semibold">archived</span> (no longer visible on the platform),
+                            but you will still have access to the ad and all applications for
+                            <span className="font-semibold"> 2 additional months</span> before it is permanently deleted.
+                        </li>
 
                         <li>
-                            Applicants who apply to your published ads will automatically appear in the Applications section below.
+                            Applicants who apply to your published ads will automatically appear in the
+                            Applications section below the specific ad they applied to.
                         </li>
 
                         {/* ================= NEW SECTION ================= */}
@@ -65,9 +71,6 @@ export default function HowItWorks() {
                                 </li>
                                 <li>
                                     Job readiness details (position preference, certifications, travel ability, overtime, relocation readiness)
-                                </li>
-                                <li>
-                                    Quiz performance breakdown based on real technical topics
                                 </li>
                             </ul>
                         </li>
