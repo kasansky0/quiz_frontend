@@ -10,12 +10,6 @@ export default function LoggedOutPage() {
             {/* CENTER WRAPPER */}
             <main className="flex-1 flex flex-col items-center justify-center px-4">
 
-                {/* LOGO */}
-                <img
-                    src="/images/left_computer_image.png"
-                    className="h-[100px] w-auto border border-gray-300 rounded-xl object-contain my-4"
-                />
-
                 {/* LOGIN CARD */}
                 <LoginSection />
 

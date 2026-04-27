@@ -43,16 +43,16 @@ export default function LoginSection() {
             <div className="bg-white border border-neutral-200 rounded-2xl shadow-sm px-7 py-8">
 
                 {/* HEADER */}
-                <div className="text-center">
-                    <h1 className="text-3xl font-bold tracking-tight text-black">
-                        Welcome to{" "}
-                        <span className="bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">
-                            NetaPrep
-                        </span>
-                    </h1>
+                <div className="flex flex-col items-center text-center">
 
-                    {/* ALL TEXT KEPT (but structured better) */}
-                    <div className="mt-4 space-y-1">
+                    {/* LOGO */}
+                    <img
+                        src="/images/left_computer_image.png"
+                        className="h-[100px] w-auto object-contain"
+                    />
+
+                    {/* TEXT */}
+                    <div className="mt-4 space-y-1 max-w-md">
                         <p className="text-sm text-green-600 font-medium">
                             Free for practice, supported by hiring partners and advanced premium exam tracks
                         </p>
@@ -65,6 +65,7 @@ export default function LoginSection() {
                             Learn at your pace with a continuously expanding question bank designed for real exam readiness
                         </p>
                     </div>
+
                 </div>
 
                 {/* METRICS (FIXED — no ugly 90% / 1000+) */}
