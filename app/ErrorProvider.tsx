@@ -23,13 +23,14 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
         hideError(); // clear banner on route change
     }, [pathname]);
 
+    // Replace your current showError function with this:
+
     const showError = (msg: string | object, showLoginBtn: boolean = false) => {
         let finalMsg = "";
 
         if (typeof msg === "string") {
             finalMsg = msg;
         } else if (typeof msg === "object" && msg !== null) {
-            // Try known fields first, fallback to generic
             finalMsg =
                 (msg as any).msg ||
                 (msg as any).detail ||
@@ -47,10 +48,22 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
 
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
+        /* =========================
+           DYNAMIC TIMEOUT BY LENGTH
+           Base: 3 sec
+           +45ms per character
+           Min: 3 sec
+           Max: 12 sec
+        ========================= */
+        const dynamicDuration = Math.min(
+            Math.max(3000, finalMsg.length * 45),
+            12000
+        );
+
         timeoutRef.current = setTimeout(() => {
             setMessage(null);
             setShowLoginButton(false);
-        }, 7000);
+        }, dynamicDuration);
     };
 
     const hideError = () => {
@@ -65,8 +78,8 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
 
             {message && (
                 <div className="fixed top-16 sm:top-16 left-0 w-full z-50 flex justify-center px-4 pointer-events-none">
-                    <div className="w-full max-w-xl pointer-events-auto">
-                        <div className="flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-white border border-neutral-200 shadow-md animate-slide-down">
+                    <div className="w-full max-w-sm pointer-events-auto">
+                        <div className="flex items-center justify-center gap-3 w-full px-4 py-3 rounded-xl bg-white border border-neutral-200 shadow-md animate-slide-down text-center">
 
                             {/* LEFT ACCENT */}
                             <div className="w-1 self-stretch rounded-full bg-red-500" />

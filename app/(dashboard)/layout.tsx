@@ -548,49 +548,31 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             bg-white shadow-md">
 
                 {/* CENTERED CONTAINER */}
-                <div className="h-full max-w-4xl mx-auto px-4 flex items-center justify-between">
+                <div className="h-full max-w-4xl mx-auto px-3 flex items-center justify-between">
 
-                    {/* LEFT SIDE */}
-                    <div className="flex items-center gap-3">
 
-                        {/* Mobile Toggle (clean outline version) */}
+
+
+
+
+
+                    {/* LOGO (RIGHT SIDE) */}
+                    <div className="flex items-center">
                         <button
-                            ref={buttonRef}
-                            className={`
-        md:hidden
-        rounded-full
-        p-2
-        transition transform duration-150 ease-out
-        active:scale-95 active:bg-neutral-200
-        focus:outline-none focus:ring-0
-        hover:scale-105 hover:bg-neutral-100
-        touch-manipulation
-    `}
-                            onClick={() => setActiveSheet(prev => prev === "sidebar" ? null : "sidebar")}
+                            onClick={() => router.push("/quiz/")}
+                            className="transition hover:scale-105 active:scale-95"
                         >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth={2}
-                                stroke="currentColor"
-                                className="w-6 h-6 text-black"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"
-                                />
-                            </svg>
+                            <img
+                                src="/images/left_computer_image.png"
+                                alt="Left decoration"
+                                className="h-12 w-auto object-contain"
+                            />
                         </button>
-
-
                     </div>
 
 
-
                         {/* MOBILE QUICK ICONS */}
-                        <div className="flex-1 flex justify-center md:hidden items-center gap-4 text-black">
+                        <div className="flex-1 flex justify-center md:hidden items-center gap-2 text-black">
 
                             {/* CHAT */}
                             <button
@@ -719,22 +701,53 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
+                    {/* LEFT SIDE */}
+                    <div className="flex items-center gap-3">
 
-
-
-
-                    {/* LOGO (RIGHT SIDE) */}
-                    <div className="flex items-center pr-6">
+                        {/* Mobile Toggle (clean outline version) */}
                         <button
-                            onClick={() => router.push("/quiz/")}
-                            className="transition hover:scale-105 active:scale-95"
+                            ref={buttonRef}
+                            className={`
+                                md:hidden
+                                rounded-full
+                                p-2
+                                transition transform duration-150 ease-out
+                                active:scale-95 active:bg-neutral-200
+                                focus:outline-none focus:ring-0
+                                hover:scale-105 hover:bg-neutral-100
+                                touch-manipulation
+                            `}
+                            onClick={() => setActiveSheet(prev => prev === "sidebar" ? null : "sidebar")}
                         >
-                            <img
-                                src="/images/android-chrome-512x512.png"
-                                className="w-7 h-7"
-                            />
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={2}
+                                stroke="currentColor"
+                                className="w-6 h-6 text-black"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"
+                                />
+                            </svg>
                         </button>
+
+
                     </div>
+
+
+
+
+
+
+
+
+
+
+
                 </div>
 
             </div>
