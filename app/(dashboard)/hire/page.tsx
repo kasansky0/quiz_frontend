@@ -76,6 +76,23 @@ export default function HirePage() {
     const { isEmployer, userId } = useUser();
     const [blocked, setBlocked] = useState(false);
 
+    const buildEmployerEmail = (app: Application, ad: Ad) => {
+        return `mailto:${app.email}?subject=${encodeURIComponent(
+            `${ad.company} Job Application`
+        )}&body=${encodeURIComponent(
+            `Hello,
+
+Thank you for your interest in the position at ${ad.company}.
+
+We would like to move forward with your application. Please reply to this email with your updated resume.
+
+We look forward to reviewing your application.
+
+Best regards,
+${ad.company} Hiring Team`
+        )}`;
+    };
+
     const FOOTER_POLICY = {
         terms: {
             title: "Terms of Service",
@@ -448,20 +465,7 @@ export default function HirePage() {
                                                                                 <p>
                                                                                     <span className="font-bold text-blue-400">Email:</span>{" "}
                                                                                     <a
-                                                                                        href={`mailto:${app.email}?subject=${encodeURIComponent(
-                                                                                            `${ad.company} Job Application`
-                                                                                        )}&body=${encodeURIComponent(
-                                                                                            `Hello,
-
-Thank you for your interest in the position at ${ad.company}.
-
-We would like to move forward with your application. Please reply to this email with your updated resume.
-
-We look forward to reviewing your application.
-
-Best regards,
-${ad.company} Hiring Team`
-                                                                                        )}`}
+                                                                                        href={buildEmployerEmail(app, ad)}
                                                                                         className="text-blue-400 underline"
                                                                                     >
                                                                                         {app.email}
