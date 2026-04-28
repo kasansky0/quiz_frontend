@@ -294,8 +294,13 @@ ${ad.company} Hiring Team`
             <div className={`w-full max-w-xl 2xl:max-w-2xl pb-16 transition-opacity duration-700 ease-in-out ${fade ? "opacity-100" : "opacity-0"}`}>
 
                 {/* HEADER */}
-                <h1 className="text-2xl font-bold mb-2 text-center">
-                    Employer Dashboard
+                <h1 className="text-2xl font-semibold mb-2 text-center tracking-tight">
+                    <span className="text-black">
+                        {ads?.[0]?.company ?? "Company"}
+                    </span>{" "}
+                    <span className="text-neutral-500 font-normal">
+                        Dashboard
+                    </span>
                 </h1>
 
                 <HowItWorks />
@@ -344,7 +349,7 @@ ${ad.company} Hiring Team`
 
                 {/* ADS LIST */}
                 <div>
-                    <h2 className="text-xl font-semibold mb-3">Your Ads</h2>
+                    <h2 className="text-xl font-semibold my-3">Your Ads</h2>
 
                     {ads.length === 0 ? (
                         <p className="text-black">No ads yet.</p>

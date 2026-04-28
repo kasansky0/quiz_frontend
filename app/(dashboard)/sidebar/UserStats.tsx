@@ -542,34 +542,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
 
 
 
-            {isEmployer && (
-                <div
-                    onClick={() => {
-                        router.push("/hire");
-                        onLinkClick?.();
-                    }}
-                    className={`${sidebarLink} group flex items-center gap-2`}
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="currentColor"
-                        className="w-6 h-6 text-black lg:group-hover:text-blue-400 flex-shrink-0"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M16.5 6.75V5.25A2.25 2.25 0 0 0 14.25 3h-4.5A2.25 2.25 0 0 0 7.5 5.25v1.5m9 0h-9m9 0A2.25 2.25 0 0 1 18.75 9v9.75A2.25 2.25 0 0 1 16.5 21H7.5A2.25 2.25 0 0 1 5.25 18.75V9A2.25 2.25 0 0 1 7.5 6.75"
-                        />
-                    </svg>
 
-                    <span className="text-black lg:group-hover:text-blue-400 font-medium">
-                        Employer
-                    </span>
-                </div>
-            )}
 
 
 
@@ -605,6 +578,47 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                     Information
                 </span>
             </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+            {isEmployer && (
+                <div
+                    onClick={() => {
+                        router.push("/hire");
+                        onLinkClick?.();
+                    }}
+                    className={`${sidebarLink} group flex items-center gap-2`}
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-6 h-6 text-black lg:group-hover:text-blue-400 flex-shrink-0"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M16.5 6.75V5.25A2.25 2.25 0 0 0 14.25 3h-4.5A2.25 2.25 0 0 0 7.5 5.25v1.5m9 0h-9m9 0A2.25 2.25 0 0 1 18.75 9v9.75A2.25 2.25 0 0 1 16.5 21H7.5A2.25 2.25 0 0 1 5.25 18.75V9A2.25 2.25 0 0 1 7.5 6.75"
+                        />
+                    </svg>
+
+                    <span className="text-black lg:group-hover:text-blue-400 font-medium">
+                        Employer
+                    </span>
+                </div>
+            )}
 
 
 

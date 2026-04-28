@@ -17,7 +17,6 @@ export default function ApplyPage() {
     const [submitted, setSubmitted] = useState(false); // NEW: submission state
     const [loading, setLoading] = useState(false);
     const { showError } = useError();
-    const shortFields = ["travel", "overtime", "readyToMove"]; // only the text-limited fields
     const [initialLoading, setInitialLoading] = useState(true);
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1); // move to next day
@@ -107,70 +106,41 @@ export default function ApplyPage() {
 
         let error = "";
 
-        // --- REQUIRED fields
-        if (
-            requiredFields.includes(name) &&
-            !["travel", "overtime", "readyToMove"].includes(name)
-        ) {
-            if (!value || value.trim() === "") {
-                error = "This field is required.";
-            }
+        const val = value?.toString() || "";
+
+        // REQUIRED fields
+        if (requiredFields.includes(name) && val.trim() === "") {
+            error = "Required field";
         }
 
-        // --- SHORT TEXT fields
-        if (["travel", "overtime", "readyToMove"].includes(name)) {
-            if (!value || value.trim() === "") {
-                error = "This field is required.";
-            } else if (value.length > 100) {
-                error = "Max 100 characters";
-            }
+        // MAX LENGTH rules (single source of truth)
+        const maxLimits: Record<string, number> = {
+            location: 100,
+            certifications: 100,
+            travel: 100,
+            overtime: 100,
+            readyToMove: 100,
+            experience: 100,
+            position: 500,
+        };
+
+        if (maxLimits[name] && val.length > maxLimits[name]) {
+            error = `Max ${maxLimits[name]} chars`;
         }
 
-        // --- CERTIFICATION
-        if (name === "certifications" && value.length > 100) {
-            error = "Max 100 characters";
-        }
-
-        // --- EXPERIENCE
-        if (name === "experience") {
-            if (!value || value.trim() === "") {
-                error = "This field is required.";
-            } else if (value.length > 100) {
-                error = "Maximum 100 characters allowed.";
-            }
-        }
-
-        // --- DATE
+        // DATE validation
         if (name === "availability") {
-            if (value && isNaN(Date.parse(value))) {
+            if (val && isNaN(Date.parse(val))) {
                 error = "Invalid date";
-            } else if (value) {
-                const selected = new Date(value);
+            } else if (val) {
+                const selected = new Date(val);
                 const today = new Date();
-                today.setHours(0,0,0,0);
+                today.setHours(0, 0, 0, 0);
 
                 if (selected < today) {
                     error = "Date cannot be in the past";
                 }
             }
-        }
-
-        // --- MAX LENGTH (UPDATED)
-        if (["position"].includes(name)) {
-            if (value.length > 500) {
-                error = "Max 500 chars";
-            }
-        }
-
-        if (name === "location") {
-            if (value.length > 100) {
-                error = "Max 100 chars";
-            }
-        }
-
-        // --- MESSAGE
-        if (name === "message" && value.length > 200) {
-            error = "Max 200 chars";
         }
 
         setErrors(prev => ({
@@ -182,79 +152,35 @@ export default function ApplyPage() {
     const handleSubmit = async (e: any) => {
         e.preventDefault();
 
-        const newErrors: { [key: string]: string } = {};
+        const newErrors: Record<string, string> = {};
 
-        // --- required fields ---
+        // REQUIRED
         requiredFields.forEach(field => {
             const value = form[field as keyof ApplyForm];
-            if (typeof value === "string" && value.trim() === "") {
-                newErrors[field] = "This field is required.";
-            }
-            if (typeof value === "boolean" && !value) {
-                // only for checkboxes like background if required
-                newErrors[field] = "This field is required.";
-            }
-        });
-
-        shortFields.forEach(field => {
-            const value = form[field as keyof typeof form];
             if (!value || value.toString().trim() === "") {
-                newErrors[field] = "This field is required.";
-            } else if (value.toString().length > 100) {
-                newErrors[field] = "Maximum 100 characters allowed.";
+                newErrors[field] = "Required field";
             }
         });
 
-        // --- Experience: 0-20, optionally 'years' ---
-        if (!form.experience || form.experience.trim() === "") {
-            newErrors.experience = "This field is required.";
-        } else if (form.experience.length > 100) {
-            newErrors.experience = "Maximum 100 characters allowed.";
-        }
-
-        // --- Date validation ---
-        if (form.availability) {
-            const selected = new Date(form.availability);
-            const today = new Date();
-            today.setHours(0,0,0,0);
-
-            if (selected < today) {
-                newErrors.availability = "Date cannot be in the past.";
-            }
-        }
-
-        // --- Certifications max 100 chars ---
-        if (form.certifications && form.certifications.length > 100) {
-            newErrors.certifications = "Certifications must be 100 characters or less.";
-        }
-
-        // --- Other fields max 100 chars ---
-        shortFields.forEach(field => {
-            const value = form[field as keyof typeof form];
-            if (value && value.toString().length > 100) {
-                newErrors[field] = "Maximum 100 characters allowed.";
-            }
-        });
-
-        // --- Consent ---
+        // CONSENT
         if (!agreed) {
             showError("You must agree to the terms before submitting.");
             return;
         }
 
-        // --- Stop if errors ---
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
             return;
         }
 
-        // Not logged in
         if (!session?.user?.email || !session?.user?.name) {
-            showError("You must be logged in to submit an application.");
+            showError("You must be logged in to submit.");
             return;
         }
 
         setLoading(true);
+
+        // rest stays same...
 
         const payload: ApplyFormPayload = {
             jobId: selectedJob._id,
@@ -418,7 +344,7 @@ export default function ApplyPage() {
     const inputClass = (field:string) =>
         `w-full h-10 px-2 rounded-xl border text-sm appearance-none
      ${errors[field] ? "border-red-500 bg-black-200" : "border-black bg-black-200"}
-     placeholder:text-xs placeholder:text-black`;
+     placeholder:text-xs placeholder:text-neutral-400`;
 
     // --- SUBMISSION SUCCESS SCREEN (LinkedIn-style + growth loop) ---
     if (submitted) {
@@ -600,7 +526,7 @@ export default function ApplyPage() {
                         </div>
 
                         <div className="text-xs text-neutral-500 mt-1 ml-6">
-                            Check this if you have served in the U.S. military (Army, Navy, Air Force, Marine Corps, Coast Guard).
+                            Check this if you have served in the U.S. Military.
                         </div>
                     </div>
 
@@ -611,7 +537,7 @@ export default function ApplyPage() {
                         </label>
 
                         <div className="text-xs text-neutral-500 mb-1">
-                            Write down your current location (city/state). This helps match you with nearby job opportunities.
+                            Write down your current location (city/state). This helps match with nearby job opportunities.
                         </div>
 
                         <input
@@ -633,7 +559,7 @@ export default function ApplyPage() {
                         </label>
 
                         <div className="text-xs text-neutral-500 mb-1">
-                            When are you available to start working? Choose the earliest date you can begin.
+                            Choose the earliest date you can begin.
                         </div>
 
                         <input
@@ -657,9 +583,7 @@ export default function ApplyPage() {
                         </label>
 
                         <div className="text-xs text-neutral-500 mb-1">
-                            Mention any related certifications you have (e.g. NETA, NICET).
-                            Include whether you have passed or previously attempted a certification.
-                            This helps match you with the right job opportunities.
+                            (e.g. NETA, NICET) Include whether you have passed or previously attempted.
                         </div>
 
                         <input
@@ -684,8 +608,7 @@ export default function ApplyPage() {
                         </label>
 
                         <div className="text-xs text-neutral-500 mb-1">
-                            Many technician roles require extended travel assignments. Are you willing to travel for 2–4 weeks at a time?
-                            Employers typically provide a company vehicle, fuel, per diem, and hotel accommodations during travel periods.
+                            2–4 week travel required. Vehicle, fuel, per diem, lodging provided.
                         </div>
 
                         <input
@@ -708,8 +631,7 @@ export default function ApplyPage() {
                         </label>
 
                         <div className="text-xs text-neutral-500 mb-1">
-                            In many technician roles, work must be completed regardless of time. NETA technicians may be required to respond to emergency power outages at any time.
-                            Overtime pay varies by company, but is typically time-and-a-half or double time on weekends and holidays.
+                            Work may require overtime and emergency response. Pay is typically time-and-a-half or double time.
                         </div>
 
                         <input
@@ -732,9 +654,7 @@ export default function ApplyPage() {
                         </label>
 
                         <div className="text-xs text-neutral-500 mb-1">
-                            Many technician positions require relocation based on project demand.
-                            Please indicate if you are available to relocate on your start date, within 1–2 weeks of starting, or after the timeline discussed above.
-                            This helps match you with active job sites faster.
+                            Work may require relocation to out-of-state job sites.
                         </div>
 
                         <input
@@ -757,8 +677,7 @@ export default function ApplyPage() {
                         </label>
 
                         <div className="text-xs text-neutral-500 mb-1">
-                            If applicable, include your total electrical experience (military and civilian).
-                            List your MOS, years in that role, and whether you are familiar with reading electrical schematics or technical diagrams.
+                            Include total electrical experience (military/civilian), MOS, years, and schematic reading ability.
                         </div>
 
                         <input
@@ -780,8 +699,7 @@ export default function ApplyPage() {
                         </label>
 
                         <div className="text-xs text-neutral-500 mb-1">
-                            This is general information about your goals and what you are looking for in this role.
-                            Include the type of work, schedule, or opportunities you are targeting.
+                            Describe your goals, preferred work, schedule, locations, and opportunities.
                         </div>
 
                         <input
@@ -807,10 +725,7 @@ export default function ApplyPage() {
                             className={`mt-1 ${!isFormComplete ? "cursor-not-allowed opacity-50" : ""}`}
                         />
                         <label htmlFor="agree" className="text-xs text-neutral-600 leading-relaxed">
-                            By submitting this application, I confirm that the information provided is accurate.
-                            I consent to being contacted regarding this application and related job opportunities,
-                            and I agree that my information, including my resume, may be shared with potential employers.
-                            I understand this does not create an employment contract.
+                            By submitting this application, I confirm that all information provided is true and accurate to the best of my knowledge. I consent to being contacted regarding this application and related employment opportunities. I understand and agree that my information, including my resume, may be shared with potential employers for hiring purposes. I acknowledge that submission of this application does not create an employment contract or guarantee of employment.
                         </label>
                     </div>
 
