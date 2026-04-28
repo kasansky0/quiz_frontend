@@ -40,7 +40,7 @@ export default function LoginSection() {
             className="w-full max-w-md"
         >
             {/* CARD */}
-            <div className="bg-white border border-neutral-200 rounded-2xl shadow-sm px-7 py-8">
+            <div className="bg-white border border-neutral-200 rounded-2xl shadow-sm px-7">
 
                 {/* HEADER */}
                 <div className="flex flex-col items-center text-center">
@@ -54,15 +54,15 @@ export default function LoginSection() {
                     {/* TEXT */}
                     <div className="mt-4 space-y-1 max-w-md">
                         <p className="text-sm text-green-600 font-medium">
-                            Free for practice, supported by hiring partners and advanced premium exam tracks
+                            Free NETA Level 2 practice + targeted quizzes with explanations and hiring partner support
                         </p>
 
                         <p className="text-sm text-black">
-                            Structured NETA Level 2 exam simulations with clear, professional explanations
+                            Exam simulations built for real-world electrical readiness
                         </p>
 
                         <p className="text-sm text-black/80 mt-1">
-                            Learn at your pace with a continuously expanding question bank designed for real exam readiness
+                            Grow your skills with a continuously expanding question bank for certification success
                         </p>
                     </div>
 

@@ -64,6 +64,8 @@ export default function HirePage() {
     const token = session?.idToken;
     const { showError } = useError();
 
+    const [openLegal, setOpenLegal] = useState<null | "terms" | "privacy">(null);
+
     const [loading, setLoading] = useState(true);
     const [fade, setFade] = useState(false);
 
@@ -73,6 +75,59 @@ export default function HirePage() {
 
     const { isEmployer, userId } = useUser();
     const [blocked, setBlocked] = useState(false);
+
+    const FOOTER_POLICY = {
+        terms: {
+            title: "Terms of Service",
+            content: [
+                "This platform is designed for legitimate hiring and job-seeking purposes related to NETA Level 2 and related technical roles.",
+
+                "Employers must be manually verified before being allowed to post job advertisements. We reserve the right to approve or reject employer access at our discretion.",
+
+                "All job advertisements are subject to review and will remain in 'pending' status until approved by the platform.",
+
+                "Only approved job ads may proceed to payment. Payment is required before a job advertisement becomes publicly visible on the platform.",
+
+                "We reserve the right to reject, remove, or archive any job advertisement that is misleading, irrelevant, low quality, or violates platform standards.",
+
+                "Applicants submit their information voluntarily when applying to job postings. Applications may be reviewed before being shared with employers to ensure quality and relevance.",
+
+                "Once approved, applicant data such as name, email, and relevant profile information may be shared with the employer who posted the job ad.",
+
+                "Employers agree to use applicant data solely for legitimate hiring purposes and not for marketing, spam, or unauthorized distribution.",
+
+                "Users are responsible for ensuring that all information submitted to the platform is accurate and not misleading.",
+
+                "We may suspend or permanently remove accounts that violate these Terms, abuse the platform, or attempt to bypass moderation systems.",
+
+                "By using the platform, users acknowledge and agree to the full hiring workflow, including verification, moderation, approval, and payment-based publishing."
+            ]
+        },
+        privacy: {
+            title: "Privacy Policy",
+            content: [
+                "We collect basic account information such as name, email, and authentication data for account creation and login.",
+
+                "Users may be verified as employers only after manual review to ensure they represent a legitimate company and not a recruitment agency.",
+
+                "Job advertisements submitted by employers are first reviewed and marked as 'pending'. Only approved ads may proceed to payment and publishing.",
+
+                "After approval, employers must complete payment before their job ad becomes publicly visible on the platform.",
+
+                "Published job ads may include company name, job title, and job location, and are visible to all users on the platform.",
+
+                "When a candidate applies to a job, their application is reviewed before being shared with the employer.",
+
+                "Once approved, the employer receives the applicant’s name, email, and relevant application details to continue communication directly.",
+
+                "We do not sell personal data or share it with third-party advertisers or external marketing platforms.",
+
+                "Platform messaging and activity data may be used internally to improve learning tools, exam preparation features, and candidate evaluation quality.",
+
+                "All data processing is designed to support recruitment, exam preparation, and legitimate hiring workflows only."
+            ]
+        }
+    };
 
     const [openStatsMap, setOpenStatsMap] = useState<Record<string, boolean>>({});
     const toggleStats = (id: string) => {
@@ -252,6 +307,23 @@ export default function HirePage() {
                         + Create New Job Ad
                     </Link>
                 </div>
+
+                <p className="text-[10px] text-neutral-400 text-center mt-2">
+                    By posting a job ad, you agree to our{" "}
+                    <button
+                        onClick={() => setOpenLegal("terms")}
+                        className="underline hover:text-black"
+                    >
+                        Terms
+                    </button>{" "}
+                    and{" "}
+                    <button
+                        onClick={() => setOpenLegal("privacy")}
+                        className="underline hover:text-black"
+                    >
+                        Privacy Policy
+                    </button>.
+                </p>
 
                 {/* ADS LIST */}
                 <div>
@@ -531,6 +603,44 @@ ${ad.company} Hiring Team`
                     )}
                 </div>
             </div>
+
+            {openLegal && (
+                <div
+                    className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+                    onClick={() => setOpenLegal(null)}
+                >
+                    <div
+                        className="bg-white max-w-xl w-full rounded-2xl p-6 relative max-h-[80vh] overflow-y-auto"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* CLOSE */}
+                        <button
+                            onClick={() => setOpenLegal(null)}
+                            className="absolute top-3 right-3 text-neutral-500 hover:text-black"
+                        >
+                            ✕
+                        </button>
+
+                        {/* TITLE */}
+                        <h1 className="text-xl font-semibold mb-4">
+                            {openLegal === "terms"
+                                ? FOOTER_POLICY.terms.title
+                                : FOOTER_POLICY.privacy.title}
+                        </h1>
+
+                        {/* CONTENT */}
+                        <div className="space-y-3 text-sm text-neutral-700 leading-relaxed">
+                            {(openLegal === "terms"
+                                    ? FOOTER_POLICY.terms.content
+                                    : FOOTER_POLICY.privacy.content
+                            ).map((item, i) => (
+                                <p key={i}>• {item}</p>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }

@@ -16,7 +16,7 @@ export default function HowItWorks() {
                 <p className="font-semibold text-black">How it works</p>
 
                 <span
-                    className={`text-black transition-transform duration-500 ease-in-out ${
+                    className={`text-black transition-transform duration-300 ${
                         open ? "rotate-180" : ""
                     }`}
                 >
@@ -24,88 +24,33 @@ export default function HowItWorks() {
                 </span>
             </button>
 
-            {/* DROPDOWN CONTENT (FIXED) */}
+            {/* CONTENT */}
             <div
                 className={`
                     px-4 pb-4
-                    transition-all duration-500 ease-in-out
+                    transition-all duration-300 ease-in-out
                     overflow-hidden
-                    ${open ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"}
+                    ${open ? "max-h-[300px] opacity-100" : "max-h-0 opacity-0"}
                 `}
             >
+                <div className="space-y-2 text-xs text-black/80">
 
-                {/* 🔥 THIS IS THE IMPORTANT FIX */}
-                <div className="max-h-64 overflow-y-auto pr-2 space-y-2 hide-scrollbar">
+                    <p>• Create a job ad, submit for review</p>
 
-                    <ul className="space-y-1 list-disc pl-5">
-                        <li>Create a job ad and submit for review.</li>
+                    <p>• Once approved, complete payment to publish</p>
 
-                        <li>Once approved, your ad becomes eligible for publishing.</li>
+                    <p>
+                        • Published ads stay live for <span className="font-semibold">15 days</span>
+                        , then move to archive
+                    </p>
 
-                        <li>
-                            Pay a <span className="text-black font-semibold">$500</span> one-time fee for{" "}
-                            <span className="text-black font-semibold">15 days of active publishing</span>.
-                        </li>
+                    <p>
+                        • Applications are reviewed before being shared with you
+                    </p>
 
-                        <li>After payment, your ad will go live on the platform.</li>
-
-                        <li>
-                            Your ad will be published and visible to users for <span className="font-semibold">15 days</span>.
-                            After that, it will be <span className="font-semibold">archived</span> (no longer visible on the platform),
-                            but you will still have access to the ad and all applications for
-                            <span className="font-semibold"> 2 additional months</span> before it is permanently deleted.
-                        </li>
-
-                        <li>
-                            Applicants who apply to your published ads will automatically appear in the
-                            Applications section below the specific ad they applied to.
-                        </li>
-
-                        {/* ================= NEW SECTION ================= */}
-                        <li>
-                            Once a candidate applies, you will be able to view:
-                            <ul className="mt-1 space-y-1 list-disc pl-5 text-black">
-                                <li>Basic profile information (name, email, experience, availability)</li>
-                                <li>
-                                    Physical location at the time of application (📍 where the applicant is currently located)
-                                </li>
-                                <li>
-                                    Job readiness details (position preference, certifications, travel ability, overtime, relocation readiness)
-                                </li>
-                            </ul>
-                        </li>
-
-                        {/* ================= QUIZ EXPLANATION ================= */}
-                        <li>
-                            Each applicant includes a <span className="text-black font-semibold">Quiz Performance</span> section:
-                            <ul className="mt-1 space-y-1 list-disc pl-5 text-black">
-                                <li>
-                                    The system tracks how many questions were <span className="text-black">seen</span>, <span className="text-green-500">correct</span>, and <span className="text-red-400">incorrect</span>.
-                                </li>
-
-                                <li>
-                                    Overall Accuracy shows total performance across all topics.
-                                </li>
-
-                                <li>
-                                    Below that, <span className="text-black font-semibold">Topic Breakdown</span> shows performance per category (example: relay, transformer, safety).
-                                </li>
-
-                                <li>
-                                    Each topic shows:
-                                    <ul className="mt-1 space-y-1 list-disc pl-5">
-                                        <li>How many questions were attempted</li>
-                                        <li>Correct vs incorrect answers</li>
-                                        <li>Accuracy percentage per topic</li>
-                                    </ul>
-                                </li>
-
-                                <li>
-                                    This allows employers to evaluate not just experience, but real technical strength by category.
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
+                    <p>
+                        • You receive approved candidates with profile + quiz performance
+                    </p>
 
                 </div>
             </div>

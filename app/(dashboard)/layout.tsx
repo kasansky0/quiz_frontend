@@ -548,7 +548,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             bg-white shadow-md">
 
                 {/* CENTERED CONTAINER */}
-                <div className="h-full max-w-4xl mx-auto px-3 flex items-center justify-between">
+                <div className="h-full max-w-4xl mx-auto px-6 sm:px-2 flex items-center justify-between">
 
 
 
