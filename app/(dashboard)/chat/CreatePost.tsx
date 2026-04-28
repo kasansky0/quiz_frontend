@@ -152,17 +152,17 @@ export default function CreatePost({
                             type="submit"
                             disabled={isSending}
                             className={`
-        px-4 py-1.5
-        rounded-full
-        text-sm font-semibold
-        transition
-        active:scale-[0.98]
-        ${
+                                px-4 py-1.5
+                                rounded-full
+                                text-sm font-semibold
+                                transition
+                                active:scale-[0.98]
+                                ${
                                 isSending
                                     ? "bg-[#7FB3E6] text-white cursor-not-allowed"
                                     : "bg-[#0a66c2] text-white hover:bg-[#004182]"
                             }
-    `}
+                                `}
                         >
                             Post
                         </button>

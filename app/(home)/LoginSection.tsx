@@ -68,16 +68,29 @@ export default function LoginSection() {
 
                 </div>
 
-                {/* METRICS (FIXED — no ugly 90% / 1000+) */}
-                <div className="mt-6 grid grid-cols-2 gap-3">
-                    <div className="rounded-xl bg-neutral-50 border border-neutral-200 p-3 text-center">
-                        <p className="text-lg font-semibold text-black">Fast</p>
-                        <p className="text-xs text-neutral-600">Instant feedback</p>
-                    </div>
+                {/* METRICS (Single LinkedIn-style block) */}
+                <div className="mt-6 rounded-2xl bg-neutral-50 border border-neutral-200 p-4">
+                    <div className="flex items-center justify-center gap-6 text-center">
 
-                    <div className="rounded-xl bg-neutral-50 border border-neutral-200 p-3 text-center">
-                        <p className="text-lg font-semibold text-black">Real</p>
-                        <p className="text-xs text-neutral-600">Exam-style questions</p>
+                        {/* FAST */}
+                        <div className="flex-1">
+                            <p className="text-lg font-semibold text-black">Fast</p>
+                            <p className="text-xs text-neutral-600 mt-1">
+                                Instant feedback
+                            </p>
+                        </div>
+
+                        {/* DIVIDER */}
+                        <div className="w-px self-stretch bg-neutral-300" />
+
+                        {/* REAL */}
+                        <div className="flex-1">
+                            <p className="text-lg font-semibold text-black">Real</p>
+                            <p className="text-xs text-neutral-600 mt-1">
+                                Exam-style questions
+                            </p>
+                        </div>
+
                     </div>
                 </div>
 
@@ -86,13 +99,42 @@ export default function LoginSection() {
 
                 {/* GOOGLE BUTTON ONLY */}
                 <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={{
+                        scale: 1.03,
+                        y: -2
+                    }}
+                    whileTap={{
+                        scale: 0.97,
+                        y: 1
+                    }}
+                    transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 18
+                    }}
                     onClick={() => signIn("google")}
-                    className="w-full flex items-center justify-center gap-3 px-5 py-3 rounded-xl bg-white border border-neutral-300 shadow-sm hover:bg-neutral-50 transition"
+                    className="
+                        w-full
+                        flex items-center justify-center gap-3
+                        px-5 py-3
+                        rounded-xl
+                        bg-white
+                        border border-neutral-300
+                        shadow-sm
+                        hover:bg-neutral-50
+                        hover:shadow-md
+                        active:shadow-sm
+                        cursor-pointer
+                        select-none
+                        will-change-transform
+                    "
                 >
-                    {/* Google Logo (kept exactly) */}
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className="w-5 h-5">
+                    {/* Google Logo */}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 48 48"
+                        className="w-5 h-5 shrink-0"
+                    >
                         <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
                         <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
                         <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
@@ -108,6 +150,20 @@ export default function LoginSection() {
                 <p className="mt-5 text-xs text-center text-neutral-500">
                     🔒 Secure Google OAuth · Encrypted login
                 </p>
+                {/* STATS (LinkedIn-style info cards) */}
+                <div className="my-4 grid grid-cols-2 gap-4 w-full max-w-sm">
+
+                    <div className="bg-white border border-neutral-200 rounded-xl p-4 text-center shadow-sm">
+                        <div className="text-xl font-bold text-black">90%</div>
+                        <div className="text-xs text-neutral-500 mt-1">Pass Rate</div>
+                    </div>
+
+                    <div className="bg-white border border-neutral-200 rounded-xl p-4 text-center shadow-sm">
+                        <div className="text-xl font-bold text-black">1000+</div>
+                        <div className="text-xs text-neutral-500 mt-1">Questions</div>
+                    </div>
+
+                </div>
             </div>
         </motion.div>
     );

@@ -180,7 +180,23 @@ export default function LoggedInAdmin() {
     const [summary, setSummary] = useState<AdminSummary | null>(null);
     const [spanWidth, setSpanWidth] = useState(90);
     const spanRef = useRef<HTMLSpanElement>(null);
+// ✅ ADD this right under:
     const paidUsersCount = users.filter(user => user.is_paid).length;
+
+// 👇 USERS ACTIVE TODAY (based on last_login local date)
+    const usersVisitedToday = users.filter(user => {
+        if (!user.last_login) return false;
+
+        const lastLogin = new Date(user.last_login);
+        const now = new Date();
+
+        return (
+            lastLogin.getFullYear() === now.getFullYear() &&
+            lastLogin.getMonth() === now.getMonth() &&
+            lastLogin.getDate() === now.getDate()
+        );
+    }).length;
+
 
     const applicationCounts = summary?.applications?.reduce(
         (acc, app) => {
@@ -493,29 +509,74 @@ export default function LoggedInAdmin() {
 
 
 
+    // ✅ REPLACE your current adsWithExpiry block with this:
+// Makes summary use EXACT same parsing + expiry math as actual ad cards
+
     const adsWithExpiry =
         summary?.hiring_ads?.map(ad => {
-            const created = new Date(ad.createdAt);
+            if (!ad.createdAt) {
+                return {
+                    ...ad,
+                    expiryDate: new Date(),
+                    diffMs: 0,
+                    diffDays: 0,
+                    isExpired: true,
+                    isExpiringSoon: false,
+                    relativeTime: "Expired",
+                };
+            }
+
+            // ✅ SAME parser as formatAdExpiry
+            const parseDate = (d: string | Date) => {
+                if (d instanceof Date) return d;
+                if (typeof d === "string") return new Date(d.split(".")[0] + "Z");
+                return new Date();
+            };
+
+            const created = parseDate(ad.createdAt);
+
+            // ✅ SAME 15 day expiry
             const expiry = new Date(created);
             expiry.setDate(expiry.getDate() + 15);
 
             const now = new Date();
+
             const diffMs = expiry.getTime() - now.getTime();
-            const diffDays = diffMs / (1000 * 60 * 60 * 24);
+            const diffSeconds = Math.floor(diffMs / 1000);
+            const diffMinutes = Math.floor(diffSeconds / 60);
+            const diffHours = Math.floor(diffMinutes / 60);
+            const diffDays = Math.floor(diffHours / 24);
+
+            let relativeTime = "";
+
+            if (diffMs <= 0) {
+                relativeTime = "Expired";
+            } else if (diffSeconds < 60) {
+                relativeTime = `${diffSeconds}s`;
+            } else if (diffMinutes < 60) {
+                relativeTime = `${diffMinutes}m`;
+            } else if (diffHours < 24) {
+                relativeTime = `${diffHours}h`;
+            } else {
+                relativeTime = `${diffDays}d`;
+            }
 
             return {
                 ...ad,
                 expiryDate: expiry,
+                diffMs,
                 diffDays,
-                isExpired: diffDays <= 0,
-                isExpiringSoon: diffDays > 0 && diffDays <= 3,
+                isExpired: diffMs <= 0,
+                isExpiringSoon: diffMs > 0 && diffDays <= 3,
+                relativeTime,
             };
         }) || [];
 
-    const sortedExpiringAds = [...adsWithExpiry]
-        .sort((a, b) => a.expiryDate.getTime() - b.expiryDate.getTime());
 
-
+// ✅ SORT remains same
+    const sortedExpiringAds = [...adsWithExpiry].sort(
+        (a, b) => a.expiryDate.getTime() - b.expiryDate.getTime()
+    );
 
 
     const expiringAds = adsWithExpiry.reduce(
@@ -724,18 +785,25 @@ export default function LoggedInAdmin() {
                             {summary?.applications?.length ?? 0}
                         </p>
                         <div className="flex flex-col gap-2 mt-1">
-                            <p className="text-xs text-red-400">
-                                Pending: {applicationCounts?.pending ?? 0}
-                            </p>
+                            <div className="flex items-center justify-between text-xs text-red-400">
+                                <span>Pending:</span>
+                                <span className="font-semibold">
+                                    {applicationCounts?.pending ?? 0}
+                                </span>
+                            </div>
 
-                            <p className="text-xs text-green-500">
-                                Approved: {applicationCounts?.approved ?? 0}
-                            </p>
+                            <div className="flex items-center justify-between text-xs text-green-500">
+                                <span>Approved:</span>
+                                <span className="font-semibold">
+                                    {applicationCounts?.approved ?? 0}
+                                </span>
+                            </div>
                         </div>
                     </div>
 
                     {/* Ads */}
                     <div className="bg-white rounded-xl border border-gray-300 p-3 text-center">
+
                         <p className="text-xs text-black">Hiring Ads</p>
 
                         <p className="text-lg font-bold text-black mb-2">
@@ -744,35 +812,36 @@ export default function LoggedInAdmin() {
 
                         <div className="flex flex-col gap-1 text-xs text-left">
 
-                            <div className="flex items-center gap-2">
-                                <span className="text-amber-500">Pending :</span>
-                                <span className="text-amber-500 font-semibold">
+                            <div className="flex items-center justify-between w-full">
+                                <span className="text-amber-500">Pending:</span>
+                                <span className="text-amber-500 font-semibold text-right">
                                     {adCounts?.pending ?? 0}
                                 </span>
                             </div>
 
-                            <div className="flex items-center gap-2">
-                                <span className="text-emerald-500">Published :</span>
-                                <span className="text-emerald-500 font-semibold">
+                            <div className="flex items-center justify-between w-full">
+                                <span className="text-emerald-500">Published:</span>
+                                <span className="text-emerald-500 font-semibold text-right">
                                     {adCounts?.published ?? 0}
                                 </span>
                             </div>
 
-                            <div className="flex items-center gap-2">
-                                <span className="text-sky-500">Approved :</span>
-                                <span className="text-sky-500 font-semibold">
+                            <div className="flex items-center justify-between w-full">
+                                <span className="text-sky-500">Approved:</span>
+                                <span className="text-sky-500 font-semibold text-right">
                                     {adCounts?.approved ?? 0}
                                 </span>
                             </div>
 
-                            <div className="flex items-center gap-2">
-                                <span className="text-red-400">Archived :</span>
-                                <span className="text-red-400 font-semibold">
+                            <div className="flex items-center justify-between w-full">
+                                <span className="text-red-400">Archived:</span>
+                                <span className="text-red-400 font-semibold text-right">
                                     {adCounts?.archived ?? 0}
                                 </span>
                             </div>
 
                         </div>
+
                     </div>
 
                     {/* Expiring Ads */}
@@ -786,15 +855,15 @@ export default function LoggedInAdmin() {
                             <div className="flex items-center justify-between">
                                 <span className="text-orange-400">Expiring (≤3d):</span>
                                 <span className="text-orange-400 font-semibold">
-                {expiringAds?.expiringSoon ?? 0}
-            </span>
+                                    {expiringAds?.expiringSoon ?? 0}
+                                </span>
                             </div>
 
                             <div className="flex items-center justify-between">
                                 <span className="text-red-500">Expired:</span>
                                 <span className="text-red-500 font-semibold">
-                {expiringAds?.expired ?? 0}
-            </span>
+                                    {expiringAds?.expired ?? 0}
+                                </span>
                             </div>
                         </div>
 
@@ -828,7 +897,7 @@ export default function LoggedInAdmin() {
                                                         : "text-black"
                                                 }
                                             >
-                                                {Math.ceil(ad.diffDays)}d
+                                                {ad.relativeTime}
                                             </span>
                                         )}
                                     </div>
@@ -839,36 +908,50 @@ export default function LoggedInAdmin() {
                     </div>
 
                     {/* Users & Employers */}
-                    <div className="bg-white rounded-xl border border-gray-300 p-3 space-y-4 text-center">
+                    <div className="bg-white rounded-xl border border-gray-300 p-3 text-center">
 
-                        {/* USERS */}
-                        <div className="space-y-1">
-                            <p className="text-xs text-black">Users</p>
+                        <p className="text-xs text-black">Users</p>
 
-                            <p className="text-lg font-bold text-black">
+                        {/* counters */}
+                        <div className="flex flex-col gap-1 mt-2 text-xs text-center">
+
+                            <p className="text-lg font-bold text-black mb-2">
                                 {users.length}
                             </p>
 
-                            <p className="text-xs text-green-500">
-                                Paid: {paidUsersCount}
-                            </p>
-                        </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-blue-500">
+                                    Visited on {new Date().toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                })}:
+                                </span>
 
-                        {/* divider */}
-                        <div className="border-t border-gray-200"></div>
+                                                            <span className="text-blue-500 font-semibold">
+                                    {usersVisitedToday}
+                                </span>
+                            </div>
 
-                        {/* EMPLOYERS */}
-                        <div className="space-y-1">
-                            <p className="text-xs text-black">Employers</p>
+                            <div className="flex items-center justify-between">
+                                <span className="text-green-500">Paid:</span>
+                                <span className="text-green-500 font-semibold">
+                                    {paidUsersCount}
+                                </span>
+                            </div>
 
-                            <p className="text-lg font-bold text-black">
-                                {summary?.employer_users?.length ?? 0}
-                            </p>
+                            <div className="flex items-center justify-between">
+                                <span className="text-black">Employers:</span>
+                                <span className="text-black font-semibold">
+                                    {summary?.employer_users?.length ?? 0}
+                                </span>
+                            </div>
+
                         </div>
 
                     </div>
 
                 </div>
+
 
 
 

@@ -563,16 +563,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             className="transition hover:scale-105 active:scale-95"
                         >
                             <img
-                                src="/images/left_computer_image.png"
+                                src="/images/android-chrome-512x512.png"
                                 alt="Left decoration"
-                                className="h-12 w-auto object-contain"
+                                className="h-8 w-8 rounded-lg"
                             />
                         </button>
                     </div>
 
 
                         {/* MOBILE QUICK ICONS */}
-                        <div className="flex-1 flex justify-center md:hidden items-center gap-2 text-black">
+                        <div className="flex-1 flex justify-center md:hidden items-center gap-4 text-black">
 
                             {/* CHAT */}
                             <button
@@ -830,7 +830,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             className="fixed bottom-0 left-0 right-0 z-50 md:hidden
                                 bg-white border-t border-green-500
                                 rounded-t-2xl p-4 shadow-2xl
-                                max-h-[85dvh] overflow-y-auto pb-6"
+                                max-h-[85dvh] overflow-y-auto hide-scrollbar pb-6"
                         >
                             {/* Drag Handle */}
                             <div className="relative flex justify-center">
