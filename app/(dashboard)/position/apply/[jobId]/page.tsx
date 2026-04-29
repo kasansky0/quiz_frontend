@@ -438,29 +438,27 @@ export default function ApplyPage() {
             <div className="w-full max-w-xl mx-auto">
 
                 <style jsx>{`
-              input[type="date"] {
-                text-align: left;
-                padding-left: 0.5rem;
-                display: block;
-                width: 100%;
-                min-width: 0;
-                -webkit-appearance: none;
-                height: 2.5rem;
-                line-height: 2.5rem;
-                padding-top: 0;
-                padding-bottom: 0;
-              }
-
-              input[type="date"]::-webkit-calendar-picker-indicator {
-                  opacity: 0.6;
-                  cursor: pointer;
-                  filter: none;
-              }
-
-              input[type="date"]::-webkit-calendar-picker-indicator:hover {
-                  opacity: 1;
-              }
-            `}</style>
+                  input[type="date"] {
+                    text-align: left;
+                    padding-left: 0.5rem;
+                  }
+                
+                  @media screen and (-webkit-min-device-pixel-ratio: 0) {
+                    input[type="date"]::-webkit-date-and-time-value {
+                      text-align: left !important;
+                    }
+                  }
+                
+                  input[type="date"]::-webkit-calendar-picker-indicator {
+                    opacity: 0.6;
+                    cursor: pointer;
+                    filter: none;
+                  }
+                
+                  input[type="date"]::-webkit-calendar-picker-indicator:hover {
+                    opacity: 1;
+                  }
+                `}</style>
 
                 {/* HEADER */}
                 <div className="relative w-full mb-4 flex items-center min-h-[48px]">
