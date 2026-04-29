@@ -441,12 +441,10 @@ export default function ApplyPage() {
                   input[type="date"] {
                     text-align: left;
                     padding-left: 0.5rem;
-                    padding-right: 2.2rem;
-                    -webkit-appearance: none;
-                    appearance: none;
+                    padding-right: 0.5rem;
                   }
                 
-                  @media screen and (-webkit-min-device-pixel-ratio: 0) {
+                  @supports (-webkit-touch-callout: none) {
                     input[type="date"]::-webkit-date-and-time-value {
                       text-align: left !important;
                     }
