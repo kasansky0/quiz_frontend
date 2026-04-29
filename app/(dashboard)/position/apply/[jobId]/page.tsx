@@ -442,6 +442,7 @@ export default function ApplyPage() {
                     text-align: left;
                     padding-left: 0.5rem;
                     padding-right: 0.5rem;
+                    color-scheme: light; /* helps iOS render dark icons correctly */
                   }
                 
                   @supports (-webkit-touch-callout: none) {
@@ -451,9 +452,9 @@ export default function ApplyPage() {
                   }
                 
                   input[type="date"]::-webkit-calendar-picker-indicator {
-                    opacity: 1;
+                    opacity: 1 !important;
+                    filter: invert(0) brightness(0); /* forces black */
                     cursor: pointer;
-                    filter: none;
                   }
                 `}</style>
 
