@@ -441,6 +441,9 @@ export default function ApplyPage() {
                   input[type="date"] {
                     text-align: left;
                     padding-left: 0.5rem;
+                    padding-right: 2.2rem;
+                    -webkit-appearance: none;
+                    appearance: none;
                   }
                 
                   @media screen and (-webkit-min-device-pixel-ratio: 0) {
@@ -450,13 +453,9 @@ export default function ApplyPage() {
                   }
                 
                   input[type="date"]::-webkit-calendar-picker-indicator {
-                    opacity: 0.6;
+                    opacity: 1;
                     cursor: pointer;
                     filter: none;
-                  }
-                
-                  input[type="date"]::-webkit-calendar-picker-indicator:hover {
-                    opacity: 1;
                   }
                 `}</style>
 
