@@ -34,24 +34,17 @@ export default function HowItWorks() {
                 `}
             >
                 <div className="space-y-2 text-xs text-black/80">
-
                     <p>• Create a job ad, submit for review</p>
 
                     <p>• Once approved, complete payment to publish</p>
 
-                    <p>
-                        • Published ads stay live for <span className="font-semibold">15 days</span>
-                        , then move to archive
-                    </p>
+                    <p>• Published ads stay live for <span className="font-semibold">15 days</span></p>
 
-                    <p>
-                        • Applications are reviewed before being shared with you
-                    </p>
+                    <p>• After 15 days, ads automatically move to Archived and are no longer visible to public users</p>
 
-                    <p>
-                        • You receive approved candidates with profile + quiz performance
-                    </p>
+                    <p>• Archived ads and all applications remain fully accessible in your dashboard</p>
 
+                    <p>• You receive candidates with profile + quiz performance</p>
                 </div>
             </div>
         </div>

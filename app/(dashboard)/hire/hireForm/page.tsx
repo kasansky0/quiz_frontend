@@ -146,11 +146,12 @@ export default function HireFormPage() {
 
         if (result.error) {
             showError(result.error, result.loginRequired);
+            setLoading(false); // 🔥 FIX HERE
             return;
         }
 
+        setLoading(false); // also good to be explicit
         router.push("/hire");
-        setLoading(false);
     };
 
     if (status === "loading") {
@@ -171,8 +172,7 @@ export default function HireFormPage() {
     const isReady =
         session &&
         isEmployer !== undefined &&
-        userId !== null &&
-        !loading;
+        userId !== null;
 
     if (!isReady) {
         return (
@@ -410,7 +410,7 @@ export default function HireFormPage() {
                             <option value="" disabled>
                                 -- Choose Relocation --
                             </option>
-                            <option value="Paid relocation">Paid relocation</option>
+                            <option value="Paid relocation">Possible paid relocation</option>
                             <option value="Partial relocation">Partial relocation</option>
                             <option value="No relocation">No relocation</option>
                         </select>

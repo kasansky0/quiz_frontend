@@ -457,7 +457,7 @@ export default function ChatStats() {
                     {!creatingPost && !activePost && (
                         <>
                             {/* Top bar */}
-                            <div className="flex items-center justify-start relative w-full">
+                            <div className="flex items-center justify-start relative w-full pb-3">
                                 <button
                                     onClick={() => setCreatingPost(true)}
                                     className="p-2 rounded-full hover:bg-white border border-transparent hover:border-neutral-200 transition z-10"
@@ -474,18 +474,80 @@ export default function ChatStats() {
                                 {/* Future Ads / Message */}
                                 <Link
                                     href="/position"
-                                    className="flex-1 text-center text-xs pt-2 pb-3 transition block active:bg-transparent focus:bg-transparent [-webkit-tap-highlight-color:transparent]"
+                                    className="w-full mt-2 text-center text-xs block active:bg-transparent focus:bg-transparent [-webkit-tap-highlight-color:transparent]"
                                 >
-                                    <div className="font-semibold">
-                                        💼 Hiring NETA Technicians
-                                    </div>
+                                    <div className="flex flex-col items-center space-y-1">
 
-                                    <div className="text-xs mt-1">
-                                        📍 Multiple locations • Relocation assistance
-                                    </div>
+                                        {/* ICON + TITLE */}
+                                        <div className="font-semibold flex items-center justify-center gap-2 text-center">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                strokeWidth={1.5}
+                                                stroke="currentColor"
+                                                className="w-4 h-4 text-neutral-700 flex-shrink-0"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    d="M20.25 7.5h-16.5A2.25 2.25 0 001.5 9.75v9A2.25 2.25 0 003.75 21h16.5A2.25 2.25 0 0022.5 18.75v-9A2.25 2.25 0 0020.25 7.5z"
+                                                />
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    d="M8.25 7.5V6a3.75 3.75 0 017.5 0v1.5"
+                                                />
+                                            </svg>
 
-                                    <div className="text-blue-400 text-xs mt-1">
-                                        View positions →
+                                            <span className="leading-none">
+                                                    Hiring NETA Technicians
+                                                </span>
+                                        </div>
+
+                                        {/* LOCATION */}
+                                        <div className="text-xs text-center flex items-center justify-center gap-1 text-neutral-600">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                strokeWidth={1.5}
+                                                stroke="currentColor"
+                                                className="w-4 h-4 text-neutral-600 flex-shrink-0"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
+                                                />
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
+                                                />
+                                            </svg>
+
+                                            <span>Multiple locations • Relocation assistance</span>
+                                        </div>
+
+                                        {/* CTA */}
+                                        <div className="text-blue-400 text-xs flex items-center gap-1 group">
+                                            <span>View positions</span>
+
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 20 20"
+                                                fill="currentColor"
+                                                className="w-3 h-3"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    d="M3 10a.75.75 0 01.75-.75h10.69L10.22 5.03a.75.75 0 011.06-1.06l5.5 5.5a.75.75 0 010 1.06l-5.5 5.5a.75.75 0 11-1.06-1.06l4.22-4.22H3.75A.75.75 0 013 10z"
+                                                    clipRule="evenodd"
+                                                />
+                                            </svg>
+                                        </div>
+
                                     </div>
                                 </Link>
                             </div>
@@ -527,20 +589,7 @@ export default function ChatStats() {
                                                     {post.nickname}
 
                                                     {userId && post.userId === userId && (
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            fill="none"
-                                                            viewBox="0 0 24 24"
-                                                            strokeWidth={1.5}
-                                                            stroke="currentColor"
-                                                            className="size-4 text-amber-500"
-                                                        >
-                                                            <path
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                                d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 0 0 6.16-12.12A14.98 14.98 0 0 0 9.631 8.41m5.96 5.96a14.926 14.926 0 0 1-5.841 2.58m-.119-8.54a6 6 0 0 0-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 0 0-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 0 1-2.448-2.448 14.9 14.9 0 0 1 .06-.312m-2.24 2.39a4.493 4.493 0 0 0-1.757 4.306 4.493 4.493 0 0 0 4.306-1.758M16.5 9a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"
-                                                            />
-                                                        </svg>
+                                                        <span className="ml-1 w-1.5 h-1.5 rounded-full bg-amber-500 opacity-80" />
                                                     )}
                                                 </span>
 
@@ -565,9 +614,14 @@ export default function ChatStats() {
                                                         )}
 
                                                         {post.pinned && (
-                                                            <span className="ml-1 text-yellow-400 text-sm font-bold">
-                                                            📌
-                                                        </span>
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                viewBox="0 0 24 24"
+                                                                fill="currentColor"
+                                                                className="w-3 h-3 ml-1 text-green-800 opacity-90"
+                                                            >
+                                                                <path d="M6 2a2 2 0 00-2 2v18l8-5 8 5V4a2 2 0 00-2-2H6z"/>
+                                                            </svg>
                                                         )}
                                                     </div>
                                                 </div>

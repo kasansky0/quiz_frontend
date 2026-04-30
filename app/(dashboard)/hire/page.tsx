@@ -70,6 +70,7 @@ export default function HirePage() {
     const [fade, setFade] = useState(false);
 
     const [ads, setAds] = useState<Ad[]>([]);
+    const [companyName, setCompanyName] = useState("Company");
 
     const [openAdId, setOpenAdId] = useState<string | null>(null);
 
@@ -183,8 +184,7 @@ ${ad.company} Hiring Team`
             try {
                 const res = await fetchEmployerAds(token);
 
-                console.log("🔥 RAW RESPONSE:", res);
-                console.log("📊 STATS:", res.data?.stats);
+                setCompanyName(res.data?.company || "Company");
 
                 if (res.error) {
                     showError?.(res.error, true);
@@ -296,7 +296,7 @@ ${ad.company} Hiring Team`
                 {/* HEADER */}
                 <h1 className="text-2xl font-semibold mb-2 text-center tracking-tight">
                     <span className="text-black">
-                        {ads?.[0]?.company ?? "Company"}
+                        {companyName}
                     </span>{" "}
                     <span className="text-neutral-500 font-normal">
                         Dashboard

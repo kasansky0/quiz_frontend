@@ -921,7 +921,7 @@ export default function LoggedInAdmin() {
 
                             <div className="flex items-center justify-between">
                                 <span className="text-blue-500">
-                                    Visited on {new Date().toLocaleDateString("en-US", {
+                                    On {new Date().toLocaleDateString("en-US", {
                                     month: "short",
                                     day: "numeric",
                                 })}:

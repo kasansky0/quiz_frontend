@@ -99,21 +99,6 @@ export default function ApplyPage() {
     const handleChange = (e: any) => {
         const { name, value } = e.target;
 
-        setForm(prev => ({
-            ...prev,
-            [name]: value
-        }));
-
-        let error = "";
-
-        const val = value?.toString() || "";
-
-        // REQUIRED fields
-        if (requiredFields.includes(name) && val.trim() === "") {
-            error = "Required field";
-        }
-
-        // MAX LENGTH rules (single source of truth)
         const maxLimits: Record<string, number> = {
             location: 100,
             certifications: 100,
@@ -124,16 +109,33 @@ export default function ApplyPage() {
             position: 500,
         };
 
-        if (maxLimits[name] && val.length > maxLimits[name]) {
-            error = `Max ${maxLimits[name]} chars`;
+        let newValue = value?.toString() || "";
+
+        const max = maxLimits[name];
+        if (max) {
+            newValue = newValue.slice(0, max); // HARD LIMIT
         }
 
-        // DATE validation
+        setForm(prev => ({
+            ...prev,
+            [name]: newValue   // ✅ IMPORTANT FIX
+        }));
+
+        let error = "";
+
+        if (requiredFields.includes(name) && newValue.trim() === "") {
+            error = "Required field";
+        }
+
+        if (max && newValue.length >= max) {
+            error = `Max ${max} chars reached`;
+        }
+
         if (name === "availability") {
-            if (val && isNaN(Date.parse(val))) {
+            if (newValue && isNaN(Date.parse(newValue))) {
                 error = "Invalid date";
-            } else if (val) {
-                const selected = new Date(val);
+            } else if (newValue) {
+                const selected = new Date(newValue);
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
 

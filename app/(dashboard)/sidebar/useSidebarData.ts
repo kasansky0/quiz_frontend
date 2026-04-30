@@ -39,6 +39,10 @@ export function useUserSidebarData({
     const [errorState, setErrorState] = useState<string | null>(null);
     const [isLoggedOut, setIsLoggedOut] = useState(false);
     const { showError } = useError();
+    const [platformStats, setPlatformStats] = useState({
+        total_users: 0,
+        users_visited_today: 0,
+    });
 
 
 
@@ -79,6 +83,10 @@ export function useUserSidebarData({
 
             const data = await res.json();
             setUserStats(data);
+            setPlatformStats({
+                total_users: data?.platform_stats?.total_users ?? 0,
+                users_visited_today: data?.platform_stats?.users_visited_today ?? 0,
+            });
 
         } catch (err) {
             console.error("Network error:", err);
@@ -278,6 +286,7 @@ export function useUserSidebarData({
 
     return {
         userStats,
+        platformStats,
         isEmployer: userStats?.isEmployer ?? false,
         onlineTime,
         userPercentage,

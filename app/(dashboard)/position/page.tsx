@@ -132,8 +132,28 @@ export default function AdsPage() {
                         </svg>
                     </button>
 
-                    <h1 className="text-xl font-semibold text-center flex-1">
-                        💼 Job Opportunities
+                    <h1 className="text-xl font-semibold text-center flex-1 flex items-center justify-center gap-2">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-5 h-5 text-neutral-700"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M20.25 7.5h-16.5A2.25 2.25 0 001.5 9.75v9A2.25 2.25 0 003.75 21h16.5A2.25 2.25 0 0022.5 18.75v-9A2.25 2.25 0 0020.25 7.5z"
+                            />
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M8.25 7.5V6a3.75 3.75 0 017.5 0v1.5"
+                            />
+                        </svg>
+
+                        Job Opportunities
                     </h1>
 
                     <div className="w-8" />
@@ -207,73 +227,91 @@ export default function AdsPage() {
                     </div>
                 </div>
 
+                {/* EMPTY STATE */}
+                {sortedJobs.length === 0 && (
+                    <div className="bg-white border border-neutral-200 rounded-xl shadow-sm p-5 text-center">
+                        <div className="text-sm font-semibold text-neutral-800">
+                            NETA Technician Job Listings
+                        </div>
+
+                        <div className="text-xs text-neutral-600 mt-1">
+                            New opportunities will appear here. Stay tuned.
+                        </div>
+
+                        <div className="text-[11px] text-neutral-500 mt-2">
+                            Keep studying and aim for 80%+ on the quiz.
+                        </div>
+                    </div>
+                )}
+
                 {/* FEED */}
-                <div className="space-y-3">
+                {sortedJobs.length > 0 && (
+                    <div className="space-y-3">
 
-                    <AnimatePresence mode="popLayout">
-                        {sortedJobs.map((job) => (
-                            <motion.div
-                                key={job._id}
-                                layout
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                transition={{ duration: 0.3, ease: "easeInOut" }}
-                            >
-                                <Link
-                                    href={`/position/apply/${job._id}`}
-                                    className="block"
+                        <AnimatePresence mode="popLayout">
+                            {sortedJobs.map((job) => (
+                                <motion.div
+                                    key={job._id}
+                                    layout
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    transition={{ duration: 0.3, ease: "easeInOut" }}
                                 >
-                                    <div className="bg-white border border-neutral-200 rounded-xl shadow-sm hover:shadow-md transition p-4">
+                                    <Link
+                                        href={`/position/apply/${job._id}`}
+                                        className="block"
+                                    >
+                                        <div className="bg-white border border-neutral-200 rounded-xl shadow-sm hover:shadow-md transition p-4">
 
-                                        {/* COMPANY */}
-                                        <div className="font-semibold text-sm text-neutral-900 mb-1">
-                                            Company: {job.company}
-                                        </div>
+                                            {/* COMPANY */}
+                                            <div className="font-semibold text-sm text-neutral-900 mb-1">
+                                                Company: {job.company}
+                                            </div>
 
-                                        {/* TITLE */}
-                                        <div className="text-base font-medium text-neutral-800 mb-2">
-                                            Position: {job.title}
-                                        </div>
+                                            {/* TITLE */}
+                                            <div className="text-base font-medium text-neutral-800 mb-2">
+                                                Position: {job.title}
+                                            </div>
 
-                                        {/* META ROW */}
-                                        <div className="flex flex-wrap gap-2 text-xs text-neutral-600 mb-3">
+                                            {/* META ROW */}
+                                            <div className="flex flex-wrap gap-2 text-xs text-neutral-600 mb-3">
 
-                                        <span className="flex items-center gap-1">
-                                            📍 {job.location}
-                                        </span>
-
-                                            <span className="px-2 py-0.5 rounded-full bg-green-50 text-green-700">
-                                            ${job.pay.min}–${job.pay.max}/hr
-                                        </span>
-
-                                            <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">
-                                            {job.relocation}
-                                        </span>
-
-                                            <span className="px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700">
-                                            {job.type}
-                                        </span>
-
-                                            {job.overtime && (
-                                                <span className="px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-700">
-                                                {job.overtime}
+                                            <span className="flex items-center gap-1">
+                                                📍 {job.location}
                                             </span>
-                                            )}
+
+                                                <span className="px-2 py-0.5 rounded-full bg-green-50 text-green-700">
+                                                ${job.pay.min}–${job.pay.max}/hr
+                                            </span>
+
+                                                <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">
+                                                {job.relocation}
+                                            </span>
+
+                                                <span className="px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700">
+                                                {job.type}
+                                            </span>
+
+                                                {job.overtime && (
+                                                    <span className="px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-700">
+                                                    {job.overtime}
+                                                </span>
+                                                )}
+                                            </div>
+
+                                            {/* FOOTER DATE */}
+                                            <div className="text-xs text-neutral-500">
+                                                {formatLocalDate(job.createdAt)}
+                                            </div>
+
                                         </div>
-
-                                        {/* FOOTER DATE */}
-                                        <div className="text-xs text-neutral-500">
-                                            {formatLocalDate(job.createdAt)}
-                                        </div>
-
-                                    </div>
-                                </Link>
-                            </motion.div>
-                        ))}
-                    </AnimatePresence>
-
-                </div>
+                                    </Link>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                    </div>
+                )}
             </div>
         </div>
     );

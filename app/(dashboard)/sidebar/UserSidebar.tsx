@@ -14,9 +14,14 @@ interface UserSidebarProps {
     loading: boolean;
     onLinkClick?: () => void;
     seenQuestions?: SeenQuestionsType;
+
+    platformStats?: {
+        total_users: number;
+        users_visited_today: number;
+    };
 }
 
-export default function UserSidebar({ userPercentage, nickname, isEmployer, totalOnlineTime, loading, onLinkClick, seenQuestions }: UserSidebarProps) {
+export default function UserSidebar({ userPercentage, platformStats, nickname, isEmployer, totalOnlineTime, loading, onLinkClick, seenQuestions }: UserSidebarProps) {
     const { data: session } = useSession();
     const router = useRouter(); // ✅ must be inside component
 
@@ -32,6 +37,7 @@ export default function UserSidebar({ userPercentage, nickname, isEmployer, tota
                 totalOnlineTime={totalOnlineTime}
                 loading={loading}
                 onLinkClick={onLinkClick}
+                platformStats={platformStats}
             />
 
         </aside>

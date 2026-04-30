@@ -23,6 +23,11 @@ interface UserStatsProps {
     seenQuestions?: SeenQuestionsType;
     onRefreshStats?: () => void;
     isEmployer: boolean;
+
+    platformStats?: {
+        total_users: number;
+        users_visited_today: number;
+    };
 }
 
 
@@ -129,12 +134,12 @@ function PercentageBar({ correct, total }: { correct: number; total: number }) {
 
             <span className="flex items-center gap-4 text-black text-sm italic mb-2">
                 <span>Aim for</span>
-                <span className="text-green-500 font-semibold">70%</span>
+                <span className="text-green-500 font-semibold">80%</span>
             </span>
 
             <div className="w-full h-5 bg-white/10 rounded-xl overflow-hidden backdrop-blur-sm border border-black/10 relative">
 
-                {/* 🎯 70% marker */}
+                {/* 🎯 80% marker */}
                 <div
                     style={{ left: "70%" }}
                     className="absolute top-0 h-full w-[2px] bg-white/30"
@@ -178,18 +183,7 @@ function formatTime(seconds: number) {
 }
 
 
-function NicknameLoading() {
-    return (
-        <span className="flex items-center space-x-1">
-      <span>Loading</span>
-      <span className="flex space-x-1">
-        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
-        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
-      </span>
-    </span>
-    );
-}
+
 
 function PercentageLoading() {
     return <DotLoader />;
@@ -214,7 +208,7 @@ function TimeLoading() {
 
 
 
-export default function UserStats({ nickname, loading, onLinkClick, seenQuestions, isEmployer }: UserStatsProps) {
+export default function UserStats({ nickname, platformStats, loading, onLinkClick, seenQuestions, isEmployer }: UserStatsProps) {
     const { data: session } = useSession();
     const router = useRouter(); // <-- initialize router here
     const [showStats, setShowStats] = useState(false);
@@ -244,6 +238,39 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                         `;
 
 
+
+
+
+
+
+
+
+
+
+    function StatLoaderIcon() {
+        return (
+            <svg
+                className="w-4 h-4 animate-spin text-black/40"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+            >
+                <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                />
+                <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v3a5 5 0 00-5 5H4z"
+                />
+            </svg>
+        );
+    }
 
 
 
@@ -321,16 +348,20 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                         </svg>
 
                         {/* Nickname text */}
-                        <span className="lg:group-hover:text-blue-400 ">
-                          {loading
-                              ? <NicknameLoading />
-                              : nickname ?? session?.user?.name ?? "User"}
+                        <span className="lg:group-hover:text-blue-400 flex items-center">
+                            {loading ? (
+                                <span className="flex items-center justify-center w-6 h-6">
+                                    <StatLoaderIcon />
+                                </span>
+                            ) : (
+                                nickname ?? session?.user?.name ?? "User"
+                            )}
                         </span>
                     </div>
 
 
                     <svg
-                        className={`w-4 h-4 ml-2 transition-transform duration-200 ${showStats ? "rotate-180" : ""}`}
+                        className={`w-4 h-4 transition-transform duration-200 ${showStats ? "rotate-180" : ""}`}
                         fill="none"
                         stroke="currentColor"
                         strokeWidth={2}
@@ -351,7 +382,7 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: "auto" }}
                             exit={{ opacity: 0, height: 0 }}
-                            className="flex flex-col pl-9 space-y-2"
+                            className="flex flex-col pl-3 space-y-2"
                         >
                             {/* ✅ Stats Table */}
                             {loading ? (
@@ -389,13 +420,93 @@ export default function UserStats({ nickname, loading, onLinkClick, seenQuestion
 
                                 </div>
                             ) : (
-                                <div className="text-black">No questions answered yet</div>
+                                <div className="text-black">No questions yet</div>
                             )}
                         </motion.div>
                     )}
                 </AnimatePresence>
 
             </div>
+
+
+
+
+
+
+
+
+            {/* PLATFORM STATS (inline like sidebar items) */}
+            {platformStats && (
+                <div className="flex flex-col w-full">
+
+                    {/* Total users */}
+                    <div className={`${sidebarLink} group flex items-center gap-2`}>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-5 h-5 transition-colors group-hover:text-blue-400"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M15.75 6.75a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.25a7.5 7.5 0 0 1 15 0"
+                            />
+                        </svg>
+
+                        <span className="flex items-center gap-3 group-hover:text-blue-400 transition-colors">
+                            Total users:
+                                                {loading ? (
+                                                    <StatLoaderIcon />
+                                                ) : (
+                                                    <span className="font-medium text-black group-hover:text-blue-400 transition-colors">
+                                    {platformStats.total_users}
+                                </span>
+                                                )}
+                        </span>
+                    </div>
+
+                    {/* Today visitors */}
+                    <div className={`${sidebarLink} group flex items-center gap-2`}>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-5 h-5 transition-colors group-hover:text-blue-400"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M3 3v18h18M7 14l3-3 4 4 5-5"
+                            />
+                        </svg>
+
+                        <span className="flex items-center gap-3 group-hover:text-blue-400 transition-colors">
+                            {new Date().toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                            })} visitors:
+
+                            {loading ? (
+                                <StatLoaderIcon />
+                            ) : (
+                                <span className="font-medium group-hover:text-blue-400 transition-colors">
+                                            {platformStats.users_visited_today}
+                                        </span>
+                                                        )}
+                                </span>
+                    </div>
+
+                </div>
+            )}
+
+
+
+
 
 
 

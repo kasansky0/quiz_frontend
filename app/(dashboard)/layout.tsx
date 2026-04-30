@@ -38,6 +38,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const [activeSheet, setActiveSheet] = useState<MobileSheet>(null);
     const { showError } = useError();
 
+    const [platformStats, setPlatformStats] = useState<{
+        total_users: number;
+        users_visited_today: number;
+    }>({
+        total_users: 0,
+        users_visited_today: 0,
+    });
+
 
     useEffect(() => {
         if (userStats?.user_id) {
@@ -264,6 +272,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             const data = await res.data;
             setUserStats(data);
+            setPlatformStats({
+                total_users: data?.platform_stats?.total_users ?? 0,
+                users_visited_today: data?.platform_stats?.users_visited_today ?? 0,
+            });
             setErrorState(null); // clear previous error
         } catch (err: any) {
             // Network failure → show error but keep dashboard
@@ -565,7 +577,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             <img
                                 src="/images/android-chrome-512x512.png"
                                 alt="Left decoration"
-                                className="h-8 w-8 rounded-lg"
+                                className="h-7 w-7 rounded-lg"
                             />
                         </button>
                     </div>
@@ -790,6 +802,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                 loading={loading || !userStats}
                                 onLinkClick={() => {}}
                                 isEmployer={isEmployer}
+                                platformStats={platformStats}
                             />
                         </div>
                     </aside>
@@ -848,6 +861,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                 totalOnlineTime={onlineTime}
                                 loading={loading || !userStats}
                                 onLinkClick={() => setActiveSheet(null)}
+                                platformStats={platformStats}
                             /> }
 
                             {activeSheet === "calculator" && <Calculator mobile />}
