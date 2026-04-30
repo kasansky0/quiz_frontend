@@ -559,83 +559,177 @@ export default function ChatStats() {
                                 }`}
                             >
                                 <div className="space-y-2 w-full">
-                                    {filteredPosts.map(post => (
-                                        <div
-                                            key={post.id}
-                                            onClick={() => handleActivatePost(post)}
-                                            className={`
-                                            relative cursor-pointer
-                                            rounded-2xl p-3 w-full
+                                    {filteredPosts.map(post => {
+                                        const netaLevel = post.neta4 ? 4 : post.neta3 ? 3 : post.neta2 ? 2 : null;
+                                        return (
+                                            <div
+                                                key={post.id}
+                                                onClick={() => handleActivatePost(post)}
+                                                className={`
+                                                relative cursor-pointer
+                                                rounded-2xl p-3 w-full
+    
+                                                bg-white backdrop-blur-xl
+                                                border border-black/5
+    
+                                                shadow-sm hover:shadow-md
+                                                hover:border-black/10
+                                                hover:translate-y-[-1px]
+    
+                                                transition-all duration-200
+                                                active:scale-[0.99]
+    
+                                                ${newCommentPosts.has(post.id)
+                                                    ? "ring-1 ring-yellow-400/40 bg-yellow-400/10"
+                                                    : "hover:bg-black-300/40"
+                                                }
+                                            `}
+                                            >
+                                                <div className="flex items-center mb-0.5 w-full">
+                                                    <div className="flex items-center gap-2 truncate w-full">
 
-                                            bg-white backdrop-blur-xl
-                                            border border-black/5
 
-                                            shadow-sm hover:shadow-md
-                                            hover:border-black/10
-                                            hover:translate-y-[-1px]
 
-                                            transition-all duration-200
-                                            active:scale-[0.99]
 
-                                            ${newCommentPosts.has(post.id)
-                                                ? "ring-1 ring-yellow-400/40 bg-yellow-400/10"
-                                                : "hover:bg-black-300/40"
-                                            }
-                                        `}
-                                        >
-                                            <div className="flex items-center mb-0.5 w-full">
-                                                <div className="flex items-center gap-2 truncate w-full">
-                                                <span className="flex items-center gap-1 text-sm sm:text-sm md:text-base font-bold truncate text-blue-400">
-                                                    {post.nickname}
 
-                                                    {userId && post.userId === userId && (
-                                                        <span className="ml-1 w-1.5 h-1.5 rounded-full bg-amber-500 opacity-80" />
-                                                    )}
-                                                </span>
 
-                                                    <div className="flex items-center justify-center bg-black-200 backdrop-blur-xl border border-black/10 rounded-full shadow-lg px-2 h-5 min-w-[40px] truncate">
-                                                        <svg
-                                                            aria-hidden="true"
-                                                            className="w-3 h-3 mr-1 text-black"
-                                                            fill="currentColor"
-                                                            viewBox="0 0 20 20"
-                                                        >
-                                                            <path d="M10 1a9 9 0 00-9 9c0 1.947.79 3.58 1.935 4.957L.231 17.661A.784.784 0 00.785 19H10a9 9 0 009-9 9 9 0 00-9-9zm0 16.2H6.162c-.994.004-1.907.053-3.045.144l-.076-.188a36.981 36.981 0 002.328-2.087l-1.05-1.263C3.297 12.576 2.8 11.331 2.8 10c0-3.97 3.23-7.2 7.2-7.2s7.2 3.23 7.2 7.2-3.23 7.2-7.2 7.2z" />
-                                                        </svg>
 
-                                                        <span className="text-black text-sm font-medium">
-                                                        {post.commentCount ?? 0}
-                                                    </span>
 
-                                                        {newCommentPosts.has(post.id) && (
-                                                            <span className="ml-1 text-yellow-400 text-sm font-semibold">
-                                                            +1
-                                                        </span>
-                                                        )}
 
-                                                        {post.pinned && (
+
+
+
+
+
+
+
+
+                                                        <span className="flex items-center gap-1 text-sm sm:text-sm md:text-base font-bold truncate text-blue-400">
+                                                            {/* NETA BADGE */}
+                                                            {netaLevel && (
+                                                                <span
+                                                                    title={`NETA Level ${netaLevel} Verified`}
+                                                                    className="flex items-center justify-center flex-shrink-0"
+                                                                >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 64 64"
+                    className="w-5 h-5"
+                >
+                    {/* Outer hex */}
+                    <polygon
+                        points="32,4 56,18 56,46 32,60 8,46 8,18"
+                        fill="currentColor"
+                        className={
+                            netaLevel === 4
+                                ? "text-blue-500"
+                                : netaLevel === 3
+                                    ? "text-purple-500"
+                                    : "text-green-600"
+                        }
+                    />
+
+                    {/* Inner */}
+                    <polygon
+                        points="32,10 50,21 50,43 32,54 14,43 14,21"
+                        fill="white"
+                    />
+
+                    {/* Text */}
+                    <text
+                        x="32"
+                        y="38"
+                        textAnchor="middle"
+                        fontSize="18"
+                        fontWeight="900"
+                        fill={
+                            netaLevel === 4
+                                ? "#3b82f6" // blue
+                                : netaLevel === 3
+                                    ? "#8b5cf6" // violet
+                                    : "#22c55e" // green
+                        }
+                        fontFamily="Arial, sans-serif"
+                    >
+                        {netaLevel === 4 ? "N4" : netaLevel === 3 ? "N3" : "N2"}
+                    </text>
+                </svg>
+            </span>
+                                                            )}
+
+                                                            {/* Nickname */}
+                                                            <span className="truncate">{post.nickname}</span>
+
+                                                            {/* Your own user dot */}
+                                                            {userId && post.userId === userId && (
+                                                                <span className="ml-1 w-1.5 h-1.5 rounded-full bg-amber-500 opacity-80" />
+                                                            )}
+    </span>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                        <div className="flex items-center justify-center bg-black-200 backdrop-blur-xl border border-black/10 rounded-full shadow-lg px-2 h-5 min-w-[40px] truncate">
                                                             <svg
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                viewBox="0 0 24 24"
+                                                                aria-hidden="true"
+                                                                className="w-3 h-3 mr-1 text-black"
                                                                 fill="currentColor"
-                                                                className="w-3 h-3 ml-1 text-green-800 opacity-90"
+                                                                viewBox="0 0 20 20"
                                                             >
-                                                                <path d="M6 2a2 2 0 00-2 2v18l8-5 8 5V4a2 2 0 00-2-2H6z"/>
+                                                                <path d="M10 1a9 9 0 00-9 9c0 1.947.79 3.58 1.935 4.957L.231 17.661A.784.784 0 00.785 19H10a9 9 0 009-9 9 9 0 00-9-9zm0 16.2H6.162c-.994.004-1.907.053-3.045.144l-.076-.188a36.981 36.981 0 002.328-2.087l-1.05-1.263C3.297 12.576 2.8 11.331 2.8 10c0-3.97 3.23-7.2 7.2-7.2s7.2 3.23 7.2 7.2-3.23 7.2-7.2 7.2z" />
                                                             </svg>
-                                                        )}
+
+                                                            <span className="text-black text-sm font-medium">
+                                                            {post.commentCount ?? 0}
+                                                        </span>
+
+                                                            {newCommentPosts.has(post.id) && (
+                                                                <span className="ml-1 text-yellow-400 text-sm font-semibold">
+                                                                +1
+                                                            </span>
+                                                            )}
+
+                                                            {post.pinned && (
+                                                                <svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    viewBox="0 0 24 24"
+                                                                    fill="currentColor"
+                                                                    className="w-3 h-3 ml-1 text-green-800 opacity-90"
+                                                                >
+                                                                    <path d="M6 2a2 2 0 00-2 2v18l8-5 8 5V4a2 2 0 00-2-2H6z"/>
+                                                                </svg>
+                                                            )}
+                                                        </div>
                                                     </div>
+
+                                                    <span className="text-black text-sm sm:text-sm md:text-base ml-auto whitespace-nowrap">
+                                                    {formatLocalDate(post.timestamp, post.edited)}
+                                                </span>
                                                 </div>
 
-                                                <span className="text-black text-sm sm:text-sm md:text-base ml-auto whitespace-nowrap">
-                                                {formatLocalDate(post.timestamp, post.edited)}
-                                            </span>
+                                                <h3 className="text-black font-bold mb-0.5 text-sm sm:text-base md:text-base line-clamp-2">
+                                                    {post.title}
+                                                </h3>
                                             </div>
-
-                                            <h3 className="text-black font-bold mb-0.5 text-sm sm:text-base md:text-base line-clamp-2">
-                                                {post.title}
-                                            </h3>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
 

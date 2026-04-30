@@ -14,6 +14,9 @@ export interface Comment {
     _isLocal?: boolean;  // used in useEffect to keep local-only comments
     deleted?: boolean;   // used in handleDeleteComment to filter out deleted comments
     reactions?: { id?: string; emoji: string }[]; // optional reactions array
+    neta2?: boolean;
+    neta3?: boolean;
+    neta4?: boolean;
 }
 
 export interface Post {
@@ -29,6 +32,9 @@ export interface Post {
     pinned?: boolean;
     commentCount?: number;
     totalComments: number;
+    neta2?: boolean;
+    neta3?: boolean;
+    neta4?: boolean;
 }
 
 export function usePosts(initialPosts: Post[] = []) {

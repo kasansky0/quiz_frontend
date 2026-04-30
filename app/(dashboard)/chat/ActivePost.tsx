@@ -106,6 +106,64 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
 
 
+    function NetaInline({ user }: { user: any }) {
+        const level = user?.neta4 ? 4 : user?.neta3 ? 3 : user?.neta2 ? 2 : null;
+
+        if (!level) return null;
+
+        return (
+            <span className="flex items-center justify-center flex-shrink-0">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 64 64"
+                className="w-5 h-5"
+            >
+                {/* Outer hex */}
+                <polygon
+                    points="32,4 56,18 56,46 32,60 8,46 8,18"
+                    fill="currentColor"
+                    className={
+                        level === 4
+                            ? "text-blue-500"
+                            : level === 3
+                                ? "text-purple-500"
+                                : "text-green-600"
+                    }
+                />
+
+                {/* Inner */}
+                <polygon
+                    points="32,10 50,21 50,43 32,54 14,43 14,21"
+                    fill="white"
+                />
+
+                {/* Text */}
+                <text
+                    x="32"
+                    y="38"
+                    textAnchor="middle"
+                    fontSize="18"
+                    fontWeight="900"
+                    fill={
+                        level === 4
+                            ? "#3b82f6"
+                            : level === 3
+                                ? "#8b5cf6"
+                                : "#22c55e"
+                    }
+                    fontFamily="Arial, sans-serif"
+                >
+                    {level === 4 ? "N4" : level === 3 ? "N3" : "N2"}
+                </text>
+            </svg>
+        </span>
+        );
+    }
+
+
+
+
+
 
 
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -1037,14 +1095,20 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
                                 <div className="flex justify-between items-center pb-3">
                                     {/* Nickname on the left */}
-                                    <div className="flex items-center justify-center">
-                                        <span className="flex items-center gap-1 text-sm sm:text-sm md:text-base font-semibold truncate text-blue-400">
-                                            {activePost.nickname}
+                                    <div className="flex items-center gap-2">
 
-                                            {userId && post.userId === userId && (
-                                                <span className="ml-1 w-1.5 h-1.5 rounded-full bg-amber-500 opacity-80" />
-                                            )}
+                                        {/* BADGE */}
+                                        <NetaInline user={activePost} />
+
+                                        {/* NICKNAME */}
+                                        <span className="text-sm sm:text-sm md:text-base font-semibold truncate text-blue-400">
+                                            {activePost.nickname}
                                         </span>
+
+                                        {/* OWNER DOT */}
+                                        {userId && activePost.userId === userId && (
+                                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 opacity-80 flex-shrink-0" />
+                                        )}
                                     </div>
 
 
@@ -1329,24 +1393,22 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                     >
                                                         {/* nickname + edit/delete */}
                                                         <div className="flex justify-between gap-5 mb-1">
-                                                                            <span
-                                                                                className="flex items-center gap-1 text-sm sm:text-sm md:text-base font-bold truncate text-blue-400">
-                                                                                    {comment.nickname}
+                                                            <div className="flex items-center gap-2 text-sm sm:text-sm md:text-base font-bold text-blue-400">
 
-                                                                                {/* reactions go here */}
-                                                                                {(comment.reactions?.length ?? 0) > 0 && (
-                                                                                    <span className="ml-2 flex gap-1">
-                                                                                        {comment.reactions?.map((r, idx) => (
-                                                                                            <span
-                                                                                                key={`${r.emoji}-${idx}`}>{r.emoji}</span>
-                                                                                        ))}
-                                                                                    </span>
-                                                                                )}
+                                                                {/* BADGE */}
+                                                                <NetaInline user={comment} />
 
-                                                                                {isOwner && (
-                                                                                    <span className="ml-1 w-1.5 h-1.5 rounded-full bg-amber-500 opacity-80" />
-                                                                                )}
-                                                                            </span>
+                                                                {/* NICKNAME */}
+                                                                <span className="truncate min-w-0">
+                                                                    {comment.nickname}
+                                                                </span>
+
+                                                                {/* DOT */}
+                                                                {isOwner && (
+                                                                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 opacity-80 flex-shrink-0" />
+                                                                )}
+
+                                                            </div>
 
                                                             {isOwner && (
                                                                 <div
