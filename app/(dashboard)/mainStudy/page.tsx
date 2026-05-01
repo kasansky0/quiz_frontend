@@ -26,7 +26,7 @@ export default function MainStudyPage() {
         if (tokenExpired) {
             // Only show once
             if (!localStorage.getItem("tokenExpiredShown")) {
-                showError?.("Oops! You need to log in again. 🙄", true);
+                showError?.("You need to log in again.", true);
                 localStorage.setItem("tokenExpiredShown", "true");
             }
         } else {

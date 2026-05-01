@@ -33,7 +33,7 @@ export default function SubscribeButton() {
             if (!res.ok) {
                 // 🔥 KEY PART: detect auth issue
                 if (res.status === 401 || res.status === 403 || !token) {
-                    showError("Oops! You need to log in again. 🤠", true);
+                    showError("You need to log in again.", true);
                     return;
                 }
 

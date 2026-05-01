@@ -41,8 +41,8 @@ export function useSubjectById(apiUrl: string, subjectId: string, token?: string
 
         if (!token) {
             setLoading(false);
-            setError("Oops! You need to log in again to continue. 🙂‍↔️");
-            showError("Oops! You need to log in again. 🤔", true);
+            setError("You need to log in again️.");
+            showError("You need to log in again.", true);
             return;
         }
 
@@ -64,7 +64,7 @@ export function useSubjectById(apiUrl: string, subjectId: string, token?: string
                 }
 
                 if (!res.ok) {
-                    showError("Oops! You need to log in again. 🥸", true);
+                    showError("You need to log in again.", true);
                 }
 
                 const data: Subject = await res.json();

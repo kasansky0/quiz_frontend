@@ -142,7 +142,7 @@ export default function QuizSampleSection({
             }
 
             if (!token) {
-                showError("Oops! You need to log in again. 🫣", true);
+                showError("You need to log in again.", true);
                 return null;
             }
 

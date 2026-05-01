@@ -65,7 +65,7 @@ export default function ChatStats() {
     const fetchPosts = async (skip: number, limit: number) => {
         if (!session?.idToken) {
             setShowLoading(true);
-            showError("Oops! You need to log in again. 😵‍💫", true);
+            showError("You need to log in again.", true);
             return { posts: [], total: 0, error: "no_session" };
         }
 
@@ -112,7 +112,7 @@ export default function ChatStats() {
             if (data.error === "offline") return;
             setServerError(data.error);
             setShowLoading(true);
-            showError("Oops! You need to log in again. 🤨", true);
+            showError("You need to log in again.", true);
             return;
         }
 
@@ -167,7 +167,7 @@ export default function ChatStats() {
     // --- COMMENTS POLLING ---
     const commentsFetcher = async (url: string) => {
         if (!session?.idToken) {
-            showError("Oops! You need to log in again. 🫩", true);
+            showError("You need to log in again.", true);
             return [];
         }
         const res = await fetch(url, {
@@ -216,7 +216,7 @@ export default function ChatStats() {
 
     const handleSessionExpired = async () => {
         setShowLoading(true);
-        showError("Oops! You need to log in again. 😷", true);
+        showError("You need to log in again.", true);
     };
 
     function LoggedOut() {
@@ -340,7 +340,7 @@ export default function ChatStats() {
 
     const handleCreatePost = async ({ title, message }: { title: string; message: string }) => {
         if (!session?.idToken) {
-            showError("Oops! You need to log in again. 🇪🤯", true);
+            showError("You need to log in again.", true);
             return;
         }
 

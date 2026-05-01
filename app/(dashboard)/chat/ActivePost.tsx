@@ -281,7 +281,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
         } catch (err) {
             setShowLoading(true);
-            showError("Oops! You need to log in again.😎", true);
+            showError("You need to log in again.", true);
             router.push("/info");
         }
     };
@@ -456,7 +456,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
         if (!userId || !session?.idToken) {
             setShowLoading(true);
-            showError("Oops! You need to log in again. 😨", true)
+            showError("You need to log in again.", true)
             // optionally include a login button in banner
             return;
         }
@@ -477,7 +477,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             // Handle null / network failure
             if (!res) {
                 setShowLoading(true);
-                showError("Oops! You need to log in again. 😠", true);
+                showError("You need to log in again.", true);
                 showStatusBanner("Failed to send comment", "error");
                 return;
             }
@@ -518,7 +518,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 // 🔴 AUTH / SESSION EXPIRED
                 if (type === "auth" || res.status === 401) {
                     setShowLoading(true);
-                    showError("Oops! You need to log in again. 🫡", true);
+                    showError("You need to log in again.", true);
                     return;
                 }
 
@@ -547,7 +547,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         } catch (err: any) {
             console.error("Failed to post comment:", err);
             setShowLoading(true);
-            showError("Oops! You need to log in again. 😞", true);
+            showError("You need to log in again.", true);
         }
     };
 
@@ -642,7 +642,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 setActivePost(prev =>
                     prev ? { ...prev, comments: previousComments } : prev
                 );
-                showError("Oops! You need to log in again.😎", true);
+                showError("You need to log in again.", true);
             }
         } catch (err) {
             setDeletedCommentIds(prev => {
@@ -692,7 +692,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             if (!res.success) {
                 if (res.status === 401) {
                     setShowLoading(true);
-                    showError("Oops! You need to log in again. 😀", true);
+                    showError("You need to log in again.", true);
                     return;
                 }
                 showError("We couldn't update your comment. Please try again.");
@@ -721,7 +721,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         if (!res.success) {
             if (res.status === 401) {
                 setShowLoading(true);
-                showError("Oops! You need to log in again. 😖", true);
+                showError("You need to log in again.", true);
                 return;
             }
             showError("We couldn't update your comment. Please try again.");
@@ -807,7 +807,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             if (!res.success) {
                 if (res.status === 401) {
                     setShowLoading(true);
-                    showError("Oops! You need to log in again. 🤪", true);
+                    showError("You need to log in again.", true);
                     return;
                 }
                 showError("We couldn't delete the post. Please try again.");
@@ -862,7 +862,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             if (!res.success) {
                 if (res.status === 401) {
                     setShowLoading(true);
-                    showError("Oops! You need to log in again. 🥳", true);
+                    showError("You need to log in again.", true);
                     return;
                 }
                 showError("We couldn't save your changes. Please try again.");

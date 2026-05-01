@@ -34,7 +34,7 @@ export default function HireSubscribeButton() {
 
             if (!res.ok) {
                 if (res.status === 401 || res.status === 403 || !token) {
-                    showError("Oops! You need to log in again. 🤠", true);
+                    showError("You need to log in again.", true);
                     return;
                 }
 

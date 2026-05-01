@@ -44,7 +44,7 @@ export function useSubjects(apiUrl: string, mainTopic: string, token?: string) {
 
             if (!res.ok) {
                 setSubscriptionRequired(true);   // ✅ set flag
-                showError("Oops! You need to log in again. 🥰", true);
+                showError("You need to log in again.", true);
                 return;
             }
 

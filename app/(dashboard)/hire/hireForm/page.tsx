@@ -103,7 +103,7 @@ export default function HireFormPage() {
         e.preventDefault();
 
         if (!token) {
-            showError("Oops! You need to log in again. 🤨", true);
+            showError("You need to log in again.", true);
             return;
         }
 
