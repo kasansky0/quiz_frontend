@@ -118,38 +118,45 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 viewBox="0 0 64 64"
                 className="w-5 h-5"
             >
-                {/* Outer hex */}
-                <polygon
-                    points="32,4 56,18 56,46 32,60 8,46 8,18"
-                    fill="currentColor"
-                    className={
+                {/* Outer rounded square */}
+                <rect
+                    x="6"
+                    y="6"
+                    width="52"
+                    height="52"
+                    rx="14"
+                    fill={
                         level === 4
-                            ? "text-blue-500"
+                            ? "#facc15" // gold
                             : level === 3
-                                ? "text-purple-500"
-                                : "text-green-600"
+                                ? "#8b5cf6" // purple
+                                : "#22c55e" // green
                     }
                 />
 
                 {/* Inner */}
-                <polygon
-                    points="32,10 50,21 50,43 32,54 14,43 14,21"
+                <rect
+                    x="14"
+                    y="14"
+                    width="36"
+                    height="36"
+                    rx="10"
                     fill="white"
                 />
 
                 {/* Text */}
                 <text
                     x="32"
-                    y="38"
+                    y="39"
                     textAnchor="middle"
                     fontSize="18"
                     fontWeight="900"
                     fill={
                         level === 4
-                            ? "#3b82f6"
+                            ? "#ca8a04" // darker gold
                             : level === 3
-                                ? "#8b5cf6"
-                                : "#22c55e"
+                                ? "#8b5cf6" // purple
+                                : "#16a34a" // darker green
                     }
                     fontFamily="Arial, sans-serif"
                 >

@@ -611,50 +611,57 @@ export default function ChatStats() {
                                                                     title={`NETA Level ${netaLevel} Verified`}
                                                                     className="flex items-center justify-center flex-shrink-0"
                                                                 >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 64 64"
-                    className="w-5 h-5"
-                >
-                    {/* Outer hex */}
-                    <polygon
-                        points="32,4 56,18 56,46 32,60 8,46 8,18"
-                        fill="currentColor"
-                        className={
-                            netaLevel === 4
-                                ? "text-blue-500"
-                                : netaLevel === 3
-                                    ? "text-purple-500"
-                                    : "text-green-600"
-                        }
-                    />
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        viewBox="0 0 64 64"
+                                                                        className="w-5 h-5"
+                                                                    >
+                                                                        {/* Outer rounded square */}
+                                                                        <rect
+                                                                            x="6"
+                                                                            y="6"
+                                                                            width="52"
+                                                                            height="52"
+                                                                            rx="14"
+                                                                            fill={
+                                                                                netaLevel === 4
+                                                                                    ? "#facc15" // gold
+                                                                                    : netaLevel === 3
+                                                                                        ? "#8b5cf6" // purple
+                                                                                        : "#22c55e" // green
+                                                                            }
+                                                                        />
 
-                    {/* Inner */}
-                    <polygon
-                        points="32,10 50,21 50,43 32,54 14,43 14,21"
-                        fill="white"
-                    />
+                                                                        {/* Inner */}
+                                                                        <rect
+                                                                            x="14"
+                                                                            y="14"
+                                                                            width="36"
+                                                                            height="36"
+                                                                            rx="10"
+                                                                            fill="white"
+                                                                        />
 
-                    {/* Text */}
-                    <text
-                        x="32"
-                        y="38"
-                        textAnchor="middle"
-                        fontSize="18"
-                        fontWeight="900"
-                        fill={
-                            netaLevel === 4
-                                ? "#3b82f6" // blue
-                                : netaLevel === 3
-                                    ? "#8b5cf6" // violet
-                                    : "#22c55e" // green
-                        }
-                        fontFamily="Arial, sans-serif"
-                    >
-                        {netaLevel === 4 ? "N4" : netaLevel === 3 ? "N3" : "N2"}
-                    </text>
-                </svg>
-            </span>
+                                                                        {/* Text */}
+                                                                        <text
+                                                                            x="32"
+                                                                            y="39"
+                                                                            textAnchor="middle"
+                                                                            fontSize="18"
+                                                                            fontWeight="900"
+                                                                            fill={
+                                                                                netaLevel === 4
+                                                                                    ? "#ca8a04"
+                                                                                    : netaLevel === 3
+                                                                                        ? "#8b5cf6"
+                                                                                        : "#16a34a"
+                                                                            }
+                                                                            fontFamily="Arial, sans-serif"
+                                                                        >
+                                                                            {netaLevel === 4 ? "N4" : netaLevel === 3 ? "N3" : "N2"}
+                                                                        </text>
+                                                                    </svg>
+                                                                </span>
                                                             )}
 
                                                             {/* Nickname */}
@@ -664,7 +671,7 @@ export default function ChatStats() {
                                                             {userId && post.userId === userId && (
                                                                 <span className="ml-1 w-1.5 h-1.5 rounded-full bg-amber-500 opacity-80" />
                                                             )}
-    </span>
+                                                        </span>
 
 
 

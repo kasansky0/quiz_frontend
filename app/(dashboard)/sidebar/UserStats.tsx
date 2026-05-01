@@ -485,20 +485,23 @@ export default function UserStats({ nickname, platformStats, loading, onLinkClic
                             />
                         </svg>
 
-                        <span className="flex items-center gap-3 group-hover:text-blue-400 transition-colors">
-                            {new Date().toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                            })} visitors:
+                        <span className="flex items-center gap-1 group-hover:text-blue-400 transition-colors">
+                            <span className="font-bold">
+                                {new Date().toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                })}
+                            </span>
+                            Visitors:
 
                             {loading ? (
                                 <StatLoaderIcon />
                             ) : (
                                 <span className="font-medium group-hover:text-blue-400 transition-colors">
-                                            {platformStats.users_visited_today}
-                                        </span>
+                                        {platformStats.users_visited_today}
+                                    </span>
                                                         )}
-                                </span>
+                            </span>
                     </div>
 
                 </div>
