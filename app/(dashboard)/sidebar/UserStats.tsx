@@ -457,7 +457,7 @@ export default function UserStats({ nickname, platformStats, loading, onLinkClic
                             />
                         </svg>
 
-                        <span className="flex items-center gap-3 group-hover:text-blue-400 transition-colors">
+                        <span className="flex items-center gap-1.5 group-hover:text-blue-400 transition-colors">
                             Total users:
                                                 {loading ? (
                                                     <StatLoaderIcon />
@@ -486,14 +486,9 @@ export default function UserStats({ nickname, platformStats, loading, onLinkClic
                             />
                         </svg>
 
-                        <span className="flex items-center gap-1 group-hover:text-blue-400 transition-colors">
-                            <span className="font-bold">
-                                {new Date().toLocaleDateString("en-US", {
-                                    month: "short",
-                                    day: "numeric",
-                                })}
-                            </span>
-                            Visitors:
+                        <span className="flex items-center gap-1.5 group-hover:text-blue-400 transition-colors">
+
+                            Active users (24h):
 
                             {loading ? (
                                 <StatLoaderIcon />
@@ -502,7 +497,7 @@ export default function UserStats({ nickname, platformStats, loading, onLinkClic
                                         {platformStats.users_visited_today}
                                     </span>
                                                         )}
-                            </span>
+                        </span>
                     </div>
 
                 </div>

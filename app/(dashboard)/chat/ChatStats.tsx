@@ -29,7 +29,13 @@ export default function ChatStats() {
     const router = useRouter();
     const [loggedOut, setLoggedOut] = useState(false);
     const {showError, hideError} = useError();
-    const handleBackToList = () => setActivePost(null);
+    const handleBackToList = () => {
+        setActivePost(null);
+
+        requestAnimationFrame(() => {
+            window.scrollTo(0, scrollY);
+        });
+    };
     const [listFade, setListFade] = useState(false);
     const [activePostComments, setActivePostComments] = useState<Comment[]>([]);
     const [serverError, setServerError] = useState<string | null>(null);
@@ -42,6 +48,7 @@ export default function ChatStats() {
     const [totalPosts, setTotalPosts] = useState(0);
     const [loadingMore, setLoadingMore] = useState(false);
     const [newCommentPosts, setNewCommentPosts] = useState<Set<string>>(new Set());
+    const [scrollY, setScrollY] = useState(0);
 
     const showOverlay = showLoading || !!serverError;
 
@@ -204,6 +211,7 @@ export default function ChatStats() {
     }, [polledComments]);
 
     const handleActivatePost = (post: Post) => {
+        setScrollY(window.scrollY);
         setActivePost(post);
         setActivePostComments([]);
 
@@ -211,6 +219,10 @@ export default function ChatStats() {
             const next = new Set(prev);
             next.delete(post.id);
             return next;
+        });
+
+        requestAnimationFrame(() => {
+            window.scrollTo(0, 0);
         });
     };
 
