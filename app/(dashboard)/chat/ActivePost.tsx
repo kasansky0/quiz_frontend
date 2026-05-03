@@ -11,6 +11,7 @@ import { fetchWithToken } from "@/app/hooks/refreshToken";
 import StatusBanner from "@/app/positiveBanner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import StatLoaderIcon from "@/components/ui/StatLoaderIcon";
 
 
 
@@ -1341,20 +1342,26 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                             transition
                                         "
                                     >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            strokeWidth={2}
-                                            stroke="white"
-                                            className="w-5 h-5"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                d="M9 12.75 11.25 15 15 9.75"
-                                            />
-                                        </svg>
+                                        {isSending ? (
+                                            <div className="text-white [&>svg]:text-white">
+                                                <StatLoaderIcon />
+                                            </div>
+                                        ) : (
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                strokeWidth={2}
+                                                stroke="white"
+                                                className="w-5 h-5"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    d="M9 12.75 11.25 15 15 9.75"
+                                                />
+                                            </svg>
+                                        )}
                                     </button>
                                 </form>
 

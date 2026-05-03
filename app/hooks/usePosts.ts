@@ -35,6 +35,8 @@ export interface Post {
     neta2?: boolean;
     neta3?: boolean;
     neta4?: boolean;
+    likes: number;
+    likedByUser?: boolean;
 }
 
 export function usePosts(initialPosts: Post[] = []) {

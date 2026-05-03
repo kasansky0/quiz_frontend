@@ -9,6 +9,7 @@ import FormulaSheet from "./formulasSheet"
 import { useMotionValue, useTransform, animate } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { SeenQuestionsType } from "@/types/userStats";
+import StatLoaderIcon from "@/components/ui/StatLoaderIcon"
 
 
 
@@ -137,7 +138,7 @@ function PercentageBar({ correct, total }: { correct: number; total: number }) {
                 <span className="text-green-500 font-semibold">80%</span>
             </span>
 
-            <div className="w-full h-5 bg-white/10 rounded-xl overflow-hidden backdrop-blur-sm border border-black/10 relative">
+            <div className="w-2/3 h-5 bg-white/10 rounded-xl overflow-hidden backdrop-blur-sm border border-black/10 relative">
 
                 {/* 🎯 80% marker */}
                 <div
@@ -238,39 +239,6 @@ export default function UserStats({ nickname, platformStats, loading, onLinkClic
                         `;
 
 
-
-
-
-
-
-
-
-
-
-    function StatLoaderIcon() {
-        return (
-            <svg
-                className="w-4 h-4 animate-spin text-black/40"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-            >
-                <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                />
-                <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v3a5 5 0 00-5 5H4z"
-                />
-            </svg>
-        );
-    }
 
 
 

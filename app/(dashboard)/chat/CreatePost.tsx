@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/Textarea";
 import { useError } from "@/app/ErrorProvider";
 import StatusBanner from "@/app/positiveBanner"
 import Link from "next/link";
+import StatLoaderIcon from "@/components/ui/StatLoaderIcon";
 
 
 interface CreatePostProps {
@@ -216,19 +217,28 @@ export default function CreatePost({
                             type="submit"
                             disabled={isSending}
                             className={`
+                                min-w-[90px]
                                 px-4 py-1.5
                                 rounded-full
                                 text-sm font-semibold
                                 transition
                                 active:scale-[0.98]
+                                flex items-center justify-center
                                 ${
                                 isSending
                                     ? "bg-[#7FB3E6] text-white cursor-not-allowed"
                                     : "bg-[#0a66c2] text-white hover:bg-[#004182]"
                             }
-                                `}
+                                 `}
                         >
-                            Post
+                            {isSending ? (
+                                <span className="flex items-center gap-2">
+                                <StatLoaderIcon />
+                                Posting
+                            </span>
+                            ) : (
+                                "Post"
+                            )}
                         </button>
 
                     </div>
@@ -286,11 +296,6 @@ export default function CreatePost({
                         {message.length}/{MESSAGE_LIMIT}
                     </span>
                     </div>
-
-                    {isSending && (
-                        <StatusBanner type="loading" message="Sending post..." />
-                    )}
-
                 </form>
             </div>
         </div>

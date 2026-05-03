@@ -296,7 +296,9 @@ export default function QuizSampleSection({
                 } catch {}
 
 
-                if (isMountedRef.current) showError(msg);
+                if (isMountedRef.current) {
+                    showError(msg, res.status === 401);
+                }
                 setFetchError(true);
                 return null;
             }

@@ -139,7 +139,7 @@ const InfoAndFormulas = () => {
                 {/* CONTACT CARD */}
                 <div className="bg-white border border-neutral-200 rounded-xl p-5 shadow-sm text-center">
                     <div className="text-xs font-semibold">
-                        Business Inquiries:
+                        General Inquiries:
                     </div>
 
                     <a

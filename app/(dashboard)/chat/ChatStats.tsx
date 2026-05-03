@@ -434,6 +434,18 @@ export default function ChatStats() {
     if (loggedOut) return <LoggedOut/>;
 
 
+
+
+
+
+
+
+
+
+
+
+
+
     return (
         <div className="w-full relative sm:px-4">
             {/* Loading / Error Banner */}
@@ -743,7 +755,7 @@ export default function ChatStats() {
                                                 </span>
                                                 </div>
 
-                                                <h3 className="text-black font-bold mb-0.5 text-sm sm:text-base md:text-base line-clamp-2">
+                                                <h3 className="text-black font-bold mb-0.5 text-sm sm:text-base md:text-base line-clamp-3">
                                                     {post.title}
                                                 </h3>
                                             </div>
