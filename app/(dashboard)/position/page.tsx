@@ -289,7 +289,7 @@ export default function AdsPage() {
                                                 {job.relocation}
                                             </span>
 
-                                                <span className="px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700">
+                                                <span className="px-2 py-0.5 rounded-full bg-orange-50 text-orange-700">
                                                 {job.type}
                                             </span>
 

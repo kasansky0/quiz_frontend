@@ -24,7 +24,7 @@ const InfoAndFormulas = () => {
                                 viewBox="0 0 24 24"
                                 strokeWidth={1.5}
                                 stroke="currentColor"
-                                className="w-4 h-4 text-neutral-700 flex-shrink-0"
+                                className="w-4 h-4 text-blue-400 flex-shrink-0"
                             >
                                 <path
                                     strokeLinecap="round"
@@ -51,7 +51,7 @@ const InfoAndFormulas = () => {
                                 viewBox="0 0 24 24"
                                 strokeWidth={1.5}
                                 stroke="currentColor"
-                                className="w-4 h-4 text-neutral-600 flex-shrink-0"
+                                className="w-4 h-4 text-blue-400 flex-shrink-0"
                             >
                                 <path
                                     strokeLinecap="round"
@@ -94,8 +94,18 @@ const InfoAndFormulas = () => {
                     href="/quiz"
                     className="block bg-white border border-neutral-200 rounded-xl p-5 shadow-sm hover:shadow-md transition active:scale-[0.99] text-center"
                 >
-                    <div className="text-lg font-semibold">
-                        📊 Take a Quiz
+                    <div className="flex items-center justify-center gap-2 text-lg font-semibold">
+                        {/* Chart/Quiz Icon */}
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            className="w-5 h-5 text-blue-500"
+                        >
+                            <path d="M3 3h2v18H3V3zm4 10h2v8H7v-8zm4-6h2v14h-2V7zm4 4h2v10h-2V11zm4-8h2v18h-2V3z" />
+                        </svg>
+
+                        <span>Take a Quiz</span>
                     </div>
 
                     <div className="text-base text-neutral-600 mt-1">
@@ -112,12 +122,29 @@ const InfoAndFormulas = () => {
                     href="/chat"
                     className="block bg-white border border-neutral-200 rounded-xl p-5 shadow-sm hover:shadow-md transition active:scale-[0.99] text-center"
                 >
-                    <div className="text-lg font-semibold">
-                        💬 Messaging
+                    <div className="flex items-center justify-center gap-2 text-lg font-semibold">
+                        {/* Chat / Messenger SVG (same style as sidebar) */}
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-5 h-5 text-blue-500"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
+                            />
+                        </svg>
+
+                        <span>Messaging</span>
                     </div>
 
                     <div className="text-base text-neutral-600 mt-1">
-                        Share your study strategies, ask questions, and let us know if you passed. We maintain a respectful and focused learning environment where all posts and comments are automatically moderated.
+                        Share your study strategies, ask questions, and let us know if you passed.
+                        We maintain a respectful and focused learning environment where all posts and comments are automatically moderated.
                     </div>
 
                     <div className="text-blue-500 text-base mt-3 font-medium">
@@ -127,8 +154,24 @@ const InfoAndFormulas = () => {
 
                 {/* AUTH CARD */}
                 <div className="bg-white border border-neutral-200 rounded-xl p-5 shadow-sm text-center">
-                    <div className="text-lg font-semibold mb-2">
-                        🔐 Authentication
+                    <div className="flex items-center justify-center gap-2 text-lg font-semibold mb-2">
+                        {/* Lock SVG */}
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-5 h-5 text-blue-500"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M16.5 10.5V7.5a4.5 4.5 0 1 0-9 0v3m-1.5 0h12a1.5 1.5 0 0 1 1.5 1.5v7.5A1.5 1.5 0 0 1 18 21h-12A1.5 1.5 0 0 1 4.5 19.5V12a1.5 1.5 0 0 1 1.5-1.5Z"
+                            />
+                        </svg>
+
+                        <span>Authentication</span>
                     </div>
 
                     <div className="text-base text-neutral-600 leading-relaxed">
@@ -138,8 +181,24 @@ const InfoAndFormulas = () => {
 
                 {/* CONTACT CARD */}
                 <div className="bg-white border border-neutral-200 rounded-xl p-5 shadow-sm text-center">
-                    <div className="text-xs font-semibold">
-                        General Inquiries:
+                    <div className="flex items-center justify-center gap-2 text-xs font-semibold mb-1">
+                        {/* Mail SVG */}
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-4 h-4 text-blue-500"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M21.75 6.75v10.5A2.25 2.25 0 0 1 19.5 19.5h-15A2.25 2.25 0 0 1 2.25 17.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15A2.25 2.25 0 0 0 2.25 6.75m19.5 0-9.75 6.75L2.25 6.75"
+                            />
+                        </svg>
+
+                        <span>General Inquiries</span>
                     </div>
 
                     <a

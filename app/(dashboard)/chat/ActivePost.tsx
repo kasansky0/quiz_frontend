@@ -467,7 +467,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         const sanitizedMessage = DOMPurify.sanitize(message.trim());
 
         try {
-            showStatusBanner("Sending...", "loading");
+            showStatusBanner("Sending ...", "loading");
             const res = await fetchWithToken(`${apiUrl}/posts/${activePost.id}/comments`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -1026,7 +1026,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                         viewBox="0 0 24 24"
                                         strokeWidth={1.5}
                                         stroke="currentColor"
-                                        className="w-4 h-4 text-neutral-700 flex-shrink-0"
+                                        className="w-4 h-4 text-blue-400 flex-shrink-0"
                                     >
                                         <path
                                             strokeLinecap="round"
@@ -1053,7 +1053,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                         viewBox="0 0 24 24"
                                         strokeWidth={1.5}
                                         stroke="currentColor"
-                                        className="w-4 h-4 text-neutral-600 flex-shrink-0"
+                                        className="w-4 h-4 text-blue-400 flex-shrink-0"
                                     >
                                         <path
                                             strokeLinecap="round"

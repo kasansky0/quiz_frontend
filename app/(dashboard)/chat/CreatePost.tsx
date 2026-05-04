@@ -147,7 +147,7 @@ export default function CreatePost({
                                         viewBox="0 0 24 24"
                                         strokeWidth={1.5}
                                         stroke="currentColor"
-                                        className="w-4 h-4 text-neutral-700 flex-shrink-0"
+                                        className="w-4 h-4 text-blue-400 flex-shrink-0"
                                     >
                                         <path
                                             strokeLinecap="round"
@@ -174,7 +174,7 @@ export default function CreatePost({
                                         viewBox="0 0 24 24"
                                         strokeWidth={1.5}
                                         stroke="currentColor"
-                                        className="w-4 h-4 text-neutral-600 flex-shrink-0"
+                                        className="w-4 h-4 text-blue-400 flex-shrink-0"
                                     >
                                         <path
                                             strokeLinecap="round"
