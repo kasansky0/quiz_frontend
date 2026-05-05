@@ -38,9 +38,9 @@ export default function HowItWorks() {
 
                     <p>• Once approved, complete payment to publish</p>
 
-                    <p>• Published ads stay live for <span className="font-semibold">15 days</span></p>
+                    <p>• Published ads stay live for <span className="font-semibold">30 days</span></p>
 
-                    <p>• After 15 days, ads automatically move to Archived and are no longer visible to public users</p>
+                    <p>• After 30 days, ads automatically move to Archived and are no longer visible to public users</p>
 
                     <p>• Archived ads and all applications remain fully accessible in your dashboard</p>
 

@@ -143,8 +143,8 @@ const InfoAndFormulas = () => {
                     </div>
 
                     <div className="text-base text-neutral-600 mt-1">
-                        Share your study strategies, ask questions, and let us know if you passed.
-                        We maintain a respectful and focused learning environment where all posts and comments are automatically moderated.
+                        Share your study strategies and let us know if you passed.
+                        We maintain a respectful and focused learning environment.
                     </div>
 
                     <div className="text-blue-500 text-base mt-3 font-medium">

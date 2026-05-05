@@ -469,7 +469,7 @@ export default function LoggedInAdmin() {
         const date = parseDate(createdAt);
 
         const expiry = new Date(date);
-        expiry.setDate(expiry.getDate() + 15); // 15-day lifetime
+        expiry.setDate(expiry.getDate() + 30); // 30-day lifetime
 
         const now = new Date();
 
@@ -535,9 +535,9 @@ export default function LoggedInAdmin() {
 
             const created = parseDate(ad.createdAt);
 
-            // ✅ SAME 15 day expiry
+            // ✅ SAME 30 day expiry
             const expiry = new Date(created);
-            expiry.setDate(expiry.getDate() + 15);
+            expiry.setDate(expiry.getDate() + 30);
 
             const now = new Date();
 
@@ -567,7 +567,7 @@ export default function LoggedInAdmin() {
                 diffMs,
                 diffDays,
                 isExpired: diffMs <= 0,
-                isExpiringSoon: diffMs > 0 && diffDays <= 3,
+                isExpiringSoon: diffMs > 0 && diffDays <= 5,
                 relativeTime,
             };
         }) || [];
