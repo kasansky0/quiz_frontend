@@ -47,7 +47,6 @@ export default function ChatStats() {
     const [allPosts, setAllPosts] = useState<Post[]>([]);
     const [totalPosts, setTotalPosts] = useState(0);
     const [loadingMore, setLoadingMore] = useState(false);
-    const [newCommentPosts, setNewCommentPosts] = useState<Set<string>>(new Set());
     const [scrollY, setScrollY] = useState(0);
 
     const showOverlay = showLoading || !!serverError;
@@ -215,12 +214,6 @@ export default function ChatStats() {
         setActivePost(post);
         setActivePostComments([]);
 
-        setNewCommentPosts(prev => {
-            const next = new Set(prev);
-            next.delete(post.id);
-            return next;
-        });
-
         requestAnimationFrame(() => {
             window.scrollTo(0, 0);
         });
@@ -284,19 +277,11 @@ export default function ChatStats() {
 
                 setAllPosts(prev => {
                     const map = new Map<string, Post>();
-                    const updatedNewCommentPosts = new Set<string>();
 
                     const prevMap = new Map(prev.map(p => [p.id, p]));
 
                     data.posts.forEach((p: Post) => {
                         const old = prevMap.get(p.id);
-
-                        if (
-                            old &&
-                            (p.commentCount ?? 0) > (old.commentCount ?? 0)
-                        ) {
-                            updatedNewCommentPosts.add(p.id);
-                        }
 
                         map.set(p.id, p);
                     });
@@ -304,15 +289,6 @@ export default function ChatStats() {
                     prev.forEach(p => {
                         if (!map.has(p.id)) map.set(p.id, p);
                     });
-
-                    // update highlight state
-                    if (updatedNewCommentPosts.size > 0) {
-                        setNewCommentPosts(prevSet => {
-                            const next = new Set(prevSet);
-                            updatedNewCommentPosts.forEach(id => next.add(id));
-                            return next;
-                        });
-                    }
 
                     return Array.from(map.values());
                 });
@@ -603,10 +579,7 @@ export default function ChatStats() {
                                                 transition-all duration-200
                                                 active:scale-[0.99]
     
-                                                ${newCommentPosts.has(post.id)
-                                                    ? "ring-1 ring-yellow-400/40 bg-yellow-400/10"
-                                                    : "hover:bg-black-300/40"
-                                                }
+                                                hover:bg-black-300/40
                                             `}
                                             >
                                                 <div className="flex items-center mb-0.5 w-full">
@@ -730,12 +703,6 @@ export default function ChatStats() {
                                                             <span className="text-black text-sm font-medium">
                                                             {post.commentCount ?? 0}
                                                         </span>
-
-                                                            {newCommentPosts.has(post.id) && (
-                                                                <span className="ml-1 text-yellow-400 text-sm font-semibold">
-                                                                +1
-                                                            </span>
-                                                            )}
 
                                                             {post.pinned && (
                                                                 <svg

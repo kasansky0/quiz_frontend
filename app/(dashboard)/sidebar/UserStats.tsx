@@ -401,6 +401,9 @@ export default function UserStats({ nickname, platformStats, loading, onLinkClic
 
 
 
+            <Calculator/>
+            <FormulaSheet/>
+
 
 
 
@@ -480,8 +483,7 @@ export default function UserStats({ nickname, platformStats, loading, onLinkClic
 
 
 
-            <Calculator/>
-            <FormulaSheet/>
+
 
 
 

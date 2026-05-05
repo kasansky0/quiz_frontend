@@ -5,6 +5,7 @@ import "./styles/globals.css";
 import Footer from "@/app/(home)/Footer"
 import Providers from "@/app/Providers"; // <-- make sure this line exists
 import Script from "next/script";
+import {ScrollProvider} from "@/app/ScrollProvider";
 
 const FontSans = Plus_Jakarta_Sans({
     subsets: ["latin"],
@@ -148,7 +149,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 
         <Providers>
-            {children}
+            <ScrollProvider>
+                {children}
+            </ScrollProvider>
         </Providers>
 
         </body>

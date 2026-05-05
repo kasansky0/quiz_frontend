@@ -89,8 +89,9 @@ export default function QuizSampleSection({
 
     const showLoading = !questionData && !fetchError;
 
-
     const [isFetchingNext, setIsFetchingNext] = useState(false);
+
+    const adRef = useRef<HTMLAnchorElement>(null);
 
 
     useEffect(() => {
@@ -161,7 +162,15 @@ export default function QuizSampleSection({
 
     useEffect(() => {
         if (!selectedOption) return;
-        optionsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+
+        const t = setTimeout(() => {
+            adRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+            });
+        }, 200);
+
+        return () => clearTimeout(t);
     }, [selectedOption]);
 
 
@@ -509,6 +518,7 @@ export default function QuizSampleSection({
 
                                     {/* Future Ads / Message */}
                                     <Link
+                                        ref={adRef}
                                         href="/position"
                                         className="w-full text-center text-xs block active:bg-transparent focus:bg-transparent [-webkit-tap-highlight-color:transparent]"
                                     >

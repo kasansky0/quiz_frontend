@@ -102,6 +102,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const [deletedCommentIds, setDeletedCommentIds] = useState<Set<string>>(new Set());
     const router = useRouter();
     const { fetchPostComments } = chatApis({ apiUrl });
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [isDeletingComment, setIsDeletingComment] = useState(false);
 
 
 
@@ -176,13 +178,16 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
-    const confirmDelete = () => {
-        if (!pendingDeleteId) return;
+    const confirmDelete = async () => {
+        try {
+            setIsDeleting(true);
 
-        handleDeletePost(pendingDeleteId);
+            await handleDeletePost(activePost.id);
 
-        setShowDeleteConfirm(false);
-        setPendingDeleteId(null);
+            setShowDeleteConfirm(false);
+        } finally {
+            setIsDeleting(false);
+        }
     };
 
     const cancelDelete = () => {
@@ -198,7 +203,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
     const [showDeleteCommentConfirm, setShowDeleteCommentConfirm] = useState(false);
     const [pendingDeleteCommentId, setPendingDeleteCommentId] = useState<string | null>(null);
-    const confirmCommentDelete = () => {
+    const confirmCommentDelete = async () => {
         if (!pendingDeleteCommentId) return;
 
         const comment = displayedComments.find(
@@ -207,10 +212,17 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
         if (!comment) return;
 
-        handleDeleteComment(comment);
+        try {
+            setIsDeletingComment(true); // 🔥 START SPINNER
 
-        setShowDeleteCommentConfirm(false);
-        setPendingDeleteCommentId(null);
+            await handleDeleteComment(comment);
+
+            setShowDeleteCommentConfirm(false);
+            setPendingDeleteCommentId(null);
+
+        } finally {
+            setIsDeletingComment(false); // 🔥 STOP SPINNER
+        }
     };
 
     const cancelCommentDelete = () => {
@@ -247,7 +259,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         commentsKey(post.id, 0),
         fetcher,
         {
-            refreshInterval: 5000,
+            refreshInterval: 10000,
             fallbackData: comments, // use the comments prop you already have
             revalidateOnMount: false // prevents SWR from fetching immediately on mount
         }
@@ -350,6 +362,9 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
     useEffect(() => {
         if (!polledData?.comments?.length) return;
+
+        // ✅ ADD THIS HERE (early exit if nothing changed at top)
+        if (polledData?.comments?.[0]?._id === displayedComments?.[0]?._id) return;
 
         const polledComments = polledData.comments as Comment[]; // ✅ cast to Comment[]
 
@@ -1651,9 +1666,17 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
                             <button
                                 onClick={confirmDelete}
-                                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-full transition"
+                                disabled={isDeleting}
+                                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-full transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
                             >
-                                Delete
+                                {isDeleting ? (
+                                    <>
+                                        <StatLoaderIcon />
+                                        Deleting...
+                                    </>
+                                ) : (
+                                    "Delete"
+                                )}
                             </button>
 
                         </div>
@@ -1686,9 +1709,17 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
                             <button
                                 onClick={confirmCommentDelete}
-                                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-full transition"
+                                disabled={isDeletingComment}
+                                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-full transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
                             >
-                                Delete
+                                {isDeletingComment ? (
+                                    <>
+                                        <StatLoaderIcon />
+                                        Deleting...
+                                    </>
+                                ) : (
+                                    "Delete"
+                                )}
                             </button>
 
                         </div>
