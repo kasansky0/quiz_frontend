@@ -79,7 +79,7 @@ export default function HireSubscribeButton() {
                 <span className="w-4 h-4 border-2 border-[#0a66c2] border-t-transparent rounded-full animate-spin" />
             )}
 
-            {loading ? "Redirecting..." : "Unlock Hire Access ($150/month)"}
+            {loading ? "Redirecting..." : "Unlock Hire Access ($500/month)"}
         </button>
     );
 }
