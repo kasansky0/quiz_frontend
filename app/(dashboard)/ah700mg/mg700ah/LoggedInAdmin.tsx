@@ -106,6 +106,13 @@ interface AdminSummary {
     employer_users?: EmployerUser[];
 }
 
+interface UserQuestionStats {
+    user_id: string;
+    total_seen: number;
+    total_correct: number;
+    total_wrong: number;
+}
+
 type AdStatus = "pending" | "approved" | "published" | "archived";
 
 
@@ -182,6 +189,11 @@ export default function LoggedInAdmin() {
     const spanRef = useRef<HTMLSpanElement>(null);
 // ✅ ADD this right under:
     const paidUsersCount = users.filter(user => user.is_paid).length;
+
+
+    const [userStatsMap, setUserStatsMap] = useState<Record<string, UserQuestionStats>>({});
+    const [loadingStatsUserId, setLoadingStatsUserId] = useState<string | null>(null);
+
 
 // 👇 USERS ACTIVE TODAY (based on last_login local date)
     const usersVisitedToday = users.filter(user => {
@@ -591,6 +603,63 @@ export default function LoggedInAdmin() {
         }
     );
 
+
+    const fetchUserQuestionStats = async (userId: string) => {
+        try {
+            const res = await fetchWithToken(
+                `${apiUrl}/info/user-stats/${userId}`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            if (!res) {
+                showError("Network error fetching user stats");
+                return null;
+            }
+
+            if (!res.success) {
+                const err = await res.data;
+
+                if (res.status === 401 || res.status === 403) {
+                    showError("Session expired or unauthorized");
+                    return null;
+                }
+
+                showError(err?.detail || "Failed to fetch stats");
+                return null;
+            }
+
+            const data: UserQuestionStats = await res.data;
+            return data;
+
+        } catch (err) {
+            console.error(err);
+            showError("Error fetching user stats");
+            return null;
+        }
+    };
+
+
+    const fetchAndStoreUserStats = async (userId: string) => {
+        if (userStatsMap[userId]) return;
+
+        setLoadingStatsUserId(userId);
+
+        const stats = await fetchUserQuestionStats(userId);
+
+        if (stats) {
+            setUserStatsMap(prev => ({
+                ...prev,
+                [userId]: stats
+            }));
+        }
+
+        setLoadingStatsUserId(null);
+    };
 
 
 
@@ -1585,6 +1654,86 @@ export default function LoggedInAdmin() {
                                 {Math.floor((user.totalOnlineTime % 3600) / 60)}m
                             </p>
                             <p><strong>User Percentage:</strong> {user.userPercentage}</p>
+
+
+
+                            <div className="mt-2">
+                                {userStatsMap[user.user_id] ? (
+                                    <div className="border-t border-gray-100 pt-3">
+
+                                        {/* SINGLE KPI ROW */}
+                                        <div className="flex items-center justify-between text-xs text-gray-600">
+
+                                            {/* Accuracy */}
+                                            <div className="flex flex-col items-center">
+                                                <p className="text-[10px] uppercase tracking-wide text-gray-400">
+                                                    Accuracy
+                                                </p>
+                                                <p className="text-sm font-bold text-blue-600">
+                                                    {userStatsMap[user.user_id].total_seen > 0
+                                                        ? (
+                                                            (userStatsMap[user.user_id].total_correct /
+                                                                userStatsMap[user.user_id].total_seen) *
+                                                            100
+                                                        ).toFixed(1)
+                                                        : 0}
+                                                    %
+                                                </p>
+                                            </div>
+
+                                            <div className="w-px h-6 bg-gray-200" />
+
+                                            {/* Seen */}
+                                            <div className="flex flex-col items-center">
+                                                <p className="text-[10px] uppercase tracking-wide text-gray-400">
+                                                    Seen
+                                                </p>
+                                                <p className="font-semibold text-gray-900">
+                                                    {userStatsMap[user.user_id].total_seen}
+                                                </p>
+                                            </div>
+
+                                            <div className="w-px h-6 bg-gray-200" />
+
+                                            {/* Correct */}
+                                            <div className="flex flex-col items-center">
+                                                <p className="text-[10px] uppercase tracking-wide text-gray-400">
+                                                    Correct
+                                                </p>
+                                                <p className="font-semibold text-green-600">
+                                                    {userStatsMap[user.user_id].total_correct}
+                                                </p>
+                                            </div>
+
+                                            <div className="w-px h-6 bg-gray-200" />
+
+                                            {/* Wrong */}
+                                            <div className="flex flex-col items-center">
+                                                <p className="text-[10px] uppercase tracking-wide text-gray-400">
+                                                    Wrong
+                                                </p>
+                                                <p className="font-semibold text-red-500">
+                                                    {userStatsMap[user.user_id].total_wrong}
+                                                </p>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <button
+                                        onClick={() => fetchAndStoreUserStats(user.user_id)}
+                                        className="mt-2 w-full text-xs font-medium text-gray-700 border border-gray-200 rounded-xl py-2 hover:bg-gray-50 transition"
+                                    >
+                                        {loadingStatsUserId === user.user_id
+                                            ? "Loading analytics..."
+                                            : "View Question Analytics"}
+                                    </button>
+                                )}
+                            </div>
+
+
+
+
                             <p>
                                 <strong>Paid User:</strong>{" "}
                                 {user.is_paid ? (

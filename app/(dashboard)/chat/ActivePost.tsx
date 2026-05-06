@@ -647,6 +647,15 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             );
 
             if (!res || !res.success) {
+                const detail = res?.data?.detail;
+
+                // 🔴 BLOCKED USER
+                if (res?.status === 403 || detail?.blocked || detail?.type === "blocked") {
+                    showError("You are blocked.");
+                } else {
+                    showError("You need to log in again.", true);
+                }
+
                 // rollback on failure
                 setDeletedCommentIds(prev => {
                     const newSet = new Set(prev);
@@ -658,7 +667,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                 setActivePost(prev =>
                     prev ? { ...prev, comments: previousComments } : prev
                 );
-                showError("You need to log in again.", true);
+
+                return;
             }
         } catch (err) {
             setDeletedCommentIds(prev => {
@@ -729,18 +739,34 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             body: JSON.stringify({ message: sanitizedMessage }),
         });
 
-        if (!res) {
-            showError("Network error: unable to reach server.");
-            return;
-        }
+        if (!res || !res.success) {
+            const detail = res?.data?.detail;
 
-        if (!res.success) {
-            if (res.status === 401) {
+            // 🔴 BLOCKED USER
+            if (res?.status === 403 || detail?.blocked || detail?.type === "blocked") {
+                showError("You are blocked.");
+                return;
+            }
+
+            // 🔴 AUTH / SESSION EXPIRED
+            if (res?.status === 401 || detail?.type === "auth") {
                 setShowLoading(true);
                 showError("You need to log in again.", true);
                 return;
             }
-            showError("We couldn't update your comment. Please try again.");
+
+            // 🔴 NETWORK FAILURE (no response at all)
+            if (!res) {
+                showError("Network error: unable to reach server.");
+                return;
+            }
+
+            // 🔴 GENERIC ERROR
+            showError(
+                detail?.error ||
+                "We couldn't update your comment. Please try again."
+            );
+
             return;
         }
 
@@ -871,17 +897,32 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             });
 
             if (!res) {
-                showError("We couldn't save your changes. Please check your internet and try again.");
+                showError("Network error: unable to reach server.");
                 return;
             }
 
             if (!res.success) {
-                if (res.status === 401) {
+                const detail = res?.data?.detail;
+
+                // 🔴 BLOCKED USER
+                if (res.status === 403 || detail?.blocked || detail?.type === "blocked") {
+                    showError("You are blocked.");
+                    return;
+                }
+
+                // 🔴 AUTH / SESSION EXPIRED
+                if (res.status === 401 || detail?.type === "auth") {
                     setShowLoading(true);
                     showError("You need to log in again.", true);
                     return;
                 }
-                showError("We couldn't save your changes. Please try again.");
+
+                // 🔴 GENERIC FALLBACK ERROR
+                showError(
+                    detail?.error ||
+                    "We couldn't save your changes. Please try again."
+                );
+
                 return;
             }
 

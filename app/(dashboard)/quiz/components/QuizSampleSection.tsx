@@ -673,19 +673,6 @@ export default function QuizSampleSection({
                                                 <ScrollHint />
                                                 <span className="text-xs sm:text-sm text-black opacity-70 mt-1 flex items-center gap-1">
                                                     Study the explanation below
-
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        viewBox="0 0 20 20"
-                                                        fill="currentColor"
-                                                        className="w-4 h-4 opacity-70"
-                                                    >
-                                                        <path
-                                                            fillRule="evenodd"
-                                                            d="M10 3a.75.75 0 01.75.75v10.69l3.72-3.72a.75.75 0 111.06 1.06l-5 5a.75.75 0 01-1.06 0l-5-5a.75.75 0 111.06-1.06l3.72 3.72V3.75A.75.75 0 0110 3z"
-                                                            clipRule="evenodd"
-                                                        />
-                                                    </svg>
                                                 </span>
                                             </div>
 

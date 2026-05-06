@@ -182,7 +182,7 @@ export default function Calculator({ mobile = false }: CalculatorProps) {
                 transition={{ duration: 0.25, ease: "easeInOut" }}
                 style={{ transformOrigin: "top" }}
                 className={`max-w-full px-1 sm:px-2 pt-2 pb-4 w-full backdrop-blur-xl rounded-2xl shadow-2xl flex flex-col items-center overflow-hidden border border-black/20
-        ${powerSurge
+                        ${powerSurge
                     ? "bg-blue-900 border-2 border-blue-400 shadow-[0_0_40px_rgba(0,150,255,0.8)] animate-pulse"
                     : breakerMode
                         ? "bg-red-900 border-2 border-red-400 shadow-[0_0_40px_rgba(255,50,50,0.8)] animate-pulse"
