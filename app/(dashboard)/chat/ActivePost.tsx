@@ -104,6 +104,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const { fetchPostComments } = chatApis({ apiUrl });
     const [isDeleting, setIsDeleting] = useState(false);
     const [isDeletingComment, setIsDeletingComment] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isSavingComment, setIsSavingComment] = useState(false);
 
 
 
@@ -692,121 +694,130 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const handleEditComment = async () => {
         if (!activePost || !editingCommentId) return;
 
-        let trimmed = editCommentMessage.trim();
+        if (isSavingComment) return; // 🚫 prevent spam clicks
 
-        // ✅ enforce 500-character limit
-        if (trimmed.length > 500) {
-            trimmed = trimmed.slice(0, 500);
-            setEditCommentMessage(trimmed); // update state so input reflects limit
-        }
+        setIsSavingComment(true); // 🔵 start loading
 
-        // Sanitize after trimming
-        const sanitizedMessage = DOMPurify.sanitize(trimmed);
+        try {
 
-        // 🗑️ If empty → DELETE instead of PATCH
-        if (trimmed === "") {
-            const res = await fetchWithToken(`${apiUrl}/posts/${activePost.id}/comments/${editingCommentId}`, {
-                method: "DELETE",
-            });
+            let trimmed = editCommentMessage.trim();
 
-            // handle null / network failure
-            if (!res) {
-                showError("We couldn't update your comment. Please check your connection and try again.");
+            // ✅ enforce 500-character limit
+            if (trimmed.length > 500) {
+                trimmed = trimmed.slice(0, 500);
+                setEditCommentMessage(trimmed); // update state so input reflects limit
+            }
+
+            // Sanitize after trimming
+            const sanitizedMessage = DOMPurify.sanitize(trimmed);
+
+            // 🗑️ If empty → DELETE instead of PATCH
+            if (trimmed === "") {
+                const res = await fetchWithToken(`${apiUrl}/posts/${activePost.id}/comments/${editingCommentId}`, {
+                    method: "DELETE",
+                });
+
+                // handle null / network failure
+                if (!res) {
+                    showError("We couldn't update your comment. Please check your connection and try again.");
+                    return;
+                }
+
+                if (!res.success) {
+                    if (res.status === 401) {
+                        setShowLoading(true);
+                        showError("You need to log in again.", true);
+                        return;
+                    }
+                    showError("We couldn't update your comment. Please try again.");
+                    return;
+                }
+
+                setEditingCommentId(null);
+                setEditCommentMessage("");
                 return;
             }
 
-            if (!res.success) {
-                if (res.status === 401) {
+            // ✏️ Otherwise → normal edit
+            const res = await fetchWithToken(`${apiUrl}/posts/${activePost.id}/comments/${editingCommentId}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ message: sanitizedMessage }),
+            });
+
+            if (!res || !res.success) {
+                const detail = res?.data?.detail;
+
+                // 🔴 BLOCKED USER
+                if (res?.status === 403 || detail?.blocked || detail?.type === "blocked") {
+                    showError("You are blocked.");
+                    return;
+                }
+
+                // 🔴 AUTH / SESSION EXPIRED
+                if (res?.status === 401 || detail?.type === "auth") {
                     setShowLoading(true);
                     showError("You need to log in again.", true);
                     return;
                 }
-                showError("We couldn't update your comment. Please try again.");
+
+                // 🔴 NETWORK FAILURE (no response at all)
+                if (!res) {
+                    showError("Network error: unable to reach server.");
+                    return;
+                }
+
+                // 🔴 GENERIC ERROR
+                showError(
+                    detail?.error ||
+                    "We couldn't update your comment. Please try again."
+                );
+
                 return;
             }
+
+            const updatedComment: Comment = await res.data;
+
+
+            // update visible comments
+            setDisplayedComments(prev =>
+                prev.map(c => (c._id === updatedComment._id ? updatedComment : c))
+            );
+
+            // update active post
+            setActivePost(prev => {
+                if (!prev || !prev.comments) return prev;
+
+                return {
+                    ...prev,
+                    comments: prev.comments.map(c =>
+                        c._id === updatedComment._id ? updatedComment : c
+                    )
+                };
+            });
+            globalMutate(`${apiUrl}/posts/`, (cachedData: { posts: Post[]; total: number } | undefined) => {
+                if (!cachedData) return { posts: [], total: 0 };
+
+                const newPosts = cachedData.posts.map(p =>
+                    p.id === activePost.id
+                        ? {
+                            ...p,
+                            comments: (p.comments || []).map(c =>
+                                c._id === updatedComment._id ? updatedComment : c
+                            )
+                        }
+                        : p
+                );
+
+                return { ...cachedData, posts: newPosts };
+            }, false);
 
             setEditingCommentId(null);
-            setEditCommentMessage("");
-            return;
+        } finally {
+            setIsSavingComment(false);
         }
-
-        // ✏️ Otherwise → normal edit
-        const res = await fetchWithToken(`${apiUrl}/posts/${activePost.id}/comments/${editingCommentId}`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ message: sanitizedMessage }),
-        });
-
-        if (!res || !res.success) {
-            const detail = res?.data?.detail;
-
-            // 🔴 BLOCKED USER
-            if (res?.status === 403 || detail?.blocked || detail?.type === "blocked") {
-                showError("You are blocked.");
-                return;
-            }
-
-            // 🔴 AUTH / SESSION EXPIRED
-            if (res?.status === 401 || detail?.type === "auth") {
-                setShowLoading(true);
-                showError("You need to log in again.", true);
-                return;
-            }
-
-            // 🔴 NETWORK FAILURE (no response at all)
-            if (!res) {
-                showError("Network error: unable to reach server.");
-                return;
-            }
-
-            // 🔴 GENERIC ERROR
-            showError(
-                detail?.error ||
-                "We couldn't update your comment. Please try again."
-            );
-
-            return;
-        }
-
-        const updatedComment: Comment = await res.data;
-
-
-        // update visible comments
-        setDisplayedComments(prev =>
-            prev.map(c => (c._id === updatedComment._id ? updatedComment : c))
-        );
-
-        // update active post
-        setActivePost(prev => {
-            if (!prev || !prev.comments) return prev;
-
-            return {
-                ...prev,
-                comments: prev.comments.map(c =>
-                    c._id === updatedComment._id ? updatedComment : c
-                )
-            };
-        });
-        globalMutate(`${apiUrl}/posts/`, (cachedData: { posts: Post[]; total: number } | undefined) => {
-            if (!cachedData) return { posts: [], total: 0 };
-
-            const newPosts = cachedData.posts.map(p =>
-                p.id === activePost.id
-                    ? {
-                        ...p,
-                        comments: (p.comments || []).map(c =>
-                            c._id === updatedComment._id ? updatedComment : c
-                        )
-                    }
-                    : p
-            );
-
-            return { ...cachedData, posts: newPosts };
-        }, false);
-
-        setEditingCommentId(null);
     };
 
 // COMMENT EDIT //
@@ -880,6 +891,10 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const handleEditPost = async () => {
         if (!editingPostId) return;
 
+        if (isSaving) return; // 🔴 ADD THIS HERE (BLOCK SPAM CLICKS)
+
+        setIsSaving(true); // 🔵 ADD THIS HERE (START LOADING LOCK)
+
         // Sanitize input
         const sanitizedTitle = DOMPurify.sanitize(editTitle.trim());
         const sanitizedMessage = DOMPurify.sanitize(editMessage.trim());
@@ -949,6 +964,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         } catch (err: any) {
             console.error("Edit post error:", err);
             showError("We couldn't save your changes. Please try again.");
+        } finally {
+            setIsSaving(false); // 🟢 ADD THIS HERE (UNLOCK BUTTON ALWAYS)
         }
     };
 
@@ -1206,22 +1223,36 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
                                                     <button
                                                         onClick={handleEditPost}
-                                                        disabled={!editMessage.trim()}
+                                                        disabled={!editMessage.trim() || isSaving}
+                                                        className={`
+                                                        w-9 h-9
+                                                        flex items-center justify-center
+                                                        rounded-full
+                                                        transition
+                                                        ${isSaving
+                                                            ? "opacity-60 cursor-not-allowed"
+                                                            : "hover:scale-105 active:scale-95"
+                                                        }
+                                                        `}
                                                     >
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            fill="none"
-                                                            viewBox="0 0 24 24"
-                                                            strokeWidth={1.5}
-                                                            stroke="currentColor"
-                                                            className="w-6 h-6"
-                                                        >
-                                                            <path
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                                d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                                                            />
-                                                        </svg>
+                                                        {isSaving ? (
+                                                            <StatLoaderIcon />
+                                                        ) : (
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                fill="none"
+                                                                viewBox="0 0 24 24"
+                                                                strokeWidth={1.5}
+                                                                stroke="currentColor"
+                                                                className="w-6 h-6"
+                                                            >
+                                                                <path
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                                                />
+                                                            </svg>
+                                                        )}
                                                     </button>
 
 
@@ -1555,22 +1586,29 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
                                                                             <button
                                                                                 onClick={handleEditComment}
-                                                                                title="Save"
+                                                                                disabled={!editCommentMessage.trim() || isSavingComment}
+                                                                                className={`transition ${
+                                                                                    isSavingComment ? "opacity-50 cursor-not-allowed" : "hover:scale-105 active:scale-95"
+                                                                                }`}
                                                                             >
-                                                                                <svg
-                                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                                    fill="none"
-                                                                                    viewBox="0 0 24 24"
-                                                                                    strokeWidth={1.5}
-                                                                                    stroke="currentColor"
-                                                                                    className="w-6 h-6"
-                                                                                >
-                                                                                    <path
-                                                                                        strokeLinecap="round"
-                                                                                        strokeLinejoin="round"
-                                                                                        d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                                                                                    />
-                                                                                </svg>
+                                                                                {isSavingComment ? (
+                                                                                    <StatLoaderIcon />
+                                                                                ) : (
+                                                                                    <svg
+                                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                                        fill="none"
+                                                                                        viewBox="0 0 24 24"
+                                                                                        strokeWidth={1.5}
+                                                                                        stroke="currentColor"
+                                                                                        className="w-6 h-6"
+                                                                                    >
+                                                                                        <path
+                                                                                            strokeLinecap="round"
+                                                                                            strokeLinejoin="round"
+                                                                                            d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                                                                        />
+                                                                                    </svg>
+                                                                                )}
                                                                             </button>
                                                                         </div>
                                                                     )}

@@ -569,7 +569,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
                     {/* LOGO (RIGHT SIDE) */}
-                    <div className="flex items-center">
+                    <div className="flex items-center gap-2">
                         <button
                             onClick={() => router.push("/quiz/")}
                             className="transition hover:scale-105 active:scale-95"
@@ -580,6 +580,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                 className="h-7 w-7 rounded-lg"
                             />
                         </button>
+
+                        <span className="font-semibold hidden md:block">
+                            Neta<span className="text-green-500">Prep</span>
+                        </span>
                     </div>
 
 
