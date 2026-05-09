@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRef } from "react";
 
 export default function SubjectPage() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
@@ -13,6 +14,43 @@ export default function SubjectPage() {
     const router = useRouter();
     const { data: session } = useSession();
     const token = session?.idToken;
+    const topicRefs = useRef<Array<HTMLDivElement | null>>([]);
+    const [activeTopic, setActiveTopic] = useState(0);
+
+
+    const scrollToTopic = (index: number) => {
+        const el = topicRefs.current[index];
+        if (el) {
+            const yOffset = -70; // adjust for your top bar height
+            const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
+            window.scrollTo({
+                top: y,
+                behavior: "smooth",
+            });
+
+            setActiveTopic(index);
+        }
+    };
+
+
+    useEffect(() => {
+        const handleScroll = () => {
+            topicRefs.current.forEach((el, index) => {
+                if (!el) return;
+
+                const rect = el.getBoundingClientRect();
+
+                if (rect.top >= 0 && rect.top < window.innerHeight / 2) {
+                    setActiveTopic(index);
+                }
+            });
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
 
     const { subject, loading, error, subscriptionRequired } = useSubjectById(
         apiUrl,
@@ -228,12 +266,15 @@ export default function SubjectPage() {
                     )}
 
                     {/* TOPICS */}
-                    {subject.topics?.length ? (
+                    {(subject?.topics ?? []).length ? (
                         <div className="space-y-4">
-                            {subject.topics.map((topic) => (
+                            {(subject?.topics ?? []).map((topic, index) => (
                                 <div
                                     key={topic.id}
-                                    className="rounded-xl border border-neutral-200 bg-white shadow-sm hover:shadow-md transition p-4"
+                                    ref={(el) => {
+                                        topicRefs.current[index] = el;
+                                    }}
+                                    className="rounded-xl border border-neutral-200 bg-white shadow-sm hover:shadow-md transition p-4 scroll-mt-20"
                                 >
                                     <h2 className="text-lg font-semibold text-green-600 mb-3">
                                         {topic.title}
@@ -253,9 +294,9 @@ export default function SubjectPage() {
                                                     <p className="text-sm text-neutral-700 leading-relaxed">
                                                         {sub.content?.split("\n").map((line, i) => (
                                                             <span key={i}>
-                                                            {line}
+                                            {line}
                                                                 <br />
-                                                        </span>
+                                        </span>
                                                         ))}
                                                     </p>
 
@@ -263,9 +304,9 @@ export default function SubjectPage() {
                                                         <ul className="mt-2 ml-4 list-disc text-sm text-neutral-600">
                                                             {sub.resources.map((res, i) => (
                                                                 <li key={`${res.code}-${i}`}>
-                                                                <span className="font-medium">
-                                                                    {res.code}:
-                                                                </span>{" "}
+                                                <span className="font-medium">
+                                                    {res.code}:
+                                                </span>{" "}
                                                                     {res.description}
                                                                 </li>
                                                             ))}
@@ -315,6 +356,95 @@ export default function SubjectPage() {
                             </button>
                         </div>
                     )}
+
+                    {/* FLOATING TOPIC NAV */}
+                    {(subject?.topics ?? []).length > 0 && (
+                        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 lg:left-[60%] lg:-translate-x-[60%] z-50">
+
+                            <div className="flex items-center gap-2 bg-white border border-neutral-200 shadow-lg rounded-full px-3 py-2">
+
+                                {/* TO TOP (primary / reset action) */}
+                                <button
+                                    onClick={() => {
+                                        window.scrollTo({ top: 0, behavior: "smooth" });
+                                        setActiveTopic(0);
+                                    }}
+                                    className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-50 hover:bg-blue-100 text-blue-600 transition"
+                                    title="Scroll to top"
+                                >
+                                    {/* double up = “all the way up” */}
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                        <path
+                                            d="M6 16l6-6 6 6"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                        <path
+                                            d="M6 10l6-6 6 6"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                    </svg>
+                                </button>
+
+                                {/* divider */}
+                                <div className="w-px h-5 bg-neutral-200" />
+
+                                {/* PREV TOPIC */}
+                                <button
+                                    onClick={() => {
+                                        if (activeTopic > 0) {
+                                            scrollToTopic(activeTopic - 1);
+                                        }
+                                    }}
+                                    className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-neutral-100 transition text-neutral-700"
+                                    title="Previous topic"
+                                >
+                                    {/* up arrow (subtle) */}
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                        <path
+                                            d="M6 14l6-6 6 6"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                    </svg>
+                                </button>
+
+                                {/* divider */}
+                                <div className="w-px h-5 bg-neutral-200" />
+
+                                {/* NEXT TOPIC */}
+                                <button
+                                    onClick={() => {
+                                        if (activeTopic < (subject?.topics ?? []).length - 1) {
+                                            scrollToTopic(activeTopic + 1);
+                                        }
+                                    }}
+                                    className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-neutral-100 transition text-green-600"
+                                    title="Next topic"
+                                >
+                                    {/* down arrow = forward */}
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                        <path
+                                            d="M6 10l6 6 6-6"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                    </svg>
+                                </button>
+
+                            </div>
+                        </div>
+                    )}
+
                 </div>
             ) : null}
         </div>
