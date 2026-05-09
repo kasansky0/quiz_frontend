@@ -96,7 +96,10 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMoreComments, setHasMoreComments] = useState(totalComments > COMMENTS_PAGE_SIZE);
     const [displayedComments, setDisplayedComments] = useState<Comment[]>([]);
-    const [statusBanner, setStatusBanner] = useState<{ message: string; type?: "loading" | "success" | "error" } | null>(null);
+    const [statusBanner, setStatusBanner] = useState<{
+        message: string | null;
+        type?: "loading" | "success" | "error";
+    } | null>(null);
     const [isButtonLoading, setIsButtonLoading] = useState(false);
     const [loadError, setLoadError] = useState<string | null>(null);
     const [deletedCommentIds, setDeletedCommentIds] = useState<Set<string>>(new Set());
@@ -240,13 +243,16 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
 
 
-    const showStatusBanner = (message: string, type: "loading" | "success" | "error" = "loading") => {
+    const showStatusBanner = (
+        message: string | null = null,
+        type: "loading" | "success" | "error" = "loading"
+    ) => {
         setStatusBanner({ message, type });
-        setIsSending(true); // 🔒 lock
+        setIsSending(true);
 
         setTimeout(() => {
             setStatusBanner(null);
-            setIsSending(false); // 🔓 unlock AFTER banner
+            setIsSending(false);
         }, 2000);
     };
 
@@ -1453,16 +1459,16 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                 </form>
 
                                 {/* Status */}
-                                {statusBanner && (
-                                    <div className="mt-2">
+                                <div className="mt-1">
+                                    {statusBanner && (
                                         <StatusBanner
-                                            message={statusBanner.message}
+                                            message={statusBanner.message ?? ""}
                                             type={statusBanner.type}
                                             onClose={() => setStatusBanner(null)}
                                             inline={true}
                                         />
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </div>
 
 
