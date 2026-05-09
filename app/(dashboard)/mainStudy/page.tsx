@@ -4,8 +4,9 @@ import { useMainTopics } from "@/app/(dashboard)/mainStudy/mainStudyTopicHook";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import SubscribeButton from "@/components/ui/SubscribeButton"; // adjust path if needed
-import { useError } from "@/app/ErrorProvider"; // make sure you import showError
+import SubscribeButton from "@/components/ui/SubscribeButton";
+import { useError } from "@/app/ErrorProvider";
+import { ChevronRight } from "lucide-react";
 
 
 export default function MainStudyPage() {
@@ -175,8 +176,12 @@ export default function MainStudyPage() {
                                 {/* Titles */}
                                 <ul className="text-sm text-neutral-600 space-y-1 mt-2">
                                     {titles.map((title, i) => (
-                                        <li key={i} className="truncate">
-                                            • {title}
+                                        <li
+                                            key={i}
+                                            className="flex items-start gap-2 break-words leading-relaxed text-neutral-700"
+                                        >
+                                            <ChevronRight className="w-4 h-4 mt-[2px] text-neutral-400 shrink-0" />
+                                            <span>{title}</span>
                                         </li>
                                     ))}
                                 </ul>
