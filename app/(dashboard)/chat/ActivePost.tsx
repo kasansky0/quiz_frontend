@@ -12,6 +12,7 @@ import StatusBanner from "@/app/positiveBanner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import StatLoaderIcon from "@/components/ui/StatLoaderIcon";
+import { motion, AnimatePresence } from "framer-motion";
 
 
 
@@ -433,7 +434,6 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             setBlockSeconds(prev => {
                 if (prev === null || prev <= 1) {
                     setIsBlocked(false);
-                    hideError();
                     return null;
                 }
                 return prev - 1;
@@ -441,7 +441,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [isBlocked, blockSeconds, hideError]);
+    }, [isBlocked, blockSeconds]);
 
 
 
@@ -456,7 +456,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
 
     const placeholderText = isBlocked
-        ? `Blocked for ${blockSeconds}s...`
+        ? `Please wait ${blockSeconds}s...`
         : "Add a comment...";
 
 
@@ -529,7 +529,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                     const seconds = detail?.remaining || 60;
                     setIsBlocked(true);
                     setBlockSeconds(seconds);
-                    showError(`Slow down. Wait ${seconds} second${seconds !== 1 ? "s" : ""}.`);
+                    showError(`Please wait ${seconds} second${seconds !== 1 ? "s" : ""}.`);
                     return;
                 }
 
@@ -1482,15 +1482,33 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                     id="comments-container"
                                     className="space-y-3"
                                 >
-                                    {displayedComments.map((comment) => {
+                                    <AnimatePresence initial={false}>
+                                        {displayedComments.map((comment) => {
 
 
                                             const isOwner = userId && comment.userId === userId;
                                             const isEditing = editingCommentId === comment._id;
 
                                             return (
-                                                <div
+                                                <motion.div
                                                     key={comment._id || `${comment.userId}-${comment.timestamp}`}
+                                                    layout
+                                                    initial={{
+                                                        opacity: 0,
+                                                        x: isOwner ? 20 : -20
+                                                    }}
+                                                    animate={{
+                                                        opacity: 1,
+                                                        x: 0
+                                                    }}
+                                                    exit={{
+                                                        opacity: 0,
+                                                        x: isOwner ? 20 : -20
+                                                    }}
+                                                    transition={{
+                                                        duration: 0.35,
+                                                        ease: "easeOut"
+                                                    }}
                                                     className={`w-full flex ${isOwner ? "justify-end" : "justify-start"}`}
                                                 >
                                                     <div
@@ -1659,10 +1677,10 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                             {formatLocalDate(comment.timestamp, comment.edited)}
                                                         </div>
                                                     </div>
-                                                </div>
+                                            </motion.div>
                                             );
                                         })}
-
+                                    </AnimatePresence>
                                 </div>
                             {/* Load more button */}
                             {hasMoreComments && (

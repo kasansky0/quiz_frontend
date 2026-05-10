@@ -1,29 +1,37 @@
-export default function StatLoaderIcon({ className = "w-6 h-6" }) {
+export default function StatLoaderIcon() {
     return (
         <svg
-            className={`${className} animate-spin text-black`}
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
+            className="w-4 h-4 animate-spin text-black/60"
             viewBox="0 0 24 24"
+            fill="none"
         >
-            {/* outer ring (same vibe as stroke icons) */}
+            {/* soft background ring (very subtle) */}
             <circle
-                className="opacity-25"
                 cx="12"
                 cy="12"
                 r="9"
                 stroke="currentColor"
-                strokeWidth="1.5"
+                strokeWidth="2"
+                opacity="0.15"
             />
 
-            {/* spinning arc (same stroke weight feel) */}
+            {/* modern gradient arc */}
             <path
-                className="opacity-75"
-                fill="none"
+                d="M12 3
+                   a9 9 0 0 1 9 9"
                 stroke="currentColor"
-                strokeWidth="1.5"
+                strokeWidth="2"
                 strokeLinecap="round"
-                d="M12 3a9 9 0 0 1 9 9"
+                opacity="0.9"
+            />
+
+            {/* highlight dot (gives “LinkedIn loading feel”) */}
+            <circle
+                cx="21"
+                cy="12"
+                r="1.5"
+                fill="currentColor"
+                className="opacity-80"
             />
         </svg>
     );
