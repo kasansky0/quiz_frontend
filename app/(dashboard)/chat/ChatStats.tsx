@@ -444,7 +444,7 @@ export default function ChatStats() {
             )}
 
             {/* Main Content */}
-            {!showLoading && allPosts.length > 0 && (
+            {!showLoading && (
                 <div className="w-full flex flex-col pb-10">
                     {creatingPost && (
                         <CreatePost

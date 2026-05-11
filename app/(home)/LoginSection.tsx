@@ -159,7 +159,7 @@ export default function LoginSection() {
                     </div>
 
                     <div className="bg-white border border-neutral-200 rounded-xl p-4 text-center shadow-sm">
-                        <div className="text-xl font-bold text-black">1000+</div>
+                        <div className="text-xl font-bold text-black">1200+</div>
                         <div className="text-xs text-neutral-500 mt-1">Questions</div>
                     </div>
 

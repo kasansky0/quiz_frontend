@@ -128,7 +128,7 @@ export default function MainStudyPage() {
                                 that focus on one topic at a time.
                                 <br />
                                 Unlike the free version where questions are random across
-                                800+ questions, this improves retention and speed.
+                                1200+ questions, this improves retention and speed.
                             </p>
 
                             <div className="w-full max-w-xs">

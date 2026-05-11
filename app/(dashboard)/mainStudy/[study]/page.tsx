@@ -20,6 +20,7 @@ export default function StudyPage() {
 
     const shouldRedirect = !loadingSubjects && subscriptionRequired === true;
 
+
     useEffect(() => {
         if (shouldRedirect) {
             router.replace("/mainStudy");

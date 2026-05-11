@@ -162,10 +162,6 @@ export default function Footer() {
                             Privacy Policy
                         </h1>
 
-                        <p className="text-xs text-neutral-500 mb-4">
-                            Last updated: April 27, 2026
-                        </p>
-
                         {/* CONTENT */}
                         <div className="space-y-5 text-sm text-neutral-700 leading-relaxed">
                             {POLICY_CONTENT.map((section, i) => (
@@ -209,10 +205,6 @@ export default function Footer() {
                             Terms of Service
                         </h1>
 
-                        <p className="text-xs text-neutral-500 mb-4">
-                            Last updated: April 27, 2026
-                        </p>
-
                         <div className="space-y-5 text-sm text-neutral-700 leading-relaxed">
                             {TERMS_CONTENT.map((section, i) => (
                                 <div key={i}>
@@ -254,10 +246,6 @@ export default function Footer() {
                         <h1 className="text-xl font-semibold mb-1">
                             Cookies Policy
                         </h1>
-
-                        <p className="text-xs text-neutral-500 mb-4">
-                            Last updated: April 27, 2026
-                        </p>
 
                         <div className="space-y-4 text-sm text-neutral-700 leading-relaxed">
 
@@ -310,8 +298,8 @@ export default function Footer() {
                         </h1>
 
                         <p className="text-sm text-neutral-600 mb-5">
-                            For any questions about your account, quizzes, job applications, or partnerships,
-                            please contact us below.
+                            For any questions about quizzes, job applications, or partnerships,
+                            please contact below.
                         </p>
 
                         {/* EMAIL */}
@@ -326,15 +314,11 @@ export default function Footer() {
                                 info@netaprep.com
                             </a>
 
-                            <p className="text-xs text-neutral-500 pt-2">
-                                Typical response time: 24–72 hours
-                            </p>
-
                         </div>
 
                         {/* OPTIONAL NOTICE */}
                         <div className="mt-5 pt-4 border-t border-neutral-200 text-xs text-neutral-500 leading-relaxed">
-                            Please include your account email and a clear description of your issue when contacting support.
+                            Please include your account email and a clear description of your issue when contacting.
                         </div>
 
                     </div>

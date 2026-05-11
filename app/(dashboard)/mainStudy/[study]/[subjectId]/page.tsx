@@ -34,6 +34,8 @@ export default function SubjectPage() {
     };
 
 
+
+
     useEffect(() => {
         const handleScroll = () => {
             topicRefs.current.forEach((el, index) => {
