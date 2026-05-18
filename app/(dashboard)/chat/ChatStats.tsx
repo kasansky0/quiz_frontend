@@ -13,47 +13,40 @@ import ActivePost from "./ActivePost";
 import Link from "next/link";
 import { formatLocalDate } from "@/app/hooks/formatLocalDate";
 
-type FetchPostsResult = {
-    posts: Post[];
-    total: number;
-    error?: string;
-};
-
 const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
 
 export default function ChatStats() {
     const [activePost, setActivePost] = useState<Post | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [creatingPost, setCreatingPost] = useState(false);
-    const {userId} = useUser();
-    const router = useRouter();
+    const [isOnline, setIsOnline] = useState(navigator.onLine);
     const [loggedOut, setLoggedOut] = useState(false);
-    const {showError, hideError} = useError();
-    const handleBackToList = () => {
-        setActivePost(null);
-
-        requestAnimationFrame(() => {
-            window.scrollTo(0, scrollY);
-        });
-    };
     const [listFade, setListFade] = useState(false);
     const [activePostComments, setActivePostComments] = useState<Comment[]>([]);
     const [serverError, setServerError] = useState<string | null>(null);
     const [showLoading, setShowLoading] = useState(true);
-    const {data: session} = useSession();
     const [deletedCommentIds, setDeletedCommentIds] = useState<Set<string>>(new Set());
     const [postSkip, setPostSkip] = useState(0);
-    const postLimit = 10; // number of posts to fetch per batch
     const [allPosts, setAllPosts] = useState<Post[]>([]);
     const [totalPosts, setTotalPosts] = useState(0);
     const [loadingMore, setLoadingMore] = useState(false);
     const [scrollY, setScrollY] = useState(0);
 
-    const showOverlay = showLoading || !!serverError;
 
-    const [isOnline, setIsOnline] = useState(navigator.onLine);
+    const {data: session} = useSession();
+    const {userId} = useUser();
+    const router = useRouter();
+    const {showError, hideError} = useError();
+    const handleBackToList = () => {
+        setActivePost(null);
+        requestAnimationFrame(() => {
+            window.scrollTo(0, scrollY);
+        });
+    };
+    const postLimit = 10; // number of posts to fetch per batch
 
-    // Network event listeners
+
+    // 1.Network event listeners
     useEffect(() => {
         const handleOnline = () => setIsOnline(true);
         const handleOffline = () => setIsOnline(false);
@@ -128,7 +121,7 @@ export default function ChatStats() {
         setShowLoading(false); // hide only if network OK
     };
 
-// --- Optional: auto retry when back online ---
+// --- 2. Optional: auto retry when back online ---
     useEffect(() => {
         if (isOnline && showLoading) {
             loadInitialPosts(); // retry fetching posts
@@ -164,7 +157,7 @@ export default function ChatStats() {
         }
     };
 
-    // Fade-in effect
+    // 3. Fade-in effect
     useEffect(() => {
         const timer = setTimeout(() => setListFade(true), 50);
         return () => clearTimeout(timer);
@@ -424,6 +417,14 @@ export default function ChatStats() {
 
     return (
         <div className="w-full relative sm:px-4">
+
+
+
+
+
+
+
+
             {/* Loading / Error Banner */}
             {(showLoading || serverError) && (
                 <div className="flex-1 flex items-center justify-center min-h-screen text-black w-full">
@@ -443,9 +444,26 @@ export default function ChatStats() {
                 </div>
             )}
 
+
+
+
+
+
+
+
+
+
+
             {/* Main Content */}
             {!showLoading && (
                 <div className="w-full flex flex-col pb-10">
+
+
+
+
+
+
+
                     {creatingPost && (
                         <CreatePost
                             onSubmit={handleCreatePost}
@@ -453,6 +471,13 @@ export default function ChatStats() {
                             isBlocked={false}
                         />
                     )}
+
+
+
+
+
+
+
 
                     {!creatingPost && !activePost && (
                         <>
@@ -602,6 +627,11 @@ export default function ChatStats() {
 
 
                                                         <span className="flex items-center gap-1 text-sm sm:text-sm md:text-base font-bold truncate text-blue-400">
+
+
+
+
+
                                                             {/* NETA BADGE */}
                                                             {netaLevel && (
                                                                 <span
@@ -731,6 +761,14 @@ export default function ChatStats() {
                                 </div>
                             </div>
 
+
+
+
+
+
+
+
+
                             {/* LOAD MORE POSTS BUTTON */}
                             {allPosts.length < totalPosts && (
                                 <div className="flex justify-center my-3 w-full">
@@ -825,8 +863,6 @@ export default function ChatStats() {
                     </div>
                 </div>
             )}
-
-            {/* Active post outside main content still controlled */}
         </div>
     );
 }

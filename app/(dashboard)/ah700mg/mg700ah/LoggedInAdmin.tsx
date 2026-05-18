@@ -1649,11 +1649,6 @@ export default function LoggedInAdmin() {
                             <p className="font-bold text-blue-400 mb-2">
                                 <strong>Created At:</strong> {formatDate(user.created_at)}
                             </p>
-                            <p>
-                                <strong>Total Online Time:</strong> {Math.floor(user.totalOnlineTime / 3600)}h{" "}
-                                {Math.floor((user.totalOnlineTime % 3600) / 60)}m
-                            </p>
-                            <p><strong>User Percentage:</strong> {user.userPercentage}</p>
 
 
 
@@ -1748,7 +1743,7 @@ export default function LoggedInAdmin() {
                                     href={`https://whatismyipaddress.com/ip/${user.ip_address}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-blue-400 hover:underline"
+                                    className="text-blue-400 hover:underline break-all"
                                 >
                                     {user.ip_address}
                                 </a>
