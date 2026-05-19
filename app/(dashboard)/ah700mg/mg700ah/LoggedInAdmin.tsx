@@ -318,7 +318,7 @@ export default function LoggedInAdmin() {
         };
 
         fetchUsers();
-    }, [session]);
+    }, []);
 
 
     if (status === "loading") return <FullScreenMessage text="Loading..." />;

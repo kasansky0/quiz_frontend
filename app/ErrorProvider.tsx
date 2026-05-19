@@ -93,7 +93,7 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
                             {showLoginButton && (
                                 <button
                                     onClick={() => signIn("google")}
-                                    className="text-sm font-medium text-blue-600 hover:text-blue-700 transition whitespace-nowrap"
+                                    className="text-sm font-medium text-blue-600 hover:text-blue-700 transition whitespace-nowrap px-3 py-1 rounded-full border border-transparent hover:border-blue-200 hover:bg-blue-50"
                                 >
                                     Log in
                                 </button>
