@@ -48,7 +48,7 @@ export default function AdminPage() {
         } finally {
             setLoadingAdmin(false);
         }
-    }, [session, showError]);
+    }, [showError]);
 
     useEffect(() => {
         if (session) fetchAdminStatus();
@@ -56,7 +56,7 @@ export default function AdminPage() {
 
         const timer = setTimeout(() => setMinLoading(false), 800);
         return () => clearTimeout(timer);
-    }, [session, fetchAdminStatus]);
+    }, [fetchAdminStatus]);
 
     // Show loading state while checking admin status
     if (status === "loading" || loadingAdmin || minLoading) {
