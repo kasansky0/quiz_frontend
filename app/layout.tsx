@@ -28,16 +28,16 @@ export const metadata: Metadata = {
         "NETA Level 2 exam prep",
         "NETA certification practice"
     ],
-    metadataBase: new URL("https://netaprep.com"),
-    alternates: { canonical: "https://netaprep.com" },
+    metadataBase: new URL("https://www.netaprep.com"),
+    alternates: { canonical: "https://www.netaprep.com" },
     openGraph: {
         title: "NETA Level 2 Practice Exam | Netaprep",
         description: "Master the NETA Level 2 exam with realistic questions, explanations, and exam tips.",
-        url: "https://netaprep.com",
+        url: "https://www.netaprep.com",
         siteName: "Netaprep",
         type: "website",
         images: [{
-            url: "https://netaprep.com/android-chrome-512x512.png",
+            url: "https://www.netaprep.com/android-chrome-512x512.png",
             width: 1200,
             height: 630,
             alt: "NETA Practice Exam – Netaprep"
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
         card: "summary_large_image",
         title: "NETA Level 2 Exam Prep | Netaprep",
         description: "Realistic NETA Level 2 practice questions with explanations to boost your score.",
-        images: ["https://netaprep.com/android-chrome-512x512.png"],
+        images: ["https://www.netaprep.com/android-chrome-512x512.png"],
     },
     icons: {
         icon: [
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
         shortcut: "/favicon.ico",
     },
     manifest: "/site.webmanifest",
-    authors: [{ name: "Netaprep", url: "https://netaprep.com" }],
+    authors: [{ name: "Netaprep", url: "https://www.netaprep.com" }],
     category: "Education",
     robots: {
         index: true,
@@ -125,7 +125,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     "provider": {
                         "@type": "Organization",
                         "name": "Netaprep",
-                        "sameAs": "https://netaprep.com"
+                        "sameAs": "https://www.netaprep.com"
                     },
                     "educationalCredentialAwarded": "NETA Level 2 Certification",
                     "audience": {

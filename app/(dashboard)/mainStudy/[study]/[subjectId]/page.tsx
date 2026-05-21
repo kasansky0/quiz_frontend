@@ -296,9 +296,9 @@ export default function SubjectPage() {
                                                     <p className="text-sm text-neutral-700 leading-relaxed">
                                                         {sub.content?.split("\n").map((line, i) => (
                                                             <span key={i}>
-                                            {line}
+                                                                {line}
                                                                 <br />
-                                        </span>
+                                                            </span>
                                                         ))}
                                                     </p>
 
@@ -306,9 +306,9 @@ export default function SubjectPage() {
                                                         <ul className="mt-2 ml-4 list-disc text-sm text-neutral-600">
                                                             {sub.resources.map((res, i) => (
                                                                 <li key={`${res.code}-${i}`}>
-                                                <span className="font-medium">
-                                                    {res.code}:
-                                                </span>{" "}
+                                                                    <span className="font-medium">
+                                                                        {res.code}
+                                                                    </span>{" "}
                                                                     {res.description}
                                                                 </li>
                                                             ))}
