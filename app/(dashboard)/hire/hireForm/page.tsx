@@ -37,8 +37,6 @@ export default function HireFormPage() {
     const requiredFields = [
         "title",
         "location",
-        "payMin",
-        "payMax",
         "type",
         "travel",
         "overtime",
@@ -114,10 +112,10 @@ export default function HireFormPage() {
             }
         });
 
-        const min = Number(form.payMin);
-        const max = Number(form.payMax);
+        const min = form.payMin.trim() ? Number(form.payMin) : null;
+        const max = form.payMax.trim() ? Number(form.payMax) : null;
 
-        if (min > max) {
+        if (min !== null && max !== null && min > max) {
             newErrors.payMax = "Max must be greater than min";
         }
 
@@ -133,8 +131,8 @@ export default function HireFormPage() {
                 title: form.title,
                 location: form.location,
                 pay: {
-                    min: Number(form.payMin),
-                    max: Number(form.payMax),
+                    min: form.payMin.trim() ? Number(form.payMin) : null,
+                    max: form.payMax.trim() ? Number(form.payMax) : null,
                 },
                 type: form.type,
                 travel: form.travel,
@@ -290,9 +288,12 @@ export default function HireFormPage() {
                     {/* PAY */}
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="text-sm text-neutral-600">Pay Min ($/hr)</label>
+                            <label className="text-sm text-neutral-600">
+                                Pay Min ($/hr) <span className="text-neutral-400 font-normal">(optional)</span>
+                            </label>
+
                             <div className="text-xs text-neutral-500 mb-1">
-                                Minimum hourly rate across all positions (lowest paid role).
+                                Enter the minimum hourly rate for this position.
                             </div>
 
                             <input
@@ -304,9 +305,12 @@ export default function HireFormPage() {
                         </div>
 
                         <div>
-                            <label className="text-sm text-neutral-600">Pay Max ($/hr)</label>
+                            <label className="text-sm text-neutral-600">
+                                Pay Max ($/hr) <span className="text-neutral-400 font-normal">(optional)</span>
+                            </label>
+
                             <div className="text-xs text-neutral-500 mb-1">
-                                Maximum hourly rate across all positions (highest paid role).
+                                Enter the maximum hourly rate for this position.
                             </div>
 
                             <input

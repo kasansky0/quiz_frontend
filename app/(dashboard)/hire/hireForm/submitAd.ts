@@ -4,9 +4,9 @@ export interface SubmitAdPayload {
     title: string;
     location: string;
 
-    pay: {
-        min: number;
-        max: number;
+    pay?: {
+        min: number | null;
+        max: number | null;
     };
 
     type: string;

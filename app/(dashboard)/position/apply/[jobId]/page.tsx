@@ -723,7 +723,7 @@ export default function ApplyPage() {
                             className={`mt-1 ${!isFormComplete ? "cursor-not-allowed opacity-50" : ""}`}
                         />
                         <label htmlFor="agree" className="text-xs text-neutral-600 leading-relaxed">
-                            By submitting this application, I confirm that all information provided is true and accurate to the best of my knowledge. I consent to being contacted regarding this application and related employment opportunities. I understand and agree that my information, including my resume, may be shared with potential employers for hiring purposes. I acknowledge that submission of this application does not create an employment contract or guarantee of employment.
+                            By submitting this application, I confirm that all information provided is true and accurate to the best of my knowledge. I consent to being contacted regarding this application and related employment opportunities. I understand and agree that my application information (which may include my name, email address, resume, and other details I voluntarily provide) will be shared with potential employers solely for recruitment and hiring purposes. I acknowledge that submission of this application does not create an employment contract or guarantee of employment.
                         </label>
                     </div>
 

@@ -13,10 +13,10 @@ type Job = {
     company: string;
     location: string;
     title: string;
-    pay: {
+    pay?: {
         min: number;
         max: number;
-    };
+    } | null;
     relocation: string;
     perDiem?: string;
     overtime: string;
@@ -281,15 +281,27 @@ export default function AdsPage() {
                                                 📍 {job.location}
                                             </span>
 
-                                                <span className="px-2 py-0.5 rounded-full bg-green-50 text-green-700">
-                                                ${job.pay.min}–${job.pay.max}/hr
-                                            </span>
+                                                {(job.pay?.min != null || job.pay?.max != null) && (
+                                                    <span className="px-2 py-0.5 rounded-full bg-green-50 text-green-700">
+                                                        {job.pay?.min != null && job.pay?.max != null && (
+                                                            <>${job.pay.min}–${job.pay.max}/hr</>
+                                                        )}
 
-                                                <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">
+                                                        {job.pay?.min != null && job.pay?.max == null && (
+                                                            <>${job.pay.min}+/hr</>
+                                                        )}
+
+                                                        {job.pay?.min == null && job.pay?.max != null && (
+                                                            <>Up to ${job.pay.max}/hr</>
+                                                        )}
+                                                    </span>
+                                                )}
+
+                                            <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">
                                                 {job.relocation}
                                             </span>
 
-                                                <span className="px-2 py-0.5 rounded-full bg-orange-50 text-orange-700">
+                                            <span className="px-2 py-0.5 rounded-full bg-orange-50 text-orange-700">
                                                 {job.type}
                                             </span>
 
