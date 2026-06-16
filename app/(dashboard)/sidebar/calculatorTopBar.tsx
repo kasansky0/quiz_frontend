@@ -39,7 +39,7 @@ export default function CalculatorMobile() {
                     </button>
 
                     {/* PREVIEW WINDOW */}
-                    <div className="h-[66vh] rounded-xl bg-white overflow-auto relative">
+                    <div className="h-[56vh] rounded-xl bg-white overflow-auto relative">
 
                         {/* IFRAME (UNCHANGED) */}
                         {!error && (
