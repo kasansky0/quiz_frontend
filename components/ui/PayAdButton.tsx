@@ -16,7 +16,7 @@ export default function PayAdButton({ adId }: Props) {
 
     const handlePay = async () => {
         if (!token) {
-            showError("You need to log in to continue. 😟", true);
+            showError("You need to log in to continue.", true);
             return;
         }
 

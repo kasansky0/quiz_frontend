@@ -922,7 +922,7 @@ export default function LoggedInAdmin() {
                         <div className="flex flex-col gap-1 mt-2 text-xs text-left">
 
                             <div className="flex items-center justify-between">
-                                <span className="text-orange-400">Expiring (≤3d):</span>
+                                <span className="text-orange-400">Expiring (≤5d):</span>
                                 <span className="text-orange-400 font-semibold">
                                     {expiringAds?.expiringSoon ?? 0}
                                 </span>

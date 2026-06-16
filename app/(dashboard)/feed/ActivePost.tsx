@@ -13,6 +13,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import StatLoaderIcon from "@/components/ui/StatLoaderIcon";
 import { motion, AnimatePresence } from "framer-motion";
+import PostMedia from "./ActivePostMedia"
+import PositionCard from "@/app/PositionCard";
 
 
 
@@ -49,10 +51,12 @@ type Props = {
     totalComments: number;
     onPostUpdate?: (updatedPost: Post) => void;   // <-- new
     onPostDelete?: (deletedPostId: string) => void; // <-- new
-    onCommentCountChange?: (postId: string, newCount: number) => void; // ← new
+    onCommentCountChange?: (postId: string, newCount: number) => void;
+    expandedPosts: Set<string>;
+    togglePostExpand: (postId: string) => void;
 };
 
-export default function ActivePost({ post, comments, userId, onBack, totalComments, onPostDelete, onPostUpdate, onCommentCountChange }: Props) {
+export default function ActivePost({ post, comments, userId, onBack, totalComments, onPostDelete, onPostUpdate, onCommentCountChange, expandedPosts, togglePostExpand }: Props) {
     const { data: session, status } = useSession();
 
     // 1️⃣ While session is loading, just show a placeholder
@@ -111,6 +115,34 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const [isSaving, setIsSaving] = useState(false);
     const [isSavingComment, setIsSavingComment] = useState(false);
 
+    const [isImageOpen, setIsImageOpen] = useState(false);
+
+    const commentsTopRef = useRef<HTMLDivElement | null>(null);
+
+    const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
+
+    const toggleCommentExpand = (id: string) => {
+        setExpandedComments(prev => {
+            const next = new Set(prev);
+            next.has(id) ? next.delete(id) : next.add(id);
+            return next;
+        });
+    };
+
+
+
+
+    const [expandedPost, setExpandedPost] = useState(false);
+
+    const POST_PREVIEW_LENGTH = 300;
+
+    const shouldTruncatePost =
+        activePost.message.length > POST_PREVIEW_LENGTH;
+
+    const displayedPostMessage =
+        expandedPost || !shouldTruncatePost
+            ? activePost.message
+            : activePost.message.slice(0, POST_PREVIEW_LENGTH) + "...";
 
 
 
@@ -268,7 +300,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         commentsKey(post.id, 0),
         fetcher,
         {
-            refreshInterval: 10000,
+            refreshInterval: 60000,
             fallbackData: comments, // use the comments prop you already have
             revalidateOnMount: false // prevents SWR from fetching immediately on mount
         }
@@ -559,7 +591,10 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             }, 1000);
 
             // COMMENT ADD
-            onCommentCountChange?.(activePost.id, (totalComments || 0) + 1);
+            onCommentCountChange?.(
+                activePost.id,
+                (activePost.commentCount ?? 0) + 1
+            );
 
 
             setCurrentPage(1);
@@ -594,6 +629,11 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             // 1️⃣ Optimistically remove comment from UI
             setDisplayedComments(prev =>
                 prev.filter(c => c._id !== comment._id)
+            );
+
+            onCommentCountChange?.(
+                activePost.id,
+                Math.max(0, (activePost.commentCount ?? 0) - 1)
             );
 
             // Update activePost locally
@@ -708,9 +748,9 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
             let trimmed = editCommentMessage.trim();
 
-            // ✅ enforce 500-character limit
-            if (trimmed.length > 500) {
-                trimmed = trimmed.slice(0, 500);
+            // ✅ enforce 1500-character limit
+            if (trimmed.length > 1500) {
+                trimmed = trimmed.slice(0, 1500);
                 setEditCommentMessage(trimmed); // update state so input reflects limit
             }
 
@@ -990,6 +1030,143 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
 
 
+    function CommentText({
+                             message,
+                             isExpanded,
+                             onToggle,
+                         }: {
+        message: string;
+        isExpanded: boolean;
+        onToggle: () => void;
+    }) {
+        const LIMIT = 300;
+        const shouldTruncate = message.length > LIMIT;
+
+        const handleToggle = (e: React.MouseEvent) => {
+            const selection = window.getSelection();
+            if (selection && selection.toString().length > 0) return;
+
+            onToggle();
+        };
+
+        const previewText =
+            !isExpanded && shouldTruncate
+                ? message.slice(0, LIMIT)
+                : message;
+
+        return (
+            <div className="relative text-black break-words whitespace-pre-wrap">
+                {/* TEXT BLOCK */}
+                <div
+                    onClick={shouldTruncate ? handleToggle : undefined}
+                    className="cursor-pointer"
+                >
+                    <p className="text-sm sm:text-sm md:text-base select-text">
+                        {previewText}
+                        {!isExpanded && shouldTruncate ? "..." : ""}
+                    </p>
+
+                    {/* FADE (ONLY FOR PREVIEW MODE) */}
+                    {!isExpanded && shouldTruncate && (
+                        <div className="absolute bottom-6 left-0 w-full h-8 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+                    )}
+                </div>
+
+                {/* BUTTON */}
+                {shouldTruncate && (
+                    <button
+                        onClick={onToggle}
+                        className="mt-1 text-sm text-blue-500 hover:text-blue-600 font-medium transition"
+                    >
+                        {isExpanded ? "Show less" : "See more"}
+                    </button>
+                )}
+            </div>
+        );
+    }
+
+
+
+
+
+
+
+
+
+    function PostExpandableText({
+                                    message,
+                                    isExpanded,
+                                    onToggle,
+                                }: {
+        message: string;
+        isExpanded: boolean;
+        onToggle: () => void;
+    }) {
+        const LIMIT = 500;
+        const shouldTruncate = message.length > LIMIT;
+
+        const handleToggle = (e: React.MouseEvent) => {
+            const selection = window.getSelection();
+            if (selection && selection.toString().length > 0) return;
+
+            onToggle();
+        };
+
+        return (
+            <div className="relative text-black break-words whitespace-pre-wrap">
+                {/* TEXT BLOCK */}
+                <div
+                    onClick={shouldTruncate ? handleToggle : undefined}
+                    className={`cursor-pointer ${
+                        isExpanded
+                            ? ""
+                            : "max-h-[6.5rem] overflow-hidden relative will-change-[max-height]"
+                    }`}
+                >
+                    <p className="text-sm sm:text-sm md:text-base select-text">
+                        {message}
+                    </p>
+
+                    {/* FADE GRADIENT */}
+                    {!isExpanded && shouldTruncate && (
+                        <div className="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+                    )}
+                </div>
+
+                {/* BUTTON */}
+                {shouldTruncate && (
+                    <button
+                        onClick={onToggle}
+                        className="mt-1 text-sm text-blue-500 hover:text-blue-600 font-medium transition"
+                    >
+                        {isExpanded ? "Show less" : "See more"}
+                    </button>
+                )}
+            </div>
+        );
+    }
+
+
+    const scrollToTop = () => {
+        const el = commentsTopRef.current;
+        if (!el) return;
+
+        const yOffset = -80; // adjust this value
+        const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
+        window.scrollTo({
+            top: y,
+            behavior: "smooth",
+        });
+    };
+
+
+
+
+
+
+
+
 
 
 
@@ -1044,6 +1221,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     return (
         <div className={`transition-opacity duration-500 ease-in-out ${fade ? "opacity-100" : "opacity-0"}`}>
 
+            <div ref={commentsTopRef} />
+
             {showLoading ? (
                 <div className="flex-1 flex items-center justify-center min-h-screen text-black">
                     <p className="text-xl flex items-center">
@@ -1061,10 +1240,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             ) : (
 
 
-
-
-
                 <div className="flex flex-col w-full">
+
 
 
                     {/* Back button like Reddit, aligned left */}
@@ -1091,84 +1268,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                         </button>
 
                         {/* Future Ads / Message */}
-                        <Link
-                            href="/position"
-                            className="w-full text-center text-xs block active:bg-transparent focus:bg-transparent [-webkit-tap-highlight-color:transparent]"
-                        >
-                            <div className="flex flex-col items-center space-y-1 pb-3">
-
-                                {/* ICON + TITLE */}
-                                <div className="font-semibold flex items-center justify-center gap-2 text-center">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        strokeWidth={1.5}
-                                        stroke="currentColor"
-                                        className="w-4 h-4 text-blue-400 flex-shrink-0"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            d="M20.25 7.5h-16.5A2.25 2.25 0 001.5 9.75v9A2.25 2.25 0 003.75 21h16.5A2.25 2.25 0 0022.5 18.75v-9A2.25 2.25 0 0020.25 7.5z"
-                                        />
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            d="M8.25 7.5V6a3.75 3.75 0 017.5 0v1.5"
-                                        />
-                                    </svg>
-
-                                    <span className="leading-none">
-                                                    Hiring NETA Technicians
-                                                </span>
-                                </div>
-
-                                {/* LOCATION */}
-                                <div className="text-xs text-center flex items-center justify-center gap-1 text-neutral-600">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        strokeWidth={1.5}
-                                        stroke="currentColor"
-                                        className="w-4 h-4 text-blue-400 flex-shrink-0"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
-                                        />
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
-                                        />
-                                    </svg>
-
-                                    <span>Multiple locations • Relocation assistance</span>
-                                </div>
-
-                                {/* CTA */}
-                                <div className="text-blue-400 text-xs flex items-center gap-1 group">
-                                    <span>View positions</span>
-
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 20 20"
-                                        fill="currentColor"
-                                        className="w-3 h-3"
-                                    >
-                                        <path
-                                            fillRule="evenodd"
-                                            d="M3 10a.75.75 0 01.75-.75h10.69L10.22 5.03a.75.75 0 011.06-1.06l5.5 5.5a.75.75 0 010 1.06l-5.5 5.5a.75.75 0 11-1.06-1.06l4.22-4.22H3.75A.75.75 0 013 10z"
-                                            clipRule="evenodd"
-                                        />
-                                    </svg>
-                                </div>
-
-                            </div>
-                        </Link>
+                        <PositionCard />
 
                     </div>
 
@@ -1180,7 +1280,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                             <div className="z-10 sm:px-4 py-4 px-4 rounded-xl bg-white border border-black/10 shadow-sm mb-2">
 
 
-                                <div className="flex justify-between items-center pb-3">
+                                <div className="flex justify-between items-center">
                                     {/* Nickname on the left */}
                                     <div className="flex items-center gap-2">
 
@@ -1342,27 +1442,83 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                             style={{ WebkitOverflowScrolling: "touch" }}
                                             onChange={(e) => {
                                                 const value = e.target.value;
-                                                if (value.length <= 500) setEditMessage(value); // 500 char limit
+                                                if (value.length <= 1500) setEditMessage(value); // 1500 char limit
                                             }}
                                             rows={11}
                                             placeholder="Edit message..."
                                             className="bg-transparent w-full rounded-xl bg-black-200 border border-black/10 px-2 py-1 text-sm sm:text-sm md:text-base text-black resize-none focus:outline-none focus:ring-2 focus:ring-white/20"
                                         />
                                         <div className="text-black text-xs text-right">
-                                            {editMessage.length}/500
+                                            {editMessage.length}/1500
                                         </div>
                                     </div>
                                 ) : (
                                     <>
                                         {/* Topic / Title */}
-                                        <h3 className="text-black font-bold mb-3 text-sm sm:text-base md:text-base">
+                                        <h3 className="text-black font-bold text-sm sm:text-base md:text-base">
                                             {activePost.title}
                                         </h3>
 
+
+
+
+
+
+
+                                        {/* TAGS */}
+                                        {Array.isArray(activePost.tags) && activePost.tags.length > 0 && (
+                                            <div className="flex flex-wrap gap-x-2 gap-y-1 mb-2 text-[11px] text-neutral-500">
+                                                {activePost.tags.slice(0, 5).map((tag, idx) => {
+                                                    if (typeof tag !== "string") return null;
+
+                                                    const cleanTag = tag.trim();
+                                                    if (!cleanTag) return null;
+
+                                                    return (
+                                                        <span
+                                                            key={`${cleanTag}-${idx}`}
+                                                            className="
+                                                                text-neutral-500
+                                                                hover:text-neutral-700
+                                                                transition-colors
+                                                                select-none
+                                                            "
+                                                        >
+                                                            #{cleanTag}
+                                                        </span>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+
+
+
+
+
+
+
+                                        <PostMedia
+                                            images={(activePost?.images ?? [])
+                                                .map((img) =>
+                                                    typeof img === "string"
+                                                        ? img
+                                                        : img?.secure_url ?? img?.url ?? img?.thumbnail
+                                                )
+                                                .filter((img): img is string => Boolean(img))}
+                                            tags={activePost?.tags ?? []}
+                                            onOpenChange={setIsImageOpen}
+                                        />
+
+
+
                                         {/* Message */}
-                                        <p className="text-black break-words text-sm sm:text-sm md:text-base">
-                                            {activePost.message}
-                                        </p>
+                                        <div className="mt-2">
+                                            <PostExpandableText
+                                                message={activePost.message}
+                                                isExpanded={expandedPosts.has(activePost.id)}
+                                                onToggle={() => togglePostExpand(activePost.id)}
+                                            />
+                                        </div>
                                     </>
                                 )}
 
@@ -1393,6 +1549,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                     <textarea
                                         ref={commentInputRef}
                                         placeholder={placeholderText}
+                                        value={commentMessage}
                                         rows={1}
                                         className="
                                             flex-1
@@ -1409,14 +1566,26 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                             focus:ring-blue-400/30
                                             focus:bg-white
                                             transition
+                                            max-h-[140px]
+                                            overflow-y-auto
                                             min-h-[42px]
                                         "
-                                        value={commentMessage}
                                         onChange={(e) => {
                                             if (isSending) return;
+
                                             const value = e.target.value;
-                                            if (value.length <= 500) setCommentMessage(value);
-                                            else setCommentMessage(value.slice(0, 500));
+
+                                            // keep your limit logic
+                                            if (value.length <= 1500) {
+                                                setCommentMessage(value);
+                                            } else {
+                                                setCommentMessage(value.slice(0, 1500));
+                                            }
+
+                                            // auto-grow until max height, then scroll
+                                            const el = e.target;
+                                            el.style.height = "auto";
+                                            el.style.height = Math.min(el.scrollHeight, 140) + "px";
                                         }}
                                         disabled={isBlocked || isSending}
                                     />
@@ -1492,23 +1661,10 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                             return (
                                                 <motion.div
                                                     key={comment._id || `${comment.userId}-${comment.timestamp}`}
-                                                    layout
-                                                    initial={{
-                                                        opacity: 0,
-                                                        x: isOwner ? 20 : -20
-                                                    }}
-                                                    animate={{
-                                                        opacity: 1,
-                                                        x: 0
-                                                    }}
-                                                    exit={{
-                                                        opacity: 0,
-                                                        x: isOwner ? 20 : -20
-                                                    }}
-                                                    transition={{
-                                                        duration: 0.35,
-                                                        ease: "easeOut"
-                                                    }}
+                                                    initial={{ opacity: 0, x: isOwner ? 20 : -20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    exit={{ opacity: 0, x: isOwner ? 20 : -20 }}
+                                                    transition={{ duration: 0.25, ease: "easeOut" }}
                                                     className={`w-full flex ${isOwner ? "justify-end" : "justify-start"}`}
                                                 >
                                                     <div
@@ -1641,35 +1797,51 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                         </div>
 
                                                         {/* comment text */}
-                                                        <p
-                                                            contentEditable={isEditing}
-                                                            suppressContentEditableWarning
-                                                            className={`text-black break-words whitespace-pre-wrap
-                                                                                ${isEditing ? "text-base border border-black px-2 py-1" : "text-sm sm:text-sm md:text-base"}
-                                                                                bg-transparent rounded-xl`}
-                                                            ref={(el) => {
-                                                                if (el && isEditing && el.innerText !== editCommentMessage) {
-                                                                    el.innerText = editCommentMessage || comment.message;
-                                                                }
-                                                            }}
-                                                            onInput={(e) => {
-                                                                const text = (e.currentTarget as HTMLDivElement).innerText;
-                                                                setEditCommentMessage(text.slice(0, 500)); // limit to 500
-                                                                // optional: immediately truncate the contentEditable to match
-                                                                if (text.length > 500) {
-                                                                    (e.currentTarget as HTMLDivElement).innerText = text.slice(0, 500);
-                                                                    // move caret to the end
-                                                                    const range = document.createRange();
-                                                                    const sel = window.getSelection();
-                                                                    range.selectNodeContents(e.currentTarget);
-                                                                    range.collapse(false);
-                                                                    sel?.removeAllRanges();
-                                                                    sel?.addRange(range);
-                                                                }
-                                                            }}
+                                                        <div
+                                                            className={`
+                                                            text-black break-words whitespace-pre-wrap
+                                                            bg-transparent rounded-xl
+                                                            ${isEditing
+                                                                ? "text-base border border-black px-2 py-1 max-h-[200px] overflow-y-auto"
+                                                                : "text-sm sm:text-sm md:text-base"
+                                                            }
+                                                         `}
                                                         >
-                                                            {!isEditing && comment.message}
-                                                        </p>
+                                                            {isEditing ? (
+                                                                <div
+                                                                    contentEditable
+                                                                    suppressContentEditableWarning
+                                                                    className="outline-none min-h-[60px]"
+                                                                    ref={(el) => {
+                                                                        if (el && el.innerText !== editCommentMessage) {
+                                                                            el.innerText = editCommentMessage || comment.message;
+                                                                        }
+                                                                    }}
+                                                                    onInput={(e) => {
+                                                                        const text = (e.currentTarget as HTMLDivElement).innerText;
+
+                                                                        setEditCommentMessage(text.slice(0, 1500));
+
+                                                                        if (text.length > 1500) {
+                                                                            (e.currentTarget as HTMLDivElement).innerText = text.slice(0, 1500);
+
+                                                                            const range = document.createRange();
+                                                                            const sel = window.getSelection();
+                                                                            range.selectNodeContents(e.currentTarget);
+                                                                            range.collapse(false);
+                                                                            sel?.removeAllRanges();
+                                                                            sel?.addRange(range);
+                                                                        }
+                                                                    }}
+                                                                />
+                                                            ) : (
+                                                                <CommentText
+                                                                    message={comment.message}
+                                                                    isExpanded={expandedComments.has(comment._id)}
+                                                                    onToggle={() => toggleCommentExpand(comment._id)}
+                                                                />
+                                                            )}
+                                                        </div>
 
                                                         {/* timestamp */}
                                                         <div
@@ -1829,6 +2001,41 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                     </div>
                 </div>
             )}
+
+            {!isImageOpen && (
+                <div className="fixed bottom-32 right-6 z-50">
+                    <button
+                        onClick={scrollToTop}
+                        className="
+                            w-11 h-11
+                            flex items-center justify-center
+                            rounded-full
+                            bg-white
+                            border border-neutral-200
+                            shadow-md
+                            text-neutral-700
+                            hover:bg-neutral-50
+                            active:scale-95
+                            transition
+                        "
+                        title="Go to top"
+                    >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                            <path
+                                d="M6 16l6-6 6 6"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                            />
+                            <path
+                                d="M6 10l6-6 6 6"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                            />
+                        </svg>
+                    </button>
+                </div>
+            )}
+
         </div>
     );
 }

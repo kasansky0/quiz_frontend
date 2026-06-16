@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TI-84 Calculator</title>
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: white;
+            overflow: hidden; /* 🚀 removes scrolling */
+        }
+
+        iframe {
+            width: 100%;
+            height: 100vh;
+            border: none;
+            transform-origin: top center;
+            transition: transform 0.25s ease;
+        }
+
+        /* default (compact) */
+        iframe.compact {
+            transform: scale(0.9);
+        }
+
+        /* fullscreen mode */
+        iframe.full {
+            transform: scale(1.15);
+        }
+    </style>
+</head>
+<body>
+
+<!-- JUST the calculator -->
+<iframe id="calcFrame" src="ti84calc.html"></iframe>
+
+<script>
+    function getMode() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get("mode") || "compact";
+    }
+
+    function applyMode() {
+        const iframe = document.getElementById("calcFrame");
+        const mode = getMode();
+
+        iframe.classList.remove("compact", "full");
+        iframe.classList.add(mode);
+    }
+
+    applyMode();
+</script>
+
+</body>
+</html>

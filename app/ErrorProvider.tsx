@@ -3,6 +3,7 @@
 import { useEffect, createContext, useContext, useState, useRef, ReactNode } from "react";
 import { signIn } from "next-auth/react";
 import { usePathname } from "next/navigation";
+import StatLoaderIcon from "@/components/ui/StatLoaderIcon";
 
 interface ErrorContextType {
     showError: (msg: string | object, showLoginButton?: boolean) => void;
@@ -18,6 +19,7 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
     const [showLoginButton, setShowLoginButton] = useState(false);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const pathname = usePathname();
+    const [isLoggingIn, setIsLoggingIn] = useState(false);
 
     useEffect(() => {
         hideError(); // clear banner on route change
@@ -92,10 +94,21 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
                             {/* LOGIN BUTTON */}
                             {showLoginButton && (
                                 <button
-                                    onClick={() => signIn("google")}
-                                    className="text-sm font-medium text-blue-600 hover:text-blue-700 transition whitespace-nowrap px-3 py-1 rounded-full border border-blue-200 hover:bg-blue-50 active:bg-blue-100 active:border-blue-400"
+                                    onClick={() => {
+                                        setIsLoggingIn(true);
+                                        signIn("google");
+                                    }}
+                                    disabled={isLoggingIn}
+                                    className="w-[110px] text-sm font-medium text-blue-600 hover:text-blue-700 transition whitespace-nowrap px-3 py-1 rounded-full border border-blue-200 hover:bg-blue-50 active:bg-blue-100 active:border-blue-400 disabled:opacity-70 flex items-center justify-center"
                                 >
-                                    Log in
+                                    {isLoggingIn ? (
+                                        <>
+                                            <StatLoaderIcon />
+                                            <span className="ml-2">Loading</span>
+                                        </>
+                                    ) : (
+                                        "Log in"
+                                    )}
                                 </button>
                             )}
 

@@ -12,6 +12,7 @@ import Calculator from "@/app/(dashboard)/sidebar/calculator"
 import FormulaSheet from "@/app/(dashboard)/sidebar/formulasSheet"
 import { useError } from "@/app/ErrorProvider";
 import { fetchWithToken, handleSessionExpired } from "@/app/hooks/refreshToken";
+import CalculatorMobile from "@/app/(dashboard)/sidebar/calculatorTopBar";
 
 
 
@@ -129,7 +130,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         if (session) {
             // Only redirect if current path is exactly "/dashboard" (or wherever this layout is)
             if (window.location.pathname === "/") {
-                router.push("/info");
+                router.push("/info"); // change to feed later
             }
         }
     }, [session, router]);
@@ -593,7 +594,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             {/* CHAT */}
                             <button
                                 onClick={() => {
-                                    router.push("/chat"); // then navigate
+                                    router.push("/feed"); // then navigate
                                 }}
                                 className={`
                                     group
@@ -612,12 +613,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                     viewBox="0 0 24 24"
                                     strokeWidth={1.5}
                                     stroke="currentColor"
-                                    className="w-6 h-6 text-black transition-colors duration-150 group-hover:text-neutral-700"
+                                    className="size-7 lg:group-hover:text-blue-400"
                                 >
                                     <path
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
-                                        d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
+                                        d="M19.5 4.5h-15a1.5 1.5 0 0 0-1.5 1.5v12a1.5 1.5 0 0 0 1.5 1.5h15a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5ZM6.75 8.25h3v3h-3v-3Zm0 6h10.5M12 9.75h4.5"
                                     />
                                 </svg>
                             </button>
@@ -868,27 +869,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                 platformStats={platformStats}
                             /> }
 
-                            {activeSheet === "calculator" && <Calculator mobile />}
+                            {activeSheet === "calculator" && <CalculatorMobile/>}
                             {activeSheet === "formula" && <FormulaSheet mobile />}
 
-                            <button
-                                onClick={() => setActiveSheet(null)}
-                                className="
-                                    mt-3 w-full
-                                    bg-white
-                                    text-[#0a66c2]
-                                    border border-[#0a66c2]
-                                    py-2
-                                    rounded-full
-                                    font-semibold
-                                    text-sm
-                                    transition
-                                    hover:bg-blue-50
-                                    active:scale-[0.98]
-                                "
-                            >
-                                Close
-                            </button>
                         </motion.div>
                     </>
                 )}

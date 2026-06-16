@@ -19,6 +19,12 @@ export interface Comment {
     neta4?: boolean;
 }
 
+export interface PostImage {
+    url?: string;
+    thumbnail?: string;
+    secure_url?: string;
+}
+
 export interface Post {
     _id: string;
     id: string;
@@ -31,12 +37,15 @@ export interface Post {
     comments: Comment[];
     pinned?: boolean;
     commentCount?: number;
-    totalComments: number;
     neta2?: boolean;
     neta3?: boolean;
     neta4?: boolean;
     likes: number;
     likedByUser?: boolean;
+    images?: (string | PostImage)[];
+    tags?: string[];
+    uniqueSeenUsers?: number;
+    totalViews?: number;
 }
 
 export function usePosts(initialPosts: Post[] = []) {

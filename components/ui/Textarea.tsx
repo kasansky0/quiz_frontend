@@ -14,10 +14,10 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
                 className={cn(
                     `flex w-full rounded-xl border 
                          bg-green-500/[0.02] px-3 py-2 
-                         text-black placeholder-white
+                         text-black placeholder-black/40
                          backdrop-blur-sm text-base
-                         focus:outline-none focus:ring-2 focus:ring-green-500/50
-                         caret-white transition-colors duration-200`,
+                         focus:outline-none focus:ring-2 focus:ring-blue-500/50
+                         caret-black transition-colors duration-200`,
                     className
                 )}
                 {...props}

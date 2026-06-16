@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TI-84 Plus CE Online</title>
+    <meta name="description" content="Standalone TI-84 Plus CE HTML5 emulator">
+    <meta name="theme-color" content="#ffffff">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="calc.png"/>
+    <link rel="stylesheet" type="text/css" href="https://mn.testnav.com/client/public/stylesheets/tn.css"/>
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .calculatorDiv {
+            margin: 0 auto;
+            outline: none !important;
+            transform-origin: top center;
+        }
+
+        #calculatorDiv {
+            margin: 0 auto;
+            transform-origin: top center;
+        }
+
+        #main_div {
+            display: none; /* hidden in popup mode */
+        }
+
+        /* SCALE MODES */
+        body.compact #calculatorDiv {
+            transform: scale(1);
+        }
+
+        body.full #calculatorDiv {
+            transform: scale(1.12);
+        }
+    </style>
+
+    <script src="https://mn.testnav.com/client/texasinstruments/js/ELG-min.js"></script>
+
+    <script id="h84statej" type="application/json"
+            data-url="https://mn.testnav.com/client/texasinstruments/bin/No_AppsCE.h84statej"></script>
+
+    <script id="ti84faceplate" type="application/json"
+            data-url="https://mn.testnav.com/client/texasinstruments/images/TI84CE_touch.svg"></script>
+</head>
+
+<body>
+
+<div id="calculatorDiv"></div>
+<div id="main_div"></div>
+
+<script>
+    const from_id = (id) => document.getElementById(id);
+
+    const h84statej = from_id("h84statej");
+    const ti84faceplate = from_id("ti84faceplate");
+    const calc_div = from_id("calculatorDiv");
+
+    function getMode() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get("mode") || "compact";
+    }
+
+    function applyMode(mode) {
+        document.body.classList.remove("compact", "full");
+        document.body.classList.add(mode);
+    }
+
+    function create_blob(string) {
+        if (!string) return null;
+        return URL.createObjectURL(new Blob([JSON.parse(string)]));
+    }
+
+    function sendHeight() {
+        // wait for render
+        setTimeout(() => {
+            const height = document.body.scrollHeight;
+
+            if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: "updateHeight",
+                    height
+                }, "*");
+            }
+        }, 300);
+    }
+
+    function main() {
+        // popup mode detection
+        if (location.hash === "#popup" || location.protocol === "file:") {
+            const mainDiv = document.getElementById("main_div");
+            if (mainDiv) mainDiv.style.display = "none";
+        }
+
+        let rom_url = create_blob(h84statej.innerHTML) || h84statej.getAttribute("data-url");
+        let faceplate_url = create_blob(ti84faceplate.innerHTML) || ti84faceplate.getAttribute("data-url");
+
+        rom_url += "#.h84statej";
+        faceplate_url += "#.svg";
+
+        new TI84PCE({
+            ROMLocation: rom_url,
+            FaceplateLocation: faceplate_url
+        });
+
+        // APPLY MODE (compact / full)
+        const mode = getMode();
+        applyMode(mode);
+
+        // send initial height to iframe parent
+        sendHeight();
+    }
+
+    main();
+</script>
+
+</body>
+</html>

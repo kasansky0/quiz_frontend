@@ -228,7 +228,7 @@ export default function HireFormPage() {
                 {/* FORM CARD (LinkedIn style) */}
                 <form
                     onSubmit={handleSubmit}
-                    className="bg-white p-6 rounded-2xl space-y-5 border border-neutral-200 shadow-sm"
+                    className="bg-white p-3 rounded-2xl space-y-5 border border-neutral-200 shadow-sm"
                 >
 
                     {/* TITLE */}
