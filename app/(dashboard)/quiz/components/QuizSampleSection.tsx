@@ -389,11 +389,24 @@ export default function QuizSampleSection({
             setFade(true);
         });
 
-        scrollContainerRef?.current?.scrollTo({ top: 0, behavior: "auto" });
-        window.scrollTo({ top: 0, behavior: "auto" });
-
         setIsFetchingNext(false);
     };
+
+
+    useEffect(() => {
+        if (!questionData) return;
+
+        const id = requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth",
+                });
+            });
+        });
+
+        return () => cancelAnimationFrame(id);
+    }, [questionData]);
 
 
 
