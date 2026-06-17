@@ -92,7 +92,7 @@ export default function QuizSampleSection({
 
     const [isFetchingNext, setIsFetchingNext] = useState(false);
 
-    const adRef = useRef<HTMLAnchorElement>(null);
+    const adRef = useRef<HTMLDivElement>(null);
 
 
     useEffect(() => {
@@ -518,7 +518,9 @@ export default function QuizSampleSection({
                                     <Question question={questionData.question} />
 
                                     {/* Future Ads / Message */}
-                                    <PositionCard />
+                                    <div ref={adRef}>
+                                        <PositionCard />
+                                    </div>
 
                                     {/* Options */}
                                     <div ref={optionsRef} className="flex flex-col gap-3">
