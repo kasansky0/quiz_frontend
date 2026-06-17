@@ -71,15 +71,15 @@ export default function Calculator() {
             {/* CONTENT (no jump) */}
             <div
                 className={`w-full mt-1 overflow-hidden transition-all duration-300 ${
-                    open ? "max-h-[560px] opacity-100" : "max-h-0 opacity-0"
+                    open ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
                 }`}
             >
-                <div className="relative w-full h-[560px]">
+                <div className="relative w-full h-[500px]">
 
                     {/* IFRAME */}
                     {!error && (
                         <iframe
-                            src="/ti84/index.html?mode=compact"
+                            src="/ti84/index.html?mode=sidebar"
                             className="w-full h-full border-0 block"
                             onError={() => setError(true)}
                         />

@@ -82,9 +82,9 @@
     }
 
     function sendHeight() {
-        // wait for render
         setTimeout(() => {
-            const height = document.body.scrollHeight;
+            const el = document.getElementById("calculatorDiv");
+            const height = el.getBoundingClientRect().height;
 
             if (window.parent !== window) {
                 window.parent.postMessage({

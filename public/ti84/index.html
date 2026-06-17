@@ -31,6 +31,10 @@
         iframe.full {
             transform: scale(1.15);
         }
+
+        iframe.sidebar {
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
@@ -48,7 +52,7 @@
         const iframe = document.getElementById("calcFrame");
         const mode = getMode();
 
-        iframe.classList.remove("compact", "full");
+        iframe.classList.remove("compact", "full", "sidebar");
         iframe.classList.add(mode);
     }
 
