@@ -8,6 +8,7 @@ type PositionCardProps = {
     subtitle?: string;
     badge?: string;
     cta?: string;
+    className?: string;
 };
 
 export default function PositionCard({
@@ -16,11 +17,21 @@ export default function PositionCard({
                                          subtitle = "OT available • Relocation support",
                                          badge = "NEW |",
                                          cta = "View openings now",
+                                         className = "",
                                      }: PositionCardProps) {
     return (
         <Link
             href={href}
-            className="w-full text-center text-xs block active:bg-transparent focus:bg-transparent [-webkit-tap-highlight-color:transparent] transition duration-200 ease-out hover:-translate-y-[1px] hover:bg-white active:scale-[0.98] rounded-md"
+            className={`
+                w-full text-center text-xs block
+                active:bg-transparent focus:bg-transparent
+                [-webkit-tap-highlight-color:transparent]
+                transition duration-200 ease-out
+                hover:-translate-y-[1px]
+                active:scale-[0.98]
+                rounded-md
+                ${className}
+            `}
         >
             <div className="flex flex-col items-center space-y-1 relative overflow-hidden p-2">
 

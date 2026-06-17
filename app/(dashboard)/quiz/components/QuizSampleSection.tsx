@@ -531,7 +531,7 @@ export default function QuizSampleSection({
                                     <Question question={questionData.question} />
 
                                     {/* Future Ads / Message */}
-                                    <div ref={adRef}>
+                                    <div ref={adRef} className="hover:bg-white">
                                         <PositionCard />
                                     </div>
 
