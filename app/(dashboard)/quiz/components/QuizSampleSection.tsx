@@ -396,10 +396,16 @@ export default function QuizSampleSection({
     useEffect(() => {
         if (!questionData) return;
 
-        window.scrollTo({
-            top: 0,
-            behavior: "auto",
+        const id = requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth",
+                });
+            });
         });
+
+        return () => cancelAnimationFrame(id);
     }, [questionData]);
 
 
