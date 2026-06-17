@@ -351,6 +351,11 @@ export default function QuizSampleSection({
 
     const handleNextQuestion = async () => {
         if (isFetchingNext) return;
+
+        scrollToTopChild(scrollContainerRef);
+
+        await new Promise(resolve => setTimeout(resolve, 150));
+
         setIsFetchingNext(true);
 
         setFade(false);
@@ -393,20 +398,7 @@ export default function QuizSampleSection({
     };
 
 
-    useEffect(() => {
-        if (!questionData) return;
 
-        const id = requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                window.scrollTo({
-                    top: 0,
-                    behavior: "smooth",
-                });
-            });
-        });
-
-        return () => cancelAnimationFrame(id);
-    }, [questionData]);
 
 
 
