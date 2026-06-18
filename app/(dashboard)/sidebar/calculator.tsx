@@ -70,7 +70,7 @@ export default function Calculator() {
 
             {/* CONTENT (no jump) */}
             <div
-                className={`w-full mt-1 overflow-hidden transition-all duration-300 ${
+                className={`w-full overflow-hidden transition-all duration-300 ${
                     open ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
                 }`}
             >

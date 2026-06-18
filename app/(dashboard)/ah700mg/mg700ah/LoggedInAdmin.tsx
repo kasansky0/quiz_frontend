@@ -662,6 +662,15 @@ export default function LoggedInAdmin() {
     };
 
 
+    const lastLoggedInUser =
+        [...users]
+            .sort(
+                (a, b) =>
+                    new Date(b.last_login).getTime() -
+                    new Date(a.last_login).getTime()
+            )[0];
+
+
 
 
 
@@ -832,6 +841,43 @@ export default function LoggedInAdmin() {
                                 d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0-3-3m3 3 3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"
                             />
                         </svg>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+
+                <div className="mt-3 bg-white rounded-xl border border-gray-300 p-3 text-sm">
+                    <div className="flex flex-col gap-2">
+
+                        <div>
+                            <span className="text-black">Last Login:</span>{" "}
+                            <span className="font-bold text-blue-500">
+                {lastLoggedInUser
+                    ? `${lastLoggedInUser.name} (${lastLoggedInUser.email})`
+                    : "—"}
+            </span>
+                        </div>
+
+                        <div>
+                            <span className="text-black">Pending applications:</span>{" "}
+                            <span className="font-bold text-amber-500">
+                {applicationCounts?.pending ?? 0}
+            </span>
+                        </div>
+
+                        <div>
+                            <span className="text-black">Paid users:</span>{" "}
+                            <span className="font-bold text-green-500">
+                {paidUsersCount}
+            </span>
+                        </div>
+
                     </div>
                 </div>
 
