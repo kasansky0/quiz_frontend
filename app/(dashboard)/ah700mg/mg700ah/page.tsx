@@ -25,9 +25,9 @@ export default function AdminPage() {
         try {
             const res = await fetch(`${apiUrl}/admin/check`, {
                 method: "GET",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${session.idToken}`,
                 },
             });
 

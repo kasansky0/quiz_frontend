@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { useError } from "@/app/ErrorProvider";
-import { fetchWithToken, handleSessionExpired } from "@/app/hooks/refreshToken";
+import { fetchWithToken } from "@/app/hooks/refreshToken";
 
 
 interface Application {
@@ -272,6 +272,7 @@ export default function LoggedInAdmin() {
             try {
                 const res = await fetchWithToken(`${apiUrl}/info/users`, {
                     method: "GET",
+                    credentials: "include",
                     headers: {
                         "Content-Type": "application/json",
                     },
@@ -374,6 +375,7 @@ export default function LoggedInAdmin() {
         try {
             const res = await fetchWithToken(`${apiUrl}/posts/admin/approve-application`, {
                 method: "POST",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -432,6 +434,7 @@ export default function LoggedInAdmin() {
                 `${apiUrl}/posts/admin/update-ad-status`,
                 {
                     method: "POST",
+                    credentials: "include",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         ad_id: adId,
@@ -610,6 +613,7 @@ export default function LoggedInAdmin() {
                 `${apiUrl}/info/user-stats/${userId}`,
                 {
                     method: "GET",
+                    credentials: "include",
                     headers: {
                         "Content-Type": "application/json",
                     },
@@ -738,6 +742,7 @@ export default function LoggedInAdmin() {
                                     try {
                                         const res = await fetchWithToken(`${apiUrl}/posts/admin/block-user`, {
                                             method: "POST",
+                                            credentials: "include",
                                             headers: { "Content-Type": "application/json" },
                                             body: JSON.stringify({
                                                 user_id: blockUserId,
@@ -805,6 +810,7 @@ export default function LoggedInAdmin() {
                                 try {
                                     const res = await fetchWithToken(`${apiUrl}/posts/admin/archive-deleted`, {
                                         method: "POST",
+                                        credentials: "include",
                                         headers: {
                                             "Content-Type": "application/json",
                                         },
