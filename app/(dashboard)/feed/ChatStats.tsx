@@ -295,12 +295,12 @@ export default function ChatStats() {
         images: File[];
         tags: string[];
     }) => {
-        if (!session?.sessionToken) {
+        if (!session?.idToken) {
             showError("You need to log in again.", true);
             return;
         }
 
-        const idToken = session.sessionToken;
+        const idToken = session.idToken;
         const sanitizedTitle = DOMPurify.sanitize(title.trim());
         const sanitizedMessage = DOMPurify.sanitize(message.trim());
 
@@ -375,9 +375,9 @@ export default function ChatStats() {
 
             const res = await fetch(`${apiUrl}/posts/`, {
                 method: "POST",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${idToken}`,
                 },
                 body: JSON.stringify({
                     title: sanitizedTitle,
