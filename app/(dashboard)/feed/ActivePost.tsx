@@ -30,9 +30,6 @@ const fetcher = async (url: string) => {
     if (!idToken) throw new Error("No session");
 
     const res = await fetch(url, {
-        headers: {
-            Authorization: `Bearer ${idToken}`,
-        },
         credentials: "include",
     });
 
