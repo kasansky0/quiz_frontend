@@ -209,8 +209,8 @@ export default function ChatStats() {
             return [];
         }
         const res = await fetch(url, {
+            credentials: "include",
             headers: {
-                "Authorization": `Bearer ${session.idToken}`,
                 "Content-Type": "application/json",
             },
         });
@@ -467,8 +467,8 @@ export default function ChatStats() {
         const res = await fetch(
             `${apiUrl}/posts/search?q=${encodeURIComponent(query)}&skip=${skip}&limit=${limit}`,
             {
+                credentials: "include",
                 headers: {
-                    Authorization: `Bearer ${session?.idToken}`,
                     "Content-Type": "application/json",
                 },
             }
