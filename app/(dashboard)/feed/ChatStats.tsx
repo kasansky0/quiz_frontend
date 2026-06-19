@@ -295,12 +295,12 @@ export default function ChatStats() {
         images: File[];
         tags: string[];
     }) => {
-        if (!session?.idToken) {
+        if (!session?.sessionToken) {
             showError("You need to log in again.", true);
             return;
         }
 
-        const idToken = session.idToken;
+        const idToken = session.sessionToken;
         const sanitizedTitle = DOMPurify.sanitize(title.trim());
         const sanitizedMessage = DOMPurify.sanitize(message.trim());
 
