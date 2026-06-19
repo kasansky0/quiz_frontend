@@ -28,9 +28,7 @@ export default function PostSearchBar({ onResults, onLoading, onClear }: Props) 
             const res = await fetch(
                 `${apiUrl}/posts/search?q=${encodeURIComponent(query)}&skip=0&limit=10`,
                 {
-                    headers: {
-                        Authorization: `Bearer ${session.idToken}`,
-                    },
+                    credentials: "include"
                 }
             );
 
