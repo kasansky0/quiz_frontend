@@ -112,8 +112,8 @@ export default function ChatStats() {
 
         try {
             const res = await fetch(`${apiUrl}/posts/?skip=${skip}&limit=${limit}`, {
+                credentials: "include",
                 headers: {
-                    "Authorization": `Bearer ${idToken}`,
                     "Content-Type": "application/json",
                 },
             });
