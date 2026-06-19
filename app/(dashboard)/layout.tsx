@@ -8,7 +8,6 @@ import type {UserStatsType} from "@/types/userStats";
 import type {QuestionType} from "@/app/(dashboard)/quiz/components/QuizSampleSection";
 import {useUser} from "@/app/UserContext";
 import { AnimatePresence, motion } from "framer-motion";
-import Calculator from "@/app/(dashboard)/sidebar/calculator"
 import FormulaSheet from "@/app/(dashboard)/sidebar/formulasSheet"
 import { useError } from "@/app/ErrorProvider";
 import { fetchWithToken, handleSessionExpired } from "@/app/hooks/refreshToken";

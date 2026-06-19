@@ -28,9 +28,9 @@ export async function submitAd(payload: SubmitAdPayload, token: string) {
 
         const res = await fetch(`${apiUrl}/submitAds/`, {
             method: "POST",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify(payload),
         });

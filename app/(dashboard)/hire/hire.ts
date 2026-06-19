@@ -12,9 +12,9 @@ export async function fetchEmployerAds(
     try {
         const res = await fetch(`${apiUrl}/submitAds/my`, {
             method: "GET",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
             },
         });
 
