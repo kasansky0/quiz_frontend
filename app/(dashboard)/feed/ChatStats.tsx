@@ -330,9 +330,7 @@ export default function ChatStats() {
 
                 const mediaRes = await fetch(`${apiUrl}/media/upload`, {
                     method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${idToken}`,
-                    },
+                    credentials: "include",
                     body: formData,
                 });
 
