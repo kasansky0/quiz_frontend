@@ -29,9 +29,7 @@ export function useMainTopics(apiUrl: string, token?: string) {
 
         try {
             const res = await fetch(`${apiUrl}/subjects/main-topics`, {
-                headers: token
-                    ? { "Authorization": `Bearer ${token}` }
-                    : undefined,
+                credentials: "include",
             });
 
             if (res.status === 401) {          // <-- Unauthorized

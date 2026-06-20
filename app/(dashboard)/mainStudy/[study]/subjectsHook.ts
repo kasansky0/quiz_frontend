@@ -31,8 +31,8 @@ export function useSubjects(apiUrl: string, mainTopic: string, token?: string) {
 
         try {
             const res = await fetch(`${apiUrl}/subjects/?main_topic=${encodeURIComponent(mainTopic)}`, {
+                credentials: "include",
                 headers: {
-                    "Authorization": `Bearer ${token}`,
                     "Content-Type": "application/json",
                 },
             });

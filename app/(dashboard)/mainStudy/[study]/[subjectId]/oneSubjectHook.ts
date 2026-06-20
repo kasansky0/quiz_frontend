@@ -52,8 +52,8 @@ export function useSubjectById(apiUrl: string, subjectId: string, token?: string
 
             try {
                 const res = await fetch(`${apiUrl}/subjects/${subjectId}`, {
+                    credentials: "include",
                     headers: {
-                        Authorization: `Bearer ${token}`,
                         "Content-Type": "application/json",
                     },
                 });
