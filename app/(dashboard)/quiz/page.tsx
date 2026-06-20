@@ -50,7 +50,6 @@ export default function QuizNoSubjectPage() {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`, // if backend requires it
                         },
                         body: JSON.stringify({
                             user_id: userId,

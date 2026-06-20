@@ -62,7 +62,6 @@ export function chatApis({ apiUrl, mainView }: UseChatPostsProps) {
                         method: "GET",
                         credentials: "include",
                         headers: {
-                            Authorization: `Bearer ${idToken}`,
                             "Content-Type": "application/json",
                         }
                     }
