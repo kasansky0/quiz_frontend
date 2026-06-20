@@ -33,9 +33,9 @@ export async function submitApplication(payload: ApplyFormPayload) {
 
         const res = await fetch(`${apiUrl}/apply/`, {
             method: "POST",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`,
             },
             body: JSON.stringify(payload),
         });
