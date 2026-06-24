@@ -32,7 +32,10 @@ export async function fetchWithToken(url: string, options: RequestInit = {}, ret
     };
 
     try {
-        let res = await fetch(url, options);
+        let res = await fetch(url, {
+            credentials: "include",
+            ...options,
+        });
 
         if (res.status === 401 && retries > 0) {
             const newToken = await refreshToken();
@@ -50,7 +53,10 @@ export async function fetchWithToken(url: string, options: RequestInit = {}, ret
                 Authorization: `Bearer ${idToken}`,
             };
 
-            return fetchWithToken(url, options, retries - 1);
+            return fetchWithToken(url, {
+                ...options,
+                credentials: "include",
+            }, retries - 1);
         }
 
         // Parse response safely
