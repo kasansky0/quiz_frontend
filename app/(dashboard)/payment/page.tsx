@@ -40,6 +40,7 @@ export default function AdPaymentPage() {
         try {
             const res = await fetch(`${apiUrl}/payment/create-session`, {
                 method: "POST",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
                 },
