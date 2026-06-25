@@ -79,10 +79,6 @@ export default function PaymentSuccessPage() {
                     Payment successful
                 </h1>
 
-                <p className="text-sm text-neutral-500 mt-2">
-                    Verified by server
-                </p>
-
                 <button
                     onClick={() => (window.location.href = "/")}
                     className="mt-6 bg-[#0a66c2] text-white px-6 py-2 rounded-full"
