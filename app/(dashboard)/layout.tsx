@@ -64,15 +64,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
-    useEffect(() => {
-        if (status === "unauthenticated") {
-            router.replace("/");
-        }
-    }, [status, router]);
-
-
-
-
 
 
 
@@ -299,74 +290,34 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
     useEffect(() => {
-        // Type your session
-        interface ExtendedSession {
-            idToken?: string;
-            user: {
-                name?: string;
-                email?: string;
-                image?: string;
-                id?: string;
-            };
-        }
+        const initSession = async () => {
+            setLoading(true);
 
-        const extendedSession = session as ExtendedSession;
-
-        if (!extendedSession?.idToken) return;
-        if (tokenSentRef.current) return; // 🚫 already sent
-
-        tokenSentRef.current = true; // ✅ lock immediately
-
-        // Helper function to wrap fetch safely
-        const safeFetch = async (url: string, options: RequestInit, showError?: (msg: string) => void) => {
             try {
-                return await fetch(url, options);
-            } catch (err: any) {
-                console.warn("Network fetch failed:", err);
-                if (showError) showError("⚠️ Network error: please check your connection.");
-                return null;
+                const sessionData = await fetchSession();
+
+                if (!sessionData?.user) {
+                    router.push("/");
+                    return;
+                }
+
+                setUserStats(prev => prev ? {
+                    ...prev,
+                    user_id: sessionData.user.user_id,
+                    nickname: sessionData.user.nickname,
+                } : null);
+
+                setUserId(sessionData.user.user_id);
+            } catch (err) {
+                console.warn("Session init failed:", err);
+                router.push("/");
+            } finally {
+                setLoading(false);
             }
         };
 
-        const sendToken = async () => {
-            try {
-                const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-                if (!apiUrl) {
-                    console.warn("NEXT_PUBLIC_API_URL is missing"); // ⚠️ use warn instead of error
-                    return;
-                }
-
-                const res = await safeFetch(`${apiUrl}/auth/google`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ token: extendedSession.idToken }),
-                    credentials: "include",
-                });
-
-                if (!res) {
-                    // Backend unreachable → user-friendly message
-                    showError("❌ Authentication failed: server unreachable.");
-                    return;
-                }
-
-                if (!res.ok) {
-                    const text = await res.text().catch(() => "");
-                    console.warn("Google token auth failed:", res.status, text); // ⚠️ use warn
-                    return;
-                }
-
-                // Wait for token verification before fetching user data
-                await fetchData();
-            } catch (err: unknown) {
-                // Any unexpected error → suppressed red console error
-                const message = err instanceof Error ? err.message : String(err);
-                console.warn("Failed to send Google token (suppressed):", message);
-                showError("❌ Authentication failed. Please refresh.");
-            }
-        };
-
-        sendToken();
-    }, [session?.idToken, fetchData, showError]);
+        initSession();
+    }, []);
 
 
 
