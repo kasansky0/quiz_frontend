@@ -299,6 +299,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
     useEffect(() => {
+        // Type your session
         interface ExtendedSession {
             idToken?: string;
             user: {
@@ -312,47 +313,60 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         const extendedSession = session as ExtendedSession;
 
         if (!extendedSession?.idToken) return;
+        if (tokenSentRef.current) return; // 🚫 already sent
 
-        const runAuthFlow = async () => {
+        tokenSentRef.current = true; // ✅ lock immediately
+
+        // Helper function to wrap fetch safely
+        const safeFetch = async (url: string, options: RequestInit, showError?: (msg: string) => void) => {
             try {
-                // 1️⃣ Check backend session first
-                const sessionData = await fetchSession();
+                return await fetch(url, options);
+            } catch (err: any) {
+                console.warn("Network fetch failed:", err);
+                if (showError) showError("⚠️ Network error: please check your connection.");
+                return null;
+            }
+        };
 
-                if (sessionData?.user?.user_id) {
-                    // ✅ Session valid → no Google auth needed
-                    await fetchData();
-                    return;
-                }
-
-                // 2️⃣ Session invalid → do Google login
+        const sendToken = async () => {
+            try {
                 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
                 if (!apiUrl) {
-                    console.warn("API URL missing");
+                    console.warn("NEXT_PUBLIC_API_URL is missing"); // ⚠️ use warn instead of error
                     return;
                 }
 
-                const res = await fetch(`${apiUrl}/auth/google`, {
+                const res = await safeFetch(`${apiUrl}/auth/google`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ token: extendedSession.idToken }),
                     credentials: "include",
                 });
 
-                if (!res.ok) {
-                    console.warn("Google auth failed:", res.status);
+                if (!res) {
+                    // Backend unreachable → user-friendly message
+                    showError("❌ Authentication failed: server unreachable.");
                     return;
                 }
 
-                // 3️⃣ Now session exists → fetch user data
-                await fetchData();
+                if (!res.ok) {
+                    const text = await res.text().catch(() => "");
+                    console.warn("Google token auth failed:", res.status, text); // ⚠️ use warn
+                    return;
+                }
 
-            } catch (err) {
-                console.warn("Auth flow failed:", err);
+                // Wait for token verification before fetching user data
+                await fetchData();
+            } catch (err: unknown) {
+                // Any unexpected error → suppressed red console error
+                const message = err instanceof Error ? err.message : String(err);
+                console.warn("Failed to send Google token (suppressed):", message);
+                showError("❌ Authentication failed. Please refresh.");
             }
         };
 
-        runAuthFlow();
-    }, [session?.idToken, fetchData]);
+        sendToken();
+    }, [session?.idToken, fetchData, showError]);
 
 
 
