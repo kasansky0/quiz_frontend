@@ -12,6 +12,7 @@ import FormulaSheet from "@/app/(dashboard)/sidebar/formulasSheet"
 import { useError } from "@/app/ErrorProvider";
 import { fetchWithToken, handleSessionExpired } from "@/app/hooks/refreshToken";
 import CalculatorMobile from "@/app/(dashboard)/sidebar/calculatorTopBar";
+import { fetchWithToken_v2, fetchSession } from "@/app/hooks/sessionClient"
 
 
 
@@ -245,8 +246,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         }
 
         try {
-            const res = await fetchWithToken(`${apiUrl}/user/`, {
+            const res = await fetchWithToken_v2(`${apiUrl}/user/`, {
                 method: "POST",
+                credentials: "include",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     name: session.user.name,
@@ -455,8 +457,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         const updatePercentage = async () => {
             try {
-                const res = await fetchWithToken(`${apiUrl}/userPercentage/update`, {
+                const res = await fetchWithToken_v2(`${apiUrl}/userPercentage/update`, {
                     method: "POST",
+                    credentials: "include",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         userId: userStats.user_id,
