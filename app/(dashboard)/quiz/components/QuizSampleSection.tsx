@@ -131,25 +131,19 @@ export default function QuizSampleSection({
 
     // Network-safe fetch wrapper with user-friendly error
     async function safeFetch(
-        url: string, options:
-        RequestInit,
+        url: string,
+        options: RequestInit,
         showError: (msg: string, isPersistent?: boolean) => void
     ) {
         try {
-            if (token) {
-                options.headers = {
+            return await fetch(url, {
+                ...options,
+                credentials: "include", // 👈 sends cookies automatically
+                headers: {
                     ...(options.headers || {}),
-                    Authorization: `Bearer ${token}`,
-                };
-            }
-
-            if (!token) {
-                showError("You need to log in again.", true);
-                return null;
-            }
-
-            return await fetch(url, options);
-        } catch (err: any) {
+                },
+            });
+        } catch (err) {
             console.warn("Network fetch failed:", err);
             return null;
         }
