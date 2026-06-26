@@ -18,7 +18,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
  */
 export async function fetchSession(): Promise<SessionResponse | null> {
     try {
-        const res = await fetch(`${API_URL}/session`, {
+        const res = await fetch(`${API_URL}/auth/session`, {
             method: "GET",
             credentials: "include", // 👈 IMPORTANT (cookie sent automatically)
         });
