@@ -1,36 +1,9 @@
 "use client";
 
-import { signIn, useSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { motion } from "framer-motion";
-import { useEffect, useRef } from "react";
-import { fetchWithToken } from "@/app/hooks/refreshToken";
 
 export default function LoginSection() {
-    const { data: session } = useSession();
-    const tokenSentRef = useRef(false);
-
-    useEffect(() => {
-        const syncBackend = async () => {
-            if (!session?.idToken || tokenSentRef.current) return;
-            tokenSentRef.current = true;
-
-            try {
-                const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-                if (!apiUrl) return;
-
-                await fetchWithToken(`${apiUrl}/auth/google`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: "include",
-                    body: JSON.stringify({ token: session.idToken }),
-                });
-            } catch (err) {
-                console.error(err);
-            }
-        };
-
-        syncBackend();
-    }, [session?.idToken]);
 
     return (
         <motion.div
