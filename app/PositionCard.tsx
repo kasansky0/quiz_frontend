@@ -13,7 +13,7 @@ type PositionCardProps = {
 
 export default function PositionCard({
                                          href = "/position",
-                                         title = "Hiring NETA Technicians",
+                                         title = "Direct Hire NETA Technicians",
                                          subtitle = "OT available • Relocation support",
                                          badge = "NEW |",
                                          cta = "View openings now",
