@@ -50,6 +50,7 @@ export default function QuizNoSubjectPage() {
                 try {
                     const res = await fetch(`${apiUrl}/answer/record`, {
                         method: "POST",
+                        credentials: "include",
                         headers: {
                             "Content-Type": "application/json",
                         },

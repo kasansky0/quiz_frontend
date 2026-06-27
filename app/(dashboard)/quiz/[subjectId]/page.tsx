@@ -58,6 +58,7 @@ export default function QuizPage() {
                     try {
                         const res = await fetch(`${apiUrl}/answer/record`, {
                             method: "POST",
+                            credentials: "include",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
                                 user_id: userId,
