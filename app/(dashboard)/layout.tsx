@@ -235,6 +235,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const fetchData = useCallback(async () => {
         const t0 = performance.now();
         console.log("🚀 [USER API] fetchData() started");
+        console.trace("🚀 fetchData called from");
 
         if (fetchingRef.current) {
             console.log("⏭️ [USER API] Already fetching, skipping");
@@ -357,6 +358,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         const runAuth = async () => {
             const t0 = performance.now();
             console.log("🚀 [AUTH] runAuth started");
+            console.trace("runAuth()");
 
             try {
                 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
