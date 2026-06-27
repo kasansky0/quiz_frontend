@@ -424,7 +424,6 @@ export default function QuizSampleSection({
                         body: JSON.stringify({
                             question_id: questionData.id,
                             selected_option: option,
-                            user_id: String(userId),
                         }),
                     }, showError);
 
