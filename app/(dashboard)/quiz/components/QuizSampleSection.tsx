@@ -53,6 +53,7 @@ interface QuizSampleSectionProps {
     userId?: string | number;
     loadingDone?: boolean;
     style?: React.CSSProperties;
+    scrollContainerRef?: React.RefObject<HTMLElement | null>;
     onAnswer?: (isCorrect: boolean, questionId: number, selectedOption: string) => void;
     subjectId?: string; // <-- add this
     mode?: "random" | "smart"; // ✅ ADD THIS
@@ -69,6 +70,7 @@ export default function QuizSampleSection({
                                               setWrongQueue,
                                               apiUrl,
                                               loadingDone,
+                                              scrollContainerRef,
                                               subjectId,
                                               token,
                                               mode = "smart", // ✅ default behavior stays same
@@ -371,16 +373,16 @@ export default function QuizSampleSection({
     useEffect(() => {
         if (!questionData) return;
 
-        requestAnimationFrame(() => {
-            const main = document.querySelector("main");
-
-            if (main instanceof HTMLElement) {
-                main.scrollTo({
+        const id = requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                window.scrollTo({
                     top: 0,
                     behavior: "smooth",
                 });
-            }
+            });
         });
+
+        return () => cancelAnimationFrame(id);
     }, [questionData]);
 
 

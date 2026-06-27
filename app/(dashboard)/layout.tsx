@@ -817,10 +817,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     {/* ===== MAIN CONTENT ===== */}
                     <div className="flex-1 flex flex-col overflow-hidden">
 
-                        <main
-                            ref={mainRef}
-                            className="flex-1 overflow-y-auto hide-scrollbar"
-                        >
+                        <main className="flex-1 overflow-y-auto hide-scrollbar">
                             {children}
                         </main>
 
