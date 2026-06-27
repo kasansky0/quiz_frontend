@@ -18,6 +18,10 @@ import { fetchWithToken_v2, fetchSession } from "@/app/hooks/sessionClient"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const { data: session, status } = useSession();
+    const authInitializedRef = useRef(false);
+    const lastSessionKeyRef = useRef<string | null>(null);
+
+
     const router = useRouter();
     const sidebarRef = useRef<HTMLDivElement>(null);
     const [loading, setLoading] = useState(true);
@@ -127,13 +131,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
     useEffect(() => {
-        if (session) {
-            // Only redirect if current path is exactly "/dashboard" (or wherever this layout is)
-            if (window.location.pathname === "/") {
-                router.push("/info"); // change to feed later
-            }
+        if (status !== "authenticated") return;
+
+        if (window.location.pathname === "/") {
+            router.replace("/info");
         }
-    }, [session, router]);
+    }, [status, router]);
 
 
 
@@ -298,75 +301,44 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
+
     useEffect(() => {
-        // Type your session
-        interface ExtendedSession {
-            idToken?: string;
-            user: {
-                name?: string;
-                email?: string;
-                image?: string;
-                id?: string;
-            };
-        }
+        if (status !== "authenticated") return;
+        if (!session?.idToken || !session?.user?.email) return;
 
-        const extendedSession = session as ExtendedSession;
+        const sessionKey = `${session.user.email}-${session.idToken}`;
 
-        if (!extendedSession?.idToken) return;
-        if (tokenSentRef.current) return; // 🚫 already sent
+        // 👇 if same session, skip
+        if (lastSessionKeyRef.current === sessionKey) return;
 
-        tokenSentRef.current = true; // ✅ lock immediately
+        lastSessionKeyRef.current = sessionKey;
 
-        // Helper function to wrap fetch safely
-        const safeFetch = async (url: string, options: RequestInit, showError?: (msg: string) => void) => {
-            try {
-                return await fetch(url, options);
-            } catch (err: any) {
-                console.warn("Network fetch failed:", err);
-                if (showError) showError("⚠️ Network error: please check your connection.");
-                return null;
-            }
-        };
-
-        const sendToken = async () => {
+        const runAuth = async () => {
             try {
                 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-                if (!apiUrl) {
-                    console.warn("NEXT_PUBLIC_API_URL is missing"); // ⚠️ use warn instead of error
-                    return;
-                }
+                if (!apiUrl) return;
 
-                const res = await safeFetch(`${apiUrl}/auth/google`, {
+                const res = await fetch(`${apiUrl}/auth/google`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ token: extendedSession.idToken }),
+                    body: JSON.stringify({ token: session.idToken }),
                     credentials: "include",
                 });
 
-                if (!res) {
-                    // Backend unreachable → user-friendly message
-                    showError("❌ Authentication failed: server unreachable.");
-                    return;
-                }
-
                 if (!res.ok) {
-                    const text = await res.text().catch(() => "");
-                    console.warn("Google token auth failed:", res.status, text); // ⚠️ use warn
+                    console.warn("Auth failed:", await res.text().catch(() => ""));
                     return;
                 }
 
-                // Wait for token verification before fetching user data
                 await fetchData();
-            } catch (err: unknown) {
-                // Any unexpected error → suppressed red console error
-                const message = err instanceof Error ? err.message : String(err);
-                console.warn("Failed to send Google token (suppressed):", message);
+            } catch (err) {
+                console.warn("Auth error:", err);
                 showError("❌ Authentication failed. Please refresh.");
             }
         };
 
-        sendToken();
-    }, [session?.idToken, fetchData, showError]);
+        runAuth();
+    }, [status, session?.idToken, session?.user?.email]);
 
 
 
