@@ -418,6 +418,7 @@ export default function QuizSampleSection({
                 try {
                     const res = await safeFetch(`${apiUrl}/answer/check`, {
                         method: "POST",
+                        credentials: "include",
                         headers: {
                             "Content-Type": "application/json",
                         },
