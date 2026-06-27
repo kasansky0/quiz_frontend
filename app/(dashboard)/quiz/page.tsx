@@ -14,7 +14,6 @@ export default function QuizNoSubjectPage() {
     const userId = session?.user?.id;
     const token = session?.idToken;
     const { showError } = useError();
-    const scrollRef = useRef<HTMLElement>(null);
 
     if (status === "loading" || !session) {
         return (
@@ -36,7 +35,6 @@ export default function QuizNoSubjectPage() {
             isLoggedIn={true}
             wrongQueue={wrongQueue}
             setWrongQueue={setWrongQueue}
-            scrollContainerRef={scrollRef}
             apiUrl={apiUrl}
             userId={userId}
             mode="random"
