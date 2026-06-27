@@ -3,13 +3,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { UserStatsType } from "@/types/userStats";
 import { useUser } from "@/app/UserContext";
-import { signOut} from "next-auth/react";
+import { signOut } from "next-auth/react";
 import { useError } from "@/app/ErrorProvider";
-
-
-
-
-
 
 interface UseUserSidebarDataProps {
     session: any;
@@ -18,61 +13,55 @@ interface UseUserSidebarDataProps {
     answeredState: "correct" | "wrong" | null;
 }
 
-
-
-
-
-
-
 export function useUserSidebarData({
                                        session,
                                        apiUrl,
                                        answerCount,
                                        answeredState
                                    }: UseUserSidebarDataProps) {
+
     const [userStats, setUserStats] = useState<UserStatsType | null>(null);
     const [onlineTime, setOnlineTime] = useState(0);
     const [userPercentage, setUserPercentage] = useState(0);
     const [loading, setLoading] = useState(true);
-    const tokenSentRef = useRef(false);
+
     const fetchInFlightRef = useRef(false);
     const lastFetchRef = useRef(0);
+    const sessionKeyRef = useRef<string | null>(null);
 
-
-
-
-    const {setUserId} = useUser();
+    const { setUserId } = useUser();
     const [errorState, setErrorState] = useState<string | null>(null);
     const [isLoggedOut, setIsLoggedOut] = useState(false);
     const { showError } = useError();
+
     const [platformStats, setPlatformStats] = useState({
         total_users: 0,
         users_visited_today: 0,
     });
 
+    const api = apiUrl;
 
-
-
-
-    const handleSessionExpired = async () => {
+    // ----------------------------
+    // SESSION HANDLING (SAFE)
+    // ----------------------------
+    const handleSessionExpired = useCallback(async () => {
         await signOut({ redirect: false });
-        setIsLoggedOut(true); // ✅ match the renamed state
+        setIsLoggedOut(true);
         setErrorState(null);
-    };
+    }, []);
 
-
-
-
-
+    // ----------------------------
+    // CORE FETCH (PROTECTED)
+    // ----------------------------
     const fetchData = useCallback(async () => {
+        if (!api) return;
         if (isLoggedOut) return;
-        if (!apiUrl) return;
         if (fetchInFlightRef.current) return;
 
         fetchInFlightRef.current = true;
 
         try {
-            const res = await fetch(`${apiUrl}/user/`, {
+            const res = await fetch(`${api}/user/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -87,7 +76,7 @@ export function useUserSidebarData({
             if (!res.ok) {
                 const text = await res.text().catch(() => "");
                 console.error("Backend error:", text);
-                showError("Unable to load sidebar data. Please try again.", true);
+                showError("Unable to load sidebar data.");
                 return;
             }
 
@@ -101,191 +90,139 @@ export function useUserSidebarData({
 
         } catch (err) {
             console.error("Network error:", err);
-            showError("⚠️ Network error.", true);
+            showError("Network error while loading sidebar.");
         } finally {
             fetchInFlightRef.current = false;
             setLoading(false);
         }
-    }, [apiUrl, isLoggedOut, showError, handleSessionExpired]);
+    }, [api, isLoggedOut, showError, handleSessionExpired]);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    // ----------------------------
+    // SESSION RESET
+    // ----------------------------
     useEffect(() => {
         setIsLoggedOut(false);
         setUserStats(null);
         setLoading(true);
     }, [session?.user?.email]);
 
+    // ----------------------------
+    // INIT FETCH (GUARDED)
+    // ----------------------------
+    useEffect(() => {
+        if (!api) return;
+        if (!session?.user?.email) return;
 
+        const key = session.user.email;
 
+        if (sessionKeyRef.current === key) return;
+        sessionKeyRef.current = key;
 
+        fetchData();
+    }, [api, session?.user?.email, fetchData]);
 
+    // ----------------------------
+    // USER ID SYNC
+    // ----------------------------
+    useEffect(() => {
+        if (userStats?.user_id) {
+            setUserId(userStats.user_id);
+        }
+    }, [userStats?.user_id, setUserId]);
 
-
-
-
-    // Load existing time from DB into state
+    // ----------------------------
+    // ONLINE TIME (SAFE ACCUMULATION)
+    // ----------------------------
     useEffect(() => {
         if (!userStats) return;
 
         setOnlineTime(userStats.totalOnlineTime ?? 0);
-    }, [userStats]);
-
-
-    useEffect(() => {
-        if (!session?.user || !userStats) return; // wait for both session and DB data
 
         const interval = setInterval(() => {
-            setOnlineTime(prev => prev + 1); // +1 second
+            setOnlineTime(prev => prev + 1);
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [session?.user, userStats]);
+    }, [userStats]);
 
-
-    useEffect(() => {
-        if (userStats?.user_id) {
-            setUserId(userStats.user_id); // ✅ set backend UUID
-        }
-    }, [userStats?.user_id, setUserId]);
-
-
-
-
-
-
-
-
+    // ----------------------------
+    // COOLDOWN FETCH WRAPPER
+    // ----------------------------
     const safeFetch = useCallback(() => {
-        if (fetchInFlightRef.current) return;
-
         const now = Date.now();
+
+        if (fetchInFlightRef.current) return;
         if (now - lastFetchRef.current < 3000) return;
 
         lastFetchRef.current = now;
         fetchData();
     }, [fetchData]);
 
-
-
-
-    // ✅ Fetch sidebar stats
+    // ----------------------------
+    // FOCUS + VISIBILITY REFRESH
+    // ----------------------------
     useEffect(() => {
-        if (!apiUrl) return;
-        if (!session?.user) return;
-
-        safeFetch();
-    }, [apiUrl, session?.user?.email, safeFetch]);
-
-
-
-
-    // ✅ Session check on tab visibility or focus
-    useEffect(() => {
-        const handleVisibility = () => {
-            if (document.visibilityState === "visible") {
-                safeFetch();
-            }
+        const onVisible = () => {
+            if (document.visibilityState === "visible") safeFetch();
         };
 
-        const handleFocus = () => {
-            safeFetch();
-        };
+        const onFocus = () => safeFetch();
 
-        document.addEventListener("visibilitychange", handleVisibility);
-        window.addEventListener("focus", handleFocus);
+        document.addEventListener("visibilitychange", onVisible);
+        window.addEventListener("focus", onFocus);
 
         return () => {
-            document.removeEventListener("visibilitychange", handleVisibility);
-            window.removeEventListener("focus", handleFocus);
+            document.removeEventListener("visibilitychange", onVisible);
+            window.removeEventListener("focus", onFocus);
         };
     }, [safeFetch]);
 
-
-
-
-
-
-
-
-
-
-
-
+    // ----------------------------
+    // ANSWER-BASED UPDATE (DEBOUNCED LOGIC SAFETY)
+    // ----------------------------
     useEffect(() => {
-        if (!userStats?.user_id || answerCount === 0 || answeredState === null) return;
+        if (!userStats?.user_id) return;
+        if (!api) return;
+        if (answerCount === 0 || answeredState === null) return;
 
-        const updatePercentage = async () => {
+        const timeout = setTimeout(async () => {
             try {
-                const res = await fetch(`${apiUrl}/userPercentage/update`, {
+                const res = await fetch(`${api}/userPercentage/update`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
+                    credentials: "include",
                     body: JSON.stringify({
                         userId: userStats.user_id,
-                        userPercentage: userPercentage,
+                        userPercentage,
                         totalOnlineTime: onlineTime,
                     }),
                 });
 
                 if (!res.ok) {
                     const text = await res.text().catch(() => "");
-                    showError("Failed to update user percentage: " + text);
+                    showError("Failed to update user stats.");
                     return;
                 }
 
-                const data = await res.json();
-                showError("User percentage updated: " + JSON.stringify(data));
-
             } catch (err: any) {
-                showError("Failed to update sidebar percentage: " + (err?.message || err));
+                showError("Update failed: " + (err?.message || err));
             }
-        };
+        }, 500); // small debounce prevents spam calls
 
-        updatePercentage();
-    }, [answerCount, userPercentage, userStats, onlineTime, apiUrl, answeredState, showError]);
+        return () => clearTimeout(timeout);
+    }, [answerCount, answeredState, userStats?.user_id, userPercentage, onlineTime, api, showError]);
 
-
-    // 1️⃣ Add another useEffect to initialize userPercentage from DB
+    // ----------------------------
+    // INITIAL PERCENTAGE LOAD
+    // ----------------------------
     useEffect(() => {
         if (!userStats?.user_id) return;
-
-        // Set initial percentage from DB
         setUserPercentage(userStats.userPercentage ?? 0);
     }, [userStats]);
 
-
-
-
-
-
-
-
-
-
+    // ----------------------------
+    // RETURN
+    // ----------------------------
     return {
         userStats,
         platformStats,
@@ -298,15 +235,4 @@ export function useUserSidebarData({
         isLoggedOut,
         handleSessionExpired
     };
-
-
-
-
 }
-
-
-
-
-
-
-
