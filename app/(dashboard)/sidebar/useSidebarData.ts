@@ -50,23 +50,14 @@ export function useUserSidebarData({
 
     const fetchData = useCallback(async () => {
         if (isLoggedOut) return;
-
-        if (!session?.user?.email) {
-            handleSessionExpired();
-            return;
-        }
+        if (!apiUrl) return;
 
         try {
             const res = await fetch(`${apiUrl}/user/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
-                body: JSON.stringify({
-                    name: session.user.name,
-                    email: session.user.email,
-                    image: session.user.image,
-                    google_id: session.user.id ?? null,
-                }),
+                body: JSON.stringify({}),
             });
 
             if (res.status === 401) {
@@ -127,37 +118,12 @@ export function useUserSidebarData({
 
 
 
-    useEffect(() => {
-        if (!session?.idToken) return;
-        if (tokenSentRef.current) return; // 🚫 already sent
 
-        tokenSentRef.current = true; // ✅ lock immediately
 
-        async function sendToken() {
-            try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/google`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ token: session.idToken }),
-                    credentials: "include",
-                });
 
-                if (!res.ok) {
-                    const text = await res.text().catch(() => "");
-                    showError("Failed to authenticate Google token. " + text, true);
-                    return;
-                }
 
-                fetchData(); // safe to call after auth
-                // Optionally: show friendly success toast
-                // showSuccess("Logged in successfully!");
-            } catch (err: any) {
-                showError("Network error: Failed to send Google token. " + (err?.message || err), true);
-            }
-        }
 
-        sendToken();
-    }, [session?.idToken, showError]);
+
 
 
     // Load existing time from DB into state
@@ -188,11 +154,16 @@ export function useUserSidebarData({
 
     // ✅ Fetch sidebar stats
     useEffect(() => {
-        if (!session || !session.user || !session.user.email) return;
-        if (!apiUrl) return showError("NEXT_PUBLIC_API_URL is not set");
-
+        if (!apiUrl) return;
         fetchData();
-    }, [session, apiUrl, showError]);
+    }, [apiUrl]);
+
+
+
+
+
+
+
 
 
     // ✅ Session check on tab visibility or focus
