@@ -314,19 +314,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         lastSessionKeyRef.current = sessionKey;
 
         const runAuth = async () => {
-            const t0 = performance.now();
-            console.log("🚀 [AUTH] runAuth started");
-
             try {
                 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-                if (!apiUrl) {
-                    console.log("❌ [AUTH] Missing API URL");
-                    return;
-                }
-
-                console.log("📡 [AUTH] Sending Google token...");
-
-                const t1 = performance.now();
+                if (!apiUrl) return;
 
                 const res = await fetch(`${apiUrl}/auth/google`, {
                     method: "POST",
@@ -335,35 +325,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     credentials: "include",
                 });
 
-                const t2 = performance.now();
-
-                console.log("📥 [AUTH] Response received");
-                console.log("⏱️ [AUTH] Network time:", (t2 - t1).toFixed(2), "ms");
-                console.log("📊 [AUTH] Status:", res.status);
-
                 if (!res.ok) {
-                    const errorText = await res.text().catch(() => "");
-                    console.warn("❌ [AUTH] Auth failed:", errorText);
+                    console.warn("Auth failed:", await res.text().catch(() => ""));
                     return;
                 }
 
-                console.log("➡️ [AUTH] Calling fetchData()");
-
-                const t3 = performance.now();
-
                 await fetchData();
-
-                const t4 = performance.now();
-
-                console.log("📦 [AUTH] fetchData finished");
-                console.log("⏱️ [AUTH] fetchData time:", (t4 - t3).toFixed(2), "ms");
-
             } catch (err) {
-                console.warn("❌ [AUTH] Auth error:", err);
+                console.warn("Auth error:", err);
                 showError("❌ Authentication failed. Please refresh.");
-            } finally {
-                const tEnd = performance.now();
-                console.log("🏁 [AUTH] runAuth total time:", (tEnd - t0).toFixed(2), "ms");
             }
         };
 
