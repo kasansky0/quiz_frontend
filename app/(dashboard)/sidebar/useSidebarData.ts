@@ -35,6 +35,12 @@ export function useUserSidebarData({
     const [userPercentage, setUserPercentage] = useState(0);
     const [loading, setLoading] = useState(true);
     const tokenSentRef = useRef(false);
+    const fetchInFlightRef = useRef(false);
+    const lastFetchRef = useRef(0);
+
+
+
+
     const {setUserId} = useUser();
     const [errorState, setErrorState] = useState<string | null>(null);
     const [isLoggedOut, setIsLoggedOut] = useState(false);
@@ -48,9 +54,22 @@ export function useUserSidebarData({
 
 
 
+    const handleSessionExpired = async () => {
+        await signOut({ redirect: false });
+        setIsLoggedOut(true); // ✅ match the renamed state
+        setErrorState(null);
+    };
+
+
+
+
+
     const fetchData = useCallback(async () => {
         if (isLoggedOut) return;
         if (!apiUrl) return;
+        if (fetchInFlightRef.current) return;
+
+        fetchInFlightRef.current = true;
 
         try {
             const res = await fetch(`${apiUrl}/user/`, {
@@ -73,6 +92,7 @@ export function useUserSidebarData({
             }
 
             const data = await res.json();
+
             setUserStats(data);
             setPlatformStats({
                 total_users: data?.platform_stats?.total_users ?? 0,
@@ -83,24 +103,10 @@ export function useUserSidebarData({
             console.error("Network error:", err);
             showError("⚠️ Network error.", true);
         } finally {
+            fetchInFlightRef.current = false;
             setLoading(false);
         }
-    }, [session, apiUrl, isLoggedOut, showError]);
-
-
-
-
-
-
-
-
-
-
-    const handleSessionExpired = async () => {
-        await signOut({ redirect: false });
-        setIsLoggedOut(true); // ✅ match the renamed state
-        setErrorState(null);
-    };
+    }, [apiUrl, isLoggedOut, showError, handleSessionExpired]);
 
 
 
@@ -117,6 +123,22 @@ export function useUserSidebarData({
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+    useEffect(() => {
+        setIsLoggedOut(false);
+        setUserStats(null);
+        setLoading(true);
+    }, [session?.user?.email]);
 
 
 
@@ -152,16 +174,32 @@ export function useUserSidebarData({
     }, [userStats?.user_id, setUserId]);
 
 
+
+
+
+
+
+
+    const safeFetch = useCallback(() => {
+        if (fetchInFlightRef.current) return;
+
+        const now = Date.now();
+        if (now - lastFetchRef.current < 3000) return;
+
+        lastFetchRef.current = now;
+        fetchData();
+    }, [fetchData]);
+
+
+
+
     // ✅ Fetch sidebar stats
     useEffect(() => {
         if (!apiUrl) return;
-        fetchData();
-    }, [apiUrl]);
+        if (!session?.user) return;
 
-
-
-
-
+        safeFetch();
+    }, [apiUrl, session?.user?.email, safeFetch]);
 
 
 
@@ -170,12 +208,12 @@ export function useUserSidebarData({
     useEffect(() => {
         const handleVisibility = () => {
             if (document.visibilityState === "visible") {
-                fetchData();
+                safeFetch();
             }
         };
 
         const handleFocus = () => {
-            fetchData();
+            safeFetch();
         };
 
         document.addEventListener("visibilitychange", handleVisibility);
@@ -185,23 +223,16 @@ export function useUserSidebarData({
             document.removeEventListener("visibilitychange", handleVisibility);
             window.removeEventListener("focus", handleFocus);
         };
-    }, [session, apiUrl]);
+    }, [safeFetch]);
 
 
-    useEffect(() => {
-        const lastTime = {current: performance.now()};
 
-        const interval = setInterval(() => {
-            const now = performance.now();
-            if (now - lastTime.current > 20000) { // 20s pause => tab was frozen
-                showError("Tab inactive/frozen, refetching sidebar stats");
-                fetchData();
-            }
-            lastTime.current = now;
-        }, 1000);
 
-        return () => clearInterval(interval);
-    }, [fetchData]);
+
+
+
+
+
 
 
 
