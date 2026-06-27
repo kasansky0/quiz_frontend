@@ -233,35 +233,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
     const fetchData = useCallback(async () => {
-        const t0 = performance.now();
-        console.log("🚀 [USER API] fetchData() started");
-        console.trace("🚀 fetchData called from");
-
-        if (fetchingRef.current) {
-            console.log("⏭️ [USER API] Already fetching, skipping");
-            return;
-        }
-
+        if (fetchingRef.current) return; // 🚫 prevent duplicate fetches
         fetchingRef.current = true;
 
         if (!session?.user?.email) {
-            console.log("❌ [USER API] No session email");
             handleSessionExpired();
             fetchingRef.current = false;
             return;
         }
 
         if (!apiUrl) {
-            console.error("❌ [USER API] NEXT_PUBLIC_API_URL missing");
+            console.error("NEXT_PUBLIC_API_URL missing");
             fetchingRef.current = false;
             return;
         }
 
         try {
-            console.log("📡 [USER API] Sending POST /user/");
-
-            const t1 = performance.now();
-
             const res = await fetchWithToken_v2(`${apiUrl}/user/`, {
                 method: "POST",
                 credentials: "include",
@@ -274,62 +261,33 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 }),
             });
 
-            const t2 = performance.now();
-
-            console.log("📥 [USER API] Response received");
-            console.log("⏱️ [USER API] Request time:", (t2 - t1).toFixed(2), "ms");
-
             // Handle fetch failure (null) separately
             if (!res) {
-                console.log("❌ [USER API] fetchWithToken_v2 returned null");
                 setErrorState("Network error: unable to reach server.");
                 showError("❌ Network error: server unreachable.");
                 return;
             }
 
-            console.log("📊 [USER API] success =", res.success);
-
-            // Backend returned error
+            // Backend returned error → show message
             if (!res.success) {
-                console.log("❌ [USER API] Backend returned error");
-                setErrorState("Network error");
-                showError("❌ Network error");
+                setErrorState("Network error");   // optional, just to keep error state consistent
+                showError("❌ Network error");     // always shows network error to user
                 return;
             }
 
-            console.log("📦 [USER API] Parsing response");
-
-            const t3 = performance.now();
-
             const data = await res.data;
-
-            const t4 = performance.now();
-
-            console.log("⏱️ [USER API] Parse time:", (t4 - t3).toFixed(2), "ms");
-            console.log("✅ [USER API] User:", data.nickname);
-
             setUserStats(data);
-
             setPlatformStats({
                 total_users: data?.platform_stats?.total_users ?? 0,
                 users_visited_today: data?.platform_stats?.users_visited_today ?? 0,
             });
-
-            console.log("📊 [USER API] Platform stats:", data?.platform_stats);
-
-            setErrorState(null);
-
+            setErrorState(null); // clear previous error
         } catch (err: any) {
-            console.error("❌ [USER API] Exception:", err);
+            // Network failure → show error but keep dashboard
             setErrorState("Network error: unable to load sidebar data.");
             showError("❌ Network error: " + (err?.message || err));
         } finally {
-            fetchingRef.current = false; // <-- important to reset it
             setLoading(false);
-
-            const tEnd = performance.now();
-            console.log("🏁 [USER API] fetchData() finished");
-            console.log("⏱️ [USER API] Total time:", (tEnd - t0).toFixed(2), "ms");
         }
     }, [session, apiUrl, showError]);
 
@@ -358,7 +316,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         const runAuth = async () => {
             const t0 = performance.now();
             console.log("🚀 [AUTH] runAuth started");
-            console.trace("runAuth()");
 
             try {
                 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
