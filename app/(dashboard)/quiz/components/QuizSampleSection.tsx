@@ -92,8 +92,6 @@ export default function QuizSampleSection({
 
     const [isFetchingNext, setIsFetchingNext] = useState(false);
 
-    const adRef = useRef<HTMLDivElement>(null);
-
 
     useEffect(() => {
         // when component mounts
@@ -152,21 +150,6 @@ export default function QuizSampleSection({
 
 
 
-
-// --- Scroll to options when user selects an answer --- //
-
-    useEffect(() => {
-        if (!selectedOption) return;
-
-        const t = setTimeout(() => {
-            adRef.current?.scrollIntoView({
-                behavior: "smooth",
-                block: "start",
-            });
-        }, 200);
-
-        return () => clearTimeout(t);
-    }, [selectedOption]);
 
 
 
@@ -404,6 +387,21 @@ export default function QuizSampleSection({
 
 
 
+    useEffect(() => {
+        if (!selectedOption) return;
+
+        const t = setTimeout(() => {
+            optionsRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+            });
+        }, 150);
+
+        return () => clearTimeout(t);
+    }, [selectedOption]);
+
+
+
 
 
 // --- Runs when a user clicks one of the answer options in your quiz --- //
@@ -525,7 +523,7 @@ export default function QuizSampleSection({
                                     <Question question={questionData.question} />
 
                                     {/* Future Ads / Message */}
-                                    <div ref={adRef} className="hover:bg-white">
+                                    <div className="hover:bg-white">
                                         <PositionCard />
                                     </div>
 

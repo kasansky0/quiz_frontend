@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import QuizSampleSection from "@/app/(dashboard)/quiz/components/QuizSampleSection";
 import type { QuestionType } from "@/app/(dashboard)/quiz/components/QuizSampleSection";
 import { useError } from "@/app/ErrorProvider";
@@ -14,6 +14,7 @@ export default function QuizNoSubjectPage() {
     const userId = session?.user?.id;
     const token = session?.idToken;
     const { showError } = useError();
+    const scrollRef = useRef<HTMLElement>(null);
 
     if (status === "loading" || !session) {
         return (
@@ -35,6 +36,7 @@ export default function QuizNoSubjectPage() {
             isLoggedIn={true}
             wrongQueue={wrongQueue}
             setWrongQueue={setWrongQueue}
+            scrollContainerRef={scrollRef}
             apiUrl={apiUrl}
             userId={userId}
             mode="random"
