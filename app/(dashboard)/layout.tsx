@@ -232,6 +232,35 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
+
+    const syncSession = useCallback(async () => {
+        const sessionData = await fetchSession();
+
+        if (!sessionData?.user) return;
+
+        const backendUser = sessionData.user;
+
+        setUserId(backendUser.user_id);
+
+        setUserStats(prev =>
+            prev
+                ? {
+                    ...prev,
+                    user_id: backendUser.user_id,
+                    nickname: backendUser.nickname,
+                    image: backendUser.image ?? prev.image,
+                }
+                : prev
+        );
+    }, [setUserId]);
+
+
+
+
+
+
+
+
     const fetchData = useCallback(async () => {
         if (fetchingRef.current) return; // 🚫 prevent duplicate fetches
         fetchingRef.current = true;
@@ -331,6 +360,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 }
 
                 await fetchData();
+                await syncSession();
             } catch (err) {
                 console.warn("Auth error:", err);
                 showError("❌ Authentication failed. Please refresh.");
@@ -367,9 +397,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     // ✅ Session check when tab becomes visible again
     useEffect(() => {
-        const handleVisibility = () => {
+        const handleVisibility = async () => {
             if (document.visibilityState === "visible") {
-                fetchData();
+                await fetchData();
+                await syncSession();
             }
         };
 
@@ -378,7 +409,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         return () => {
             document.removeEventListener("visibilitychange", handleVisibility);
         };
-    }, [fetchData]);
+    }, [fetchData, syncSession]);
+
 
 
 
