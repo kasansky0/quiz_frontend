@@ -134,6 +134,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
     useEffect(() => {
+        if (status !== "authenticated") return;
+
         if (window.location.pathname === "/") {
             router.replace("/info");
         }
@@ -303,7 +305,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
+
     useEffect(() => {
+        if (status !== "authenticated") return;
         if (!session?.idToken || !session?.user?.email) return;
 
         const sessionKey = `${session.user.email}-${session.idToken}`;
@@ -365,22 +369,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
-
-
-
-
-
     // ✅ Session check when tab becomes visible again
     useEffect(() => {
-        const handleVisibility = async () => {
-            if (document.visibilityState !== "visible") return;
-
-            const sessionData = await fetchSession();
-
-            if (!sessionData?.user) return;
-
-            setUserId(sessionData.user.user_id);
-            await fetchData();
+        const handleVisibility = () => {
+            if (document.visibilityState === "visible") {
+                fetchData();
+            }
         };
 
         document.addEventListener("visibilitychange", handleVisibility);
@@ -388,34 +382,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         return () => {
             document.removeEventListener("visibilitychange", handleVisibility);
         };
-    }, []);
-
-
-
-
-
-
-    useEffect(() => {
-        const bootstrap = async () => {
-            try {
-                const sessionData = await fetchSession(); // cookie-based session
-
-                if (!sessionData?.user) {
-                    showError("Session expired. Please log in again.");
-                    router.replace("/");
-                    return;
-                }
-
-                setUserId(sessionData.user.user_id);
-                await fetchData();
-            } catch (err) {
-                console.log(err);
-                showError("Session restore failed");
-            }
-        };
-
-        bootstrap();
-    }, []);
+    }, [fetchData]);
 
 
 

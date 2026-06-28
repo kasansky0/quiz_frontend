@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useMemo } from "react";
 import CreatePost from "./CreatePost";
-import { useSession } from "next-auth/react";
 import { Post, Comment } from "../../hooks/usePosts";
 import { useUser } from "../../UserContext";
 import { useRouter } from "next/navigation";
@@ -63,7 +62,6 @@ export default function ChatStats() {
         }
     };
 
-    const {data: session} = useSession();
     const {userId} = useUser();
     const router = useRouter();
     const {showError, hideError} = useError();
@@ -92,14 +90,6 @@ export default function ChatStats() {
 
     // --- Modify fetchPosts ---
     const fetchPosts = async (skip: number, limit: number) => {
-        if (!session?.idToken) {
-            setShowLoading(true);
-            showError("You need to log in again.", true);
-            return { posts: [], total: 0, error: "no_session" };
-        }
-
-        const idToken = session.idToken;
-
         if (!navigator.onLine) {
             // Keep loading forever until network is back
             setServerError("⚠️ No internet connection. Please check your WiFi.");
@@ -204,10 +194,6 @@ export default function ChatStats() {
 
     // --- COMMENTS POLLING ---
     const commentsFetcher = async (url: string) => {
-        if (!session?.idToken) {
-            showError("You need to log in again.", true);
-            return [];
-        }
         const res = await fetch(url, {
             credentials: "include",
             headers: {
@@ -295,12 +281,6 @@ export default function ChatStats() {
         images: File[];
         tags: string[];
     }) => {
-        if (!session?.idToken) {
-            showError("You need to log in again.", true);
-            return;
-        }
-
-        const idToken = session.idToken;
         const sanitizedTitle = DOMPurify.sanitize(title.trim());
         const sanitizedMessage = DOMPurify.sanitize(message.trim());
 
