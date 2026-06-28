@@ -87,6 +87,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
+
+
+
     useEffect(() => {
         let timer: NodeJS.Timeout;
 
@@ -232,35 +235,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
-
-    const syncSession = useCallback(async () => {
-        const sessionData = await fetchSession();
-
-        if (!sessionData?.user) return;
-
-        const backendUser = sessionData.user;
-
-        setUserId(backendUser.user_id);
-
-        setUserStats(prev =>
-            prev
-                ? {
-                    ...prev,
-                    user_id: backendUser.user_id,
-                    nickname: backendUser.nickname,
-                    image: backendUser.image ?? prev.image,
-                }
-                : prev
-        );
-    }, [setUserId]);
-
-
-
-
-
-
-
-
     const fetchData = useCallback(async () => {
         if (fetchingRef.current) return; // 🚫 prevent duplicate fetches
         fetchingRef.current = true;
@@ -343,28 +317,40 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         lastSessionKeyRef.current = sessionKey;
 
         const runAuth = async () => {
-            try {
-                const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-                if (!apiUrl) return;
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+            if (!apiUrl) return;
 
-                const res = await fetch(`${apiUrl}/auth/google`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ token: session.idToken }),
-                    credentials: "include",
-                });
+            // 1. login backend (sets cookie)
+            const res = await fetch(`${apiUrl}/auth/google`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token: session.idToken }),
+                credentials: "include",
+            });
 
-                if (!res.ok) {
-                    console.warn("Auth failed:", await res.text().catch(() => ""));
-                    return;
-                }
+            if (!res.ok) return;
 
-                await fetchData();
-                await syncSession();
-            } catch (err) {
-                console.warn("Auth error:", err);
-                showError("❌ Authentication failed. Please refresh.");
+            // 2. WAIT for backend session to be ready
+            let sessionData = null;
+
+            for (let i = 0; i < 3; i++) {
+                sessionData = await fetchSession();
+
+                if (sessionData?.user) break;
+
+                await new Promise(r => setTimeout(r, 200));
             }
+
+            if (!sessionData?.user) {
+                showError("Session not ready. Please refresh.");
+                return;
+            }
+
+            // 3. NOW safe to use backend identity
+            setUserId(sessionData.user.user_id);
+
+            // 4. then fetch full dashboard data
+            await fetchData();
         };
 
         runAuth();
@@ -397,10 +383,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     // ✅ Session check when tab becomes visible again
     useEffect(() => {
-        const handleVisibility = async () => {
+        const handleVisibility = () => {
             if (document.visibilityState === "visible") {
-                await fetchData();
-                await syncSession();
+                fetchData();
             }
         };
 
@@ -409,8 +394,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         return () => {
             document.removeEventListener("visibilitychange", handleVisibility);
         };
-    }, [fetchData, syncSession]);
-
+    }, [fetchData]);
 
 
 
