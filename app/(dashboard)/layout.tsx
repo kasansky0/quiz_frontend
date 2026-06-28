@@ -134,8 +134,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
     useEffect(() => {
-        if (status !== "authenticated") return;
-
         if (window.location.pathname === "/") {
             router.replace("/info");
         }
@@ -306,7 +304,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
     useEffect(() => {
-        if (status !== "authenticated") return;
         if (!session?.idToken || !session?.user?.email) return;
 
         const sessionKey = `${session.user.email}-${session.idToken}`;
@@ -317,40 +314,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         lastSessionKeyRef.current = sessionKey;
 
         const runAuth = async () => {
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-            if (!apiUrl) return;
+            try {
+                const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+                if (!apiUrl) return;
 
-            // 1. login backend (sets cookie)
-            const res = await fetch(`${apiUrl}/auth/google`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ token: session.idToken }),
-                credentials: "include",
-            });
+                const res = await fetch(`${apiUrl}/auth/google`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ token: session.idToken }),
+                    credentials: "include",
+                });
 
-            if (!res.ok) return;
+                if (!res.ok) {
+                    console.warn("Auth failed:", await res.text().catch(() => ""));
+                    return;
+                }
 
-            // 2. WAIT for backend session to be ready
-            let sessionData = null;
-
-            for (let i = 0; i < 3; i++) {
-                sessionData = await fetchSession();
-
-                if (sessionData?.user) break;
-
-                await new Promise(r => setTimeout(r, 200));
+                await fetchData();
+            } catch (err) {
+                console.warn("Auth error:", err);
+                showError("❌ Authentication failed. Please refresh.");
             }
-
-            if (!sessionData?.user) {
-                showError("Session not ready. Please refresh.");
-                return;
-            }
-
-            // 3. NOW safe to use backend identity
-            setUserId(sessionData.user.user_id);
-
-            // 4. then fetch full dashboard data
-            await fetchData();
         };
 
         runAuth();
@@ -381,12 +365,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
+
+
+
+
+
     // ✅ Session check when tab becomes visible again
     useEffect(() => {
-        const handleVisibility = () => {
-            if (document.visibilityState === "visible") {
-                fetchData();
-            }
+        const handleVisibility = async () => {
+            if (document.visibilityState !== "visible") return;
+
+            const sessionData = await fetchSession();
+
+            if (!sessionData?.user) return;
+
+            setUserId(sessionData.user.user_id);
+            await fetchData();
         };
 
         document.addEventListener("visibilitychange", handleVisibility);
@@ -394,7 +388,34 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         return () => {
             document.removeEventListener("visibilitychange", handleVisibility);
         };
-    }, [fetchData]);
+    }, []);
+
+
+
+
+
+
+    useEffect(() => {
+        const bootstrap = async () => {
+            try {
+                const sessionData = await fetchSession(); // cookie-based session
+
+                if (!sessionData?.user) {
+                    showError("Session expired. Please log in again.");
+                    router.replace("/");
+                    return;
+                }
+
+                setUserId(sessionData.user.user_id);
+                await fetchData();
+            } catch (err) {
+                console.log(err);
+                showError("Session restore failed");
+            }
+        };
+
+        bootstrap();
+    }, []);
 
 
 
