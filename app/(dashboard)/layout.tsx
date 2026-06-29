@@ -322,7 +322,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
                 if (!apiUrl) return;
 
-                // optional auth handshake (DO NOT block UI if it fails)
                 if (session?.idToken) {
                     await fetch(`${apiUrl}/auth/google`, {
                         method: "POST",
@@ -332,12 +331,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     }).catch(() => {});
                 }
 
-                // ALWAYS run this
+                // 🔥 IMPORTANT: wait for cookie propagation
+                await new Promise(res => setTimeout(res, 200));
+
                 await fetchData();
 
             } catch (err) {
                 console.warn("Auth/init error:", err);
-                showError("❌ Failed to initialize dashboard");
             }
         };
 
