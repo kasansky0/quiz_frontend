@@ -308,7 +308,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     useEffect(() => {
         if (status !== "authenticated") return;
-        if (!session?.idToken || !session?.user?.email) return;
+        if (!session?.user?.email) return;
 
         const sessionKey = `${session.user.email}-${session.idToken}`;
 
@@ -322,22 +322,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
                 if (!apiUrl) return;
 
-                const res = await fetch(`${apiUrl}/auth/google`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ token: session.idToken }),
-                    credentials: "include",
-                });
-
-                if (!res.ok) {
-                    console.warn("Auth failed:", await res.text().catch(() => ""));
-                    return;
+                // optional auth handshake (DO NOT block UI if it fails)
+                if (session?.idToken) {
+                    await fetch(`${apiUrl}/auth/google`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ token: session.idToken }),
+                        credentials: "include",
+                    }).catch(() => {});
                 }
 
+                // ALWAYS run this
                 await fetchData();
+
             } catch (err) {
-                console.warn("Auth error:", err);
-                showError("❌ Authentication failed. Please refresh.");
+                console.warn("Auth/init error:", err);
+                showError("❌ Failed to initialize dashboard");
             }
         };
 
