@@ -10,7 +10,6 @@ import {useUser} from "@/app/UserContext";
 import { AnimatePresence, motion } from "framer-motion";
 import FormulaSheet from "@/app/(dashboard)/sidebar/formulasSheet"
 import { useError } from "@/app/ErrorProvider";
-import { fetchWithToken, handleSessionExpired } from "@/app/hooks/refreshToken";
 import CalculatorMobile from "@/app/(dashboard)/sidebar/calculatorTopBar";
 import { fetchWithToken_v2, fetchSession } from "@/app/hooks/sessionClient"
 
@@ -218,16 +217,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     useEffect(() => {
-        if (!session?.user || !userStats) return; // wait for both session and DB data
+        if (!userStats) return;
 
         const interval = setInterval(() => {
-            setOnlineTime(prev => prev + 1); // +1 second
+            setOnlineTime(prev => prev + 1);
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [session?.user, userStats]);
-
+    }, [userStats]);
 
 
 
@@ -239,12 +250,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         if (fetchingRef.current) return; // 🚫 prevent duplicate fetches
         fetchingRef.current = true;
 
-        if (!session?.user?.email) {
-            handleSessionExpired();
-            fetchingRef.current = false;
-            return;
-        }
-
         if (!apiUrl) {
             console.error("NEXT_PUBLIC_API_URL missing");
             fetchingRef.current = false;
@@ -253,15 +258,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         try {
             const res = await fetchWithToken_v2(`${apiUrl}/user/`, {
-                method: "POST",
+                method: "GET",
                 credentials: "include",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    name: session.user.name,
-                    email: session.user.email,
-                    image: session.user.image,
-                    google_id: session.user.id ?? null,
-                }),
             });
 
             // Handle fetch failure (null) separately
@@ -292,7 +290,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         } finally {
             setLoading(false);
         }
-    }, [session, apiUrl, showError]);
+    }, [apiUrl, showError]);
 
 
 
@@ -308,7 +306,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     useEffect(() => {
         if (status !== "authenticated") return;
-        if (!session?.idToken || !session?.user?.email) return;
 
         const sessionKey = `${session.user.email}-${session.idToken}`;
 
@@ -500,25 +497,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         );
     }
 
-    if (!session) {
-        return (
-            <div className="flex items-center justify-center h-screen text-black">
-                Redirecting to login...
-            </div>
-        );
-    }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -526,6 +504,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
     const isEmployer = userStats?.isEmployer ?? false;
+
+
+
+
+
+
+
+
 
     return (
         <div className="h-screen flex flex-col bg-black-200 text-black">
