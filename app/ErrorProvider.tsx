@@ -96,7 +96,7 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
                                 <button
                                     onClick={() => {
                                         setIsLoggingIn(true);
-                                        signIn("google");
+                                        signIn("google", { callbackUrl: "/info" });
                                     }}
                                     disabled={isLoggingIn}
                                     className="w-[110px] text-sm font-medium text-blue-600 hover:text-blue-700 transition whitespace-nowrap px-3 py-1 rounded-full border border-blue-200 hover:bg-blue-50 active:bg-blue-100 active:border-blue-400 disabled:opacity-70 flex items-center justify-center"
