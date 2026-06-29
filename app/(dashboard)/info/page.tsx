@@ -99,7 +99,7 @@ const InfoAndFormulas = () => {
                     </div>
 
                     <div className="text-base text-neutral-600 leading-relaxed">
-                        This platform uses Google authentication. For security reasons, your session may expire after a few hours. If that happens, you’ll need to log in again.
+                        This platform uses Google authentication. Your session will expire after a period of inactivity, and you may need to log in again.
                     </div>
                 </div>
 
