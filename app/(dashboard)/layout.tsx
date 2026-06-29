@@ -332,7 +332,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 }
 
                 // 🔥 IMPORTANT: wait for cookie propagation
-                await new Promise(res => setTimeout(res, 200));
+                await new Promise(res => setTimeout(res, 5000));
 
                 await fetchData();
 
