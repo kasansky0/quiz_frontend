@@ -22,9 +22,9 @@ export default function SubscribeButton() {
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/subscribed/create-checkout-session`, {
                 method: "POST",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
                 },
             });
 
