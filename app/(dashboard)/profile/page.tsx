@@ -14,19 +14,7 @@ type ProfileActivity = {
 };
 
 // -----------------------------
-// SAFE JSON
-// -----------------------------
-async function safeJson(res: Response) {
-    const text = await res.text();
-    try {
-        return JSON.parse(text);
-    } catch {
-        return null;
-    }
-}
-
-// -----------------------------
-// CALL NEXT ROUTE (NOT BACKEND)
+// CALL NEXT ROUTE ONLY
 // -----------------------------
 async function getProfile(): Promise<{
     user: UserStats;
@@ -35,18 +23,17 @@ async function getProfile(): Promise<{
     try {
         const cookieHeader = cookies().toString();
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/profile`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/profile`, {
+            method: "GET",
             headers: {
                 Cookie: cookieHeader,
             },
             cache: "no-store",
         });
 
-        const data = await safeJson(res);
+        if (!res.ok) return null;
 
-        if (!res.ok || !data) return null;
-
-        return data;
+        return await res.json();
     } catch (e) {
         console.error("Profile fetch failed:", e);
         return null;

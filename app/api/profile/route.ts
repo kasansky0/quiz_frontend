@@ -6,26 +6,51 @@ export async function GET() {
     try {
         const cookieHeader = cookies().toString();
 
-        const res = await fetch(`${API_URL}/profile/`, {
-            headers: {
-                Cookie: cookieHeader,
-            },
-            cache: "no-store",
-        });
+        const headers = {
+            Cookie: cookieHeader,
+        };
 
-        const text = await res.text();
+        // Run both requests in parallel
+        const [userRes, profileRes] = await Promise.all([
+            fetch(`${API_URL}/user`, {
+                headers,
+                cache: "no-store",
+            }),
+            fetch(`${API_URL}/profile`, {
+                headers,
+                cache: "no-store",
+            }),
+        ]);
 
-        let data;
+        const [userText, profileText] = await Promise.all([
+            userRes.text(),
+            profileRes.text(),
+        ]);
+
+        let user, profile;
+
         try {
-            data = JSON.parse(text);
+            user = JSON.parse(userText);
         } catch {
             return Response.json(
-                { error: "Invalid backend response", raw: text },
+                { error: "Invalid /user response", raw: userText },
                 { status: 500 }
             );
         }
 
-        return Response.json(data);
+        try {
+            profile = JSON.parse(profileText);
+        } catch {
+            return Response.json(
+                { error: "Invalid /profile response", raw: profileText },
+                { status: 500 }
+            );
+        }
+
+        return Response.json({
+            user,
+            activity: profile?.activity ?? profile, // flexible fallback
+        });
     } catch (e) {
         return Response.json(
             { error: "Profile route failed" },
