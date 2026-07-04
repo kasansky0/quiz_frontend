@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import type { RequestCookies } from "next/dist/compiled/@edge-runtime/cookies";
 
 type UserStats = {
     name: string;
@@ -13,55 +14,116 @@ type ProfileActivity = {
     comments: any[];
 };
 
+// -----------------------------
+// COOKIE DEBUG (SSR SAFE)
+// -----------------------------
+function getCookieHeader() {
+    const cookieStore = cookies() as any;
+
+    const cookiesList = cookieStore.getAll();
+
+    return cookiesList
+        .map((c: any) => `${c.name}=${c.value}`)
+        .join("; ");
+}
+
+// -----------------------------
+// SAFE JSON PARSER
+// -----------------------------
+async function safeJson(res: Response) {
+    const text = await res.text();
+
+    try {
+        return JSON.parse(text);
+    } catch (e) {
+        console.log("❌ JSON parse failed. Raw response:", text);
+        return null;
+    }
+}
+
+// -----------------------------
+// USER FETCH
+// -----------------------------
 async function getUser(): Promise<UserStats | null> {
     try {
-        const cookieStore = cookies();
+        console.log("🚀 [SSR] getUser START");
 
         const res = await fetch("https://api.netaprep.com/api/user/", {
             method: "POST",
             headers: {
-                Cookie: cookieStore.toString(),
+                "Content-Type": "application/json",
+                Cookie: getCookieHeader(),
             },
             cache: "no-store",
         });
 
-        if (!res.ok) return null;
+        console.log("📡 [SSR] getUser status:", res.status);
 
-        return await res.json();
+        const data = await safeJson(res);
+
+        console.log("📦 [SSR] getUser parsed:", data);
+
+        if (!res.ok || !data) {
+            console.log("❌ [SSR] getUser failed");
+            return null;
+        }
+
+        return data as UserStats;
     } catch (e) {
-        console.error("User fetch failed", e);
+        console.error("❌ User fetch failed:", e);
         return null;
     }
 }
 
+// -----------------------------
+// PROFILE ACTIVITY FETCH
+// -----------------------------
 async function getProfileActivity(): Promise<ProfileActivity | null> {
     try {
-        const cookieStore = cookies();
+        console.log("🚀 [SSR] getProfileActivity START");
 
         const res = await fetch("https://api.netaprep.com/api/profile/", {
+            method: "GET",
             headers: {
-                Cookie: cookieStore.toString(),
+                Cookie: getCookieHeader(),
             },
             cache: "no-store",
         });
 
-        if (!res.ok) return null;
+        console.log("📡 [SSR] profile status:", res.status);
 
-        return await res.json();
+        const data = await safeJson(res);
+
+        console.log("📦 [SSR] profile parsed:", data);
+
+        if (!res.ok || !data) {
+            console.log("❌ [SSR] profile failed");
+            return null;
+        }
+
+        return data as ProfileActivity;
     } catch (e) {
-        console.error("Profile fetch failed", e);
+        console.error("❌ Profile fetch failed:", e);
         return null;
     }
 }
 
+// -----------------------------
+// PAGE
+// -----------------------------
 export default async function ProfilePage() {
-    // 🔥 parallel SSR fetch (important performance improvement)
+    console.log("🔥 [SSR] ProfilePage RENDER START");
+
     const [user, activity] = await Promise.all([
         getUser(),
         getProfileActivity(),
     ]);
 
+    console.log("📊 [SSR] FINAL user:", user);
+    console.log("📊 [SSR] FINAL activity:", activity);
+
     if (!user || !activity) {
+        console.log("❌ [SSR] RETURNING FAILED PAGE");
         return (
             <div className="min-h-screen flex items-center justify-center">
                 Failed to load profile
@@ -69,8 +131,11 @@ export default async function ProfilePage() {
         );
     }
 
-    const posts = activity.posts || [];
-    const comments = activity.comments || [];
+    const posts = activity.posts ?? [];
+    const comments = activity.comments ?? [];
+
+    console.log("📌 [SSR] posts count:", posts.length);
+    console.log("💬 [SSR] comments count:", comments.length);
 
     return (
         <div className="min-h-screen bg-gray-50 flex justify-center px-4 py-10">
