@@ -14,92 +14,41 @@ type ProfileActivity = {
 };
 
 // -----------------------------
-// ENV BASE URL (RENDER SAFE)
-// -----------------------------
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-// -----------------------------
-// SAFE JSON PARSER
+// SAFE JSON
 // -----------------------------
 async function safeJson(res: Response) {
     const text = await res.text();
-
     try {
         return JSON.parse(text);
-    } catch (e) {
-        console.log("❌ JSON parse failed. Raw response:", text);
+    } catch {
         return null;
     }
 }
 
 // -----------------------------
-// USER FETCH
+// CALL NEXT ROUTE (NOT BACKEND)
 // -----------------------------
-async function getUser(): Promise<UserStats | null> {
+async function getProfile(): Promise<{
+    user: UserStats;
+    activity: ProfileActivity;
+} | null> {
     try {
-        console.log("🚀 [SSR] getUser START");
-
         const cookieHeader = cookies().toString();
 
-        const res = await fetch(`${API_URL}/user/`, {
-            method: "POST",
+        const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/profile`, {
             headers: {
-                "Content-Type": "application/json",
                 Cookie: cookieHeader,
             },
             cache: "no-store",
         });
 
-        console.log("📡 [SSR] getUser status:", res.status);
-
         const data = await safeJson(res);
 
-        console.log("📦 [SSR] getUser parsed:", data);
+        if (!res.ok || !data) return null;
 
-        if (!res.ok || !data) {
-            console.log("❌ [SSR] getUser failed");
-            return null;
-        }
-
-        return data as UserStats;
+        return data;
     } catch (e) {
-        console.error("❌ User fetch failed:", e);
-        return null;
-    }
-}
-
-// -----------------------------
-// PROFILE ACTIVITY FETCH
-// -----------------------------
-async function getProfileActivity(): Promise<ProfileActivity | null> {
-    try {
-        console.log("🚀 [SSR] getProfileActivity START");
-
-        const cookieHeader = cookies().toString();
-
-        const res = await fetch(`${API_URL}/profile/`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Cookie: cookieHeader,
-            },
-            cache: "no-store",
-        });
-
-        console.log("📡 [SSR] profile status:", res.status);
-
-        const data = await safeJson(res);
-
-        console.log("📦 [SSR] profile parsed:", data);
-
-        if (!res.ok || !data) {
-            console.log("❌ [SSR] profile failed");
-            return null;
-        }
-
-        return data as ProfileActivity;
-    } catch (e) {
-        console.error("❌ Profile fetch failed:", e);
+        console.error("Profile fetch failed:", e);
         return null;
     }
 }
@@ -108,18 +57,11 @@ async function getProfileActivity(): Promise<ProfileActivity | null> {
 // PAGE
 // -----------------------------
 export default async function ProfilePage() {
-    console.log("🔥 [SSR] ProfilePage RENDER START");
+    console.log("🔥 ProfilePage SSR START");
 
-    const [user, activity] = await Promise.all([
-        getUser(),
-        getProfileActivity(),
-    ]);
+    const result = await getProfile();
 
-    console.log("📊 [SSR] FINAL user:", user);
-    console.log("📊 [SSR] FINAL activity:", activity);
-
-    if (!user || !activity) {
-        console.log("❌ [SSR] RETURNING FAILED PAGE");
+    if (!result) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 Failed to load profile
@@ -127,11 +69,10 @@ export default async function ProfilePage() {
         );
     }
 
+    const { user, activity } = result;
+
     const posts = activity.posts ?? [];
     const comments = activity.comments ?? [];
-
-    console.log("📌 [SSR] posts count:", posts.length);
-    console.log("💬 [SSR] comments count:", comments.length);
 
     return (
         <div className="min-h-screen bg-gray-50 flex justify-center px-4 py-10">
@@ -145,9 +86,7 @@ export default async function ProfilePage() {
                     />
 
                     <div>
-                        <h1 className="text-2xl font-semibold">
-                            {user.name}
-                        </h1>
+                        <h1 className="text-2xl font-semibold">{user.name}</h1>
                         <p className="text-gray-500">{user.email}</p>
 
                         <div className="mt-2 px-3 py-1 bg-gray-100 rounded-full inline-block">
@@ -179,7 +118,6 @@ export default async function ProfilePage() {
                 {/* POSTS */}
                 <div className="bg-white p-6 rounded-2xl shadow">
                     <h2 className="font-semibold mb-3">Your Posts</h2>
-
                     <div className="space-y-3">
                         {posts.map((post: any) => (
                             <div key={post.id} className="border-b pb-3">
@@ -195,7 +133,6 @@ export default async function ProfilePage() {
                 {/* COMMENTS */}
                 <div className="bg-white p-6 rounded-2xl shadow">
                     <h2 className="font-semibold mb-3">Your Comments</h2>
-
                     <div className="space-y-3">
                         {comments.map((comment: any) => (
                             <div key={comment.id} className="border-b pb-3">
