@@ -23,7 +23,7 @@ async function getProfile(): Promise<{
     try {
         const cookieHeader = cookies().toString();
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/profile`, {
+        const res = await fetch(`${process.env.NEXTAUTH_URL}/api/profile`, {
             method: "GET",
             headers: {
                 Cookie: cookieHeader,
