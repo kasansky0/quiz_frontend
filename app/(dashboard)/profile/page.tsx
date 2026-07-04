@@ -41,7 +41,7 @@ async function getUser(): Promise<UserStats | null> {
 
         const cookieHeader = cookies().toString();
 
-        const res = await fetch(`${API_URL}/api/user/`, {
+        const res = await fetch(`${API_URL}/user/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -77,7 +77,7 @@ async function getProfileActivity(): Promise<ProfileActivity | null> {
 
         const cookieHeader = cookies().toString();
 
-        const res = await fetch(`${API_URL}/api/profile/`, {
+        const res = await fetch(`${API_URL}/profile/`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
