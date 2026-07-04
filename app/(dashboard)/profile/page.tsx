@@ -1,5 +1,4 @@
 import { cookies } from "next/headers";
-import type { RequestCookies } from "next/dist/compiled/@edge-runtime/cookies";
 
 type UserStats = {
     name: string;
@@ -15,17 +14,9 @@ type ProfileActivity = {
 };
 
 // -----------------------------
-// COOKIE DEBUG (SSR SAFE)
+// ENV BASE URL (RENDER SAFE)
 // -----------------------------
-function getCookieHeader() {
-    const cookieStore = cookies() as any;
-
-    const cookiesList = cookieStore.getAll();
-
-    return cookiesList
-        .map((c: any) => `${c.name}=${c.value}`)
-        .join("; ");
-}
+const API_URL = process.env.API_URL;
 
 // -----------------------------
 // SAFE JSON PARSER
@@ -48,11 +39,13 @@ async function getUser(): Promise<UserStats | null> {
     try {
         console.log("🚀 [SSR] getUser START");
 
-        const res = await fetch("https://api.netaprep.com/api/user/", {
+        const cookieHeader = cookies().toString();
+
+        const res = await fetch(`${API_URL}/api/user/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Cookie: getCookieHeader(),
+                Cookie: cookieHeader,
             },
             cache: "no-store",
         });
@@ -82,10 +75,13 @@ async function getProfileActivity(): Promise<ProfileActivity | null> {
     try {
         console.log("🚀 [SSR] getProfileActivity START");
 
-        const res = await fetch("https://api.netaprep.com/api/profile/", {
+        const cookieHeader = cookies().toString();
+
+        const res = await fetch(`${API_URL}/api/profile/`, {
             method: "GET",
             headers: {
-                Cookie: getCookieHeader(),
+                "Content-Type": "application/json",
+                Cookie: cookieHeader,
             },
             cache: "no-store",
         });
