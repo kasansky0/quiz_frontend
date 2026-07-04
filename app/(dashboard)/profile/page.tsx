@@ -16,7 +16,7 @@ type ProfileActivity = {
 // -----------------------------
 // ENV BASE URL (RENDER SAFE)
 // -----------------------------
-const API_URL = process.env.API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // -----------------------------
 // SAFE JSON PARSER
