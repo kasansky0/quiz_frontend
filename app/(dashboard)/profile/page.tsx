@@ -1,4 +1,6 @@
-import { cookies } from "next/headers";
+"use client";
+
+import { useEffect, useState } from "react";
 
 type UserStats = {
     name: string;
@@ -13,53 +15,65 @@ type ProfileActivity = {
     comments: any[];
 };
 
-// -----------------------------
-// CALL NEXT ROUTE ONLY
-// -----------------------------
-async function getProfile(): Promise<{
-    user: UserStats;
-    activity: ProfileActivity;
-} | null> {
-    try {
-        const cookieHeader = cookies().toString();
+export default function ProfilePage() {
+    const [user, setUser] = useState<UserStats | null>(null);
+    const [posts, setPosts] = useState<any[]>([]);
+    const [comments, setComments] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-        const res = await fetch(`${process.env.NEXTAUTH_URL}/api/profile`, {
-            method: "GET",
-            headers: {
-                Cookie: cookieHeader,
-            },
-            cache: "no-store",
-        });
+    useEffect(() => {
+        async function loadData() {
+            try {
+                const base = process.env.NEXT_PUBLIC_API_URL;
 
-        if (!res.ok) return null;
+                // 🔥 CALL YOUR EXISTING BACKEND DIRECTLY
 
-        return await res.json();
-    } catch (e) {
-        console.error("Profile fetch failed:", e);
-        return null;
-    }
-}
+                const [userRes, profileRes] = await Promise.all([
+                    fetch(`${base}/user/`, {
+                        method: "POST",
+                        credentials: "include", // IMPORTANT (auth cookie)
+                    }),
+                    fetch(`${base}/profile/`, {
+                        method: "GET",
+                        credentials: "include",
+                    }),
+                ]);
 
-// -----------------------------
-// PAGE
-// -----------------------------
-export default async function ProfilePage() {
-    console.log("🔥 ProfilePage SSR START");
+                if (!userRes.ok || !profileRes.ok) {
+                    throw new Error("Failed to load profile data");
+                }
 
-    const result = await getProfile();
+                const userData = await userRes.json();
+                const profileData: ProfileActivity = await profileRes.json();
 
-    if (!result) {
+                setUser(userData);
+                setPosts(profileData.posts ?? []);
+                setComments(profileData.comments ?? []);
+            } catch (err) {
+                console.error("Profile load failed:", err);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        loadData();
+    }, []);
+
+    if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
-                Failed to load profile
+                Loading...
             </div>
         );
     }
 
-    const { user, activity } = result;
-
-    const posts = activity.posts ?? [];
-    const comments = activity.comments ?? [];
+    if (!user) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                Failed to load user
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 flex justify-center px-4 py-10">
