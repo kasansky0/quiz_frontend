@@ -127,6 +127,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
 
+    useEffect(() => {
+        console.log("STATUS:", status);
+    }, [status]);
+
+
+    useEffect(() => {
+        console.log("SESSION:", session);
+    }, [session]);
+
 
 
 
