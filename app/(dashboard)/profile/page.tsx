@@ -209,8 +209,8 @@ export default function ProfilePage() {
                                 return (
                                     <div key={qId} className="border-b pb-3">
                                         <p className="font-semibold">
-                                            {preview.length > 80
-                                                ? preview.slice(0, 80) + "..."
+                                            {preview.length > 79
+                                                ? preview.slice(0, 79) + "..."
                                                 : preview}
                                         </p>
 
