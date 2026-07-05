@@ -18,6 +18,23 @@ export default function ProfilePage() {
     const [posts, setPosts] = useState<any[]>([]);
     const [comments, setComments] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [expandedPosts, setExpandedPosts] = useState<Record<string, boolean>>({});
+
+    const togglePost = (id: string) => {
+        setExpandedPosts((prev) => ({
+            ...prev,
+            [id]: !prev[id],
+        }));
+    };
+
+    const [expandedComments, setExpandedComments] = useState<Record<string, boolean>>({});
+
+    const toggleComment = (id: string) => {
+        setExpandedComments((prev) => ({
+            ...prev,
+            [id]: !prev[id],
+        }));
+    };
 
     const [stats, setStats] = useState({
         totalSeen: 0,
@@ -223,14 +240,32 @@ export default function ProfilePage() {
                                 You haven't created any posts yet.
                             </p>
                         ) : (
-                            posts.map((post) => (
-                                <div key={post.id} className="border-b pb-3">
-                                    <p className="font-semibold">{post.title}</p>
-                                    <p className="text-sm text-gray-500">
-                                        {post.message}
-                                    </p>
-                                </div>
-                            ))
+                            posts.map((post) => {
+                                const isExpanded = expandedPosts[post.id];
+
+                                return (
+                                    <div key={post.id} className="border-b pb-3">
+                                        <p className="font-semibold">{post.title}</p>
+
+                                        <p
+                                            className={`text-sm text-gray-500 ${
+                                                !isExpanded ? "line-clamp-5" : ""
+                                            }`}
+                                        >
+                                            {post.message}
+                                        </p>
+
+                                        {post.message?.length > 200 && (
+                                            <button
+                                                onClick={() => togglePost(post.id)}
+                                                className="text-blue-500 text-xs mt-1"
+                                            >
+                                                {isExpanded ? "Show less" : "More"}
+                                            </button>
+                                        )}
+                                    </div>
+                                );
+                            })
                         )}
                     </div>
                 </div>
@@ -245,11 +280,31 @@ export default function ProfilePage() {
                                 You haven't posted any comments yet.
                             </p>
                         ) : (
-                            comments.map((c) => (
-                                <div key={c.id} className="border-b pb-3">
-                                    <p className="text-sm">{c.message}</p>
-                                </div>
-                            ))
+                            comments.map((c) => {
+                                const isExpanded = expandedComments[c.id];
+                                const message = c.message;
+
+                                return (
+                                    <div key={c.id} className="border-b pb-3">
+                                        <p
+                                            className={`text-sm ${
+                                                !isExpanded ? "line-clamp-5" : ""
+                                            }`}
+                                        >
+                                            {message}
+                                        </p>
+
+                                        {message?.length > 200 && (
+                                            <button
+                                                onClick={() => toggleComment(c.id)}
+                                                className="text-blue-500 text-xs mt-1"
+                                            >
+                                                {isExpanded ? "Show less" : "More"}
+                                            </button>
+                                        )}
+                                    </div>
+                                );
+                            })
                         )}
                     </div>
                 </div>
