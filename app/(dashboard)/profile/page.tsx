@@ -247,20 +247,28 @@ export default function ProfilePage() {
                                     <div key={post.id} className="border-b pb-3">
                                         <p className="font-semibold">{post.title}</p>
 
-                                        <p
-                                            className={`text-sm text-gray-500 ${
-                                                !isExpanded ? "line-clamp-5" : ""
-                                            }`}
-                                        >
-                                            {post.message}
-                                        </p>
+                                        {/* TEXT WRAPPER */}
+                                        <div className="relative">
+                                            <p
+                                                className={`text-sm text-gray-500 whitespace-pre-wrap ${
+                                                    !isExpanded ? "line-clamp-5" : ""
+                                                }`}
+                                            >
+                                                {post.message}
+                                            </p>
+
+                                            {/* FADE ONLY WHEN COLLAPSED */}
+                                            {!isExpanded && (
+                                                <div className="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+                                            )}
+                                        </div>
 
                                         {post.message?.length > 200 && (
                                             <button
                                                 onClick={() => togglePost(post.id)}
                                                 className="text-blue-500 text-xs mt-1"
                                             >
-                                                {isExpanded ? "Show less" : "More"}
+                                                {isExpanded ? "Show less" : "See more"}
                                             </button>
                                         )}
                                     </div>
@@ -282,24 +290,31 @@ export default function ProfilePage() {
                         ) : (
                             comments.map((c) => {
                                 const isExpanded = expandedComments[c.id];
-                                const message = c.message;
 
                                 return (
                                     <div key={c.id} className="border-b pb-3">
-                                        <p
-                                            className={`text-sm ${
-                                                !isExpanded ? "line-clamp-5" : ""
-                                            }`}
-                                        >
-                                            {message}
-                                        </p>
+                                        {/* TEXT WRAPPER */}
+                                        <div className="relative">
+                                            <p
+                                                className={`text-sm whitespace-pre-wrap ${
+                                                    !isExpanded ? "line-clamp-5" : ""
+                                                }`}
+                                            >
+                                                {c.message}
+                                            </p>
 
-                                        {message?.length > 200 && (
+                                            {/* FADE ONLY WHEN COLLAPSED */}
+                                            {!isExpanded && (
+                                                <div className="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+                                            )}
+                                        </div>
+
+                                        {c.message?.length > 200 && (
                                             <button
                                                 onClick={() => toggleComment(c.id)}
                                                 className="text-blue-500 text-xs mt-1"
                                             >
-                                                {isExpanded ? "Show less" : "More"}
+                                                {isExpanded ? "Show less" : "See more"}
                                             </button>
                                         )}
                                     </div>
