@@ -184,14 +184,17 @@ export default function ProfilePage() {
                     <div className="max-h-64 overflow-y-auto space-y-3 pr-2">
                         {user.seenQuestions &&
                             Object.entries(user.seenQuestions).map(([qId, attempts]: any) => {
-                                const lastAttempt = attempts[attempts.length - 1];
+                                const lastAttempt = attempts?.[attempts.length - 1];
+                                const preview = lastAttempt?.question_preview;
 
-                                if (!lastAttempt?.question_preview) return null;
+                                if (!preview) return null;
 
                                 return (
                                     <div key={qId} className="border-b pb-3">
                                         <p className="font-semibold">
-                                            {lastAttempt.question_preview}
+                                            {preview.length > 80
+                                                ? preview.slice(0, 80) + "..."
+                                                : preview}
                                         </p>
 
                                         <p className="text-sm text-gray-600">
