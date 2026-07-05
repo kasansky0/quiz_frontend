@@ -129,7 +129,7 @@ export default function ProfilePage() {
 
     return (
         <div className="min-h-screen bg-gray-100 flex justify-center px-4 py-10">
-            <div className="w-full max-w-xl space-y-6">
+            <div className="w-full max-w-xl space-y-8">
 
                 {/* HEADER */}
                 <div className="bg-white rounded-2xl shadow p-6 flex items-center gap-5">
@@ -151,8 +151,8 @@ export default function ProfilePage() {
                 {/* POSTS + COMMENTS (SEPARATE CARDS) */}
                 <div className="grid grid-cols-2 gap-4">
                     <div className="bg-white p-5 rounded-2xl shadow">
-                        <p className="text-gray-500 text-sm">Posts</p>
-                        <p className="text-3xl font-bold">{posts.length}</p>
+                        <p className="text-xs uppercase tracking-wide text-gray-500">Posts</p>
+                        <p className="text-3xl font-semibold text-gray-800">{posts.length}</p>
                     </div>
 
                     <div className="bg-white p-5 rounded-2xl shadow">
@@ -195,8 +195,8 @@ export default function ProfilePage() {
                 </div>
 
                 {/* SEEN QUESTIONS (REAL CONTENT) */}
-                <div className="bg-white p-6 rounded-2xl shadow">
-                    <h2 className="font-semibold mb-3">Questions You've Seen</h2>
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h2 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-3">Questions You've Seen</h2>
 
                     <div className="max-h-64 overflow-y-auto space-y-3 pr-2">
                         {user.seenQuestions &&
@@ -231,8 +231,10 @@ export default function ProfilePage() {
                 </div>
 
                 {/* POSTS SCROLL */}
-                <div className="bg-white p-6 rounded-2xl shadow">
-                    <h2 className="font-semibold mb-3">Your Posts</h2>
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h2 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-3">
+                        Your Posts
+                    </h2>
 
                     <div className="max-h-64 overflow-y-auto space-y-3 pr-2">
                         {posts.map((post) => {
@@ -273,8 +275,8 @@ export default function ProfilePage() {
                 </div>
 
                 {/* COMMENTS SCROLL */}
-                <div className="bg-white p-6 rounded-2xl shadow">
-                    <h2 className="font-semibold mb-3">Your Comments</h2>
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h2 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-3">Your Comments</h2>
 
                     <div className="max-h-64 overflow-y-auto space-y-3 pr-2">
                         {comments.map((c) => {
