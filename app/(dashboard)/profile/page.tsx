@@ -148,19 +148,6 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
-                {/* POSTS + COMMENTS (SEPARATE CARDS) */}
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white p-5 rounded-2xl shadow">
-                        <p className="text-xs uppercase tracking-wide text-gray-500">Posts</p>
-                        <p className="text-3xl font-semibold text-gray-800">{posts.length}</p>
-                    </div>
-
-                    <div className="bg-white p-5 rounded-2xl shadow">
-                        <p className="text-gray-500 text-sm">Comments</p>
-                        <p className="text-3xl font-bold">{comments.length}</p>
-                    </div>
-                </div>
-
                 {/* QUESTION STATS */}
                 <div className="grid grid-cols-3 gap-4">
                     <div className="bg-white p-4 rounded-2xl shadow">
@@ -196,37 +183,64 @@ export default function ProfilePage() {
 
                 {/* SEEN QUESTIONS (REAL CONTENT) */}
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-3">Questions You've Seen</h2>
+                    <h2 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-3">
+                        Questions You've Seen
+                    </h2>
 
                     <div className="max-h-64 overflow-y-auto space-y-3 pr-2">
                         {user.seenQuestions &&
-                            Object.entries(user.seenQuestions).map(([qId, attempts]: any) => {
-                                const lastAttempt = attempts?.[attempts.length - 1];
-                                const preview = lastAttempt?.question_preview;
+                            Object.entries(user.seenQuestions)
+                                .sort(([, attemptsA]: any, [, attemptsB]: any) => {
+                                    const lastA = attemptsA?.[attemptsA.length - 1]?.seen_at
+                                        ? new Date(attemptsA[attemptsA.length - 1].seen_at).getTime()
+                                        : 0;
 
-                                if (!preview) return null;
+                                    const lastB = attemptsB?.[attemptsB.length - 1]?.seen_at
+                                        ? new Date(attemptsB[attemptsB.length - 1].seen_at).getTime()
+                                        : 0;
 
-                                return (
-                                    <div key={qId} className="border-b pb-3">
-                                        <p className="font-semibold">
-                                            {preview.length > 79
-                                                ? preview.slice(0, 79) + "..."
-                                                : preview}
-                                        </p>
+                                    return lastB - lastA; // newest first
+                                })
+                                .map(([qId, attempts]: any) => {
+                                    const lastAttempt = attempts?.[attempts.length - 1];
+                                    const preview = lastAttempt?.question_preview;
 
-                                        <p className="text-sm text-gray-600">
-                                            Last answer:{" "}
-                                            {lastAttempt?.answered_correctly
-                                                ? "Correct"
-                                                : "Wrong"}
-                                        </p>
+                                    if (!preview) return null;
 
-                                        <p className="text-xs text-gray-400">
-                                            Attempts: {attempts.length}
-                                        </p>
-                                    </div>
-                                );
-                            })}
+                                    return (
+                                        <div key={qId} className="border-b pb-3">
+                                            <p className="font-semibold">
+                                                {preview.length > 79
+                                                    ? preview.slice(0, 79) + "..."
+                                                    : preview}
+                                            </p>
+
+                                            <p className="text-sm text-gray-600">
+                                                Last answer:{" "}
+                                                {lastAttempt?.answered_correctly
+                                                    ? "Correct"
+                                                    : "Wrong"}
+                                            </p>
+
+                                            <p className="text-xs text-gray-400">
+                                                Attempts: {attempts.length}
+                                            </p>
+                                        </div>
+                                    );
+                                })}
+                    </div>
+                </div>
+
+                {/* POSTS + COMMENTS (SEPARATE CARDS) */}
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white p-5 rounded-2xl shadow">
+                        <p className="text-xs uppercase tracking-wide text-gray-500">Posts</p>
+                        <p className="text-3xl font-semibold text-gray-800">{posts.length}</p>
+                    </div>
+
+                    <div className="bg-white p-5 rounded-2xl shadow">
+                        <p className="text-gray-500 text-sm">Comments</p>
+                        <p className="text-3xl font-bold">{comments.length}</p>
                     </div>
                 </div>
 
