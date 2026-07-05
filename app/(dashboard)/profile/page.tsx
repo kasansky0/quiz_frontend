@@ -30,6 +30,8 @@ export default function ProfilePage() {
         async function load() {
             const base = process.env.NEXT_PUBLIC_API_URL;
 
+            console.log("🚀 Fetching from:", base);
+
             const [u, p] = await Promise.all([
                 fetch(`${base}/user/`, {
                     method: "POST",
@@ -40,16 +42,24 @@ export default function ProfilePage() {
                 }),
             ]);
 
+            console.log("📡 /user response status:", u.status);
+            console.log("📡 /profile response status:", p.status);
+
             const userData = await u.json();
             const profileData = await p.json();
+
+            console.log("👤 RAW USER DATA:", userData);
+            console.log("📊 RAW PROFILE DATA:", profileData);
 
             setUser(userData);
             setPosts(profileData.posts ?? []);
             setComments(profileData.comments ?? []);
 
             const seen = userData.seenQuestions ?? {};
+            console.log("📚 seenQuestions RAW:", seen);
 
             const uniqueQuestionIds = Object.keys(seen);
+            console.log("🧠 uniqueQuestionIds:", uniqueQuestionIds);
 
             let totalSeen = 0;
             let correct = 0;
@@ -57,6 +67,8 @@ export default function ProfilePage() {
 
             for (const qId of uniqueQuestionIds) {
                 const entries = seen[qId];
+
+                console.log(`➡️ Q${qId} attempts:`, entries);
 
                 for (const entry of entries) {
                     totalSeen++;
@@ -69,8 +81,15 @@ export default function ProfilePage() {
             const total = correct + wrong;
             const accuracy = total ? Math.round((correct / total) * 100) : 0;
 
+            console.log("📈 FINAL STATS:", {
+                totalSeen,
+                correct,
+                wrong,
+                accuracy,
+            });
+
             setStats({
-                totalSeen: total,
+                totalSeen,
                 correct,
                 wrong,
                 accuracy,
