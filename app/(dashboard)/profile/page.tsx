@@ -30,8 +30,6 @@ export default function ProfilePage() {
         async function load() {
             const base = process.env.NEXT_PUBLIC_API_URL;
 
-            console.log("🚀 Fetching from:", base);
-
             const [u, p] = await Promise.all([
                 fetch(`${base}/user/`, {
                     method: "POST",
@@ -42,24 +40,16 @@ export default function ProfilePage() {
                 }),
             ]);
 
-            console.log("📡 /user response status:", u.status);
-            console.log("📡 /profile response status:", p.status);
-
             const userData = await u.json();
             const profileData = await p.json();
-
-            console.log("👤 RAW USER DATA:", userData);
-            console.log("📊 RAW PROFILE DATA:", profileData);
 
             setUser(userData);
             setPosts(profileData.posts ?? []);
             setComments(profileData.comments ?? []);
 
             const seen = userData.seenQuestions ?? {};
-            console.log("📚 seenQuestions RAW:", seen);
 
             const uniqueQuestionIds = Object.keys(seen);
-            console.log("🧠 uniqueQuestionIds:", uniqueQuestionIds);
 
             let totalSeen = 0;
             let correct = 0;
@@ -67,8 +57,6 @@ export default function ProfilePage() {
 
             for (const qId of uniqueQuestionIds) {
                 const entries = seen[qId];
-
-                console.log(`➡️ Q${qId} attempts:`, entries);
 
                 for (const entry of entries) {
                     totalSeen++;
@@ -80,13 +68,6 @@ export default function ProfilePage() {
 
             const total = correct + wrong;
             const accuracy = total ? Math.round((correct / total) * 100) : 0;
-
-            console.log("📈 FINAL STATS:", {
-                totalSeen,
-                correct,
-                wrong,
-                accuracy,
-            });
 
             setStats({
                 totalSeen,
@@ -108,8 +89,15 @@ export default function ProfilePage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                Loading...
+            <div className="fixed inset-0 flex items-center justify-center bg-black-200 text-black">
+                <p className="text-xl flex items-center">
+                    Loading
+                    <span className="ml-2 flex space-x-1">
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                </span>
+                </p>
             </div>
         );
     }
@@ -124,7 +112,7 @@ export default function ProfilePage() {
 
     return (
         <div className="min-h-screen bg-gray-100 flex justify-center px-4 py-10">
-            <div className="w-full max-w-3xl space-y-6">
+            <div className="w-full max-w-xl space-y-6">
 
                 {/* HEADER */}
                 <div className="bg-white rounded-2xl shadow p-6 flex items-center gap-5">
@@ -191,17 +179,19 @@ export default function ProfilePage() {
 
                 {/* SEEN QUESTIONS (REAL CONTENT) */}
                 <div className="bg-white p-6 rounded-2xl shadow">
-                    <h2 className="font-semibold mb-3">Questions You’ve Seen</h2>
+                    <h2 className="font-semibold mb-3">Questions You've Seen</h2>
 
                     <div className="max-h-64 overflow-y-auto space-y-3 pr-2">
                         {user.seenQuestions &&
                             Object.entries(user.seenQuestions).map(([qId, attempts]: any) => {
                                 const lastAttempt = attempts[attempts.length - 1];
 
+                                if (!lastAttempt?.question_preview) return null;
+
                                 return (
                                     <div key={qId} className="border-b pb-3">
                                         <p className="font-semibold">
-                                            Question #{qId}
+                                            {lastAttempt.question_preview}
                                         </p>
 
                                         <p className="text-sm text-gray-600">
@@ -225,14 +215,20 @@ export default function ProfilePage() {
                     <h2 className="font-semibold mb-3">Your Posts</h2>
 
                     <div className="max-h-64 overflow-y-auto space-y-3 pr-2">
-                        {posts.map((post) => (
-                            <div key={post.id} className="border-b pb-3">
-                                <p className="font-semibold">{post.title}</p>
-                                <p className="text-sm text-gray-500">
-                                    {post.message}
-                                </p>
-                            </div>
-                        ))}
+                        {posts.length === 0 ? (
+                            <p className="text-sm text-gray-500 text-center py-6">
+                                You haven't created any posts yet.
+                            </p>
+                        ) : (
+                            posts.map((post) => (
+                                <div key={post.id} className="border-b pb-3">
+                                    <p className="font-semibold">{post.title}</p>
+                                    <p className="text-sm text-gray-500">
+                                        {post.message}
+                                    </p>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
 
@@ -241,14 +237,20 @@ export default function ProfilePage() {
                     <h2 className="font-semibold mb-3">Your Comments</h2>
 
                     <div className="max-h-64 overflow-y-auto space-y-3 pr-2">
-                        {comments.map((c) => (
-                            <div key={c.id} className="border-b pb-3">
-                                <p className="text-sm">{c.message}</p>
-                                <p className="text-xs text-gray-400">
-                                    Post ID: {c.postId}
-                                </p>
-                            </div>
-                        ))}
+                        {comments.length === 0 ? (
+                            <p className="text-sm text-gray-500 text-center py-6">
+                                You haven't posted any comments yet.
+                            </p>
+                        ) : (
+                            comments.map((c) => (
+                                <div key={c.id} className="border-b pb-3">
+                                    <p className="text-sm">{c.message}</p>
+                                    <p className="text-xs text-gray-400">
+                                        Post ID: {c.postId}
+                                    </p>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
 
