@@ -237,79 +237,93 @@ export default function ProfilePage() {
                     </h2>
 
                     <div className="max-h-64 overflow-y-auto space-y-3 pr-2">
-                        {posts.map((post) => {
-                            const isExpanded = expandedPosts[post.id];
-                            const shouldTruncate = post.message?.length > 180;
+                        {posts.length === 0 ? (
+                            <p className="text-sm text-gray-500 text-center py-6">
+                                You haven’t posted anything yet.
+                            </p>
+                        ) : (
+                            posts.map((post) => {
+                                const isExpanded = expandedPosts[post.id];
+                                const shouldTruncate = post.message?.length > 180;
 
-                            return (
-                                <div key={post.id} className="border-b pb-3">
-                                    <p className="font-semibold">{post.title}</p>
+                                return (
+                                    <div key={post.id} className="border-b pb-3">
+                                        <p className="font-semibold">{post.title}</p>
 
-                                    <div className="relative">
-                                        <p
-                                            className={`text-sm text-gray-500 whitespace-pre-wrap ${
-                                                !isExpanded && shouldTruncate ? "line-clamp-3" : ""
-                                            }`}
-                                        >
-                                            {post.message}
-                                        </p>
+                                        <div className="relative">
+                                            <p
+                                                className={`text-sm text-gray-500 whitespace-pre-wrap ${
+                                                    !isExpanded && shouldTruncate ? "line-clamp-3" : ""
+                                                }`}
+                                            >
+                                                {post.message}
+                                            </p>
 
-                                        {/* FADE ONLY IF TRUNCATED + NOT EXPANDED */}
-                                        {!isExpanded && shouldTruncate && (
-                                            <div className="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+                                            {/* FADE ONLY IF TRUNCATED + NOT EXPANDED */}
+                                            {!isExpanded && shouldTruncate && (
+                                                <div className="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+                                            )}
+                                        </div>
+
+                                        {shouldTruncate && (
+                                            <button
+                                                onClick={() => togglePost(post.id)}
+                                                className="text-blue-500 text-xs mt-1"
+                                            >
+                                                {isExpanded ? "Show less" : "See more"}
+                                            </button>
                                         )}
                                     </div>
-
-                                    {shouldTruncate && (
-                                        <button
-                                            onClick={() => togglePost(post.id)}
-                                            className="text-blue-500 text-xs mt-1"
-                                        >
-                                            {isExpanded ? "Show less" : "See more"}
-                                        </button>
-                                    )}
-                                </div>
-                            );
-                        })}
+                                );
+                            })
+                        )}
                     </div>
                 </div>
 
                 {/* COMMENTS SCROLL */}
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-3">Your Comments</h2>
+                    <h2 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-3">
+                        Your Comments
+                    </h2>
 
                     <div className="max-h-64 overflow-y-auto space-y-3 pr-2">
-                        {comments.map((c) => {
-                            const isExpanded = expandedComments[c.id];
-                            const shouldTruncate = c.message?.length > 180;
+                        {comments.length === 0 ? (
+                            <p className="text-sm text-gray-500 text-center py-6">
+                                You haven’t added any comments yet.
+                            </p>
+                        ) : (
+                            comments.map((c) => {
+                                const isExpanded = expandedComments[c.id];
+                                const shouldTruncate = c.message?.length > 180;
 
-                            return (
-                                <div key={c.id} className="border-b pb-3">
-                                    <div className="relative">
-                                        <p
-                                            className={`text-sm whitespace-pre-wrap ${
-                                                !isExpanded && shouldTruncate ? "line-clamp-3" : ""
-                                            }`}
-                                        >
-                                            {c.message}
-                                        </p>
+                                return (
+                                    <div key={c.id} className="border-b pb-3">
+                                        <div className="relative">
+                                            <p
+                                                className={`text-sm whitespace-pre-wrap ${
+                                                    !isExpanded && shouldTruncate ? "line-clamp-3" : ""
+                                                }`}
+                                            >
+                                                {c.message}
+                                            </p>
 
-                                        {!isExpanded && shouldTruncate && (
-                                            <div className="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+                                            {!isExpanded && shouldTruncate && (
+                                                <div className="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+                                            )}
+                                        </div>
+
+                                        {shouldTruncate && (
+                                            <button
+                                                onClick={() => toggleComment(c.id)}
+                                                className="text-blue-500 text-xs mt-1"
+                                            >
+                                                {isExpanded ? "Show less" : "See more"}
+                                            </button>
                                         )}
                                     </div>
-
-                                    {shouldTruncate && (
-                                        <button
-                                            onClick={() => toggleComment(c.id)}
-                                            className="text-blue-500 text-xs mt-1"
-                                        >
-                                            {isExpanded ? "Show less" : "See more"}
-                                        </button>
-                                    )}
-                                </div>
-                            );
-                        })}
+                                );
+                            })
+                        )}
                     </div>
                 </div>
 
