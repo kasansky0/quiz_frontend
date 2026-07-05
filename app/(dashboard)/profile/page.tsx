@@ -248,9 +248,6 @@ export default function ProfilePage() {
                             comments.map((c) => (
                                 <div key={c.id} className="border-b pb-3">
                                     <p className="text-sm">{c.message}</p>
-                                    <p className="text-xs text-gray-400">
-                                        Post ID: {c.postId}
-                                    </p>
                                 </div>
                             ))
                         )}
