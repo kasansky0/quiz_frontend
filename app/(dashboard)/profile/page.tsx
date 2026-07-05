@@ -1,91 +1,91 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type UserStats = {
     name: string;
     email: string;
     image: string;
     nickname: string;
-    platform_stats?: any;
     seenQuestions?: Record<
         string,
         { answered_correctly: boolean; seen_at: any }[]
     >;
 };
 
-type ProfileActivity = {
-    posts: any[];
-    comments: any[];
-};
-
 export default function ProfilePage() {
     const [user, setUser] = useState<UserStats | null>(null);
     const [posts, setPosts] = useState<any[]>([]);
     const [comments, setComments] = useState<any[]>([]);
-
     const [loading, setLoading] = useState(true);
 
-    const [seenStats, setSeenStats] = useState({
+    const [stats, setStats] = useState({
         totalSeen: 0,
         correct: 0,
         wrong: 0,
+        accuracy: 0,
     });
 
     useEffect(() => {
-        async function loadData() {
-            try {
-                const base = process.env.NEXT_PUBLIC_API_URL;
+        async function load() {
+            const base = process.env.NEXT_PUBLIC_API_URL;
 
-                const [userRes, profileRes] = await Promise.all([
-                    fetch(`${base}/user/`, {
-                        method: "POST",
-                        credentials: "include",
-                    }),
-                    fetch(`${base}/profile/`, {
-                        method: "GET",
-                        credentials: "include",
-                    }),
-                ]);
+            const [u, p] = await Promise.all([
+                fetch(`${base}/user/`, {
+                    method: "POST",
+                    credentials: "include",
+                }),
+                fetch(`${base}/profile/`, {
+                    credentials: "include",
+                }),
+            ]);
 
-                if (!userRes.ok || !profileRes.ok) {
-                    throw new Error("Failed to load data");
-                }
+            const userData = await u.json();
+            const profileData = await p.json();
 
-                const userData: UserStats = await userRes.json();
-                const profileData: ProfileActivity = await profileRes.json();
+            setUser(userData);
+            setPosts(profileData.posts ?? []);
+            setComments(profileData.comments ?? []);
 
-                setUser(userData);
-                setPosts(profileData.posts ?? []);
-                setComments(profileData.comments ?? []);
+            const seen = userData.seenQuestions ?? {};
 
-                // -----------------------------
-                // 🔥 COMPUTE STATS FROM DB
-                // -----------------------------
-                const seen = userData.seenQuestions ?? {};
+            const uniqueQuestionIds = Object.keys(seen);
 
-                const allEntries = Object.values(seen).flat();
+            let totalSeen = 0;
+            let correct = 0;
+            let wrong = 0;
 
-                let totalSeen = 0;
-                let correct = 0;
-                let wrong = 0;
+            for (const qId of uniqueQuestionIds) {
+                const entries = seen[qId];
 
-                for (const entry of allEntries) {
+                for (const entry of entries) {
                     totalSeen++;
+
                     if (entry.answered_correctly) correct++;
                     else wrong++;
                 }
-
-                setSeenStats({ totalSeen, correct, wrong });
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setLoading(false);
             }
+
+            const total = correct + wrong;
+            const accuracy = total ? Math.round((correct / total) * 100) : 0;
+
+            setStats({
+                totalSeen: total,
+                correct,
+                wrong,
+                accuracy,
+            });
+
+            setLoading(false);
         }
 
-        loadData();
+        load();
     }, []);
+
+    const uniqueQuestions = useMemo(() => {
+        if (!user?.seenQuestions) return [];
+        return Object.keys(user.seenQuestions);
+    }, [user]);
 
     if (loading) {
         return (
@@ -104,90 +104,153 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex justify-center px-4 py-10">
-            <div className="w-full max-w-3xl space-y-6">
+        <div className="min-h-screen bg-gray-100 flex justify-center px-4 py-6">
+            <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-12 gap-6">
 
-                {/* HEADER */}
-                <div className="bg-white rounded-2xl shadow p-6 flex items-center gap-5">
-                    <img
-                        src={user.image}
-                        className="w-20 h-20 rounded-full object-cover border"
-                    />
+                {/* LEFT SIDEBAR */}
+                <div className="md:col-span-3 space-y-4">
 
-                    <div>
-                        <h1 className="text-2xl font-semibold">
+                    {/* PROFILE CARD */}
+                    <div className="bg-white rounded-xl shadow p-4 text-center">
+                        <img
+                            src={user.image}
+                            className="w-20 h-20 mx-auto rounded-full border object-cover"
+                        />
+
+                        <h1 className="mt-3 font-semibold text-lg">
                             {user.name}
                         </h1>
-                        <p className="text-gray-500">{user.email}</p>
 
-                        <div className="mt-2 px-3 py-1 bg-gray-100 rounded-full inline-block">
+                        <p className="text-sm text-gray-500">
+                            {user.email}
+                        </p>
+
+                        <div className="mt-2 text-xs bg-gray-100 inline-block px-2 py-1 rounded-full">
                             {user.nickname}
+                        </div>
+                    </div>
+
+                    {/* QUICK STATS */}
+                    <div className="bg-white rounded-xl shadow p-4 space-y-2 text-sm">
+                        <div className="flex justify-between">
+                            <span>Posts</span>
+                            <span className="font-semibold">{posts.length}</span>
+                        </div>
+
+                        <div className="flex justify-between">
+                            <span>Comments</span>
+                            <span className="font-semibold">{comments.length}</span>
+                        </div>
+
+                        <div className="flex justify-between">
+                            <span>Questions Seen</span>
+                            <span className="font-semibold">{stats.totalSeen}</span>
+                        </div>
+
+                        <div className="flex justify-between">
+                            <span>Correct / Wrong</span>
+                            <span className="font-semibold">
+                            {stats.correct} / {stats.wrong}
+                        </span>
+                        </div>
+                    </div>
+
+                    {/* ACCURACY */}
+                    <div className="bg-white rounded-xl shadow p-4">
+                        <div className="flex justify-between text-sm mb-2">
+                            <span>Accuracy</span>
+                            <span className="font-semibold">
+                            {stats.accuracy}%
+                        </span>
+                        </div>
+
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div
+                                className="bg-green-500 h-2 rounded-full transition-all"
+                                style={{ width: `${stats.accuracy}%` }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* QUESTIONS SUMMARY */}
+                    <div className="bg-white rounded-xl shadow p-4">
+                        <h2 className="text-sm font-semibold mb-2">
+                            Questions Seen
+                        </h2>
+
+                        <div className="space-y-1 text-xs text-gray-600 max-h-40 overflow-y-auto">
+                            {uniqueQuestions.map((q) => (
+                                <div
+                                    key={q}
+                                    className="bg-gray-50 px-2 py-1 rounded"
+                                >
+                                    Question #{q}
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
 
-                {/* STATS */}
-                <div className="grid grid-cols-4 gap-4">
+                {/* CENTER FEED */}
+                <div className="md:col-span-6 space-y-4">
 
-                    <div className="bg-white p-4 rounded-xl shadow">
-                        <p className="text-gray-500 text-sm">Posts</p>
-                        <p className="text-2xl font-bold">{posts.length}</p>
-                    </div>
+                    {/* POSTS FEED */}
+                    {posts.map((post) => (
+                        <div
+                            key={post.id}
+                            className="bg-white rounded-xl shadow p-4"
+                        >
+                            <h3 className="font-semibold text-base">
+                                {post.title}
+                            </h3>
 
-                    <div className="bg-white p-4 rounded-xl shadow">
-                        <p className="text-gray-500 text-sm">Comments</p>
-                        <p className="text-2xl font-bold">{comments.length}</p>
-                    </div>
+                            <p className="text-sm text-gray-600 mt-1">
+                                {post.message}
+                            </p>
+                        </div>
+                    ))}
 
-                    <div className="bg-white p-4 rounded-xl shadow">
-                        <p className="text-gray-500 text-sm">Questions Seen</p>
-                        <p className="text-2xl font-bold">
-                            {seenStats.totalSeen}
-                        </p>
-                    </div>
-
-                    <div className="bg-white p-4 rounded-xl shadow">
-                        <p className="text-gray-500 text-sm">Correct / Wrong</p>
-                        <p className="text-2xl font-bold">
-                            {seenStats.correct} / {seenStats.wrong}
-                        </p>
-                    </div>
+                    {/* COMMENTS FEED */}
+                    {comments.map((c) => (
+                        <div
+                            key={c.id}
+                            className="bg-white rounded-xl shadow p-4"
+                        >
+                            <p className="text-sm">{c.message}</p>
+                            <p className="text-xs text-gray-400 mt-1">
+                                Post #{c.postId}
+                            </p>
+                        </div>
+                    ))}
                 </div>
 
-                {/* POSTS */}
-                <div className="bg-white p-6 rounded-2xl shadow">
-                    <h2 className="font-semibold mb-3">Your Posts</h2>
-                    <div className="space-y-3">
-                        {posts.map((post: any) => (
-                            <div key={post.id} className="border-b pb-3">
-                                <p className="font-semibold">
-                                    {post.title}
-                                </p>
-                                <p className="text-sm text-gray-500">
-                                    {post.message}
-                                </p>
+                {/* RIGHT SIDEBAR */}
+                <div className="md:col-span-3 space-y-4">
+
+                    {/* INSIGHTS */}
+                    <div className="bg-white rounded-xl shadow p-4">
+                        <h2 className="font-semibold text-sm mb-3">
+                            Insights
+                        </h2>
+
+                        <div className="text-sm space-y-2">
+                            <div className="flex justify-between">
+                                <span>Engagement</span>
+                                <span className="font-semibold">
+                                {posts.length + comments.length}
+                            </span>
                             </div>
-                        ))}
-                    </div>
-                </div>
 
-                {/* COMMENTS */}
-                <div className="bg-white p-6 rounded-2xl shadow">
-                    <h2 className="font-semibold mb-3">Your Comments</h2>
-                    <div className="space-y-3">
-                        {comments.map((comment: any) => (
-                            <div key={comment.id} className="border-b pb-3">
-                                <p className="text-sm">
-                                    {comment.message}
-                                </p>
-                                <p className="text-xs text-gray-400">
-                                    Post ID: {comment.postId}
-                                </p>
+                            <div className="flex justify-between">
+                                <span>Accuracy</span>
+                                <span className="font-semibold">
+                                {stats.accuracy}%
+                            </span>
                             </div>
-                        ))}
+                        </div>
                     </div>
-                </div>
 
+                </div>
             </div>
         </div>
     );
