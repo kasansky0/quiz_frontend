@@ -152,24 +152,51 @@ export default function PostPage() {
     // FINAL RENDER (MOVED ACTIVE POST)
     // -----------------------------
     return (
-        <div className="w-full min-h-screen bg-white">
-            <ActivePost
-                post={post}
-                comments={{
-                    comments: activePostComments,
-                    total: Number(post.commentCount ?? 0),
-                }}
-                userId={userId}
-                deletedCommentIds={deletedCommentIds}
-                setDeletedCommentIds={setDeletedCommentIds}
-                totalComments={Number(post.commentCount ?? 0)}
-                expandedPosts={expandedPosts}
-                togglePostExpand={togglePostExpand}
-                onBack={() => router.back()}
-                onPostUpdate={handlePostUpdate}
-                onPostDelete={handlePostDelete}
-                onCommentCountChange={handleCommentCountChange}
-            />
+        <div className="w-full relative sm:px-4">
+            {/* Loading (same style as feed) */}
+            {postLoading || !post && (
+                <div className="flex-1 flex items-center justify-center min-h-screen text-black w-full">
+                    <p className="text-xl flex items-center">
+                        Loading
+                        <span className="ml-2 flex space-x-1">
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                        <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                    </span>
+                    </p>
+                </div>
+            )}
+
+            {/* Main content wrapper (IMPORTANT: same structure as ChatStats) */}
+            {!postLoading && post && (
+                <div className="w-full flex flex-col pb-10">
+
+                    <div
+                        className={`transition-opacity duration-500 ease-in-out w-full flex-1 ${
+                            post ? "opacity-100" : "opacity-0"
+                        }`}
+                    >
+                        <ActivePost
+                            post={post}
+                            comments={{
+                                comments: activePostComments,
+                                total: Number(post.commentCount ?? 0),
+                            }}
+                            userId={userId}
+                            deletedCommentIds={deletedCommentIds}
+                            setDeletedCommentIds={setDeletedCommentIds}
+                            totalComments={Number(post.commentCount ?? 0)}
+                            expandedPosts={expandedPosts}
+                            togglePostExpand={togglePostExpand}
+                            onBack={() => router.back()}
+                            onPostUpdate={handlePostUpdate}
+                            onPostDelete={handlePostDelete}
+                            onCommentCountChange={handleCommentCountChange}
+                        />
+                    </div>
+
+                </div>
+            )}
         </div>
     );
 }
