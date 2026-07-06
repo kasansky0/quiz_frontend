@@ -1678,6 +1678,11 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                         <div className="flex justify-between gap-5 mb-1">
                                                             <div className="flex items-center gap-2 text-sm sm:text-sm md:text-base font-bold text-blue-400">
 
+                                                                {(() => {
+                                                                    console.log("🔥 comment in render:", comment);
+                                                                    return null;
+                                                                })()}
+
                                                                 {/* BADGE */}
                                                                 <NetaInline user={comment} />
 
