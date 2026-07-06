@@ -128,6 +128,31 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
 
 
+    const handleMention = (nickname: string) => {
+        const mention = `@${nickname} `;
+
+        const el = commentInputRef.current;
+        if (!el) return;
+
+        const start = el.selectionStart ?? commentMessage.length;
+        const end = el.selectionEnd ?? commentMessage.length;
+
+        const newValue =
+            commentMessage.slice(0, start) +
+            mention +
+            commentMessage.slice(end);
+
+        setCommentMessage(newValue);
+
+        requestAnimationFrame(() => {
+            el.focus();
+            const pos = start + mention.length;
+            el.setSelectionRange(pos, pos);
+        });
+    };
+
+
+
 
     const [expandedPost, setExpandedPost] = useState(false);
 
@@ -1677,7 +1702,10 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                                 <NetaInline user={comment} />
 
                                                                 {/* NICKNAME */}
-                                                                <span className="truncate min-w-0">
+                                                                <span
+                                                                    className="truncate min-w-0 cursor-pointer hover:underline"
+                                                                    onClick={() => handleMention(comment.nickname)}
+                                                                >
                                                                     {comment.nickname}
                                                                 </span>
 
