@@ -1281,6 +1281,11 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                     {/* Nickname on the left */}
                                     <div className="flex items-center gap-2">
 
+                                        {(() => {
+                                            console.log("🔥 activePost in render:", activePost);
+                                            return null;
+                                        })()}
+
                                         {/* BADGE */}
                                         <NetaInline user={activePost} />
 
