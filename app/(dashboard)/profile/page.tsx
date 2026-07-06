@@ -316,30 +316,37 @@ export default function ProfilePage() {
                                 const shouldTruncate = c.message?.length > 180;
 
                                 return (
-                                    <div key={c.id} className="border-b pb-3">
-                                        <div className="relative">
-                                            <p
-                                                className={`text-sm whitespace-pre-wrap ${
-                                                    !isExpanded && shouldTruncate ? "line-clamp-3" : ""
-                                                }`}
-                                            >
-                                                {c.message}
-                                            </p>
+                                    <Link href={`/post/${c.postId}`} key={c.id} className="block">
+                                        <div className="border-b pb-3 cursor-pointer hover:bg-gray-50 rounded-md p-2 transition">
 
-                                            {!isExpanded && shouldTruncate && (
-                                                <div className="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+                                            <div className="relative">
+                                                <p
+                                                    className={`text-sm whitespace-pre-wrap ${
+                                                        !isExpanded && shouldTruncate ? "line-clamp-3" : ""
+                                                    }`}
+                                                >
+                                                    {c.message}
+                                                </p>
+
+                                                {!isExpanded && shouldTruncate && (
+                                                    <div className="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+                                                )}
+                                            </div>
+
+                                            {shouldTruncate && (
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        toggleComment(c.id);
+                                                    }}
+                                                    className="text-blue-500 text-xs mt-1"
+                                                >
+                                                    {isExpanded ? "Show less" : "See more"}
+                                                </button>
                                             )}
                                         </div>
-
-                                        {shouldTruncate && (
-                                            <button
-                                                onClick={() => toggleComment(c.id)}
-                                                className="text-blue-500 text-xs mt-1"
-                                            >
-                                                {isExpanded ? "Show less" : "See more"}
-                                            </button>
-                                        )}
-                                    </div>
+                                    </Link>
                                 );
                             })
                         )}
