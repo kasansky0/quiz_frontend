@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 
 type UserStats = {
     name: string;
@@ -262,7 +263,11 @@ export default function ProfilePage() {
 
                                 return (
                                     <div key={post.id} className="border-b pb-3">
-                                        <p className="font-semibold">{post.title}</p>
+                                        <Link href={`/post/${post.id}`} className="inline-block">
+                                            <span className="font-semibold text-blue-600 hover:underline cursor-pointer">
+                                                {post.title}
+                                            </span>
+                                        </Link>
 
                                         <div className="relative">
                                             <p
