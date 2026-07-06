@@ -139,11 +139,15 @@ export default function PostPage() {
     // -----------------------------
     if (postLoading || !post) {
         return (
-            <div className="min-h-screen flex items-center justify-center text-black">
-                <div className="text-center space-y-2">
-                    <p className="text-lg font-medium">Loading post...</p>
-                    <p className="text-xs text-gray-500">ID: {postId}</p>
-                </div>
+            <div className="flex-1 flex items-center justify-center min-h-screen text-black">
+                <p className="text-xl flex items-center">
+                    Loading
+                    <span className="ml-2 flex space-x-1">
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                </span>
+                </p>
             </div>
         );
     }
