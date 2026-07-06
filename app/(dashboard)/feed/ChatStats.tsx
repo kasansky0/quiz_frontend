@@ -610,7 +610,7 @@ export default function ChatStats() {
                                         return (
                                             <div
                                                 key={post.id}
-                                                onClick={() => handleActivatePost(post)}
+                                                onClick={() => router.push(`/post/${post.id}`)}
                                                 className={`
                                                 relative cursor-pointer
                                                 rounded-2xl p-3 w-full

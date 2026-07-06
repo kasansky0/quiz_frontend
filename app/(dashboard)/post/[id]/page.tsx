@@ -152,27 +152,25 @@ export default function PostPage() {
     // FINAL RENDER (MOVED ACTIVE POST)
     // -----------------------------
     return (
-        <div className="w-full relative sm:px-4">
-            <div className="w-full flex flex-col pb-10">
-                <div className="transition-opacity duration-500 ease-in-out w-full flex-1 opacity-100">
-                    <ActivePost
-                        post={post}
-                        comments={{
-                            comments: activePostComments,
-                            total: Number(post.commentCount ?? 0),
-                        }}
-                        userId={userId}
-                        deletedCommentIds={deletedCommentIds}
-                        setDeletedCommentIds={setDeletedCommentIds}
-                        totalComments={Number(post.commentCount ?? 0)}
-                        expandedPosts={expandedPosts}
-                        togglePostExpand={togglePostExpand}
-                        onBack={() => router.back()}
-                        onPostUpdate={handlePostUpdate}
-                        onPostDelete={handlePostDelete}
-                        onCommentCountChange={handleCommentCountChange}
-                    />
-                </div>
+        <div className="w-full flex justify-center px-3 sm:px-4">
+            <div className="w-full max-w-2xl flex flex-col pb-10">
+                <ActivePost
+                    post={post}
+                    comments={{
+                        comments: activePostComments,
+                        total: Number(post.commentCount ?? 0),
+                    }}
+                    userId={userId}
+                    deletedCommentIds={deletedCommentIds}
+                    setDeletedCommentIds={setDeletedCommentIds}
+                    totalComments={Number(post.commentCount ?? 0)}
+                    expandedPosts={expandedPosts}
+                    togglePostExpand={togglePostExpand}
+                    onBack={() => router.back()}
+                    onPostUpdate={handlePostUpdate}
+                    onPostDelete={handlePostDelete}
+                    onCommentCountChange={handleCommentCountChange}
+                />
             </div>
         </div>
     );
