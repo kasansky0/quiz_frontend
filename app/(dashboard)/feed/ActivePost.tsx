@@ -131,6 +131,11 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const handleMention = (nickname: string) => {
         const mention = `@${nickname} `;
 
+        // Prevent duplicate mention
+        if (commentMessage.includes(mention)) {
+            return;
+        }
+
         const el = commentInputRef.current;
         if (!el) return;
 
@@ -146,6 +151,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
         requestAnimationFrame(() => {
             el.focus();
+
             const pos = start + mention.length;
             el.setSelectionRange(pos, pos);
         });
