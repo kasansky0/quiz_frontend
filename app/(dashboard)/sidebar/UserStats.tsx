@@ -212,7 +212,6 @@ function TimeLoading() {
 export default function UserStats({ nickname, platformStats, loading, onLinkClick, seenQuestions, isEmployer }: UserStatsProps) {
     const { data: session } = useSession();
     const router = useRouter(); // <-- initialize router here
-    const [showStats, setShowStats] = useState(false);
     const questionStats = calculateQuestionStats(seenQuestions); // ✅ calculate stats
 
 
@@ -282,7 +281,10 @@ export default function UserStats({ nickname, platformStats, loading, onLinkClic
 
                 {/* Nickname badge with icon and arrow */}
                 <div
-                    onClick={() => setShowStats(prev => !prev)} // toggle stats
+                    onClick={() => {
+                        router.push("/profile");
+                        onLinkClick?.();
+                    }}
                     className={`
                       group
                       w-full
@@ -327,74 +329,7 @@ export default function UserStats({ nickname, platformStats, loading, onLinkClic
                             )}
                         </span>
                     </div>
-
-
-                    <svg
-                        className={`w-4 h-4 transition-transform duration-200 ${showStats ? "rotate-180" : ""}`}
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                        viewBox="0 0 24 24"
-                    >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                    </svg>
-
                 </div>
-
-
-
-
-                {/* Stats dropdown */}
-                <AnimatePresence>
-                    {showStats && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="flex flex-col pl-3 space-y-2"
-                        >
-                            {/* ✅ Stats Table */}
-                            {loading ? (
-                                <>
-                                    <PercentageLoading />
-                                    <PercentageLoading />
-                                    <PercentageLoading />
-                                </>
-                            ) : seenQuestions && Object.keys(seenQuestions).length > 0 ? (
-                                <div className="flex flex-col space-y-1 text-black text-sm">
-
-                                    {/* Total Questions */}
-                                    <div className="flex justify-start gap-4 w-full">
-                                        <span>Total Questions:</span>
-                                        <span>{questionStats.total}</span>
-                                    </div>
-
-                                    {/* Correct */}
-                                    <div className="flex justify-start gap-4 w-full">
-                                        <span>Correct:</span>
-                                        <span>{questionStats.correct}</span>
-                                    </div>
-
-                                    {/* Wrong */}
-                                    <div className="flex justify-start gap-4 w-full">
-                                        <span>Wrong:</span>
-                                        <span>{questionStats.wrong}</span>
-                                    </div>
-
-                                    {/* Percentage bar */}
-                                    <div className="flex-1 mr-2">
-                                        <PercentageBar correct={questionStats.correct} total={questionStats.total} />
-                                    </div>
-
-
-                                </div>
-                            ) : (
-                                <div className="text-black">No questions yet</div>
-                            )}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
             </div>
 
 
