@@ -1740,12 +1740,12 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                     className={`w-full flex ${isOwner ? "justify-end" : "justify-start"}`}
                                                 >
                                                     <div
-                                                        className={`relative block w-full sm:px-4 py-4 px-4 rounded-xl
+                                                        className={`relative block w-full min-w-0 sm:px-4 py-4 px-4 rounded-xl
                                                                             ${isOwner ? `mr-auto bg-white border border-black/10` : "mr-auto bg-white border border-black/10"}`}
 
                                                     >
                                                         {/* nickname + edit/delete */}
-                                                        <div className="flex justify-between gap-5 mb-1">
+                                                        <div className="flex justify-between gap-5 mb-1 min-w-0">
                                                             <div className="flex items-center gap-2 text-sm sm:text-sm md:text-base font-bold text-blue-400">
 
                                                                 {/* BADGE */}
@@ -1758,6 +1758,11 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                                 >
                                                                     {comment.nickname}
                                                                 </span>
+
+                                                                {/* DOT */}
+                                                                {isOwner && (
+                                                                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 opacity-80 flex-shrink-0" />
+                                                                )}
 
                                                                 <button
                                                                     onClick={() => {
@@ -1773,7 +1778,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                                 >
                                                                     <svg
                                                                         xmlns="http://www.w3.org/2000/svg"
-                                                                        className="h-5 w-5"
+                                                                        className="h-4 w-4"
                                                                         viewBox="0 -960 960 960"
                                                                         fill="currentColor"
                                                                     >
@@ -1781,10 +1786,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                                     </svg>
                                                                 </button>
 
-                                                                {/* DOT */}
-                                                                {isOwner && (
-                                                                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 opacity-80 flex-shrink-0" />
-                                                                )}
+
 
                                                             </div>
 
@@ -1894,14 +1896,15 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                         </div>
 
                                                         {/* Reply indicator */}
+                                                        {/* Reply indicator */}
                                                         {comment.replyTo && (
-                                                            <div className="mb-2 text-xs text-gray-500">
-                                                                {" "}
+                                                            <div className="mb-2 min-w-0 max-w-full text-xs text-gray-500 overflow-hidden">
+                                                                Replying to{" "}
                                                                 <span className="font-semibold text-blue-500">
                                                                     @{comment.replyTo.nickname}
                                                                 </span>
 
-                                                                <div className="truncate text-black/60">
+                                                                <div className="mt-1 truncate max-w-full text-black/60">
                                                                     {comment.replyTo.preview}
                                                                 </div>
                                                             </div>
