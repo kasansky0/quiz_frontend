@@ -1769,8 +1769,16 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
                                                                         commentInputRef.current?.focus();
                                                                     }}
+                                                                    className="rounded-full p-1 text-black/60 hover:bg-black/10 hover:text-black"
                                                                 >
-                                                                    ↩
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        className="h-5 w-5"
+                                                                        viewBox="0 -960 960 960"
+                                                                        fill="currentColor"
+                                                                    >
+                                                                        <path d="M760-200v-160q0-50-35-85t-85-35H273l144 144-57 56-240-240 240-240 57 56-144 144h367q83 0 141.5 58.5T840-360v160h-80Z" />
+                                                                    </svg>
                                                                 </button>
 
                                                                 {/* DOT */}
@@ -1888,7 +1896,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                         {/* Reply indicator */}
                                                         {comment.replyTo && (
                                                             <div className="mb-2 text-xs text-gray-500">
-                                                                ↪ Replying to{" "}
+                                                                {" "}
                                                                 <span className="font-semibold text-blue-500">
                                                                     @{comment.replyTo.nickname}
                                                                 </span>
