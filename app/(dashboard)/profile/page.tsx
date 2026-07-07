@@ -232,23 +232,11 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
-                {/* POSTS + COMMENTS (SEPARATE CARDS) */}
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white p-5 rounded-2xl shadow">
-                        <p className="text-xs uppercase tracking-wide text-gray-500">Posts</p>
-                        <p className="text-3xl font-semibold text-gray-800">{posts.length}</p>
-                    </div>
-
-                    <div className="bg-white p-5 rounded-2xl shadow">
-                        <p className="text-gray-500 text-sm">Comments</p>
-                        <p className="text-3xl font-bold">{comments.length}</p>
-                    </div>
-                </div>
-
                 {/* POSTS SCROLL */}
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-3">
-                        Your Posts
+                    <h2 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-3 flex justify-between">
+                        <span>Your Posts</span>
+                        <span className="text-gray-400">{posts.length}</span>
                     </h2>
 
                     <div className="max-h-64 overflow-y-auto space-y-3 pr-2">
@@ -301,8 +289,9 @@ export default function ProfilePage() {
 
                 {/* COMMENTS SCROLL */}
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-3">
-                        Your Comments
+                    <h2 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-3 flex justify-between">
+                        <span>Your Comments</span>
+                        <span className="text-gray-400">{comments.length}</span>
                     </h2>
 
                     <div className="max-h-64 overflow-y-auto space-y-3 pr-2">
