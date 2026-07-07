@@ -17,6 +17,11 @@ export interface Comment {
     neta2?: boolean;
     neta3?: boolean;
     neta4?: boolean;
+    replyTo?: {
+        commentId: string;
+        nickname: string;
+        preview: string;
+    };
 }
 
 export interface PostImage {

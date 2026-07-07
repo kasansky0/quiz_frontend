@@ -10,7 +10,6 @@ import { useSession, signOut, getSession } from "next-auth/react"; // ✅ add us
 import { fetchWithToken } from "@/app/hooks/refreshToken";
 import StatusBanner from "@/app/positiveBanner";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import StatLoaderIcon from "@/components/ui/StatLoaderIcon";
 import { motion, AnimatePresence } from "framer-motion";
 import PostMedia from "./ActivePostMedia"
@@ -125,6 +124,15 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             return next;
         });
     };
+
+
+
+
+    const [replyingTo, setReplyingTo] = useState<{
+        commentId: string;
+        nickname: string;
+        preview: string;
+    } | null>(null);
 
 
 
@@ -554,7 +562,14 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             const res = await fetchWithToken(`${apiUrl}/posts/${activePost.id}/comments`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: sanitizedMessage }),
+                body: JSON.stringify({
+                    message: sanitizedMessage,
+                    replyTo: replyingTo
+                        ? {
+                            commentId: replyingTo.commentId
+                        }
+                        : null
+                }),
             });
             setCommentMessage("");
 
@@ -628,6 +643,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             setCurrentPage(1);
             setCommentsSkip(prev => prev + 1);
             setCommentMessage("");
+            setReplyingTo(null);
             if (commentInputRef.current) commentInputRef.current.style.height = "auto";
             hideError();
 
@@ -1564,6 +1580,29 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                     </div>
                                 )}
 
+                                {replyingTo && (
+                                    <div className="mb-2 rounded-lg bg-black/5 p-2 text-xs">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <div className="font-semibold text-blue-500">
+                                                    Replying to @{replyingTo.nickname}
+                                                </div>
+
+                                                <div className="text-black/60 truncate">
+                                                    {replyingTo.preview}
+                                                </div>
+                                            </div>
+
+                                            <button
+                                                onClick={() => setReplyingTo(null)}
+                                                className="text-red-500 hover:text-red-600"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
                                 <form
                                     className="flex items-end gap-2"
                                     onSubmit={(e) => {
@@ -1715,6 +1754,20 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                                     {comment.nickname}
                                                                 </span>
 
+                                                                <button
+                                                                    onClick={() => {
+                                                                        setReplyingTo({
+                                                                            commentId: comment._id,
+                                                                            nickname: comment.nickname,
+                                                                            preview: comment.message.slice(0, 80)
+                                                                        });
+
+                                                                        commentInputRef.current?.focus();
+                                                                    }}
+                                                                >
+                                                                    ↩
+                                                                </button>
+
                                                                 {/* DOT */}
                                                                 {isOwner && (
                                                                     <span className="w-1.5 h-1.5 rounded-full bg-amber-500 opacity-80 flex-shrink-0" />
@@ -1826,6 +1879,20 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                                 </div>
                                                             )}
                                                         </div>
+
+                                                        {/* Reply indicator */}
+                                                        {comment.replyTo && (
+                                                            <div className="mb-2 text-xs text-gray-500">
+                                                                ↪ Replying to{" "}
+                                                                <span className="font-semibold text-blue-500">
+                                                                    @{comment.replyTo.nickname}
+                                                                </span>
+
+                                                                <div className="truncate text-black/60">
+                                                                    {comment.replyTo.preview}
+                                                                </div>
+                                                            </div>
+                                                        )}
 
                                                         {/* comment text */}
                                                         <div
