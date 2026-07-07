@@ -559,17 +559,22 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
         try {
             showStatusBanner();
+
+            const payload = {
+                message: sanitizedMessage,
+                replyTo: replyingTo
+                    ? {
+                        commentId: replyingTo.commentId
+                    }
+                    : null
+            };
+
+            console.log("🚀 Sending comment payload:", payload);
+
             const res = await fetchWithToken(`${apiUrl}/posts/${activePost.id}/comments`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    message: sanitizedMessage,
-                    replyTo: replyingTo
-                        ? {
-                            commentId: replyingTo.commentId
-                        }
-                        : null
-                }),
+                body: JSON.stringify(payload),
             });
             setCommentMessage("");
 
