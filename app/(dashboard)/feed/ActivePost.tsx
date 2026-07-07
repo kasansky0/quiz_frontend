@@ -136,37 +136,6 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
 
 
-    const handleMention = (nickname: string) => {
-        const mention = `@${nickname} `;
-
-        // Prevent duplicate mention
-        if (commentMessage.includes(mention)) {
-            return;
-        }
-
-        const el = commentInputRef.current;
-        if (!el) return;
-
-        const start = el.selectionStart ?? commentMessage.length;
-        const end = el.selectionEnd ?? commentMessage.length;
-
-        const newValue =
-            commentMessage.slice(0, start) +
-            mention +
-            commentMessage.slice(end);
-
-        setCommentMessage(newValue);
-
-        requestAnimationFrame(() => {
-            el.focus();
-
-            const pos = start + mention.length;
-            el.setSelectionRange(pos, pos);
-        });
-    };
-
-
-
 
     const [expandedPost, setExpandedPost] = useState(false);
 
@@ -1586,21 +1555,21 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                 )}
 
                                 {replyingTo && (
-                                    <div className="mb-2 rounded-lg bg-black/5 p-2 text-xs">
-                                        <div className="flex justify-between items-start">
-                                            <div>
+                                    <div className="mb-2 rounded-xl border border-black/10 bg-white p-3 text-xs shadow-sm">
+                                        <div className="flex justify-between items-start gap-3">
+                                            <div className="min-w-0">
                                                 <div className="font-semibold text-blue-500">
                                                     Replying to @{replyingTo.nickname}
                                                 </div>
 
-                                                <div className="text-black/60 truncate">
+                                                <div className="mt-1 truncate text-black/60">
                                                     {replyingTo.preview}
                                                 </div>
                                             </div>
 
                                             <button
                                                 onClick={() => setReplyingTo(null)}
-                                                className="text-red-500 hover:text-red-600"
+                                                className="flex-shrink-0 rounded-full p-1 text-black/50 hover:bg-black/5 hover:text-red-500"
                                             >
                                                 ✕
                                             </button>
@@ -1752,10 +1721,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                                 <NetaInline user={comment} />
 
                                                                 {/* NICKNAME */}
-                                                                <span
-                                                                    className="truncate min-w-0 cursor-pointer hover:underline"
-                                                                    onClick={() => handleMention(comment.nickname)}
-                                                                >
+                                                                <span className="truncate min-w-0">
                                                                     {comment.nickname}
                                                                 </span>
 
@@ -1896,10 +1862,9 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                         </div>
 
                                                         {/* Reply indicator */}
-                                                        {/* Reply indicator */}
                                                         {comment.replyTo && (
                                                             <div className="mb-2 min-w-0 max-w-full text-xs text-gray-500 overflow-hidden">
-                                                                Replying to{" "}
+                                                                Replied to{" "}
                                                                 <span className="font-semibold text-blue-500">
                                                                     @{comment.replyTo.nickname}
                                                                 </span>
