@@ -1769,7 +1769,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                                         setReplyingTo({
                                                                             commentId: comment._id,
                                                                             nickname: comment.nickname,
-                                                                            preview: comment.message.slice(0, 80)
+                                                                            preview: comment.message.slice(0, 50)
                                                                         });
 
                                                                         commentInputRef.current?.focus();
