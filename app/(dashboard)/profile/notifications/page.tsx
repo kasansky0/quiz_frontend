@@ -193,21 +193,22 @@ export default function NotificationsPage() {
 
                 {/* HEADER */}
 
-                <div className="flex items-center gap-3">
-
+                <div className="relative flex items-center justify-center mb-2">
 
                     <Link
                         href="/profile"
                         title="Back"
                         className="
-        p-2
-        rounded-full
-        hover:bg-white
-        border
-        border-transparent
-        hover:border-neutral-200
-        transition
-        "
+                        absolute
+                        left-0
+                        p-2
+                        rounded-full
+                        hover:bg-white
+                        border
+                        border-transparent
+                        hover:border-neutral-200
+                        transition
+                        "
                     >
 
                         <svg
@@ -218,30 +219,26 @@ export default function NotificationsPage() {
                             stroke="currentColor"
                             className="w-8 h-8"
                         >
-
                             <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 d="M15.75 19.5 8.25 12l7.5-7.5"
                             />
-
                         </svg>
 
                     </Link>
 
-
-                    <div>
+                    <div className="text-center">
 
                         <h1 className="text-xl font-semibold">
                             Notifications
                         </h1>
 
-                        <p className="text-sm text-gray-500">
-                            Comment replies
+                        <p className="text-xs text-gray-500 mt-1">
+                            Replies to your comments will appear here.
                         </p>
 
                     </div>
-
 
                 </div>
 
