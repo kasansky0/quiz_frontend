@@ -191,14 +191,14 @@ export default function NotificationsPage() {
                         href="/profile"
                         title="Back"
                         className="
-                        p-2
-                        rounded-full
-                        hover:bg-white
-                        border
-                        border-transparent
-                        hover:border-neutral-200
-                        transition
-                        "
+                    p-2
+                    rounded-full
+                    hover:bg-white
+                    border
+                    border-transparent
+                    hover:border-neutral-200
+                    transition
+                    "
                     >
 
                         <svg
@@ -222,7 +222,6 @@ export default function NotificationsPage() {
                     </Link>
 
 
-
                     <h1 className="text-xl font-semibold">
                         Notifications
                     </h1>
@@ -242,9 +241,7 @@ export default function NotificationsPage() {
 
                 ) : (
 
-
-                    notifications.map((notification)=>(
-
+                    notifications.map((notification) => (
 
                         <Link
                             key={notification._id}
@@ -252,33 +249,55 @@ export default function NotificationsPage() {
                             className="block"
                         >
 
-
                             <div
                                 className={`
-                                bg-white
-                                rounded-xl
-                                border
-                                shadow-sm
-                                p-4
-                                transition
-                                hover:bg-gray-50
-                                ${!notification.seen
-                                    ? "border-blue-200 bg-blue-50/30"
-                                    : "border-black/10"
+                            relative
+                            bg-white
+                            rounded-xl
+                            border
+                            shadow-sm
+                            p-4
+                            transition
+                            hover:bg-gray-50
+                            ${
+                                    !notification.seen
+                                        ? "border-blue-200 bg-blue-50/30"
+                                        : "border-black/10"
                                 }
-                                `}
+                            `}
                             >
 
 
-                                {/* TITLE */}
+                                {/* UNREAD DOT */}
+
+                                {!notification.seen && (
+
+                                    <div
+                                        className="
+                                    absolute
+                                    top-4
+                                    right-4
+                                    w-2.5
+                                    h-2.5
+                                    rounded-full
+                                    bg-blue-600
+                                    "
+                                    />
+
+                                )}
+
+
+
+
+                                {/* WHO REPLIED */}
 
                                 <p className="text-sm">
 
-                                    <span className="font-semibold text-blue-500">
-                                        {notification.replyNickname}
-                                    </span>
+                                <span className="font-semibold text-blue-500">
+                                    {notification.replyNickname}
+                                </span>
 
-                                    {" replied to your comment"}
+                                    {" replied"}
 
                                 </p>
 
@@ -287,59 +306,33 @@ export default function NotificationsPage() {
 
                                 {/* ORIGINAL COMMENT */}
 
-                                <div className="mt-3">
-
-
-                                    <p className="text-xs text-gray-400">
-                                        Original comment
-                                    </p>
-
-
-                                    <p
-                                        className="
-                                        mt-1
-                                        text-sm
-                                        text-gray-700
-                                        bg-gray-100
-                                        rounded-lg
-                                        p-2
-                                        "
-                                    >
-                                        "{notification.preview}"
-                                    </p>
-
-
-                                </div>
+                                <p
+                                    className="
+                                mt-3
+                                text-xs
+                                text-gray-400
+                                italic
+                                line-clamp-2
+                                "
+                                >
+                                    "{notification.preview}"
+                                </p>
 
 
 
 
-                                {/* REPLY */}
+                                {/* REPLY MESSAGE */}
 
-                                <div className="mt-3">
-
-
-                                    <p className="text-xs text-gray-400">
-                                        Reply
-                                    </p>
-
-
-                                    <p
-                                        className="
-                                        mt-1
-                                        text-sm
-                                        text-black
-                                        rounded-lg
-                                        border
-                                        border-black/10
-                                        p-2
-                                        "
-                                    >
-                                        {notification.message}
-                                    </p>
-
-
-                                </div>
+                                <p
+                                    className="
+                                mt-3
+                                text-base
+                                font-medium
+                                text-black
+                                "
+                                >
+                                    {notification.message}
+                                </p>
 
 
 
@@ -352,20 +345,6 @@ export default function NotificationsPage() {
 
                                 </p>
 
-
-
-
-                                {/* UNREAD DOT */}
-
-                                {!notification.seen && (
-
-                                    <div
-                                        className="
-                                        absolute
-                                        "
-                                    />
-
-                                )}
 
 
                             </div>
