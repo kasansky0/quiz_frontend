@@ -279,11 +279,11 @@ export default function UserStats({ nickname, platformStats, loading, onLinkClic
 
             <div className="flex flex-col space-y-1 w-full mb-3">
 
-                {/* Nickname badge with icon and arrow */}
+                {/* Nickname badge with icon */}
                 <div
                     onClick={() => {
-                        router.push("/profile");
                         onLinkClick?.();
+                        router.push("/profile");
                     }}
                     className={`
                       group
@@ -317,7 +317,6 @@ export default function UserStats({ nickname, platformStats, loading, onLinkClic
                             />
                         </svg>
 
-                        {/* Nickname text */}
                         {/* Nickname text */}
                         <span className="lg:group-hover:text-blue-400 flex items-center">
                             {loading ? (
