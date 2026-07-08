@@ -114,6 +114,43 @@ export default function ProfilePage() {
         load();
     }, []);
 
+    const formatLocalDate = (dateString?: string) => {
+        if (!dateString) return "";
+
+        let isoString = dateString.split(".")[0] + "Z";
+
+        const date = new Date(isoString);
+        const now = new Date();
+
+        const diffMs = now.getTime() - date.getTime();
+
+        const diffSeconds = Math.floor(diffMs / 1000);
+        const diffMinutes = Math.floor(diffSeconds / 60);
+        const diffHours = Math.floor(diffMinutes / 60);
+        const diffDays = Math.floor(diffHours / 24);
+
+        if (diffSeconds < 60)
+            return `${diffSeconds} seconds ago`;
+
+        if (diffMinutes < 60)
+            return `${diffMinutes} minutes ago`;
+
+        if (diffHours < 24)
+            return `${diffHours} hours ago`;
+
+        if (diffDays < 30)
+            return `${diffDays} days ago`;
+
+        const diffMonths = Math.floor(diffDays / 30);
+
+        if (diffMonths < 12)
+            return `${diffMonths} month${diffMonths > 1 ? "s" : ""} ago`;
+
+        const diffYears = Math.floor(diffMonths / 12);
+
+        return `${diffYears} year${diffYears > 1 ? "s" : ""} ago`;
+    };
+
     if (loading) {
         return (
             <div className="fixed inset-0 flex items-center justify-center bg-black-200 text-black">
@@ -265,7 +302,7 @@ export default function ProfilePage() {
                         <span className="text-gray-400">{posts.length}</span>
                     </h2>
 
-                    <div className="max-h-64 overflow-y-auto space-y-3 pr-2">
+                    <div className="max-h-96 overflow-y-auto space-y-3 pr-2">
                         {posts.length === 0 ? (
                             <p className="text-sm text-gray-500 text-center py-6">
                                 You haven’t posted anything yet.
@@ -320,7 +357,7 @@ export default function ProfilePage() {
                         <span className="text-gray-400">{comments.length}</span>
                     </h2>
 
-                    <div className="max-h-64 overflow-y-auto space-y-3 pr-2">
+                    <div className="max-h-96 overflow-y-auto space-y-3 pr-2">
                         {comments.length === 0 ? (
                             <p className="text-sm text-gray-500 text-center py-6">
                                 You haven’t added any comments yet.
@@ -336,20 +373,50 @@ export default function ProfilePage() {
                                         key={c.id}
                                         className="block"
                                     >
-                                        <div className="border-b pb-3 cursor-pointer hover:bg-gray-50 rounded-md p-2 transition">
+                                        <div className="bg-white rounded-xl border shadow-sm p-4 transition hover:bg-gray-50">
 
+                                            {/* POST TITLE */}
+                                            {c.postTitle && (
+                                                <p className="text-xs mb-3">
+                                    <span className="text-gray-500">
+                                        Post title:{" "}
+                                    </span>
+
+                                                    <span className="font-medium text-blue-600">
+                                        {c.postTitle}
+                                    </span>
+                                                </p>
+                                            )}
+
+                                            {/* COMMENT */}
                                             <div className="relative">
+
                                                 <p
-                                                    className={`text-sm whitespace-pre-wrap ${
-                                                        !isExpanded && shouldTruncate ? "line-clamp-3" : ""
+                                                    className={`text-sm text-black whitespace-pre-wrap ${
+                                                        !isExpanded && shouldTruncate
+                                                            ? "line-clamp-3"
+                                                            : ""
                                                     }`}
                                                 >
                                                     {c.message}
                                                 </p>
 
                                                 {!isExpanded && shouldTruncate && (
-                                                    <div className="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+                                                    <div
+                                                        className="
+                                            absolute
+                                            bottom-0
+                                            left-0
+                                            w-full
+                                            h-10
+                                            bg-gradient-to-t
+                                            from-white
+                                            to-transparent
+                                            pointer-events-none
+                                        "
+                                                    />
                                                 )}
+
                                             </div>
 
                                             {shouldTruncate && (
@@ -364,6 +431,12 @@ export default function ProfilePage() {
                                                     {isExpanded ? "Show less" : "See more"}
                                                 </button>
                                             )}
+
+                                            {/* DATE */}
+                                            <p className="text-xs text-gray-400 mt-3">
+                                                {formatLocalDate(c.timestamp)}
+                                            </p>
+
                                         </div>
                                     </Link>
                                 );
