@@ -128,6 +128,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
     const [isImageOpen, setIsImageOpen] = useState(false);
 
+    const hasHighlightedComment = useRef(false);
+
     const commentsTopRef = useRef<HTMLDivElement | null>(null);
 
     const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
@@ -171,6 +173,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     useEffect(() => {
         if (!displayedComments.length) return;
 
+        if (hasHighlightedComment.current) return;
+
         const hash = window.location.hash;
 
         if (!hash.startsWith("#comment-")) return;
@@ -190,6 +194,14 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             });
 
             setHighlightedCommentId(commentId);
+
+            hasHighlightedComment.current = true;
+
+            window.history.replaceState(
+                null,
+                "",
+                window.location.pathname
+            );
 
             setTimeout(() => {
                 setHighlightedCommentId(null);
