@@ -371,7 +371,7 @@ export default function ProfilePage() {
                                     <Link
                                         href={`/post/${c.postId}#comment-${c.id}`}
                                         key={c.id}
-                                        className="block"
+                                        className="block border-b pb-3"
                                     >
                                         <div className="bg-white rounded-xl shadow-sm p-4">
 
