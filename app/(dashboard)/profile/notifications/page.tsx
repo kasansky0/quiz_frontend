@@ -267,7 +267,7 @@ export default function NotificationsPage() {
 
                             <Link
                                 key={notification._id}
-                                href={`/post/${notification.postId}`}
+                                href={`/post/${notification.postId}#comment-${notification.commentId}`}
                                 className="block"
                             >
 
