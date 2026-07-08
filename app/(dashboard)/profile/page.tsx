@@ -343,6 +343,11 @@ export default function ProfilePage() {
                                                 {isExpanded ? "Show less" : "See more"}
                                             </button>
                                         )}
+
+                                        <p className="text-xs text-gray-400 mt-2">
+                                            {formatLocalDate(post.timestamp)}
+                                        </p>
+
                                     </div>
                                 );
                             })
@@ -373,38 +378,21 @@ export default function ProfilePage() {
                                         key={c.id}
                                         className="block"
                                     >
-                                        <div className="bg-white rounded-xl border shadow-sm p-4 transition hover:bg-gray-50">
+                                        <div className="border-b pb-3 cursor-pointer hover:bg-gray-50 rounded-md p-2 transition">
 
                                             <div className="relative">
-
                                                 <p
-                                                    className={`text-sm text-black whitespace-pre-wrap ${
-                                                        !isExpanded && shouldTruncate
-                                                            ? "line-clamp-3"
-                                                            : ""
+                                                    className={`text-sm whitespace-pre-wrap ${
+                                                        !isExpanded && shouldTruncate ? "line-clamp-3" : ""
                                                     }`}
                                                 >
                                                     {c.message}
                                                 </p>
 
                                                 {!isExpanded && shouldTruncate && (
-                                                    <div
-                                                        className="
-                                                            absolute
-                                                            bottom-0
-                                                            left-0
-                                                            w-full
-                                                            h-10
-                                                            bg-gradient-to-t
-                                                            from-white
-                                                            to-transparent
-                                                            pointer-events-none
-                                                            "
-                                                    />
+                                                    <div className="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-t from-white to-transparent pointer-events-none" />
                                                 )}
-
                                             </div>
-
 
                                             {shouldTruncate && (
                                                 <button
@@ -419,11 +407,9 @@ export default function ProfilePage() {
                                                 </button>
                                             )}
 
-
-                                            <p className="text-xs text-gray-400 mt-3">
+                                            <p className="text-xs text-gray-400 mt-2">
                                                 {formatLocalDate(c.timestamp)}
                                             </p>
-
 
                                         </div>
                                     </Link>
