@@ -138,8 +138,8 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 flex justify-center px-4 py-10">
-            <div className="w-full max-w-xl space-y-8">
+        <div className="min-h-screen bg-gray-100 flex justify-center px-3 py-6 sm:px-4 sm:py-10">
+            <div className="w-full max-w-xl space-y-5 sm:space-y-8">
 
                 {/* HEADER */}
                 <div className="bg-white rounded-2xl shadow p-6 relative">
@@ -172,20 +172,24 @@ export default function ProfilePage() {
                 </div>
 
                 {/* QUESTION STATS */}
-                <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-white p-4 rounded-2xl shadow">
-                        <p className="text-gray-500 text-sm">Seen</p>
-                        <p className="text-2xl font-bold">{stats.totalSeen}</p>
+                <div className="grid grid-cols-3 gap-3">
+                    <div className="bg-white p-3 rounded-2xl shadow">
+                        <p className="text-gray-500 text-xs sm:text-sm">Seen</p>
+                        <p className="text-xl sm:text-2xl font-bold">{stats.totalSeen}</p>
                     </div>
 
-                    <div className="bg-white p-4 rounded-2xl shadow">
-                        <p className="text-gray-500 text-sm">Correct</p>
-                        <p className="text-2xl font-bold text-green-600">{stats.correct}</p>
+                    <div className="bg-white p-3 rounded-2xl shadow">
+                        <p className="text-gray-500 text-xs sm:text-sm">Correct</p>
+                        <p className="text-xl sm:text-2xl font-bold text-green-600">
+                            {stats.correct}
+                        </p>
                     </div>
 
-                    <div className="bg-white p-4 rounded-2xl shadow">
-                        <p className="text-gray-500 text-sm">Wrong</p>
-                        <p className="text-2xl font-bold text-red-500">{stats.wrong}</p>
+                    <div className="bg-white p-3 rounded-2xl shadow">
+                        <p className="text-gray-500 text-xs sm:text-sm">Wrong</p>
+                        <p className="text-xl sm:text-2xl font-bold text-red-500">
+                            {stats.wrong}
+                        </p>
                     </div>
                 </div>
 
