@@ -371,11 +371,10 @@ export default function ProfilePage() {
                                     <Link
                                         href={`/post/${c.postId}#comment-${c.id}`}
                                         key={c.id}
-                                        className="block border-b pb-3"
+                                        className="block"
                                     >
-                                        <div className="bg-white rounded-xl shadow-sm p-4">
+                                        <div className="bg-white rounded-xl border shadow-sm p-4 transition hover:bg-gray-50">
 
-                                            {/* COMMENT */}
                                             <div className="relative">
 
                                                 <p
@@ -400,11 +399,12 @@ export default function ProfilePage() {
                                                             from-white
                                                             to-transparent
                                                             pointer-events-none
-                                                        "
+                                                            "
                                                     />
                                                 )}
 
                                             </div>
+
 
                                             {shouldTruncate && (
                                                 <button
@@ -419,10 +419,11 @@ export default function ProfilePage() {
                                                 </button>
                                             )}
 
-                                            {/* DATE */}
+
                                             <p className="text-xs text-gray-400 mt-3">
                                                 {formatLocalDate(c.timestamp)}
                                             </p>
+
 
                                         </div>
                                     </Link>
