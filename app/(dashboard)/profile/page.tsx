@@ -147,7 +147,13 @@ export default function ProfilePage() {
             <div className="w-full max-w-xl space-y-8">
 
                 {/* HEADER */}
-                <div className="bg-white rounded-2xl shadow p-6 flex items-center justify-between">
+                {/* HEADER */}
+                <div className="bg-white rounded-2xl shadow p-6 relative">
+
+                    <div className="absolute top-5 right-5">
+                        <NotificationBell unreadCount={unreadNotificationCount} />
+                    </div>
+
                     <div className="flex items-center gap-5">
                         <img
                             src={user.image}
@@ -163,7 +169,7 @@ export default function ProfilePage() {
                             </div>
                         </div>
                     </div>
-                    <NotificationBell unreadCount={unreadNotificationCount} />
+
                 </div>
 
                 {/* QUESTION STATS */}
