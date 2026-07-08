@@ -20,7 +20,20 @@ import PositionCard from "@/app/PositionCard";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
 const COMMENTS_PAGE_SIZE = 25;
-const commentsKey = (postId: string, skip: number) => `${apiUrl}/posts/${postId}/comments?skip=${skip}&limit=${COMMENTS_PAGE_SIZE}`;
+const commentsKey = (
+    postId: string,
+    skip: number
+) => {
+    return `${apiUrl}/posts/${postId}/comments?skip=${skip}&limit=${COMMENTS_PAGE_SIZE}`;
+};
+
+
+const singleCommentKey = (
+    postId: string,
+    commentId: string
+) => {
+    return `${apiUrl}/posts/${postId}/comments/${commentId}`;
+};
 
 const fetcher = async (url: string) => {
     const session = await getSession();
@@ -111,6 +124,8 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
     const [isSaving, setIsSaving] = useState(false);
     const [isSavingComment, setIsSavingComment] = useState(false);
 
+    const [targetCommentId, setTargetCommentId] = useState<string | null>(null);
+
     const [isImageOpen, setIsImageOpen] = useState(false);
 
     const commentsTopRef = useRef<HTMLDivElement | null>(null);
@@ -163,7 +178,9 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         const commentId = hash.replace("#comment-", "");
 
         const timer = setTimeout(() => {
-            const element = document.getElementById(`comment-${commentId}`);
+            const element = document.getElementById(
+                `comment-${commentId}`
+            );
 
             if (!element) return;
 
@@ -177,9 +194,11 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
             setTimeout(() => {
                 setHighlightedCommentId(null);
             }, 3000);
+
         }, 200);
 
         return () => clearTimeout(timer);
+
     }, [displayedComments]);
 
 
@@ -337,10 +356,58 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         fetcher,
         {
             refreshInterval: 60000,
-            fallbackData: comments, // use the comments prop you already have
-            revalidateOnMount: false // prevents SWR from fetching immediately on mount
+            fallbackData: comments,
+            revalidateOnMount: true
         }
     );
+
+    const { data: singleComment } = useSWR(
+        targetCommentId
+            ? singleCommentKey(post.id, targetCommentId)
+            : null,
+        fetcher
+    );
+
+
+
+
+    useEffect(() => {
+        if (!singleComment) return;
+
+        setDisplayedComments(prev => {
+            const exists = prev.some(
+                c => c._id === singleComment._id
+            );
+
+            if (exists) return prev;
+
+            const updated = [...prev, singleComment];
+
+            return updated.sort(
+                (a, b) =>
+                    new Date(b.timestamp).getTime() -
+                    new Date(a.timestamp).getTime()
+            );
+        });
+
+    }, [singleComment]);
+
+
+
+
+    useEffect(() => {
+        const hash = window.location.hash;
+
+        if (!hash.startsWith("#comment-")) return;
+
+        const commentId = hash.replace("#comment-", "");
+
+        setTargetCommentId(commentId);
+
+    }, []);
+
+
+
 
 //LOAD NEXT PAGE OF COMMENTS FOR THE ACTIVE POST //
     const handleLoadMore = async () => {
