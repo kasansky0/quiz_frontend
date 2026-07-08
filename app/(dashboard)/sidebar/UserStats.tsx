@@ -319,13 +319,7 @@ export default function UserStats({ nickname, platformStats, loading, onLinkClic
 
                         {/* Nickname text */}
                         <span className="lg:group-hover:text-blue-400 flex items-center">
-                            {loading ? (
-                                <span className="flex items-center justify-center w-6 h-6">
-                                    <StatLoaderIcon />
-                                </span>
-                            ) : (
-                                nickname ?? "User"
-                            )}
+                            {nickname ?? "User"}
                         </span>
                     </div>
                 </div>
