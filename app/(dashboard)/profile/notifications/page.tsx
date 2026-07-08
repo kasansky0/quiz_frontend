@@ -25,6 +25,15 @@ export default function NotificationsPage() {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [loading, setLoading] = useState(true);
 
+    const [expandedNotifications, setExpandedNotifications] = useState<Record<string, boolean>>({});
+
+    const toggleNotification = (id: string) => {
+        setExpandedNotifications((prev) => ({
+            ...prev,
+            [id]: !prev[id],
+        }));
+    };
+
 
 
     // FORMAT DATE AS X TIME AGO AND INDICATE IF EDITED
@@ -241,119 +250,195 @@ export default function NotificationsPage() {
 
                 ) : (
 
-                    notifications.map((notification) => (
+                    notifications.map((notification) => {
 
-                        <Link
-                            key={notification._id}
-                            href={`/post/${notification.postId}`}
-                            className="block"
-                        >
+                        const isExpanded =
+                            expandedNotifications[notification._id];
 
-                            <div
-                                className={`
-                            relative
-                            bg-white
-                            rounded-xl
-                            border
-                            shadow-sm
-                            p-4
-                            transition
-                            hover:bg-gray-50
-                            ${
-                                    !notification.seen
-                                        ? "border-blue-200 bg-blue-50/30"
-                                        : "border-black/10"
-                                }
-                            `}
+                        const shouldTruncate =
+                            notification.message?.length > 180;
+
+
+                        return (
+
+                            <Link
+                                key={notification._id}
+                                href={`/post/${notification.postId}`}
+                                className="block"
                             >
 
+                                <div
+                                    className={`
+                                relative
+                                bg-white
+                                rounded-xl
+                                border
+                                shadow-sm
+                                p-4
+                                transition
+                                hover:bg-gray-50
+                                ${
+                                        !notification.seen
+                                            ? "border-blue-200 bg-blue-50/30"
+                                            : "border-black/10"
+                                    }
+                                `}
+                                >
 
-                                {/* UNREAD DOT */}
 
-                                {!notification.seen && (
+                                    {/* UNREAD DOT */}
 
-                                    <div
+                                    {!notification.seen && (
+
+                                        <div
+                                            className="
+                                        absolute
+                                        top-4
+                                        right-4
+                                        w-2.5
+                                        h-2.5
+                                        rounded-full
+                                        bg-blue-600
+                                        "
+                                        />
+
+                                    )}
+
+
+
+
+                                    {/* WHO REPLIED */}
+
+                                    <p className="text-sm">
+
+                                    <span className="font-semibold text-blue-500">
+                                        {notification.replyNickname}
+                                    </span>
+
+                                        {" replied"}
+
+                                    </p>
+
+
+
+
+
+                                    {/* ORIGINAL COMMENT */}
+
+                                    <p
                                         className="
-                                    absolute
-                                    top-4
-                                    right-4
-                                    w-2.5
-                                    h-2.5
-                                    rounded-full
-                                    bg-blue-600
+                                    mt-3
+                                    text-xs
+                                    text-gray-400
+                                    italic
+                                    line-clamp-2
                                     "
-                                    />
-
-                                )}
-
-
-
-
-                                {/* WHO REPLIED */}
-
-                                <p className="text-sm">
-
-                                <span className="font-semibold text-blue-500">
-                                    {notification.replyNickname}
-                                </span>
-
-                                    {" replied"}
-
-                                </p>
+                                    >
+                                        "{notification.preview}"
+                                    </p>
 
 
 
 
-                                {/* ORIGINAL COMMENT */}
 
-                                <p
-                                    className="
-                                mt-3
-                                text-xs
-                                text-gray-400
-                                italic
-                                line-clamp-2
-                                "
-                                >
-                                    "{notification.preview}"
-                                </p>
+                                    {/* REPLY MESSAGE */}
+
+                                    <div className="relative">
 
 
-
-
-                                {/* REPLY MESSAGE */}
-
-                                <p
-                                    className="
-                                mt-3
-                                text-base
-                                font-medium
-                                text-black
-                                "
-                                >
-                                    {notification.message}
-                                </p>
+                                        <p
+                                            className={`
+                                        mt-3
+                                        text-base
+                                        font-medium
+                                        text-black
+                                        whitespace-pre-wrap
+                                        ${
+                                                !isExpanded && shouldTruncate
+                                                    ? "line-clamp-3"
+                                                    : ""
+                                            }
+                                        `}
+                                        >
+                                            {notification.message}
+                                        </p>
 
 
 
+                                        {/* FADE ONLY IF TRUNCATED + NOT EXPANDED */}
 
-                                {/* TIME */}
+                                        {!isExpanded && shouldTruncate && (
 
-                                <p className="text-xs text-gray-400 mt-3">
+                                            <div
+                                                className="
+                                            absolute
+                                            bottom-0
+                                            left-0
+                                            w-full
+                                            h-10
+                                            bg-gradient-to-t
+                                            from-white
+                                            to-transparent
+                                            pointer-events-none
+                                            "
+                                            />
 
-                                    {formatLocalDate(notification.timestamp)}
-
-                                </p>
+                                        )}
 
 
-
-                            </div>
-
-
-                        </Link>
+                                    </div>
 
 
-                    ))
+
+
+
+                                    {shouldTruncate && (
+
+                                        <button
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                toggleNotification(notification._id);
+                                            }}
+                                            className="
+                                        text-blue-500
+                                        text-xs
+                                        mt-1
+                                        "
+                                        >
+
+                                            {isExpanded
+                                                ? "Show less"
+                                                : "See more"}
+
+                                        </button>
+
+                                    )}
+
+
+
+
+
+
+                                    {/* TIME */}
+
+                                    <p className="text-xs text-gray-400 mt-3">
+
+                                        {formatLocalDate(notification.timestamp)}
+
+                                    </p>
+
+
+
+                                </div>
+
+
+                            </Link>
+
+
+                        );
+
+                    })
 
                 )}
 
