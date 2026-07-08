@@ -20,6 +20,7 @@ export default function ProfilePage() {
     const [comments, setComments] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [expandedPosts, setExpandedPosts] = useState<Record<string, boolean>>({});
+    const [notifications, setNotifications] = useState<any[]>([]);
 
     const togglePost = (id: string) => {
         setExpandedPosts((prev) => ({
@@ -48,22 +49,31 @@ export default function ProfilePage() {
         async function load() {
             const base = process.env.NEXT_PUBLIC_API_URL;
 
-            const [u, p] = await Promise.all([
+            const [u, p, n] = await Promise.all([
                 fetch(`${base}/user/`, {
                     method: "POST",
                     credentials: "include",
                 }),
+
                 fetch(`${base}/profile/`, {
+                    credentials: "include",
+                }),
+
+                fetch(`${base}/notifications/`, {
                     credentials: "include",
                 }),
             ]);
 
             const userData = await u.json();
             const profileData = await p.json();
+            const notificationData = await n.json();
+
+            console.log("🔔 Notifications from API:", notificationData);
 
             setUser(userData);
             setPosts(profileData.posts ?? []);
             setComments(profileData.comments ?? []);
+            setNotifications(notificationData ?? []);
 
             const seen = userData.seenQuestions ?? {};
 
