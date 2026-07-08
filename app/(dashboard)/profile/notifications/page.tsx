@@ -200,14 +200,14 @@ export default function NotificationsPage() {
                         href="/profile"
                         title="Back"
                         className="
-                    p-2
-                    rounded-full
-                    hover:bg-white
-                    border
-                    border-transparent
-                    hover:border-neutral-200
-                    transition
-                    "
+        p-2
+        rounded-full
+        hover:bg-white
+        border
+        border-transparent
+        hover:border-neutral-200
+        transition
+        "
                     >
 
                         <svg
@@ -227,13 +227,20 @@ export default function NotificationsPage() {
 
                         </svg>
 
-
                     </Link>
 
 
-                    <h1 className="text-xl font-semibold">
-                        Notifications
-                    </h1>
+                    <div>
+
+                        <h1 className="text-xl font-semibold">
+                            Notifications
+                        </h1>
+
+                        <p className="text-sm text-gray-500">
+                            Comment replies
+                        </p>
+
+                    </div>
 
 
                 </div>
