@@ -45,7 +45,7 @@ export default function NotificationBell({ unreadCount }: Props) {
                         h-5
                         px-1
                         rounded-full
-                        bg-red-600
+                        bg-red-800
                         text-white
                         text-xs
                         font-semibold
