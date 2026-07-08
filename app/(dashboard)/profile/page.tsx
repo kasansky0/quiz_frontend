@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import NotificationBell from "./NotificationBell";
 
@@ -114,11 +114,6 @@ export default function ProfilePage() {
         load();
     }, []);
 
-    const uniqueQuestions = useMemo(() => {
-        if (!user?.seenQuestions) return [];
-        return Object.keys(user.seenQuestions);
-    }, [user]);
-
     if (loading) {
         return (
             <div className="fixed inset-0 flex items-center justify-center bg-black-200 text-black">
@@ -147,24 +142,28 @@ export default function ProfilePage() {
             <div className="w-full max-w-xl space-y-8">
 
                 {/* HEADER */}
-                {/* HEADER */}
                 <div className="bg-white rounded-2xl shadow p-6 relative">
 
                     <div className="absolute top-5 right-5">
                         <NotificationBell unreadCount={unreadNotificationCount} />
                     </div>
 
-                    <div className="flex items-center gap-5">
+                    <div className="flex items-center gap-3 pr-10">
                         <img
                             src={user.image}
-                            className="w-20 h-20 rounded-full object-cover border"
+                            className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border shrink-0"
                         />
 
-                        <div>
-                            <h1 className="text-2xl font-semibold">{user.name}</h1>
-                            <p className="text-gray-500">{user.email}</p>
+                        <div className="min-w-0">
+                            <h1 className="text-lg sm:text-xl font-semibold truncate">
+                                {user.name}
+                            </h1>
 
-                            <div className="mt-2 px-3 py-1 bg-gray-100 rounded-full inline-block">
+                            <p className="text-sm text-gray-500 truncate">
+                                {user.email}
+                            </p>
+
+                            <div className="mt-2 px-3 py-1 bg-gray-100 rounded-full inline-block text-sm">
                                 {user.nickname}
                             </div>
                         </div>
