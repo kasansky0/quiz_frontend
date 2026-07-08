@@ -381,9 +381,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
             if (exists) return prev;
 
-            const updated = [...prev, singleComment];
-
-            return updated.sort(
+            return [...prev, singleComment].sort(
                 (a, b) =>
                     new Date(b.timestamp).getTime() -
                     new Date(a.timestamp).getTime()
@@ -423,14 +421,22 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
             setDisplayedComments(prev => {
                 const sortedNew = [...data.comments].sort(
-                    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+                    (a, b) =>
+                        new Date(b.timestamp).getTime() -
+                        new Date(a.timestamp).getTime()
                 );
 
-                const updated = [...prev, ...sortedNew];
+                const merged = [...prev, ...sortedNew];
 
-                setHasMoreComments(updated.length < totalComments);
+                const deduped = Array.from(
+                    new Map(
+                        merged.map(comment => [comment._id, comment])
+                    ).values()
+                );
 
-                return updated;
+                setHasMoreComments(deduped.length < totalComments);
+
+                return deduped;
             });
 
             setCommentsSkip(prev => prev + data.comments.length);
