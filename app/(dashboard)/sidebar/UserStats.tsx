@@ -282,8 +282,8 @@ export default function UserStats({ nickname, platformStats, loading, onLinkClic
                 {/* Nickname badge with icon */}
                 <div
                     onClick={() => {
-                        onLinkClick?.();
                         router.push("/profile");
+                        onLinkClick?.();
                     }}
                     className={`
                       group
