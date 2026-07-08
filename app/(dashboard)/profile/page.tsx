@@ -153,7 +153,7 @@ export default function ProfilePage() {
 
     if (loading) {
         return (
-            <div className="min-h-[400px] flex items-center justify-center text-black">
+            <div className="min-h-screen flex items-center justify-center text-black">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
