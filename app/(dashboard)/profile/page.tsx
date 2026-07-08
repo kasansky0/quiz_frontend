@@ -373,20 +373,7 @@ export default function ProfilePage() {
                                         key={c.id}
                                         className="block"
                                     >
-                                        <div className="bg-white rounded-xl border shadow-sm p-4 transition hover:bg-gray-50">
-
-                                            {/* POST TITLE */}
-                                            {c.postTitle && (
-                                                <p className="text-xs mb-3">
-                                    <span className="text-gray-500">
-                                        Post title:{" "}
-                                    </span>
-
-                                                    <span className="font-medium text-blue-600">
-                                        {c.postTitle}
-                                    </span>
-                                                </p>
-                                            )}
+                                        <div className="bg-white rounded-xl shadow-sm p-4">
 
                                             {/* COMMENT */}
                                             <div className="relative">
@@ -404,16 +391,16 @@ export default function ProfilePage() {
                                                 {!isExpanded && shouldTruncate && (
                                                     <div
                                                         className="
-                                            absolute
-                                            bottom-0
-                                            left-0
-                                            w-full
-                                            h-10
-                                            bg-gradient-to-t
-                                            from-white
-                                            to-transparent
-                                            pointer-events-none
-                                        "
+                                                            absolute
+                                                            bottom-0
+                                                            left-0
+                                                            w-full
+                                                            h-10
+                                                            bg-gradient-to-t
+                                                            from-white
+                                                            to-transparent
+                                                            pointer-events-none
+                                                        "
                                                     />
                                                 )}
 
