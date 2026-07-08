@@ -151,6 +151,37 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
 
 
+    const [highlightedCommentId, setHighlightedCommentId] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!displayedComments.length) return;
+
+        const hash = window.location.hash;
+
+        if (!hash.startsWith("#comment-")) return;
+
+        const commentId = hash.replace("#comment-", "");
+
+        const timer = setTimeout(() => {
+            const element = document.getElementById(`comment-${commentId}`);
+
+            if (!element) return;
+
+            element.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+            });
+
+            setHighlightedCommentId(commentId);
+
+            setTimeout(() => {
+                setHighlightedCommentId(null);
+            }, 3000);
+        }, 200);
+
+        return () => clearTimeout(timer);
+    }, [displayedComments]);
+
 
     function NetaInline({ user }: { user: any }) {
         const level = user?.neta4 ? 4 : user?.neta3 ? 3 : user?.neta2 ? 2 : null;
@@ -1701,6 +1732,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
 
                                             return (
                                                 <motion.div
+                                                    id={`comment-${comment._id}`}
                                                     key={comment._id || `${comment.userId}-${comment.timestamp}`}
                                                     initial={{ opacity: 0, x: isOwner ? 20 : -20 }}
                                                     animate={{ opacity: 1, x: 0 }}
@@ -1709,9 +1741,16 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                                     className={`w-full flex ${isOwner ? "justify-end" : "justify-start"}`}
                                                 >
                                                     <div
-                                                        className={`relative block w-full min-w-0 sm:px-4 py-4 px-4 rounded-xl
-                                                                            ${isOwner ? `mr-auto bg-white border border-black/10` : "mr-auto bg-white border border-black/10"}`}
-
+                                                        className={`
+                                                            relative block w-full min-w-0 sm:px-4 py-4 px-4 rounded-xl
+                                                            mr-auto border border-black/10
+                                                            transition-all duration-700
+                                                            ${
+                                                            highlightedCommentId === comment._id
+                                                                ? "bg-yellow-100 ring-2 ring-yellow-400 shadow-lg"
+                                                                : "bg-white"
+                                                        }
+                                                        `}
                                                     >
                                                         {/* nickname + edit/delete */}
                                                         <div className="flex justify-between gap-5 mb-1 min-w-0">

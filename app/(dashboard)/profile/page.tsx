@@ -331,7 +331,11 @@ export default function ProfilePage() {
                                 const shouldTruncate = c.message?.length > 180;
 
                                 return (
-                                    <Link href={`/post/${c.postId}`} key={c.id} className="block">
+                                    <Link
+                                        href={`/post/${c.postId}#comment-${c.id}`}
+                                        key={c.id}
+                                        className="block"
+                                    >
                                         <div className="border-b pb-3 cursor-pointer hover:bg-gray-50 rounded-md p-2 transition">
 
                                             <div className="relative">
