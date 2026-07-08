@@ -1,11 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 type Notification = {
     id: string;
     fromNickname: string;
-    fromImage?: string;
     message: string;
     preview: string;
     postId: string;
@@ -16,28 +16,73 @@ type Notification = {
 
 export default function NotificationsPage() {
 
-    const notifications: Notification[] = [
-        {
-            id: "1",
-            fromNickname: "Power_120∠0°",
-            message: "replied to your comment",
-            preview: "Calculations",
-            postId: "6a022158b7a6178b43d91963",
-            seen: false,
-            timestamp: "2 hours ago",
-            fromImage:
-                "https://lh3.googleusercontent.com/a/ACg8ocIENQUcvgOqCRJTJ2li7ZYQ5w4fuKOfWt4ufnIWqLwCPLShEQ=s96-c",
-        },
-        {
-            id: "2",
-            fromNickname: "Relay_Master",
-            message: "replied to your comment",
-            preview: "Transformer differential protection",
-            postId: "123456",
-            seen: true,
-            timestamp: "1 day ago",
-        },
-    ];
+    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [loading, setLoading] = useState(true);
+
+
+    useEffect(() => {
+        async function loadNotifications() {
+
+            const base = process.env.NEXT_PUBLIC_API_URL;
+
+            try {
+
+                // Get notifications first
+                const response = await fetch(
+                    `${base}/notifications/`,
+                    {
+                        credentials: "include",
+                    }
+                );
+
+
+                const data = await response.json();
+
+
+                setNotifications(data ?? []);
+
+
+
+                // Mark all notifications as seen after fetching
+                await fetch(
+                    `${base}/notifications/read-all`,
+                    {
+                        method: "PATCH",
+                        credentials: "include",
+                    }
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Failed to load notifications",
+                    error
+                );
+
+            } finally {
+
+                setLoading(false);
+
+            }
+
+        }
+
+
+        loadNotifications();
+
+    }, []);
+
+
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-100">
+                Loading...
+            </div>
+        );
+    }
+
 
 
     return (
@@ -86,41 +131,16 @@ export default function NotificationsPage() {
 
                                 <div
                                     className={`
-                                    flex gap-4 p-5
+                                    flex
+                                    items-start
+                                    gap-4
+                                    p-5
                                     hover:bg-gray-50
                                     transition
                                     cursor-pointer
                                     ${!notification.seen ? "bg-blue-50/40" : ""}
                                     `}
                                 >
-
-
-                                    {/* AVATAR */}
-
-                                    {notification.fromImage ? (
-
-                                        <img
-                                            src={notification.fromImage}
-                                            className="w-12 h-12 rounded-full object-cover border"
-                                        />
-
-                                    ) : (
-
-                                        <div
-                                            className="
-                                            w-12 h-12 rounded-full
-                                            bg-gray-200
-                                            flex items-center justify-center
-                                            font-semibold
-                                            text-gray-600
-                                            "
-                                        >
-                                            {notification.fromNickname[0]}
-                                        </div>
-
-                                    )}
-
-
 
                                     {/* CONTENT */}
 
@@ -160,13 +180,16 @@ export default function NotificationsPage() {
 
                                     {!notification.seen && (
 
-                                        <div className="
+                                        <div
+                                            className="
                                             w-2.5
                                             h-2.5
                                             rounded-full
                                             bg-blue-600
                                             mt-3
-                                        "/>
+                                            shrink-0
+                                            "
+                                        />
 
                                     )}
 

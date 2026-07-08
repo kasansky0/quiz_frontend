@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import NotificationBell from "./NotificationBell";
 
 type UserStats = {
     name: string;
@@ -20,7 +21,7 @@ export default function ProfilePage() {
     const [comments, setComments] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [expandedPosts, setExpandedPosts] = useState<Record<string, boolean>>({});
-    const [notifications, setNotifications] = useState<any[]>([]);
+    const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
 
     const togglePost = (id: string) => {
         setExpandedPosts((prev) => ({
@@ -68,12 +69,15 @@ export default function ProfilePage() {
             const profileData = await p.json();
             const notificationData = await n.json();
 
-            console.log("🔔 Notifications from API:", notificationData);
-
             setUser(userData);
             setPosts(profileData.posts ?? []);
             setComments(profileData.comments ?? []);
-            setNotifications(notificationData ?? []);
+
+            const unreadCount = (notificationData ?? []).filter(
+                (notification: any) => notification.seen === false
+            ).length;
+
+            setUnreadNotificationCount(unreadCount);
 
             const seen = userData.seenQuestions ?? {};
 
@@ -143,20 +147,23 @@ export default function ProfilePage() {
             <div className="w-full max-w-xl space-y-8">
 
                 {/* HEADER */}
-                <div className="bg-white rounded-2xl shadow p-6 flex items-center gap-5">
-                    <img
-                        src={user.image}
-                        className="w-20 h-20 rounded-full object-cover border"
-                    />
+                <div className="bg-white rounded-2xl shadow p-6 flex items-center justify-between">
+                    <div className="flex items-center gap-5">
+                        <img
+                            src={user.image}
+                            className="w-20 h-20 rounded-full object-cover border"
+                        />
 
-                    <div>
-                        <h1 className="text-2xl font-semibold">{user.name}</h1>
-                        <p className="text-gray-500">{user.email}</p>
+                        <div>
+                            <h1 className="text-2xl font-semibold">{user.name}</h1>
+                            <p className="text-gray-500">{user.email}</p>
 
-                        <div className="mt-2 px-3 py-1 bg-gray-100 rounded-full inline-block">
-                            {user.nickname}
+                            <div className="mt-2 px-3 py-1 bg-gray-100 rounded-full inline-block">
+                                {user.nickname}
+                            </div>
                         </div>
                     </div>
+                    <NotificationBell unreadCount={unreadNotificationCount} />
                 </div>
 
                 {/* QUESTION STATS */}
