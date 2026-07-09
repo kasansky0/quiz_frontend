@@ -210,20 +210,20 @@ export default function ProfilePage() {
 
                 {/* QUESTION STATS */}
                 <div className="grid grid-cols-3 gap-3">
-                    <div className="bg-white p-3 rounded-2xl shadow">
+                    <div className="bg-white p-3 rounded-2xl shadow text-center">
                         <p className="text-gray-500 text-xs sm:text-sm">Seen</p>
                         <p className="text-xl sm:text-2xl font-bold">{stats.totalSeen}</p>
                     </div>
 
-                    <div className="bg-white p-3 rounded-2xl shadow">
+                    <div className="bg-white p-3 rounded-2xl shadow text-center">
                         <p className="text-gray-500 text-xs sm:text-sm">Correct</p>
                         <p className="text-xl sm:text-2xl font-bold text-green-600">
                             {stats.correct}
                         </p>
                     </div>
 
-                    <div className="bg-white p-3 rounded-2xl shadow">
-                        <p className="text-gray-500 text-xs sm:text-sm">Wrong</p>
+                    <div className="bg-white p-3 rounded-2xl shadow text-center">
+                        <p className="text-gray-500 text-xs sm:text-sm">Needs review</p>
                         <p className="text-xl sm:text-2xl font-bold text-red-500">
                             {stats.wrong}
                         </p>
@@ -248,7 +248,7 @@ export default function ProfilePage() {
                 {/* SEEN QUESTIONS (REAL CONTENT) */}
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                     <h2 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-3">
-                        Questions You've Seen
+                        Recall Practice
                     </h2>
 
                     <div className="max-h-64 overflow-y-auto space-y-3 pr-2">
@@ -283,7 +283,7 @@ export default function ProfilePage() {
                                                 Last answer:{" "}
                                                 {lastAttempt?.answered_correctly
                                                     ? "Correct"
-                                                    : "Wrong"}
+                                                    : "Needs review"}
                                             </p>
 
                                             <p className="text-xs text-gray-400">
@@ -320,25 +320,18 @@ export default function ProfilePage() {
                                             </span>
                                         </Link>
 
-                                        <div className="relative">
-                                            <p
-                                                className={`text-sm text-gray-500 whitespace-pre-wrap ${
-                                                    !isExpanded && shouldTruncate ? "line-clamp-3" : ""
-                                                }`}
-                                            >
-                                                {post.message}
-                                            </p>
-
-                                            {/* FADE ONLY IF TRUNCATED + NOT EXPANDED */}
-                                            {!isExpanded && shouldTruncate && (
-                                                <div className="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-t from-white to-transparent pointer-events-none" />
-                                            )}
-                                        </div>
+                                        <p
+                                            className={`text-sm text-gray-500 whitespace-pre-wrap ${
+                                                !isExpanded && shouldTruncate ? "line-clamp-3" : ""
+                                            }`}
+                                        >
+                                            {post.message}
+                                        </p>
 
                                         {shouldTruncate && (
                                             <button
                                                 onClick={() => togglePost(post.id)}
-                                                className="text-blue-500 text-xs mt-1"
+                                                className="text-xs text-blue-600 hover:underline mt-1"
                                             >
                                                 {isExpanded ? "Show less" : "See more"}
                                             </button>
@@ -380,19 +373,13 @@ export default function ProfilePage() {
                                     >
                                         <div className="border-b pb-3 cursor-pointer hover:bg-gray-50 rounded-md p-2 transition">
 
-                                            <div className="relative">
-                                                <p
-                                                    className={`text-sm whitespace-pre-wrap ${
-                                                        !isExpanded && shouldTruncate ? "line-clamp-3" : ""
-                                                    }`}
-                                                >
-                                                    {c.message}
-                                                </p>
-
-                                                {!isExpanded && shouldTruncate && (
-                                                    <div className="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-t from-white to-transparent pointer-events-none" />
-                                                )}
-                                            </div>
+                                            <p
+                                                className={`text-sm whitespace-pre-wrap ${
+                                                    !isExpanded && shouldTruncate ? "line-clamp-3" : ""
+                                                }`}
+                                            >
+                                                {c.message}
+                                            </p>
 
                                             {shouldTruncate && (
                                                 <button
@@ -401,7 +388,7 @@ export default function ProfilePage() {
                                                         e.stopPropagation();
                                                         toggleComment(c.id);
                                                     }}
-                                                    className="text-blue-500 text-xs mt-1"
+                                                    className="text-xs text-blue-600 hover:underline mt-1"
                                                 >
                                                     {isExpanded ? "Show less" : "See more"}
                                                 </button>
