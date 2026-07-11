@@ -58,9 +58,15 @@ export default function PostPage() {
     );
 
     useEffect(() => {
-        if (!postData) return;
+        if (!postData) {
+            if (!postLoading) {
+                router.push("/feed");
+            }
+            return;
+        }
+
         setPost(postData);
-    }, [postData]);
+    }, [postData, postLoading, router]);
 
     // -----------------------------
     // COMMENTS FETCHER
