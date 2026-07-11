@@ -14,6 +14,7 @@ import StatLoaderIcon from "@/components/ui/StatLoaderIcon";
 import { motion, AnimatePresence } from "framer-motion";
 import PostMedia from "./ActivePostMedia"
 import PositionCard from "@/app/PositionCard";
+import Share from "@/app/(dashboard)/feed/share"
 
 
 
@@ -1430,6 +1431,12 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                                         {userId && activePost.userId === userId && (
                                             <span className="w-1.5 h-1.5 rounded-full bg-amber-500 opacity-80 flex-shrink-0" />
                                         )}
+
+                                        {/*Share button to share the post*/}
+                                        <Share
+                                            postId={activePost.id}
+                                            title={activePost.title}
+                                        />
                                     </div>
 
 
