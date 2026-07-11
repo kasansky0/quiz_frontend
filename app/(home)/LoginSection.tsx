@@ -85,7 +85,12 @@ export default function LoginSection() {
                         stiffness: 400,
                         damping: 18
                     }}
-                    onClick={() => signIn("google")}
+                    onClick={() =>
+                        signIn("google", {
+                            callbackUrl:
+                                new URLSearchParams(window.location.search).get("callbackUrl") || "/"
+                        })
+                    }
                     className="
                         w-full
                         flex items-center justify-center gap-3

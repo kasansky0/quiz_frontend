@@ -70,7 +70,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     useEffect(() => {
         if (status === "unauthenticated") {
-            router.replace("/");
+            const currentPath = window.location.pathname;
+
+            router.replace(
+                `/?callbackUrl=${encodeURIComponent(currentPath)}`
+            );
         }
     }, [status, router]);
 
