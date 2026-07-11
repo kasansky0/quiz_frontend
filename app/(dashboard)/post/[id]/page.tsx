@@ -5,17 +5,18 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
 export async function generateMetadata({
                                            params,
                                        }: {
-    params: { id: string };
+    params: Promise<{ id: string }>;
 }) {
 
+    const { id } = await params;
+
     const res = await fetch(
-        `${apiUrl}/posts/${params.id}/share`,
+        `${apiUrl}/posts/${id}/share`,
         {
-            next: {
-                revalidate: 60,
-            },
+            cache: "no-store",
         }
     );
+
 
     if (!res.ok) {
         return {
@@ -23,13 +24,16 @@ export async function generateMetadata({
         };
     }
 
+
     const post = await res.json();
+
 
     return {
         title: post.title,
         description: post.message?.slice(0,160),
 
         openGraph: {
+            type: "article",
             title: post.title,
             description: post.message?.slice(0,160),
             images: [
@@ -44,6 +48,8 @@ export async function generateMetadata({
 
         twitter: {
             card: "summary_large_image",
+            title: post.title,
+            description: post.message?.slice(0,160),
             images: [post.image],
         },
     };
