@@ -33,6 +33,7 @@ export default function PostPage() {
     // -----------------------------
     const fetchPost = async (url: string) => {
         const res = await fetch(url, {
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
             },
