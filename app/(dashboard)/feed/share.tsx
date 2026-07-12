@@ -64,9 +64,9 @@ export default function Share({
         >
             <svg
                 xmlns="http://www.w3.org/2000/svg"
-                height="20"
+                height="15"
                 viewBox="0 -960 960 960"
-                width="20"
+                width="15"
                 fill="currentColor"
                 className="text-neutral-600 hover:text-black transition-colors"
             >
