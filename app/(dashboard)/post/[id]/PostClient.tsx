@@ -141,6 +141,13 @@ export default function PostPage() {
     };
 
     // -----------------------------
+    // LOADING STATE
+    // -----------------------------
+    if (postLoading || !post) {
+        return null;
+    }
+
+    // -----------------------------
     // FINAL RENDER (MOVED ACTIVE POST)
     // -----------------------------
     return (
