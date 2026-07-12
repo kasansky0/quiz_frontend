@@ -498,25 +498,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
     // Handle loading and unauthenticated state
-    if (status === "loading") {
+    if (status === "loading" || !session) {
         return (
             <div className="flex-1 flex items-center justify-center min-h-screen text-black">
                 <p className="text-xl flex items-center">
                     Loading
                     <span className="ml-2 flex space-x-1">
-                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
-                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
-                          <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
-                        </span>
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce"></span>
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.2s]"></span>
+                    <span className="w-2 h-2 bg-black rounded-full animate-dot-bounce [animation-delay:0.4s]"></span>
+                </span>
                 </p>
-            </div>
-        );
-    }
-
-    if (!session) {
-        return (
-            <div className="flex items-center justify-center h-screen text-black">
-                Redirecting to login...
             </div>
         );
     }
