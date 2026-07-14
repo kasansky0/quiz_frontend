@@ -253,7 +253,13 @@ export default function ProfilePage() {
                     </h2>
 
                     <div className="max-h-64 overflow-y-auto space-y-3 pr-2">
-                        {user.seenQuestions &&
+
+                        {!user.seenQuestions ||
+                        Object.keys(user.seenQuestions).length === 0 ? (
+                            <p className="text-sm text-gray-500 text-center py-6">
+                                You haven’t seen any questions yet.
+                            </p>
+                        ) : (
                             Object.entries(user.seenQuestions)
                                 .sort(([, attemptsA]: any, [, attemptsB]: any) => {
                                     const lastA = attemptsA?.[attemptsA.length - 1]?.seen_at
@@ -264,7 +270,7 @@ export default function ProfilePage() {
                                         ? new Date(attemptsB[attemptsB.length - 1].seen_at).getTime()
                                         : 0;
 
-                                    return lastB - lastA; // newest first
+                                    return lastB - lastA;
                                 })
                                 .map(([qId, attempts]: any) => {
                                     const lastAttempt = attempts?.[attempts.length - 1];
@@ -292,7 +298,9 @@ export default function ProfilePage() {
                                             </p>
                                         </div>
                                     );
-                                })}
+                                })
+                        )}
+
                     </div>
                 </div>
 
