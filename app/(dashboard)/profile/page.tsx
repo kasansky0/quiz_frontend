@@ -179,31 +179,32 @@ export default function ProfilePage() {
             <div className="w-full max-w-xl space-y-5 sm:space-y-8">
 
                 {/* HEADER */}
-                <div className="bg-white rounded-2xl shadow p-6 relative">
+                <div className="bg-white rounded-2xl shadow px-4 py-3">
 
-                    <div className="absolute top-5 right-5">
-                        <NotificationBell unreadCount={unreadNotificationCount} />
-                    </div>
+                    <div className="flex items-center justify-between">
 
-                    <div className="flex items-center gap-3 pr-10">
-                        <img
-                            src={user.image}
-                            className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border shrink-0"
-                        />
+                        {/* Avatar + nickname */}
+                        <div className="flex items-center gap-3 min-w-0">
 
-                        <div className="min-w-0">
-                            <h1 className="text-lg sm:text-xl font-semibold truncate">
-                                {user.name}
+                            <div className="w-10 h-10 rounded-full bg-gray-200 border flex items-center justify-center shrink-0">
+                                <span className="font-semibold text-gray-700">
+                                    {user.nickname
+                                        ?.replace(/[^a-zA-Z0-9]/g, "")
+                                        .charAt(0)
+                                        .toUpperCase() || "?"}
+                                </span>
+                            </div>
+
+                            <h1 className="text-lg font-semibold truncate">
+                                {user.nickname}
                             </h1>
 
-                            <p className="text-sm text-gray-500 truncate">
-                                {user.email}
-                            </p>
-
-                            <div className="mt-2 px-3 py-1 bg-gray-100 rounded-full inline-block text-sm">
-                                {user.nickname}
-                            </div>
                         </div>
+
+
+                        {/* Notification */}
+                        <NotificationBell unreadCount={unreadNotificationCount} />
+
                     </div>
 
                 </div>
