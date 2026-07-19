@@ -88,10 +88,6 @@ export default function QuizSampleSection({
     const router = useRouter();
     const isMountedRef = useRef(true);
 
-    const questionTopRef = useRef<HTMLDivElement>(null);
-
-    const [shouldScrollTop, setShouldScrollTop] = useState(false);
-
     const showLoading = !questionData && !fetchError;
 
     const [isFetchingNext, setIsFetchingNext] = useState(false);
@@ -364,7 +360,6 @@ export default function QuizSampleSection({
 
         // THEN SET NEW QUESTION
         setQuestionData(nextQuestion);
-        setShouldScrollTop(true);
 
         // THEN FADE IN
         requestAnimationFrame(() => {
@@ -375,22 +370,20 @@ export default function QuizSampleSection({
     };
 
 
-
-
     useEffect(() => {
-        if (!shouldScrollTop) return;
+        if (!questionData) return;
 
-        requestAnimationFrame(() => {
-            questionTopRef.current?.scrollIntoView({
-                behavior: "smooth",
-                block: "start",
+        const id = requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth",
+                });
             });
         });
 
-        setShouldScrollTop(false);
-    }, [questionData, shouldScrollTop]);
-
-
+        return () => cancelAnimationFrame(id);
+    }, [questionData]);
 
 
 
@@ -521,7 +514,6 @@ export default function QuizSampleSection({
                         ) : (
                             questionData && (
                                 <div
-                                    ref={questionTopRef}
                                     className={`w-full max-w-xl flex flex-col gap-6 justify-start transition-opacity duration-700 ease-in-out
                                         bg-white border border-black/10 rounded-xl shadow-sm p-5 sm:p-6 ${
                                         fade ? "opacity-100" : "opacity-0"
