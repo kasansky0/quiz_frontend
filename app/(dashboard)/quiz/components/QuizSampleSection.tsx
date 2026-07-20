@@ -91,6 +91,8 @@ export default function QuizSampleSection({
     const showLoading = !questionData && !fetchError;
 
     const questionRef = useRef<HTMLHeadingElement>(null);
+    const positionCardRef = useRef<HTMLDivElement>(null);
+    const [shouldScrollToQuestion, setShouldScrollToQuestion] = useState(false);
 
     const [isFetchingNext, setIsFetchingNext] = useState(false);
 
@@ -361,6 +363,7 @@ export default function QuizSampleSection({
         setAnswerResult(null);
 
         // THEN SET NEW QUESTION
+        setShouldScrollToQuestion(true);
         setQuestionData(nextQuestion);
 
         // THEN FADE IN
@@ -375,17 +378,28 @@ export default function QuizSampleSection({
     useEffect(() => {
         if (!questionData) return;
 
-        const id = requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
+        const timer = setTimeout(() => {
+
+            if (shouldScrollToQuestion) {
                 questionRef.current?.scrollIntoView({
                     behavior: "smooth",
                     block: "start",
                 });
-            });
-        });
 
-        return () => cancelAnimationFrame(id);
-    }, [questionData]);
+                setShouldScrollToQuestion(false);
+            } else {
+                // initial load only
+                positionCardRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                });
+            }
+
+        }, 100);
+
+        return () => clearTimeout(timer);
+
+    }, [questionData, shouldScrollToQuestion]);
 
 
 
@@ -393,7 +407,7 @@ export default function QuizSampleSection({
         if (!selectedOption) return;
 
         const t = setTimeout(() => {
-            optionsRef.current?.scrollIntoView({
+            positionCardRef.current?.scrollIntoView({
                 behavior: "smooth",
                 block: "start",
             });
@@ -528,7 +542,10 @@ export default function QuizSampleSection({
                                     />
 
                                     {/* Future Ads / Message */}
-                                    <div className="hover:bg-white">
+                                    <div
+                                        ref={positionCardRef}
+                                        className="hover:bg-white scroll-mt-24"
+                                    >
                                         <PositionCard />
                                     </div>
 
