@@ -90,7 +90,7 @@ export default function QuizSampleSection({
 
     const showLoading = !questionData && !fetchError;
 
-    const questionCardRef = useRef<HTMLDivElement>(null);
+    const questionRef = useRef<HTMLHeadingElement>(null);
 
     const [isFetchingNext, setIsFetchingNext] = useState(false);
 
@@ -377,7 +377,7 @@ export default function QuizSampleSection({
 
         const id = requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-                questionCardRef.current?.scrollIntoView({
+                questionRef.current?.scrollIntoView({
                     behavior: "smooth",
                     block: "start",
                 });
@@ -516,14 +516,16 @@ export default function QuizSampleSection({
                         ) : (
                             questionData && (
                                 <div
-                                    ref={questionCardRef}
-                                    className={`scroll-mt-20 w-full max-w-xl flex flex-col gap-6 justify-start transition-opacity duration-700 ease-in-out
-                                    bg-white border border-black/10 rounded-xl shadow-sm p-5 sm:p-6 ${
+                                    className={`w-full max-w-xl flex flex-col gap-6 justify-start transition-opacity duration-700 ease-in-out
+                                        bg-white border border-black/10 rounded-xl shadow-sm p-5 sm:p-6 ${
                                         fade ? "opacity-100" : "opacity-0"
                                     }`}
                                 >
                                     {/* Question */}
-                                    <Question question={questionData.question} />
+                                    <Question
+                                        ref={questionRef}
+                                        question={questionData.question}
+                                    />
 
                                     {/* Future Ads / Message */}
                                     <div className="hover:bg-white">
