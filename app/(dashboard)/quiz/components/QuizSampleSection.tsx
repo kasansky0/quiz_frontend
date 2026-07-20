@@ -90,10 +90,6 @@ export default function QuizSampleSection({
 
     const showLoading = !questionData && !fetchError;
 
-    const questionRef = useRef<HTMLHeadingElement>(null);
-    const positionCardRef = useRef<HTMLDivElement>(null);
-    const [shouldScrollToQuestion, setShouldScrollToQuestion] = useState(false);
-
     const [isFetchingNext, setIsFetchingNext] = useState(false);
 
 
@@ -363,7 +359,6 @@ export default function QuizSampleSection({
         setAnswerResult(null);
 
         // THEN SET NEW QUESTION
-        setShouldScrollToQuestion(true);
         setQuestionData(nextQuestion);
 
         // THEN FADE IN
@@ -378,28 +373,17 @@ export default function QuizSampleSection({
     useEffect(() => {
         if (!questionData) return;
 
-        const timer = setTimeout(() => {
-
-            if (shouldScrollToQuestion) {
-                questionRef.current?.scrollIntoView({
+        const id = requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                window.scrollTo({
+                    top: 0,
                     behavior: "smooth",
-                    block: "start",
                 });
+            });
+        });
 
-                setShouldScrollToQuestion(false);
-            } else {
-                // initial load only
-                positionCardRef.current?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start",
-                });
-            }
-
-        }, 100);
-
-        return () => clearTimeout(timer);
-
-    }, [questionData, shouldScrollToQuestion]);
+        return () => cancelAnimationFrame(id);
+    }, [questionData]);
 
 
 
@@ -407,7 +391,7 @@ export default function QuizSampleSection({
         if (!selectedOption) return;
 
         const t = setTimeout(() => {
-            positionCardRef.current?.scrollIntoView({
+            optionsRef.current?.scrollIntoView({
                 behavior: "smooth",
                 block: "start",
             });
@@ -536,16 +520,10 @@ export default function QuizSampleSection({
                                     }`}
                                 >
                                     {/* Question */}
-                                    <Question
-                                        ref={questionRef}
-                                        question={questionData.question}
-                                    />
+                                    <Question question={questionData.question} />
 
                                     {/* Future Ads / Message */}
-                                    <div
-                                        ref={positionCardRef}
-                                        className="hover:bg-white scroll-mt-24"
-                                    >
+                                    <div className="hover:bg-white">
                                         <PositionCard />
                                     </div>
 
