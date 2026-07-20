@@ -81,6 +81,7 @@ export default function QuizSampleSection({
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [answerResult, setAnswerResult] = useState<{ correct: boolean; answer: string; explanation: string } | null>(null);
     const optionsRef = useRef<HTMLDivElement>(null);
+    const questionTopRef = useRef<HTMLDivElement>(null);
     const [cycleCount, setCycleCount] = useState(0);
     const [fetchError, setFetchError] = useState(false); // <-- track fetch failures
     const QUESTIONS_BEFORE_REVIEW = 2;
@@ -359,6 +360,7 @@ export default function QuizSampleSection({
         setAnswerResult(null);
 
         // THEN SET NEW QUESTION
+        // THEN SET NEW QUESTION
         setQuestionData(nextQuestion);
 
         // THEN FADE IN
@@ -368,24 +370,6 @@ export default function QuizSampleSection({
 
         setIsFetchingNext(false);
     };
-
-
-    useEffect(() => {
-        if (!questionData) return;
-
-        const id = requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                window.scrollTo({
-                    top: 0,
-                    behavior: "smooth",
-                });
-            });
-        });
-
-        return () => cancelAnimationFrame(id);
-    }, [questionData]);
-
-
 
     useEffect(() => {
         if (!selectedOption) return;
@@ -399,6 +383,21 @@ export default function QuizSampleSection({
 
         return () => clearTimeout(t);
     }, [selectedOption]);
+
+
+    useEffect(() => {
+        if (!questionData) return;
+
+        const timer = setTimeout(() => {
+            questionTopRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+            });
+        }, 100);
+
+        return () => clearTimeout(timer);
+
+    }, [questionData]);
 
 
 
@@ -514,6 +513,7 @@ export default function QuizSampleSection({
                         ) : (
                             questionData && (
                                 <div
+                                    ref={questionTopRef}
                                     className={`w-full max-w-xl flex flex-col gap-6 justify-start transition-opacity duration-700 ease-in-out
                                         bg-white border border-black/10 rounded-xl shadow-sm p-5 sm:p-6 ${
                                         fade ? "opacity-100" : "opacity-0"
