@@ -517,8 +517,8 @@ export default function QuizSampleSection({
                             questionData && (
                                 <div
                                     ref={questionCardRef}
-                                    className={`w-full max-w-xl flex flex-col gap-6 justify-start transition-opacity duration-700 ease-in-out
-                                        bg-white border border-black/10 rounded-xl shadow-sm p-5 sm:p-6 ${
+                                    className={`scroll-mt-20 w-full max-w-xl flex flex-col gap-6 justify-start transition-opacity duration-700 ease-in-out
+                                    bg-white border border-black/10 rounded-xl shadow-sm p-5 sm:p-6 ${
                                         fade ? "opacity-100" : "opacity-0"
                                     }`}
                                 >
