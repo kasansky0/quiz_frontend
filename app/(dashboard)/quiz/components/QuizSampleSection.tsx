@@ -9,7 +9,6 @@ import { ScrollHint } from "./ScrollHint";
 import { Button } from "@/components/ui/Button";
 import { useError } from "@/app/ErrorProvider";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import PositionCard from "@/app/PositionCard";
 
 
@@ -21,26 +20,7 @@ export interface QuestionType {
     explanation: string;
 }
 
-export function scrollToTopChild(container?: React.RefObject<HTMLElement | null>) {
-    if (!container?.current) return;
 
-    const topChild = container.current.firstElementChild as HTMLElement | null;
-
-    if (topChild) {
-        // Get the child's offset relative to the container
-        const containerTop = container.current.getBoundingClientRect().top;
-        const childTop = topChild.getBoundingClientRect().top;
-        const scrollOffset = childTop - containerTop + container.current.scrollTop;
-
-        container.current.scrollTo({
-            top: scrollOffset,
-            behavior: "smooth",
-        });
-    } else {
-        // fallback to container itself
-        container.current.scrollTo({ top: 0, behavior: "smooth" });
-    }
-}
 
 
 interface QuizSampleSectionProps {
@@ -80,7 +60,6 @@ export default function QuizSampleSection({
     const [fade, setFade] = useState(false);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [answerResult, setAnswerResult] = useState<{ correct: boolean; answer: string; explanation: string } | null>(null);
-    const optionsRef = useRef<HTMLDivElement>(null);
     const [cycleCount, setCycleCount] = useState(0);
     const [fetchError, setFetchError] = useState(false); // <-- track fetch failures
     const QUESTIONS_BEFORE_REVIEW = 2;
@@ -370,37 +349,6 @@ export default function QuizSampleSection({
     };
 
 
-    useEffect(() => {
-        if (!questionData) return;
-
-        const id = requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                window.scrollTo({
-                    top: 0,
-                    behavior: "smooth",
-                });
-            });
-        });
-
-        return () => cancelAnimationFrame(id);
-    }, [questionData]);
-
-
-
-    useEffect(() => {
-        if (!selectedOption) return;
-
-        const t = setTimeout(() => {
-            optionsRef.current?.scrollIntoView({
-                behavior: "smooth",
-                block: "start",
-            });
-        }, 150);
-
-        return () => clearTimeout(t);
-    }, [selectedOption]);
-
-
 
 
 
@@ -528,7 +476,7 @@ export default function QuizSampleSection({
                                     </div>
 
                                     {/* Options */}
-                                    <div ref={optionsRef} className="flex flex-col gap-3">
+                                    <div className="flex flex-col gap-3">
                                         {questionData.options.map((option) => (
                                             <Option
                                                 key={option}
