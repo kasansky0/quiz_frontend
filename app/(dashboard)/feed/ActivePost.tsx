@@ -1237,8 +1237,11 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
         isExpanded: boolean;
         onToggle: () => void;
     }) {
-        const LIMIT = 500;
-        const shouldTruncate = message.length > LIMIT;
+        const LINE_LIMIT = 10;
+
+        const shouldTruncate =
+            message.split("\n").length > LINE_LIMIT ||
+            message.length > 500;
 
         const handleToggle = (e: React.MouseEvent) => {
             const selection = window.getSelection();
