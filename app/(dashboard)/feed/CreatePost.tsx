@@ -227,9 +227,9 @@ export default function CreatePost({
             return;
         }
 
-        // Clean text
-        const cleanedTitle = title.replace(/\n/g, " ");
-        const cleanedMessage = message.replace(/\s*\n\s*/g, " ");
+        // Clean text but preserve new lines
+        const cleanedTitle = title.trim();
+        const cleanedMessage = message.trim();
 
         // Show loading screen
         setIsSending(true);
