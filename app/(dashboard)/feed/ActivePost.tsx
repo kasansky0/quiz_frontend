@@ -1258,7 +1258,7 @@ export default function ActivePost({ post, comments, userId, onBack, totalCommen
                     className={`cursor-pointer ${
                         isExpanded
                             ? ""
-                            : "max-h-[6.5rem] overflow-hidden relative will-change-[max-height]"
+                            : "max-h-[10rem] overflow-hidden relative will-change-[max-height]"
                     }`}
                 >
                     <p className="text-sm sm:text-sm md:text-base select-text">
