@@ -606,7 +606,7 @@ export default function ApplyPage() {
                         </label>
 
                         <div className="text-xs text-neutral-500 mb-1">
-                            2–4 week travel required. Vehicle, fuel, per diem, lodging provided.
+                            Vehicle, fuel, per diem, lodging provided.
                         </div>
 
                         <input
