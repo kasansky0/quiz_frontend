@@ -171,7 +171,7 @@ export default function MainStudyPage() {
                                         {mainTopic}
 
                                         {newTopics[mainTopic] && (
-                                            <span className="text-xs font-semibold text-green-600">
+                                            <span className="text-[10px] text-blue-500 font-semibold animate-[softPulse_1.6s_ease-in-out_infinite]">
                                                 NEW
                                             </span>
                                         )}
