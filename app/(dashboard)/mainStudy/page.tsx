@@ -167,23 +167,21 @@ export default function MainStudyPage() {
                             >
                                 {/* Header */}
                                 <div className="flex items-center justify-between mb-2">
-                                    <h2 className="font-semibold text-neutral-900">
+                                    <h2 className="font-semibold text-neutral-900 flex items-center gap-2">
                                         {mainTopic}
-                                    </h2>
 
-                                    <div className="flex items-center gap-2">
                                         {newTopics[mainTopic] && (
                                             <span className="text-xs font-semibold text-green-600">
                                                 NEW
                                             </span>
                                         )}
+                                    </h2>
 
-                                        {locked && (
-                                            <span className="text-xs text-neutral-400 font-medium">
-                                                🔒 Locked
-                                            </span>
-                                        )}
-                                    </div>
+                                    {locked && (
+                                        <span className="text-xs text-neutral-400 font-medium">
+                                            🔒 Locked
+                                        </span>
+                                    )}
                                 </div>
 
                                 {/* Titles */}
