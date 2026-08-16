@@ -5,6 +5,7 @@ import { useError } from "@/app/ErrorProvider";
 interface MainTopicItem {
     main_topic: string;
     title: string;
+    new?: boolean;
 }
 
 // --- We no longer need MainTopic interface per item, just array + boolean ---

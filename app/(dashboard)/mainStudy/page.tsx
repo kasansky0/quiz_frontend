@@ -60,6 +60,11 @@ export default function MainStudyPage() {
         return acc;
     }, {});
 
+    const newTopics = mainTopics.reduce((acc: Record<string, boolean>, item) => {
+        acc[item.main_topic] = item.new ?? false;
+        return acc;
+    }, {});
+
     // Then render all your full content with headings, subscription text, grid, etc.
     return (
         <div className="relative min-h-screen w-full flex justify-center items-start p-4 md:p-8 bg-black-200 text-black">
@@ -166,11 +171,19 @@ export default function MainStudyPage() {
                                         {mainTopic}
                                     </h2>
 
-                                    {locked && (
-                                        <span className="text-xs text-neutral-400 font-medium">
-                                        🔒 Locked
-                                    </span>
-                                    )}
+                                    <div className="flex items-center gap-2">
+                                        {newTopics[mainTopic] && (
+                                            <span className="text-xs font-semibold text-green-600">
+                                                NEW
+                                            </span>
+                                        )}
+
+                                        {locked && (
+                                            <span className="text-xs text-neutral-400 font-medium">
+                                                🔒 Locked
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
 
                                 {/* Titles */}
