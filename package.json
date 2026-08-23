@@ -10,6 +10,8 @@
     "test": "jest --watch"
   },
   "dependencies": {
+    "@capacitor/cli": "^7.6.8",
+    "@capacitor/core": "^8.5.0",
     "@emnapi/core": "^1.7.1",
     "@emnapi/runtime": "^1.7.1",
     "@emnapi/wasi-threads": "^1.1.0",
