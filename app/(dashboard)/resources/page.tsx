@@ -224,9 +224,7 @@ export default function ResourcesPage() {
                 <div className="
                     grid
                     grid-cols-1
-                    md:grid-cols-2
-                    lg:grid-cols-3
-                    gap-6
+                    gap-8
                 ">
 
 
@@ -241,6 +239,7 @@ export default function ResourcesPage() {
                                 border-gray-100
                                 shadow-sm
                                 overflow-hidden
+                                w-full
                             "
                         >
 
