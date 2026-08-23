@@ -192,7 +192,7 @@ export default function ResourcesPage() {
             technicianNotes:
                 "A reliable meter is one of the most important tools a technician carries in the field.",
 
-            amazonLink: "#",
+            amazonLink: "https://amzn.to/4zuRq1j",
         },
 
     ];
