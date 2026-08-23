@@ -10,8 +10,6 @@
     "test": "jest --watch"
   },
   "dependencies": {
-    "@capacitor/cli": "^7.6.8",
-    "@capacitor/core": "^8.5.0",
     "@emnapi/core": "^1.7.1",
     "@emnapi/runtime": "^1.7.1",
     "@emnapi/wasi-threads": "^1.1.0",
@@ -42,6 +40,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
