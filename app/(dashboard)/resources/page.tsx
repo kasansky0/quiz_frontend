@@ -238,7 +238,7 @@ export default function ResourcesPage() {
                     text-2xl
                     font-bold
                     text-gray-900
-                    mb-8
+                    mb-4
                     text-center
                 ">
                     NETA Technician Resources
