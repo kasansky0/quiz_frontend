@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import PositionCard from "@/app/PositionCard";
 
 
 type ResourceMediaProps = {
@@ -175,7 +177,7 @@ function ResourceMedia({
 
 export default function ResourcesPage() {
 
-
+    const router = useRouter();
     const resources: Resource[] = [
 
         {
@@ -228,6 +230,43 @@ export default function ResourcesPage() {
                 py-12
             ">
 
+
+                <div className="relative flex items-center mb-4">
+
+                    {/* Back button */}
+                    <button
+                        onClick={() => router.back()}
+                        className="
+                            p-2
+                            rounded-full
+                            hover:bg-white
+                            border
+                            border-transparent
+                            hover:border-neutral-200
+                            transition
+                            z-10
+                        "
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.8}
+                            stroke="currentColor"
+                            className="w-8 h-8 text-neutral-700"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M15.75 19.5 8.25 12l7.5-7.5"
+                            />
+                        </svg>
+                    </button>
+
+                    {/* Ads card */}
+                    <PositionCard />
+
+                </div>
 
                 <h1 className="
                     text-4xl

@@ -136,7 +136,7 @@ const InfoAndFormulas = () => {
                     </div>
 
                     <div className="text-base text-neutral-600 mt-1">
-                        Find useful tools, test leads, and equipment for electrical testing and field work.
+                        Find useful tools for electrical testing.
                     </div>
 
                     <div className="text-blue-500 text-base mt-3 font-medium">
