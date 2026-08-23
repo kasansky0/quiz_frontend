@@ -179,18 +179,17 @@ export default function ResourcesPage() {
     const resources: Resource[] = [
 
         {
-            name: "Fluke Industrial Multimeter",
+            name: "Elenco Banana to Banana Test Lead Set - TL-18",
 
             images: [
-                "https://res.cloudinary.com/demo/image/upload/v1690000000/sample.jpg",
-                "https://res.cloudinary.com/demo/image/upload/v1690000000/sample2.jpg",
+                "https://res.cloudinary.com/ddkkoi4as/image/upload/v1787448618/s-l1600_rv5kjf.webp",
             ],
 
             description:
-                "Industrial multimeter commonly used by electrical technicians for troubleshooting and verification.",
+                "36-inch red and black test leads with stackable 3-way banana plugs, designed for electrical testing and measurement applications.",
 
             technicianNotes:
-                "A reliable meter is one of the most important tools a technician carries in the field.",
+                "A useful set of test leads for technicians performing electrical testing with compatible meters and test equipment.",
 
             amazonLink: "https://amzn.to/4zuRq1j",
         },
