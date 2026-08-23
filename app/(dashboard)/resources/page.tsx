@@ -193,6 +193,25 @@ export default function ResourcesPage() {
 
             amazonLink: "https://amzn.to/4zuRq1j",
         },
+        {
+            name: "TestHelper AC262 Insulated Alligator Clip Test Leads - 5-Piece Set",
+
+            images: [
+                "https://res.cloudinary.com/ddkkoi4as/image/upload/v1787450041/alligator_clip_1_ehc9b6.webp",
+                "https://res.cloudinary.com/ddkkoi4as/image/upload/v1787450041/alligator_clip_2_fhtno0.webp",
+                "https://res.cloudinary.com/ddkkoi4as/image/upload/v1787450040/alligator_clip_3_n3ty7h.webp",
+                "https://res.cloudinary.com/ddkkoi4as/image/upload/v1787450040/alligator_clip_4_epuspe.webp",
+                "https://res.cloudinary.com/ddkkoi4as/image/upload/v1787450040/alligator_clip_5_fgyw4k.webp"
+            ],
+
+            description:
+                "Insulated alligator clip test leads with 4mm banana plug connections, suitable for electrical testing and measurement applications.",
+
+            technicianNotes:
+                "A practical accessory for connecting test equipment to terminals, conductors, and other points during electrical testing.",
+
+            amazonLink: "https://amzn.to/4c49y8b",
+        },
 
     ];
 
