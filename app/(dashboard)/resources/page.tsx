@@ -26,7 +26,6 @@ function ResourceMedia({
                        }: ResourceMediaProps) {
 
     const [index, setIndex] = useState(0);
-    const [open, setOpen] = useState(false);
 
 
     if (!images || images.length === 0) return null;
@@ -62,12 +61,10 @@ function ResourceMedia({
                 <img
                     src={images[index]}
                     alt={`${alt}-${index}`}
-                    onClick={() => setOpen(true)}
                     className="
                         w-full
                         h-full
                         object-contain
-                        cursor-zoom-in
                     "
                 />
 
@@ -135,37 +132,6 @@ function ResourceMedia({
 
                 </div>
             )}
-
-
-
-            {open && (
-                <div
-                    className="
-                        fixed
-                        inset-0
-                        z-50
-                        bg-black/90
-                        flex
-                        items-center
-                        justify-center
-                    "
-                    onClick={() => setOpen(false)}
-                >
-
-                    <img
-                        src={images[index]}
-                        alt={alt}
-                        className="
-                            max-w-[95%]
-                            max-h-[90%]
-                            object-contain
-                        "
-                        onClick={(e) => e.stopPropagation()}
-                    />
-
-                </div>
-            )}
-
 
         </div>
     );
@@ -269,10 +235,11 @@ export default function ResourcesPage() {
                 </div>
 
                 <h1 className="
-                    text-4xl
+                    text-2xl
                     font-bold
                     text-gray-900
                     mb-8
+                    text-center
                 ">
                     NETA Technician Resources
                 </h1>
