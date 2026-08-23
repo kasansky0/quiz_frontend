@@ -9,6 +9,15 @@ type ResourceMediaProps = {
 };
 
 
+type Resource = {
+    name: string;
+    images: string[];
+    description: string;
+    technicianNotes: string;
+    amazonLink: string;
+};
+
+
 function ResourceMedia({
                            images,
                            alt = "resource image",
@@ -110,15 +119,15 @@ function ResourceMedia({
                         <div
                             key={i}
                             className={`
-                                w-2
-                                h-2
-                                rounded-full
-                                ${
-                                i === index
-                                    ? "bg-black"
-                                    : "bg-gray-300"
-                            }
-                            `}
+                                        w-2
+                                        h-2
+                                        rounded-full
+                                        ${
+                                            i === index
+                                                ? "bg-black"
+                                                : "bg-gray-300"
+                                        }
+                                        `}
                         />
                     ))}
 
@@ -149,7 +158,7 @@ function ResourceMedia({
                             max-h-[90%]
                             object-contain
                         "
-                        onClick={(e)=>e.stopPropagation()}
+                        onClick={(e) => e.stopPropagation()}
                     />
 
                 </div>
@@ -167,23 +176,26 @@ function ResourceMedia({
 export default function ResourcesPage() {
 
 
-    const demoResource = {
+    const resources: Resource[] = [
 
-        name: "Fluke Industrial Multimeter",
+        {
+            name: "Fluke Industrial Multimeter",
 
-        images: [
-            "https://res.cloudinary.com/demo/image/upload/v1690000000/sample.jpg",
-            "https://res.cloudinary.com/demo/image/upload/v1690000000/sample2.jpg",
-        ],
+            images: [
+                "https://res.cloudinary.com/demo/image/upload/v1690000000/sample.jpg",
+                "https://res.cloudinary.com/demo/image/upload/v1690000000/sample2.jpg",
+            ],
 
-        description:
-            "Industrial multimeter commonly used by electrical technicians for troubleshooting and verification.",
+            description:
+                "Industrial multimeter commonly used by electrical technicians for troubleshooting and verification.",
 
-        technicianNotes:
-            "A reliable meter is one of the most important tools a technician carries in the field.",
+            technicianNotes:
+                "A reliable meter is one of the most important tools a technician carries in the field.",
 
-        amazonLink: "#",
-    };
+            amazonLink: "#",
+        },
+
+    ];
 
 
     return (
@@ -211,74 +223,97 @@ export default function ResourcesPage() {
 
 
                 <div className="
-                    bg-white
-                    rounded-2xl
-                    border
-                    border-gray-100
-                    shadow-sm
-                    overflow-hidden
-                    max-w-md
+                    grid
+                    grid-cols-1
+                    md:grid-cols-2
+                    lg:grid-cols-3
+                    gap-6
                 ">
 
 
-                    <ResourceMedia
-                        images={demoResource.images}
-                        alt={demoResource.name}
-                    />
+                    {resources.map((resource) => (
 
-
-
-                    <div className="p-5">
-
-
-                        <h2 className="
-                            text-xl
-                            font-semibold
-                            text-gray-900
-                        ">
-                            {demoResource.name}
-                        </h2>
-
-
-
-                        <p className="
-                            mt-3
-                            text-sm
-                            text-gray-600
-                        ">
-                            {demoResource.description}
-                        </p>
-
-
-
-                        <p className="
-                            mt-4
-                            text-sm
-                            text-gray-500
-                            italic
-                        ">
-                            {demoResource.technicianNotes}
-                        </p>
-
-
-
-                        <button
+                        <div
+                            key={resource.name}
                             className="
-                                mt-5
-                                w-full
-                                rounded-xl
-                                bg-blue-600
-                                text-white
-                                py-3
-                                font-medium
-                                hover:bg-blue-700
+                                bg-white
+                                rounded-2xl
+                                border
+                                border-gray-100
+                                shadow-sm
+                                overflow-hidden
                             "
                         >
-                            View on Amazon
-                        </button>
 
 
-                    </div>
+                            <ResourceMedia
+                                images={resource.images}
+                                alt={resource.name}
+                            />
+
+
+
+                            <div className="p-5">
+
+
+                                <h2 className="
+                                    text-xl
+                                    font-semibold
+                                    text-gray-900
+                                ">
+                                    {resource.name}
+                                </h2>
+
+
+
+                                <p className="
+                                    mt-3
+                                    text-sm
+                                    text-gray-600
+                                ">
+                                    {resource.description}
+                                </p>
+
+
+
+                                <p className="
+                                    mt-4
+                                    text-sm
+                                    text-gray-500
+                                    italic
+                                ">
+                                    {resource.technicianNotes}
+                                </p>
+
+
+
+                                <a
+                                    href={resource.amazonLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="
+                                        mt-5
+                                        block
+                                        w-full
+                                        rounded-xl
+                                        bg-blue-600
+                                        text-white
+                                        py-3
+                                        text-center
+                                        font-medium
+                                        hover:bg-blue-700
+                                    "
+                                >
+                                    View on Amazon
+                                </a>
+
+
+                            </div>
+
+
+                        </div>
+
+                    ))}
 
 
                 </div>
