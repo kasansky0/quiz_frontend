@@ -51,7 +51,7 @@ function ResourceMedia({
                 className="
                     relative
                     aspect-[4/3]
-                    bg-gray-100
+                    bg-black
                     rounded-xl
                     overflow-hidden
                 "
