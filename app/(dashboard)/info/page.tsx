@@ -110,6 +110,40 @@ const InfoAndFormulas = () => {
                     </div>
                 </Link>
 
+                {/* RESOURCES CARD */}
+                <Link
+                    href="/resources"
+                    className="block bg-white border border-neutral-200 rounded-xl p-5 shadow-sm hover:shadow-md transition active:scale-[0.99] text-center"
+                >
+                    <div className="flex items-center justify-center gap-2 text-lg font-semibold">
+                        {/* Resources / Toolbox SVG */}
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-5 h-5 text-blue-500"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M20.25 7.5h-3.375V6A2.25 2.25 0 0 0 14.625 3.75h-5.25A2.25 2.25 0 0 0 7.125 6v1.5H3.75A2.25 2.25 0 0 0 1.5 9.75v7.5a2.25 2.25 0 0 0 2.25 2.25h16.5a2.25 2.25 0 0 0 2.25-2.25v-7.5a2.25 2.25 0 0 0-2.25-2.25ZM8.625 6a.75.75 0 0 1 .75-.75h5.25a.75.75 0 0 1 .75.75v1.5h-6.75V6ZM12 12.75a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z"
+                            />
+                        </svg>
+
+                        <span>Technician Resources</span>
+                    </div>
+
+                    <div className="text-base text-neutral-600 mt-1">
+                        Find useful tools, test leads, and equipment for electrical testing and field work.
+                    </div>
+
+                    <div className="text-blue-500 text-base mt-3 font-medium">
+                        View resources →
+                    </div>
+                </Link>
+
                 {/* CONTACT CARD */}
                 <div className="bg-white border border-neutral-200 rounded-xl p-5 shadow-sm text-center">
                     <div className="flex items-center justify-center gap-2 text-xs font-semibold mb-1">
