@@ -39,7 +39,7 @@ const InfoAndFormulas = () => {
                     </div>
 
                     <div className="text-base text-neutral-600 mt-1">
-                        View your quiz statistics, posts, comments, and reply notifications all in one place.
+                        View your quiz stats, posts, comments, and reply notifications.
                     </div>
 
                     <div className="text-blue-500 text-base mt-3 font-medium">
@@ -67,7 +67,7 @@ const InfoAndFormulas = () => {
                     </div>
 
                     <div className="text-base text-neutral-600 mt-1">
-                        Test your knowledge with random questions. Aim to stay above 80%.
+                        Test your knowledge with 1700 random questions.
                     </div>
 
                     <div className="text-blue-500 text-base mt-3 font-medium">
@@ -102,7 +102,6 @@ const InfoAndFormulas = () => {
 
                     <div className="text-base text-neutral-600 mt-1">
                         Share your learning progress and job-related milestones.
-                        Keep the community focused, respectful, and career-driven.
                     </div>
 
                     <div className="text-blue-500 text-base mt-3 font-medium">
