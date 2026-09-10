@@ -19,6 +19,7 @@ export interface QuestionType {
     options: string[];
     answer: string;
     explanation: string;
+    image_url?: string | null;
 }
 
 export function scrollToTopChild(container?: React.RefObject<HTMLElement | null>) {
@@ -521,6 +522,16 @@ export default function QuizSampleSection({
                                 >
                                     {/* Question */}
                                     <Question question={questionData.question} />
+
+                                    {questionData.image_url && (
+                                        <div className="w-full flex justify-center">
+                                            <img
+                                                src={questionData.image_url}
+                                                alt="Question diagram"
+                                                className="w-full max-w-lg rounded-lg object-contain"
+                                            />
+                                        </div>
+                                    )}
 
                                     {/* Future Ads / Message */}
                                     <div className="hover:bg-white">
